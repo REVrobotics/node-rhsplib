@@ -15,6 +15,8 @@ class Serial : public Napi::ObjectWrap<Serial> {
   Napi::Value read(const Napi::CallbackInfo &info);
   void write(const Napi::CallbackInfo &info);
 
+  RHSPlib_Serial_T getSerialObj() { return serialPort; };
+
  private:
   RHSPlib_Serial_T serialPort;
 };
