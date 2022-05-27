@@ -12,12 +12,16 @@
   },
   "dependencies": {
     "bindings": "^1.5.0",
-    "node-addon-api": "^5.0.0"
+    "node-addon-api": "^5.0.0",
+    "node-gyp": "^9.0.0"
   },
   "scripts": {
     "install": "node-gyp rebuild",
     "pretest": "node-gyp build && tsc",
     "test": "node --napi-modules test/test_binding.js"
   },
-  "gypfile": true
+  "gypfile": true,
+  "devDependencies": {
+    "@types/node": "^17.0.35"
+  }
 }
