@@ -10,10 +10,10 @@ class Serial : public Napi::ObjectWrap<Serial> {
 
   Serial(const Napi::CallbackInfo &info);
 
-  void open(const Napi::CallbackInfo &info);
+  Napi::Value open(const Napi::CallbackInfo &info);
   void close(const Napi::CallbackInfo &info);
   Napi::Value read(const Napi::CallbackInfo &info);
-  void write(const Napi::CallbackInfo &info);
+  Napi::Value write(const Napi::CallbackInfo &info);
 
   RHSPlib_Serial_T getSerialObj() { return serialPort; };
 

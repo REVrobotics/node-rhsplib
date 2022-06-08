@@ -1,5 +1,7 @@
 #include "serialWrapper.h"
 
+#include "RHSPlibWorker.h"
+
 // See https://github.com/nodejs/node-addon-api/blob/main/doc/object_wrap.md
 Napi::Object Serial::Init(Napi::Env env, Napi::Object exports) {
   Napi::Function func =
@@ -30,7 +32,7 @@ Serial::Serial(const Napi::CallbackInfo &info)
   // TODO(jan): Non-default constructor that calls Serial::open()
 }
 
-void Serial::open(const Napi::CallbackInfo &info) {
+Napi::Value Serial::open(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   const char *serialPortName = &(info[0].As<Napi::String>().Utf8Value())[0];
@@ -43,8 +45,13 @@ void Serial::open(const Napi::CallbackInfo &info) {
       static_cast<RHSPlib_Serial_FlowControl_T>(
           info[5].As<Napi::Number>().Uint32Value());
 
-  RHSPlib_serial_open(&this->serialPort, serialPortName, baudrate, databits,
-                      parity, stopbits, flowControl);
+  CREATE_VOID_WORKER(worker, env, {
+    _code = RHSPlib_serial_open(&this->serialPort, serialPortName, baudrate,
+                                databits, parity, stopbits, flowControl);
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
 }
 
 void Serial::close(const Napi::CallbackInfo &info) {
@@ -57,28 +64,43 @@ Napi::Value Serial::read(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   size_t bytesToRead = info[0].As<Napi::Number>().Uint32Value();
-  uint8_t *buffer = new uint8_t[bytesToRead];
 
-  RHSPlib_serial_read(&this->serialPort, buffer, bytesToRead);
+  using retType = uint8_t *;
 
-  Napi::Array data = Napi::Array::New(env, bytesToRead);
-  for (int i = 0; i < bytesToRead; i++) {
-    data[i] = buffer[i];
-  }
+  CREATE_WORKER(worker, env, retType, {
+    _data = new uint8_t[bytesToRead];
 
-  return data;
+    _code = RHSPlib_serial_read(&this->serialPort, _data, bytesToRead);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType, {
+    Napi::Array data = Napi::Array::New(env, bytesToRead);
+    for (int i = 0; i < bytesToRead; i++) {
+      data[i] = _data[i];
+    }
+    return data;
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
 }
 
-void Serial::write(const Napi::CallbackInfo &info) {
+Napi::Value Serial::write(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   Napi::Array data = info[0].As<Napi::Array>();
-  size_t bytesToWrite = info[1].As<Napi::Number>().Uint32Value();
+  size_t bytesToWrite = data.Length();
 
   uint8_t *buffer = new uint8_t[bytesToWrite];
   for (int i = 0; i < bytesToWrite; i++) {
     buffer[i] = data.Get(i).As<Napi::Number>().Uint32Value();
   }
 
-  RHSPlib_serial_write(&this->serialPort, buffer, bytesToWrite);
+  CREATE_VOID_WORKER(worker, env, {
+    _code = RHSPlib_serial_write(&this->serialPort, buffer, bytesToWrite);
+    delete[] buffer;
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
 }
