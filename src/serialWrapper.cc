@@ -78,6 +78,7 @@ Napi::Value Serial::read(const Napi::CallbackInfo &info) {
     for (int i = 0; i < bytesToRead; i++) {
       data[i] = _data[i];
     }
+    delete[] _data;
     return data;
   });
 
