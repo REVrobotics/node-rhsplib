@@ -16,8 +16,8 @@
  * set to the work function's return data
  */
 #define CREATE_WORKER(NAME, ENV, RETURN, FUNCTION_BODY) \
-  auto NAME = new RHSPlibWorker<RETURN>(ENV, [=         \
-  ](Napi::Env env, int &_code, RETURN &_data) mutable##FUNCTION_BODY)
+  auto NAME = new RHSPlibWorker<RETURN>(                \
+      ENV, [=](int &_code, RETURN &_data) mutable##FUNCTION_BODY)
 
 /**
  * @brief Create a worker whose work function does not return a value (void).
@@ -28,8 +28,8 @@
  * should be set to the work function's return code (int)
  */
 #define CREATE_VOID_WORKER(NAME, ENV, FUNCTION_BODY) \
-  auto NAME = new RHSPlibWorker<void>(               \
-      ENV, [=](Napi::Env env, int &_code) mutable##FUNCTION_BODY)
+  auto NAME =                                        \
+      new RHSPlibWorker<void>(ENV, [=](int &_code) mutable##FUNCTION_BODY)
 
 /**
  * @brief Set the callback function for a worker.
@@ -40,7 +40,7 @@
  * `_data` to get the work functions' return data
  */
 #define SET_WORKER_CALLBACK(NAME, RETURN, FUNCTION_BODY) \
-  NAME->SetCallback([=](Napi::Env env, RETURN & _data) mutable##FUNCTION_BODY)
+  NAME->SetCallback([=](Napi::Env _env, RETURN & _data) mutable##FUNCTION_BODY)
 
 /**
  * @brief Async worker class for handling blocking calls from RHSPlib.
@@ -92,7 +92,7 @@ class RHSPlibWorker : public Napi::AsyncWorker {
    * @brief Run the work function. `resultCode` and `returnData` are passed by
    * reference to be set by the work function.
    */
-  void Execute() override { workFunction(Env(), resultCode, returnData); }
+  void Execute() override { workFunction(resultCode, returnData); }
 
   /**
    * @brief Run the callback function to prepare the data to be sent to
@@ -116,7 +116,7 @@ class RHSPlibWorker : public Napi::AsyncWorker {
   void OnError(const Napi::Error &e) override { deferred.Reject(e.Value()); }
 
  private:
-  std::function<void(Napi::Env, int &, TReturn &)> workFunction;
+  std::function<void(int &, TReturn &)> workFunction;
   std::function<Napi::Value(Napi::Env, TReturn &)> callbackFunction;
   Napi::Promise::Deferred deferred;
   TReturn returnData;
@@ -160,7 +160,7 @@ class RHSPlibWorker<void> : public Napi::AsyncWorker {
    * @brief Run the work function. `resultCode` is passed by reference to be set
    * by the work function.
    */
-  void Execute() override { workFunction(Env(), resultCode); }
+  void Execute() override { workFunction(resultCode); }
 
   /**
    * @brief Resolve the promise with an object that contains the `resultCode`
@@ -181,7 +181,7 @@ class RHSPlibWorker<void> : public Napi::AsyncWorker {
   void OnError(const Napi::Error &e) override { deferred.Reject(e.Value()); }
 
  private:
-  std::function<void(Napi::Env, int &)> workFunction;
+  std::function<void(int &)> workFunction;
   Napi::Promise::Deferred deferred;
   int resultCode;
 };
