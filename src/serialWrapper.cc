@@ -74,7 +74,7 @@ Napi::Value Serial::read(const Napi::CallbackInfo &info) {
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
-    Napi::Array data = Napi::Array::New(env, bytesToRead);
+    Napi::Array data = Napi::Array::New(_env, bytesToRead);
     for (int i = 0; i < bytesToRead; i++) {
       data[i] = _data[i];
     }
