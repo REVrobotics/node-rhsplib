@@ -1,5 +1,6 @@
 #include "rhsplibWrapper.h"
 
+#include "RHSPlibWorker.h"
 #include "serialWrapper.h"
 
 // See https://github.com/nodejs/node-addon-api/blob/main/doc/object_wrap.md
@@ -63,14 +64,19 @@ RHSPlib::RHSPlib(const Napi::CallbackInfo &info)
   // TODO(jan): Non-default constructor that calls RHSPlib::open()
 }
 
-void RHSPlib::open(const Napi::CallbackInfo &info) {
+Napi::Value RHSPlib::open(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   Serial *serialPort =
       Napi::ObjectWrap<Serial>::Unwrap(info[0].As<Napi::Object>());
   uint8_t destAddress = info[1].As<Napi::Number>().Uint32Value();
 
-  RHSPlib_open(&this->obj, &serialPort->getSerialObj(), destAddress);
+  CREATE_VOID_WORKER(worker, env, {
+    _code = RHSPlib_open(&this->obj, &serialPort->getSerialObj(), destAddress);
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
 }
 
 Napi::Value RHSPlib::isOpened(const Napi::CallbackInfo &info) {
@@ -113,22 +119,26 @@ Napi::Value RHSPlib::getResponseTimeoutMs(const Napi::CallbackInfo &info) {
   return Napi::Number::New(env, RHSPlib_responseTimeoutMs(&this->obj));
 }
 
-void RHSPlib::sendWriteCommandInternal(const Napi::CallbackInfo &info) {
+Napi::Value RHSPlib::sendWriteCommandInternal(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint16_t packetTypeID = info[0].As<Napi::Number>().Uint32Value();
   Napi::Array payload = info[1].As<Napi::Array>();
   uint16_t payloadSize = info[2].As<Napi::Number>().Uint32Value();
-  uint8_t nackReasonCode;
 
   uint8_t payloadData[RHSPLIB_MAX_PAYLOAD_SIZE];
   for (int i = 0; i < payloadSize; i++) {
     payloadData[i] = payload.Get(i).As<Napi::Number>().Uint32Value();
   }
 
-  RHSPlib_sendWriteCommandInternal(&this->obj, packetTypeID, payloadData,
-                                   payloadSize, &nackReasonCode);
-  // TODO(jan): Add error handling
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_sendWriteCommandInternal(
+        &this->obj, packetTypeID, payloadData, payloadSize, &nackReasonCode);
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
 }
 
 Napi::Value RHSPlib::sendWriteCommand(const Napi::CallbackInfo &info) {
@@ -137,45 +147,53 @@ Napi::Value RHSPlib::sendWriteCommand(const Napi::CallbackInfo &info) {
   uint16_t packetTypeID = info[0].As<Napi::Number>().Uint32Value();
   Napi::Array payload = info[1].As<Napi::Array>();
   uint16_t payloadSize = info[2].As<Napi::Number>().Uint32Value();
-  RHSPlib_PayloadData_T responsePayloadData;
-  uint8_t nackReasonCode;
 
   uint8_t payloadData[RHSPLIB_MAX_PAYLOAD_SIZE];
   for (int i = 0; i < payloadSize; i++) {
     payloadData[i] = payload.Get(i).As<Napi::Number>().Uint32Value();
   }
 
-  RHSPlib_sendWriteCommand(&this->obj, packetTypeID, payloadData, payloadSize,
-                           &responsePayloadData, &nackReasonCode);
-  // TODO(jan): Add error handling
+  using retType = RHSPlib_PayloadData_T;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_sendWriteCommand(&this->obj, packetTypeID, payloadData,
+                                     payloadSize, &_data, &nackReasonCode);
+  });
 
-  if (responsePayloadData.size) {
-    Napi::Array responsePayload = Napi::Array::New(env);
-    for (int i = 0; i < responsePayloadData.size; i++) {
-      responsePayload[i] = responsePayloadData.data[i];
+  SET_WORKER_CALLBACK(worker, retType, {
+    Napi::Array responsePayload = Napi::Array::New(_env);
+    if (_data.size) {
+      for (int i = 0; i < _data.size; i++) {
+        responsePayload[i] = _data.data[i];
+      }
     }
     return responsePayload;
-  }
+  });
 
-  return Napi::Array::New(env);
+  worker->Queue();
+  return worker->GetPromise();
 }
 
-void RHSPlib::sendReadCommandInternal(const Napi::CallbackInfo &info) {
+Napi::Value RHSPlib::sendReadCommandInternal(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint16_t packetTypeID = info[0].As<Napi::Number>().Uint32Value();
   Napi::Array payload = info[1].As<Napi::Array>();
   uint16_t payloadSize = info[2].As<Napi::Number>().Uint32Value();
-  uint8_t nackReasonCode;
 
   uint8_t payloadData[RHSPLIB_MAX_PAYLOAD_SIZE];
   for (int i = 0; i < payloadSize; i++) {
     payloadData[i] = payload.Get(i).As<Napi::Number>().Uint32Value();
   }
 
-  RHSPlib_sendReadCommandInternal(&this->obj, packetTypeID, payloadData,
-                                  payloadSize, &nackReasonCode);
-  // TODO(jan): Add error handling
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_sendReadCommandInternal(
+        &this->obj, packetTypeID, payloadData, payloadSize, &nackReasonCode);
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
 }
 
 Napi::Value RHSPlib::sendReadCommand(const Napi::CallbackInfo &info) {
@@ -184,124 +202,161 @@ Napi::Value RHSPlib::sendReadCommand(const Napi::CallbackInfo &info) {
   uint16_t packetTypeID = info[0].As<Napi::Number>().Uint32Value();
   Napi::Array payload = info[1].As<Napi::Array>();
   uint16_t payloadSize = info[2].As<Napi::Number>().Uint32Value();
-  RHSPlib_PayloadData_T responsePayloadData;
-  uint8_t nackReasonCode;
 
   uint8_t payloadData[RHSPLIB_MAX_PAYLOAD_SIZE];
   for (int i = 0; i < payloadSize; i++) {
     payloadData[i] = payload.Get(i).As<Napi::Number>().Uint32Value();
   }
 
-  RHSPlib_sendWriteCommand(&this->obj, packetTypeID, payloadData, payloadSize,
-                           &responsePayloadData, &nackReasonCode);
-  // TODO(jan): Add error handling
+  using retType = RHSPlib_PayloadData_T;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_sendWriteCommand(&this->obj, packetTypeID, payloadData,
+                                     payloadSize, &_data, &nackReasonCode);
+  });
 
-  if (responsePayloadData.size) {
-    Napi::Array responsePayload = Napi::Array::New(env);
-    for (int i = 0; i < responsePayloadData.size; i++) {
-      responsePayload[i] = responsePayloadData.data[i];
+  SET_WORKER_CALLBACK(worker, retType, {
+    Napi::Array responsePayload = Napi::Array::New(_env);
+    if (_data.size) {
+      for (int i = 0; i < _data.size; i++) {
+        responsePayload[i] = _data.data[i];
+      }
     }
     return responsePayload;
-  }
+  });
 
-  return Napi::Array::New(env);
+  worker->Queue();
+  return worker->GetPromise();
 }
 
 Napi::Value RHSPlib::getModuleStatus(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t clearStatusAfterResponse = info[0].As<Napi::Number>().Uint32Value();
-  RHSPlib_ModuleStatus_T status;
-  uint8_t nackReasonCode;
 
-  // TODO(jan): add error handling
-  RHSPlib_getModuleStatus(&this->obj, clearStatusAfterResponse, &status,
-                          &nackReasonCode);
+  using retType = RHSPlib_ModuleStatus_T;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_getModuleStatus(&this->obj, clearStatusAfterResponse,
+                                    &_data, &nackReasonCode);
+  });
 
-  Napi::Object statusObj = Napi::Object::New(env);
-  statusObj.Set("statusWord", status.statusWord);
-  statusObj.Set("motorAlerts", status.motorAlerts);
+  SET_WORKER_CALLBACK(worker, retType, {
+    Napi::Object statusObj = Napi::Object::New(_env);
+    statusObj.Set("statusWord", _data.statusWord);
+    statusObj.Set("motorAlerts", _data.motorAlerts);
+    return statusObj;
+  });
 
-  return statusObj;
+  worker->Queue();
+  return worker->GetPromise();
 }
 
-void RHSPlib::sendKeepAlive(const Napi::CallbackInfo &info) {
+Napi::Value RHSPlib::sendKeepAlive(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
-  uint8_t nackReasonCode;
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_sendKeepAlive(&this->obj, &nackReasonCode);
+  });
 
-  // TODO(jan): add error handling
-  RHSPlib_sendKeepAlive(&this->obj, &nackReasonCode);
+  worker->Queue();
+  return worker->GetPromise();
 }
 
-void RHSPlib::sendFailSafe(const Napi::CallbackInfo &info) {
+Napi::Value RHSPlib::sendFailSafe(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
-  uint8_t nackReasonCode;
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_sendFailSafe(&this->obj, &nackReasonCode);
+  });
 
-  // TODO(jan): add error handling
-  RHSPlib_sendFailSafe(&this->obj, &nackReasonCode);
+  worker->Queue();
+  return worker->GetPromise();
 }
 
-void RHSPlib::setNewModuleAddress(const Napi::CallbackInfo &info) {
+Napi::Value RHSPlib::setNewModuleAddress(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t newModuleAddress = info[0].As<Napi::Number>().Uint32Value();
-  uint8_t nackReasonCode;
 
-  // TODO(jan): add error handling
-  RHSPlib_setNewModuleAddress(&this->obj, newModuleAddress, &nackReasonCode);
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_setNewModuleAddress(&this->obj, newModuleAddress,
+                                        &nackReasonCode);
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
 }
 
 Napi::Value RHSPlib::queryInterface(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   char *interfaceName = &(info[0].As<Napi::String>().Utf8Value())[0];
-  RHSPlib_Module_Interface_T interfaceData;
-  uint8_t nackReasonCode;
 
-  // TODO(jan): add error handling
-  RHSPlib_queryInterface(&this->obj, interfaceName, &interfaceData,
-                         &nackReasonCode);
+  using retType = RHSPlib_Module_Interface_T;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_queryInterface(&this->obj, interfaceName, &_data,
+                                   &nackReasonCode);
+  });
 
-  Napi::Object interfaceObj = Napi::Object::New(env);
-  interfaceObj.Set("name", interfaceData.name);
-  interfaceObj.Set("firstPacketID", interfaceData.firstPacketID);
-  interfaceObj.Set("numberIDValues", interfaceData.numberIDValues);
-  return interfaceObj;
+  SET_WORKER_CALLBACK(worker, retType, {
+    Napi::Object interfaceObj = Napi::Object::New(_env);
+    interfaceObj.Set("name", _data.name);
+    interfaceObj.Set("firstPacketID", _data.firstPacketID);
+    interfaceObj.Set("numberIDValues", _data.numberIDValues);
+    return interfaceObj;
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
 }
 
-void RHSPlib::setModuleLEDColor(const Napi::CallbackInfo &info) {
+Napi::Value RHSPlib::setModuleLEDColor(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t red = info[0].As<Napi::Number>().Uint32Value();
   uint8_t green = info[1].As<Napi::Number>().Uint32Value();
   uint8_t blue = info[2].As<Napi::Number>().Uint32Value();
-  uint8_t nackReasonCode;
 
-  // TODO(jan): add error handling
-  RHSPlib_setModuleLEDColor(&this->obj, red, green, blue, &nackReasonCode);
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_setModuleLEDColor(&this->obj, red, green, blue,
+                                      &nackReasonCode);
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
 }
 
 Napi::Value RHSPlib::getModuleLEDColor(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
-  uint8_t red;
-  uint8_t green;
-  uint8_t blue;
-  uint8_t nackReasonCode;
+  using retType = uint8_t *;
+  CREATE_WORKER(worker, env, retType, {
+    _data = new uint8_t[3];
+    uint8_t nackReasonCode;
+    _code = RHSPlib_getModuleLEDColor(&this->obj, &_data[0], &_data[1],
+                                      &_data[2], &nackReasonCode);
+  });
 
-  // TODO(jan): add error handling
-  RHSPlib_getModuleLEDColor(&this->obj, &red, &green, &blue, &nackReasonCode);
+  SET_WORKER_CALLBACK(worker, retType, {
+    Napi::Object RGB = Napi::Object::New(_env);
+    RGB.Set("red", _data[0]);
+    RGB.Set("green", _data[1]);
+    RGB.Set("blue", _data[2]);
+    delete[] _data;
+    return RGB;
+  });
 
-  Napi::Object RGB = Napi::Object::New(env);
-  RGB.Set("red", red);
-  RGB.Set("green", green);
-  RGB.Set("blue", blue);
-  return RGB;
+  worker->Queue();
+  return worker->GetPromise();
 }
 
-void RHSPlib::setModuleLEDPattern(const Napi::CallbackInfo &info) {
+Napi::Value RHSPlib::setModuleLEDPattern(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   Napi::Object ledPatternObj = info[0].As<Napi::Object>();
@@ -340,42 +395,52 @@ void RHSPlib::setModuleLEDPattern(const Napi::CallbackInfo &info) {
       ledPatternObj.Get("rgbtPatternStep14").As<Napi::Number>().Uint32Value();
   ledPattern.rgbtPatternStep15 =
       ledPatternObj.Get("rgbtPatternStep15").As<Napi::Number>().Uint32Value();
-  uint8_t nackReasonCode;
 
-  // TODO(jan): add error handling
-  RHSPlib_setModuleLEDPattern(&this->obj, &ledPattern, &nackReasonCode);
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code =
+        RHSPlib_setModuleLEDPattern(&this->obj, &ledPattern, &nackReasonCode);
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
 }
 
 Napi::Value RHSPlib::getModuleLEDPattern(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
-  RHSPlib_LEDPattern_T ledPattern;
-  uint8_t nackReasonCode;
+  using retType = RHSPlib_LEDPattern_T;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_getModuleLEDPattern(&this->obj, &_data, &nackReasonCode);
+  });
 
-  // TODO(jan): add error handling
-  RHSPlib_getModuleLEDPattern(&this->obj, &ledPattern, &nackReasonCode);
+  SET_WORKER_CALLBACK(worker, retType, {
+    Napi::Object ledPatternObj = Napi::Object::New(env);
+    ledPatternObj.Set("rgbtPatternStep0", _data.rgbtPatternStep0);
+    ledPatternObj.Set("rgbtPatternStep1", _data.rgbtPatternStep1);
+    ledPatternObj.Set("rgbtPatternStep2", _data.rgbtPatternStep2);
+    ledPatternObj.Set("rgbtPatternStep3", _data.rgbtPatternStep3);
+    ledPatternObj.Set("rgbtPatternStep4", _data.rgbtPatternStep4);
+    ledPatternObj.Set("rgbtPatternStep5", _data.rgbtPatternStep5);
+    ledPatternObj.Set("rgbtPatternStep6", _data.rgbtPatternStep6);
+    ledPatternObj.Set("rgbtPatternStep7", _data.rgbtPatternStep7);
+    ledPatternObj.Set("rgbtPatternStep8", _data.rgbtPatternStep8);
+    ledPatternObj.Set("rgbtPatternStep9", _data.rgbtPatternStep9);
+    ledPatternObj.Set("rgbtPatternStep10", _data.rgbtPatternStep10);
+    ledPatternObj.Set("rgbtPatternStep11", _data.rgbtPatternStep11);
+    ledPatternObj.Set("rgbtPatternStep12", _data.rgbtPatternStep12);
+    ledPatternObj.Set("rgbtPatternStep13", _data.rgbtPatternStep13);
+    ledPatternObj.Set("rgbtPatternStep14", _data.rgbtPatternStep14);
+    ledPatternObj.Set("rgbtPatternStep15", _data.rgbtPatternStep15);
+    return ledPatternObj;
+  });
 
-  Napi::Object ledPatternObj = Napi::Object::New(env);
-  ledPatternObj.Set("rgbtPatternStep0", ledPattern.rgbtPatternStep0);
-  ledPatternObj.Set("rgbtPatternStep1", ledPattern.rgbtPatternStep1);
-  ledPatternObj.Set("rgbtPatternStep2", ledPattern.rgbtPatternStep2);
-  ledPatternObj.Set("rgbtPatternStep3", ledPattern.rgbtPatternStep3);
-  ledPatternObj.Set("rgbtPatternStep4", ledPattern.rgbtPatternStep4);
-  ledPatternObj.Set("rgbtPatternStep5", ledPattern.rgbtPatternStep5);
-  ledPatternObj.Set("rgbtPatternStep6", ledPattern.rgbtPatternStep6);
-  ledPatternObj.Set("rgbtPatternStep7", ledPattern.rgbtPatternStep7);
-  ledPatternObj.Set("rgbtPatternStep8", ledPattern.rgbtPatternStep8);
-  ledPatternObj.Set("rgbtPatternStep9", ledPattern.rgbtPatternStep9);
-  ledPatternObj.Set("rgbtPatternStep10", ledPattern.rgbtPatternStep10);
-  ledPatternObj.Set("rgbtPatternStep11", ledPattern.rgbtPatternStep11);
-  ledPatternObj.Set("rgbtPatternStep12", ledPattern.rgbtPatternStep12);
-  ledPatternObj.Set("rgbtPatternStep13", ledPattern.rgbtPatternStep13);
-  ledPatternObj.Set("rgbtPatternStep14", ledPattern.rgbtPatternStep14);
-  ledPatternObj.Set("rgbtPatternStep15", ledPattern.rgbtPatternStep15);
-  return ledPatternObj;
+  worker->Queue();
+  return worker->GetPromise();
 }
 
-void RHSPlib::setDebugLogLevel(const Napi::CallbackInfo &info) {
+Napi::Value RHSPlib::setDebugLogLevel(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   RHSPlib_DebugGroupNumber_T debugGroupNumber =
@@ -384,11 +449,15 @@ void RHSPlib::setDebugLogLevel(const Napi::CallbackInfo &info) {
   RHSPlib_VerbosityLevel_T verbosityLevel =
       static_cast<RHSPlib_VerbosityLevel_T>(
           info[1].As<Napi::Number>().Uint32Value());
-  uint8_t nackReasonCode;
 
-  // TODO(jan): add error handling
-  RHSPlib_setDebugLogLevel(&this->obj, debugGroupNumber, verbosityLevel,
-                           &nackReasonCode);
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_setDebugLogLevel(&this->obj, debugGroupNumber,
+                                     verbosityLevel, &nackReasonCode);
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
 }
 
 Napi::Value RHSPlib::discovery(const Napi::CallbackInfo &info) {
@@ -396,24 +465,29 @@ Napi::Value RHSPlib::discovery(const Napi::CallbackInfo &info) {
 
   Serial *serialPort =
       Napi::ObjectWrap<Serial>::Unwrap(info[0].As<Napi::Object>());
-  RHSPlib_DiscoveredAddresses_T discoveredAddresses;
 
-  // TODO(jan): add error handling
-  RHSPlib_discovery(&serialPort->getSerialObj(), &discoveredAddresses);
+  using retType = RHSPlib_DiscoveredAddresses_T;
+  CREATE_WORKER(worker, env, retType, {
+    _code = RHSPlib_discovery(&serialPort->getSerialObj(), &_data);
+  });
 
-  Napi::Object discoveredAddressesObj = Napi::Object::New(env);
-  discoveredAddressesObj.Set("parentAddress",
-                             discoveredAddresses.parentAddress);
-  discoveredAddressesObj.Set("numberOfChildModules",
-                             discoveredAddresses.numberOfChildModules);
+  SET_WORKER_CALLBACK(worker, retType, {
+    Napi::Object discoveredAddressesObj = Napi::Object::New(_env);
+    discoveredAddressesObj.Set("parentAddress", _data.parentAddress);
+    discoveredAddressesObj.Set("numberOfChildModules",
+                               _data.numberOfChildModules);
 
-  Napi::Array childAddresses = Napi::Array::New(env);
-  for (int i = 0; i < discoveredAddresses.numberOfChildModules; i++) {
-    childAddresses[i] = discoveredAddresses.childAddresses[i];
-  }
-  discoveredAddressesObj.Set("childAddresses", childAddresses);
+    Napi::Array childAddresses = Napi::Array::New(_env);
+    for (int i = 0; i < _data.numberOfChildModules; i++) {
+      childAddresses[i] = _data.childAddresses[i];
+    }
+    discoveredAddressesObj.Set("childAddresses", childAddresses);
 
-  return discoveredAddressesObj;
+    return discoveredAddressesObj;
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
 }
 
 Napi::Value RHSPlib::getInterfacePacketID(const Napi::CallbackInfo &info) {
@@ -421,12 +495,17 @@ Napi::Value RHSPlib::getInterfacePacketID(const Napi::CallbackInfo &info) {
 
   char *interfaceName = &(info[0].As<Napi::String>().Utf8Value())[0];
   uint16_t functionNumber = info[1].As<Napi::Number>().Uint32Value();
-  uint16_t packetID;
-  uint8_t nackReasonCode;
 
-  // TODO(jan): add error handling
-  RHSPlib_getInterfacePacketID(&this->obj, interfaceName, functionNumber,
-                               &packetID, &nackReasonCode);
+  using retType = uint16_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_getInterfacePacketID(
+        &this->obj, interfaceName, functionNumber, &_data, &nackReasonCode);
+  });
 
-  return Napi::Number::New(env, packetID);
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Number::New(env, _data); });
+
+  worker->Queue();
+  return worker->GetPromise();
 }
