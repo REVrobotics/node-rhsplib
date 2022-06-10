@@ -46,6 +46,14 @@ class RHSPlib : public Napi::ObjectWrap<RHSPlib> {
   Napi::Value setFTDIResetControl(const Napi::CallbackInfo &info);
   Napi::Value getFTDIResetControl(const Napi::CallbackInfo &info);
 
+  /* Digital */
+  Napi::Value setDigitalSingleOutput(const Napi::CallbackInfo &info);
+  Napi::Value setDigitalAllOutputs(const Napi::CallbackInfo &info);
+  Napi::Value setDigitalDirection(const Napi::CallbackInfo &info);
+  Napi::Value getDigitalDirection(const Napi::CallbackInfo &info);
+  Napi::Value getDigitalSingleInput(const Napi::CallbackInfo &info);
+  Napi::Value getDigitalAllInputs(const Napi::CallbackInfo &info);
+
  private:
   RHSPlib_Module_T obj;
 };

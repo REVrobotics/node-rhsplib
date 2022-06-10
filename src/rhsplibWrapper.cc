@@ -1,6 +1,7 @@
 #include "rhsplibWrapper.h"
 
 #include <rev/RHSPlib_device_control.h>
+#include <rev/RHSPlib_dio.h>
 
 #include "RHSPlibWorker.h"
 #include "serialWrapper.h"
@@ -61,6 +62,18 @@ Napi::Object RHSPlib::Init(Napi::Env env, Napi::Object exports) {
                                   &RHSPlib::setFTDIResetControl),
           RHSPlib::InstanceMethod("getFTDIResetControl",
                                   &RHSPlib::getFTDIResetControl),
+          RHSPlib::InstanceMethod("setDigitalSingleOutput",
+                                  &RHSPlib::setDigitalSingleOutput),
+          RHSPlib::InstanceMethod("setDigitalAllOutputs",
+                                  &RHSPlib::setDigitalAllOutputs),
+          RHSPlib::InstanceMethod("setDigitalDirection",
+                                  &RHSPlib::setDigitalDirection),
+          RHSPlib::InstanceMethod("getDigitalDirection",
+                                  &RHSPlib::getDigitalDirection),
+          RHSPlib::InstanceMethod("getDigitalSingleInput",
+                                  &RHSPlib::getDigitalSingleInput),
+          RHSPlib::InstanceMethod("getDigitalAllInputs",
+                                  &RHSPlib::getDigitalAllInputs),
       });
 
   Napi::FunctionReference *constructor = new Napi::FunctionReference();
@@ -676,6 +689,101 @@ Napi::Value RHSPlib::getFTDIResetControl(const Napi::CallbackInfo &info) {
 
   SET_WORKER_CALLBACK(worker, retType,
                       { return Napi::Boolean::New(_env, _data); });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::setDigitalSingleOutput(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t dioPin = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t value = info[1].As<Napi::Boolean>().Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code =
+        RHSPlib_dio_setSingleOutput(&this->obj, dioPin, value, &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::setDigitalAllOutputs(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t bitPackedField = info[0].As<Napi::Number>().Uint32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code =
+        RHSPlib_dio_setAllOutputs(&this->obj, bitPackedField, &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::setDigitalDirection(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t dioPin = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t direction = info[1].As<Napi::Number>().Uint32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_dio_setDirection(&this->obj, dioPin, direction,
+                                     &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getDigitalDirection(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t dioPin = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = uint8_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code =
+        RHSPlib_dio_getDirection(&this->obj, dioPin, &_data, &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Number::New(_env, _data); });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getDigitalSingleInput(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t dioPin = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = uint8_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code =
+        RHSPlib_dio_getSingleInput(&this->obj, dioPin, &_data, &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Boolean::New(_env, _data); });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getDigitalAllInputs(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  using retType = uint8_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_dio_getAllInputs(&this->obj, &_data, &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Number::New(_env, _data); });
 
   QUEUE_WORKER(worker);
 }

@@ -32,6 +32,11 @@ export enum VerbosityLevel {
   Level3
 }
 
+export enum DIODirection {
+  Input,
+  Output
+}
+
 export interface ModuleStatus {
   statusWord: number;
   motorAlerts: number;
@@ -104,7 +109,7 @@ export declare class Serial {
   constructor();
   open(serialPortName: string, baudrate: number, databits: number, parity: SerialParity, stopbits: number, flowControl: SerialFlowControl): void;
   close(): void;
-  read(bytesToRead: number): number[];
+  read(numBytesToRead: number): number[];
   write(bytes: number[]): void;
 }
 
@@ -144,4 +149,12 @@ export declare class RHSPlib {
   readVersion(): Promise<{value: Version, resultCode: number}>;
   setFTDIResetControl(ftdiResetControl: boolean): Promise<{value: null, resultCode: number}>;
   getFTDIResetControl(): Promise<{value: boolean, resultCode: number}>;
+
+  // DIO
+  setDigitalSingleOutput(dioPin: number, value: boolean): Promise<{value: null, resultCode: number}>;
+  setDigitalAllOutputs(bitPackedField: number): Promise<{value: null, resultCode: number}>;
+  setDigitalDirection(dioPin: number, direction: DIODirection): Promise<{value: null, resultCode: number}>;
+  getDigitalDirection(dioPin: number): Promise<{value: DIODirection, resultCode: number}>;
+  getDigitalSingleInput(dioPin: number): Promise<{value: boolean, resultCode: number}>;
+  getDigitalAllInputs(): Promise<{value: number, resultCode: number}>;
 }
