@@ -50,8 +50,7 @@ Napi::Value Serial::open(const Napi::CallbackInfo &info) {
                                 databits, parity, stopbits, flowControl);
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 void Serial::close(const Napi::CallbackInfo &info) {
@@ -82,8 +81,7 @@ Napi::Value Serial::read(const Napi::CallbackInfo &info) {
     return data;
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value Serial::write(const Napi::CallbackInfo &info) {
@@ -102,6 +100,5 @@ Napi::Value Serial::write(const Napi::CallbackInfo &info) {
     delete[] buffer;
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }

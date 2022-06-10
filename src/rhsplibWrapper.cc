@@ -93,8 +93,7 @@ Napi::Value RHSPlib::open(const Napi::CallbackInfo &info) {
     _code = RHSPlib_open(&this->obj, &serialPort->getSerialObj(), destAddress);
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::isOpened(const Napi::CallbackInfo &info) {
@@ -155,8 +154,7 @@ Napi::Value RHSPlib::sendWriteCommandInternal(const Napi::CallbackInfo &info) {
         &this->obj, packetTypeID, payloadData, payloadSize, &nackReasonCode);
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::sendWriteCommand(const Napi::CallbackInfo &info) {
@@ -188,8 +186,7 @@ Napi::Value RHSPlib::sendWriteCommand(const Napi::CallbackInfo &info) {
     return responsePayload;
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::sendReadCommandInternal(const Napi::CallbackInfo &info) {
@@ -210,8 +207,7 @@ Napi::Value RHSPlib::sendReadCommandInternal(const Napi::CallbackInfo &info) {
         &this->obj, packetTypeID, payloadData, payloadSize, &nackReasonCode);
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::sendReadCommand(const Napi::CallbackInfo &info) {
@@ -243,8 +239,7 @@ Napi::Value RHSPlib::sendReadCommand(const Napi::CallbackInfo &info) {
     return responsePayload;
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::getModuleStatus(const Napi::CallbackInfo &info) {
@@ -266,8 +261,7 @@ Napi::Value RHSPlib::getModuleStatus(const Napi::CallbackInfo &info) {
     return statusObj;
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::sendKeepAlive(const Napi::CallbackInfo &info) {
@@ -278,8 +272,7 @@ Napi::Value RHSPlib::sendKeepAlive(const Napi::CallbackInfo &info) {
     _code = RHSPlib_sendKeepAlive(&this->obj, &nackReasonCode);
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::sendFailSafe(const Napi::CallbackInfo &info) {
@@ -290,8 +283,7 @@ Napi::Value RHSPlib::sendFailSafe(const Napi::CallbackInfo &info) {
     _code = RHSPlib_sendFailSafe(&this->obj, &nackReasonCode);
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::setNewModuleAddress(const Napi::CallbackInfo &info) {
@@ -305,8 +297,7 @@ Napi::Value RHSPlib::setNewModuleAddress(const Napi::CallbackInfo &info) {
                                         &nackReasonCode);
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::queryInterface(const Napi::CallbackInfo &info) {
@@ -329,8 +320,7 @@ Napi::Value RHSPlib::queryInterface(const Napi::CallbackInfo &info) {
     return interfaceObj;
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::setModuleLEDColor(const Napi::CallbackInfo &info) {
@@ -346,8 +336,7 @@ Napi::Value RHSPlib::setModuleLEDColor(const Napi::CallbackInfo &info) {
                                       &nackReasonCode);
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::getModuleLEDColor(const Napi::CallbackInfo &info) {
@@ -370,8 +359,7 @@ Napi::Value RHSPlib::getModuleLEDColor(const Napi::CallbackInfo &info) {
     return RGB;
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::setModuleLEDPattern(const Napi::CallbackInfo &info) {
@@ -420,8 +408,7 @@ Napi::Value RHSPlib::setModuleLEDPattern(const Napi::CallbackInfo &info) {
         RHSPlib_setModuleLEDPattern(&this->obj, &ledPattern, &nackReasonCode);
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::getModuleLEDPattern(const Napi::CallbackInfo &info) {
@@ -454,8 +441,7 @@ Napi::Value RHSPlib::getModuleLEDPattern(const Napi::CallbackInfo &info) {
     return ledPatternObj;
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::setDebugLogLevel(const Napi::CallbackInfo &info) {
@@ -474,8 +460,7 @@ Napi::Value RHSPlib::setDebugLogLevel(const Napi::CallbackInfo &info) {
                                      verbosityLevel, &nackReasonCode);
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::discovery(const Napi::CallbackInfo &info) {
@@ -504,8 +489,7 @@ Napi::Value RHSPlib::discovery(const Napi::CallbackInfo &info) {
     return discoveredAddressesObj;
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::getInterfacePacketID(const Napi::CallbackInfo &info) {
@@ -524,8 +508,7 @@ Napi::Value RHSPlib::getInterfacePacketID(const Napi::CallbackInfo &info) {
   SET_WORKER_CALLBACK(worker, retType,
                       { return Napi::Number::New(_env, _data); });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::getBulkInputData(const Napi::CallbackInfo &info) {
@@ -558,8 +541,7 @@ Napi::Value RHSPlib::getBulkInputData(const Napi::CallbackInfo &info) {
     return bulkInputDataObj;
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::getADC(const Napi::CallbackInfo &info) {
@@ -578,8 +560,7 @@ Napi::Value RHSPlib::getADC(const Napi::CallbackInfo &info) {
   SET_WORKER_CALLBACK(worker, retType,
                       { return Napi::Number::New(_env, _data); });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::setPhoneChargeControl(const Napi::CallbackInfo &info) {
@@ -593,8 +574,7 @@ Napi::Value RHSPlib::setPhoneChargeControl(const Napi::CallbackInfo &info) {
                                                      &nackReasonCode);
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::getPhoneChargeControl(const Napi::CallbackInfo &info) {
@@ -610,8 +590,7 @@ Napi::Value RHSPlib::getPhoneChargeControl(const Napi::CallbackInfo &info) {
   SET_WORKER_CALLBACK(worker, retType,
                       { return Napi::Boolean::New(_env, _data); });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::injectDataLogHint(const Napi::CallbackInfo &info) {
@@ -625,8 +604,7 @@ Napi::Value RHSPlib::injectDataLogHint(const Napi::CallbackInfo &info) {
                                                     &nackReasonCode);
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::readVersionString(const Napi::CallbackInfo &info) {
@@ -646,8 +624,7 @@ Napi::Value RHSPlib::readVersionString(const Napi::CallbackInfo &info) {
     return Napi::String::New(_env, _data.text, _data.textLength);
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::readVersion(const Napi::CallbackInfo &info) {
@@ -670,8 +647,7 @@ Napi::Value RHSPlib::readVersion(const Napi::CallbackInfo &info) {
     return version;
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::setFTDIResetControl(const Napi::CallbackInfo &info) {
@@ -685,8 +661,7 @@ Napi::Value RHSPlib::setFTDIResetControl(const Napi::CallbackInfo &info) {
                                                    &nackReasonCode);
   });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }
 
 Napi::Value RHSPlib::getFTDIResetControl(const Napi::CallbackInfo &info) {
@@ -702,6 +677,5 @@ Napi::Value RHSPlib::getFTDIResetControl(const Napi::CallbackInfo &info) {
   SET_WORKER_CALLBACK(worker, retType,
                       { return Napi::Boolean::New(_env, _data); });
 
-  worker->Queue();
-  return worker->GetPromise();
+  QUEUE_WORKER(worker);
 }

@@ -43,6 +43,15 @@
   NAME->SetCallback([=](Napi::Env _env, RETURN & _data) mutable##FUNCTION_BODY)
 
 /**
+ * @brief Queue the worker and return its promise.
+ *
+ * @param NAME Name of the worker to queue
+ */
+#define QUEUE_WORKER(NAME) \
+  NAME->Queue();           \
+  return NAME->GetPromise();
+
+/**
  * @brief Async worker class for handling blocking calls from RHSPlib.
  *
  * @tparam TReturn Return type of the work function
