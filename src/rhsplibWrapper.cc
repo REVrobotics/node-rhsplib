@@ -250,7 +250,7 @@ Napi::Value RHSPlib::sendReadCommand(const Napi::CallbackInfo &info) {
 Napi::Value RHSPlib::getModuleStatus(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
-  uint8_t clearStatusAfterResponse = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t clearStatusAfterResponse = info[0].As<Napi::Boolean>().Value();
 
   using retType = RHSPlib_ModuleStatus_T;
   CREATE_WORKER(worker, env, retType, {
@@ -585,7 +585,7 @@ Napi::Value RHSPlib::getADC(const Napi::CallbackInfo &info) {
 Napi::Value RHSPlib::setPhoneChargeControl(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
-  uint8_t chargeEnable = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t chargeEnable = info[0].As<Napi::Boolean>().Value();
 
   CREATE_VOID_WORKER(worker, env, {
     uint8_t nackReasonCode;
@@ -677,7 +677,7 @@ Napi::Value RHSPlib::readVersion(const Napi::CallbackInfo &info) {
 Napi::Value RHSPlib::setFTDIResetControl(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
-  uint8_t ftdiResetControl = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t ftdiResetControl = info[0].As<Napi::Boolean>().Value();
 
   CREATE_VOID_WORKER(worker, env, {
     uint8_t nackReasonCode;
