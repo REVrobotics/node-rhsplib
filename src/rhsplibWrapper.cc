@@ -124,7 +124,7 @@ Napi::Value RHSPlib::sendWriteCommandInternal(const Napi::CallbackInfo &info) {
 
   uint16_t packetTypeID = info[0].As<Napi::Number>().Uint32Value();
   Napi::Array payload = info[1].As<Napi::Array>();
-  uint16_t payloadSize = info[2].As<Napi::Number>().Uint32Value();
+  uint16_t payloadSize = payload.Length();
 
   uint8_t payloadData[RHSPLIB_MAX_PAYLOAD_SIZE];
   for (int i = 0; i < payloadSize; i++) {
@@ -146,7 +146,7 @@ Napi::Value RHSPlib::sendWriteCommand(const Napi::CallbackInfo &info) {
 
   uint16_t packetTypeID = info[0].As<Napi::Number>().Uint32Value();
   Napi::Array payload = info[1].As<Napi::Array>();
-  uint16_t payloadSize = info[2].As<Napi::Number>().Uint32Value();
+  uint16_t payloadSize = payload.Length();
 
   uint8_t payloadData[RHSPLIB_MAX_PAYLOAD_SIZE];
   for (int i = 0; i < payloadSize; i++) {
@@ -179,7 +179,7 @@ Napi::Value RHSPlib::sendReadCommandInternal(const Napi::CallbackInfo &info) {
 
   uint16_t packetTypeID = info[0].As<Napi::Number>().Uint32Value();
   Napi::Array payload = info[1].As<Napi::Array>();
-  uint16_t payloadSize = info[2].As<Napi::Number>().Uint32Value();
+  uint16_t payloadSize = payload.Length();
 
   uint8_t payloadData[RHSPLIB_MAX_PAYLOAD_SIZE];
   for (int i = 0; i < payloadSize; i++) {
@@ -201,7 +201,7 @@ Napi::Value RHSPlib::sendReadCommand(const Napi::CallbackInfo &info) {
 
   uint16_t packetTypeID = info[0].As<Napi::Number>().Uint32Value();
   Napi::Array payload = info[1].As<Napi::Array>();
-  uint16_t payloadSize = info[2].As<Napi::Number>().Uint32Value();
+  uint16_t payloadSize = payload.Length();
 
   uint8_t payloadData[RHSPLIB_MAX_PAYLOAD_SIZE];
   for (int i = 0; i < payloadSize; i++) {
