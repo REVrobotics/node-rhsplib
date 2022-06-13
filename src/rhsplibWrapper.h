@@ -84,6 +84,14 @@ class RHSPlib : public Napi::ObjectWrap<RHSPlib> {
   Napi::Value setMotorPIDCoefficients(const Napi::CallbackInfo &info);
   Napi::Value getMotorPIDCoefficients(const Napi::CallbackInfo &info);
 
+  /* PWM */
+  Napi::Value setPWMConfiguration(const Napi::CallbackInfo &info);
+  Napi::Value getPWMConfiguration(const Napi::CallbackInfo &info);
+  Napi::Value setPWMPulseWidth(const Napi::CallbackInfo &info);
+  Napi::Value getPWMPulseWidth(const Napi::CallbackInfo &info);
+  Napi::Value setPWMEnable(const Napi::CallbackInfo &info);
+  Napi::Value getPWMEnable(const Napi::CallbackInfo &info);
+
  private:
   RHSPlib_Module_T obj;
 };
