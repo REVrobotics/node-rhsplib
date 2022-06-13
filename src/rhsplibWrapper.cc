@@ -3,6 +3,7 @@
 #include <rev/RHSPlib_device_control.h>
 #include <rev/RHSPlib_dio.h>
 #include <rev/RHSPlib_i2c.h>
+#include <rev/RHSPlib_motor.h>
 
 #include "RHSPlibWorker.h"
 #include "serialWrapper.h"
@@ -93,6 +94,40 @@ Napi::Object RHSPlib::Init(Napi::Env env, Napi::Object exports) {
                                   &RHSPlib::writeI2CReadMultipleBytes),
           RHSPlib::InstanceMethod("getI2CReadStatus",
                                   &RHSPlib::getI2CReadStatus),
+          RHSPlib::InstanceMethod("setMotorChannelMode",
+                                  &RHSPlib::setMotorChannelMode),
+          RHSPlib::InstanceMethod("getMotorChannelMode",
+                                  &RHSPlib::getMotorChannelMode),
+          RHSPlib::InstanceMethod("setMotorChannelEnable",
+                                  &RHSPlib::setMotorChannelEnable),
+          RHSPlib::InstanceMethod("getMotorChannelEnable",
+                                  &RHSPlib::getMotorChannelEnable),
+          RHSPlib::InstanceMethod("setMotorChannelCurrentAlertLevel",
+                                  &RHSPlib::setMotorChannelCurrentAlertLevel),
+          RHSPlib::InstanceMethod("getMotorChannelCurrentAlertLevel",
+                                  &RHSPlib::getMotorChannelCurrentAlertLevel),
+          RHSPlib::InstanceMethod("resetMotorEncoder",
+                                  &RHSPlib::resetMotorEncoder),
+          RHSPlib::InstanceMethod("setMotorConstantPower",
+                                  &RHSPlib::setMotorConstantPower),
+          RHSPlib::InstanceMethod("getMotorConstantPower",
+                                  &RHSPlib::getMotorConstantPower),
+          RHSPlib::InstanceMethod("setMotorTargetVelocity",
+                                  &RHSPlib::setMotorTargetVelocity),
+          RHSPlib::InstanceMethod("getMotorTargetVelocity",
+                                  &RHSPlib::getMotorTargetVelocity),
+          RHSPlib::InstanceMethod("setMotorTargetPosition",
+                                  &RHSPlib::setMotorTargetPosition),
+          RHSPlib::InstanceMethod("getMotorTargetPosition",
+                                  &RHSPlib::getMotorTargetPosition),
+          RHSPlib::InstanceMethod("getMotorAtTarget",
+                                  &RHSPlib::getMotorAtTarget),
+          RHSPlib::InstanceMethod("getMotorEncoderPosition",
+                                  &RHSPlib::getMotorEncoderPosition),
+          RHSPlib::InstanceMethod("setMotorPIDCoefficients",
+                                  &RHSPlib::setMotorPIDCoefficients),
+          RHSPlib::InstanceMethod("getMotorPIDCoefficients",
+                                  &RHSPlib::getMotorPIDCoefficients),
       });
 
   Napi::FunctionReference *constructor = new Napi::FunctionReference();
@@ -999,6 +1034,325 @@ Napi::Value RHSPlib::getI2CReadStatus(const Napi::CallbackInfo &info) {
     }
     i2cReadStatus.Set("bytes", bytes);
     return i2cReadStatus;
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::setMotorChannelMode(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t motorMode = info[1].As<Napi::Number>().Uint32Value();
+  uint8_t floatAtZero = info[2].As<Napi::Boolean>().Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_motor_setChannelMode(&this->obj, motorChannel, motorMode,
+                                         floatAtZero, &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getMotorChannelMode(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = struct {
+    uint8_t motorMode;
+    uint8_t floatAtZero;
+  };
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code =
+        RHSPlib_motor_getChannelMode(&this->obj, motorChannel, &_data.motorMode,
+                                     &_data.floatAtZero, &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType, {
+    Napi::Object motorChannelMode = Napi::Object::New(_env);
+    motorChannelMode.Set("motorMode", _data.motorMode);
+    motorChannelMode.Set("floatAtZero",
+                         Napi::Boolean::New(_env, _data.floatAtZero));
+    return motorChannelMode;
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::setMotorChannelEnable(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t enabled = info[1].As<Napi::Boolean>().Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_motor_setChannelEnable(&this->obj, motorChannel, enabled,
+                                           &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getMotorChannelEnable(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = uint8_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_motor_getChannelEnable(&this->obj, motorChannel, &_data,
+                                           &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Boolean::New(_env, _data); });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::setMotorChannelCurrentAlertLevel(
+    const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint16_t currentLimit_mA = info[1].As<Napi::Number>().Uint32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_motor_setChannelCurrentAlertLevel(
+        &this->obj, motorChannel, currentLimit_mA, &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getMotorChannelCurrentAlertLevel(
+    const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = uint16_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_motor_getChannelCurrentAlertLevel(&this->obj, motorChannel,
+                                                      &_data, &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Number::New(_env, _data); });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::resetMotorEncoder(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code =
+        RHSPlib_motor_resetEncoder(&this->obj, motorChannel, &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::setMotorConstantPower(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+  int16_t powerLevel = info[1].As<Napi::Number>().Int32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_motor_setConstantPower(&this->obj, motorChannel, powerLevel,
+                                           &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getMotorConstantPower(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = int16_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_motor_getConstantPower(&this->obj, motorChannel, &_data,
+                                           &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Number::New(_env, _data); });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::setMotorTargetVelocity(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+  int16_t motorVelocity = info[1].As<Napi::Number>().Int32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_motor_setTargetVelocity(&this->obj, motorChannel,
+                                            motorVelocity, &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getMotorTargetVelocity(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = int16_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_motor_getTargetVelocity(&this->obj, motorChannel, &_data,
+                                            &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Number::New(_env, _data); });
+
+  return Napi::Number::New(env, 0);
+}
+
+Napi::Value RHSPlib::setMotorTargetPosition(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+  int32_t targetPosition = info[1].As<Napi::Number>().Int32Value();
+  uint16_t targetTolerance = info[2].As<Napi::Number>().Uint32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_motor_setTargetPosition(&this->obj, motorChannel,
+                                            targetPosition, targetTolerance,
+                                            &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getMotorTargetPosition(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = struct {
+    int32_t targetPosition;
+    uint16_t targetTolerance;
+  };
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_motor_getTargetPosition(
+        &this->obj, motorChannel, &_data.targetPosition, &_data.targetTolerance,
+        &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType, {
+    Napi::Object targetPositionObj = Napi::Object::New(_env);
+    targetPositionObj.Set("targetPosition", _data.targetPosition);
+    targetPositionObj.Set("targetTolerance", _data.targetTolerance);
+    return targetPositionObj;
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getMotorAtTarget(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = uint8_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_motor_getMotorAtTarget(&this->obj, motorChannel, &_data,
+                                           &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Boolean::New(_env, _data); });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getMotorEncoderPosition(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = int32_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_motor_getEncoderPosition(&this->obj, motorChannel, &_data,
+                                             &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Number::New(_env, _data); });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::setMotorPIDCoefficients(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t motorMode = info[1].As<Napi::Number>().Uint32Value();
+  Napi::Object pid = info[2].As<Napi::Object>();
+  int32_t proportionalCoeff = pid.Get("P").As<Napi::Number>().Int32Value();
+  int32_t integralCoeff = pid.Get("I").As<Napi::Number>().Int32Value();
+  int32_t derivativeCoeff = pid.Get("D").As<Napi::Number>().Int32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_motor_setPIDControlLoopCoefficients(
+        &this->obj, motorChannel, motorMode, proportionalCoeff, integralCoeff,
+        derivativeCoeff, &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getMotorPIDCoefficients(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t motorMode = info[1].As<Napi::Number>().Uint32Value();
+
+  using retType = struct {
+    int32_t proportionalCoeff;
+    int32_t integralCoeff;
+    int32_t derivativeCoeff;
+  };
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_motor_getPIDControlLoopCoefficients(
+        &this->obj, motorChannel, motorMode, &_data.proportionalCoeff,
+        &_data.integralCoeff, &_data.derivativeCoeff, &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType, {
+    Napi::Object pidCoeffObj = Napi::Object::New(_env);
+    pidCoeffObj.Set("P", _data.proportionalCoeff);
+    pidCoeffObj.Set("I", _data.integralCoeff);
+    pidCoeffObj.Set("D", _data.derivativeCoeff);
+    return pidCoeffObj;
   });
 
   QUEUE_WORKER(worker);
