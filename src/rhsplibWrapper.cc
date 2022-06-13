@@ -5,6 +5,7 @@
 #include <rev/RHSPlib_i2c.h>
 #include <rev/RHSPlib_motor.h>
 #include <rev/RHSPlib_pwm.h>
+#include <rev/RHSPlib_servo.h>
 
 #include "RHSPlibWorker.h"
 #include "serialWrapper.h"
@@ -139,6 +140,16 @@ Napi::Object RHSPlib::Init(Napi::Env env, Napi::Object exports) {
                                   &RHSPlib::getPWMPulseWidth),
           RHSPlib::InstanceMethod("setPWMEnable", &RHSPlib::setPWMEnable),
           RHSPlib::InstanceMethod("getPWMEnable", &RHSPlib::getPWMEnable),
+          RHSPlib::InstanceMethod("setServoConfiguration",
+                                  &RHSPlib::setServoConfiguration),
+          RHSPlib::InstanceMethod("getServoConfiguration",
+                                  &RHSPlib::getServoConfiguration),
+          RHSPlib::InstanceMethod("setServoPulseWidth",
+                                  &RHSPlib::setServoPulseWidth),
+          RHSPlib::InstanceMethod("getServoPulseWidth",
+                                  &RHSPlib::getServoPulseWidth),
+          RHSPlib::InstanceMethod("setServoEnable", &RHSPlib::setServoEnable),
+          RHSPlib::InstanceMethod("getServoEnable", &RHSPlib::getServoEnable),
       });
 
   Napi::FunctionReference *constructor = new Napi::FunctionReference();
@@ -1460,6 +1471,105 @@ Napi::Value RHSPlib::getPWMEnable(const Napi::CallbackInfo &info) {
     uint8_t nackReasonCode;
     _code =
         RHSPlib_pwm_getEnable(&this->obj, pwmChannel, &_data, &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Boolean::New(_env, _data); });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::setServoConfiguration(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t servoChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint16_t framePeriod = info[1].As<Napi::Number>().Uint32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_servo_setConfiguration(&this->obj, servoChannel,
+                                           framePeriod, &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getServoConfiguration(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t servoChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = uint16_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_servo_getConfiguration(&this->obj, servoChannel, &_data,
+                                           &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Number::New(_env, _data); });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::setServoPulseWidth(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t servoChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint16_t pulseWidth = info[1].As<Napi::Number>().Uint32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_servo_setPulseWidth(&this->obj, servoChannel, pulseWidth,
+                                        &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getServoPulseWidth(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t servoChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = uint16_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_servo_getPulseWidth(&this->obj, servoChannel, &_data,
+                                        &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Number::New(_env, _data); });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::setServoEnable(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t servoChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t enable = info[1].As<Napi::Boolean>().Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_servo_setEnable(&this->obj, servoChannel, enable,
+                                    &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getServoEnable(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t servoChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = uint8_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_servo_getEnable(&this->obj, servoChannel, &_data,
+                                    &nackReasonCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
