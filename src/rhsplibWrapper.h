@@ -65,6 +65,25 @@ class RHSPlib : public Napi::ObjectWrap<RHSPlib> {
   Napi::Value writeI2CReadMultipleBytes(const Napi::CallbackInfo &info);
   Napi::Value getI2CReadStatus(const Napi::CallbackInfo &info);
 
+  /* Motor */
+  Napi::Value setMotorChannelMode(const Napi::CallbackInfo &info);
+  Napi::Value getMotorChannelMode(const Napi::CallbackInfo &info);
+  Napi::Value setMotorChannelEnable(const Napi::CallbackInfo &info);
+  Napi::Value getMotorChannelEnable(const Napi::CallbackInfo &info);
+  Napi::Value setMotorChannelCurrentAlertLevel(const Napi::CallbackInfo &info);
+  Napi::Value getMotorChannelCurrentAlertLevel(const Napi::CallbackInfo &info);
+  Napi::Value resetMotorEncoder(const Napi::CallbackInfo &info);
+  Napi::Value setMotorConstantPower(const Napi::CallbackInfo &info);
+  Napi::Value getMotorConstantPower(const Napi::CallbackInfo &info);
+  Napi::Value setMotorTargetVelocity(const Napi::CallbackInfo &info);
+  Napi::Value getMotorTargetVelocity(const Napi::CallbackInfo &info);
+  Napi::Value setMotorTargetPosition(const Napi::CallbackInfo &info);
+  Napi::Value getMotorTargetPosition(const Napi::CallbackInfo &info);
+  Napi::Value getMotorAtTarget(const Napi::CallbackInfo &info);
+  Napi::Value getMotorEncoderPosition(const Napi::CallbackInfo &info);
+  Napi::Value setMotorPIDCoefficients(const Napi::CallbackInfo &info);
+  Napi::Value getMotorPIDCoefficients(const Napi::CallbackInfo &info);
+
  private:
   RHSPlib_Module_T obj;
 };

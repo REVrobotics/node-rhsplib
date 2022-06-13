@@ -121,6 +121,12 @@ export interface I2CReadStatus {
   bytes: number[];
 }
 
+export interface PIDCoefficients {
+  P: number,
+  I: number,
+  D: number
+}
+
 export declare class Serial {
   constructor();
   open(serialPortName: string, baudrate: number, databits: number, parity: SerialParity, stopbits: number, flowControl: SerialFlowControl): void;
@@ -184,4 +190,23 @@ export declare class RHSPlib {
   readI2CMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number): Promise<{value: null, resultCode: number}>;
   writeI2CReadMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number, startAddress: number): Promise<{value: null, resultCode: number}>;
   getI2CReadStatus(i2cChannel: number): Promise<{value: I2CReadStatus, resultCode: number}>;
+
+  // Motor
+  setMotorChannelMode(motorChannel: number, motorMode: number, floatAtZero: boolean): Promise<{value: null, resultCode: number}>;
+  getMotorChannelMode(motorChannel: number): Promise<{value: {motorMode: number, floatAtZero: boolean}, resultCode: number}>
+  setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<{value: null, resultCode: number}>;
+  getMotorChannelEnable(motorChannel: number): Promise<{value: boolean, resultCode: number}>;
+  setMotorChannelCurrentAlertLevel(motorChannel: number, currentLimit_mA: number): Promise<{value: null, resultCode: number}>;
+  getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<{value: number, resultCode: number}>;
+  resetMotorEncoder(motorChannel: number): Promise<{value: null, resultCode: number}>;
+  setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<{value: null, resultCode: number}>;
+  getMotorConstantPower(motorChannel: number): Promise<{value: number, resultCode: number}>;
+  setMotorTargetVelocity(motorChannel: number, velocity_cps: number): Promise<{value: null, resultCode: number}>;
+  getMotorTargetVelocity(motorChannel: number): Promise<{value: number, resultCode: number}>;
+  setMotorTargetPosition(motorChannel: number, targetPosition_counts: number, targetTolerance_counts: number): Promise<{value: null, resultCode: number}>;
+  getMotorTargetPosition(motorChannel: number): Promise<{value: {targetPosition: number, targetTolerance: number}, resultCode: number}>;
+  getMotorAtTarget(motorChannel: number): Promise<{value: boolean, resultCode: number}>;
+  getMotorEncoderPosition(motorChannel: number): Promise<{value: number, resultCode: number}>;
+  setMotorPIDCoefficients(motorChannel: number, motorMode: number, pid: PIDCoefficients): Promise<{value: null, resultCode: number}>;
+  getMotorPIDCoefficients(motorChannel: number, motorMode: number): Promise<{value: PIDCoefficients, resultCode: number}>;
 }
