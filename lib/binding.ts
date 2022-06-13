@@ -210,4 +210,12 @@ export declare class RHSPlib {
   getMotorEncoderPosition(motorChannel: number): Promise<{value: number, resultCode: number}>;
   setMotorPIDCoefficients(motorChannel: number, motorMode: number, pid: PIDCoefficients): Promise<{value: null, resultCode: number}>;
   getMotorPIDCoefficients(motorChannel: number, motorMode: number): Promise<{value: PIDCoefficients, resultCode: number}>;
+
+  // PWM
+  setPWMConfiguration(pwmChannel: number, framePeriod: number): Promise<{value: null, resultCode: number}>;
+  getPWMConfiguration(pwmChannel: number): Promise<{value: number, resultCode: number}>;
+  setPWMPulseWidth(pwmChannel: number, pulseWidth: number): Promise<{value: null, resultCode: number}>;
+  getPWMPulseWidth(pwmChannel: number): Promise<{value: number, resultCode: number}>;
+  setPWMEnable(pwmChannel: number, enable: boolean): Promise<{value: null, resultCode: number}>;
+  getPWMEnable(pwmChannel: number): Promise<{value: boolean, resultCode: number}>;
 }

@@ -4,6 +4,7 @@
 #include <rev/RHSPlib_dio.h>
 #include <rev/RHSPlib_i2c.h>
 #include <rev/RHSPlib_motor.h>
+#include <rev/RHSPlib_pwm.h>
 
 #include "RHSPlibWorker.h"
 #include "serialWrapper.h"
@@ -128,6 +129,16 @@ Napi::Object RHSPlib::Init(Napi::Env env, Napi::Object exports) {
                                   &RHSPlib::setMotorPIDCoefficients),
           RHSPlib::InstanceMethod("getMotorPIDCoefficients",
                                   &RHSPlib::getMotorPIDCoefficients),
+          RHSPlib::InstanceMethod("setPWMConfiguration",
+                                  &RHSPlib::setPWMConfiguration),
+          RHSPlib::InstanceMethod("getPWMConfiguration",
+                                  &RHSPlib::getPWMConfiguration),
+          RHSPlib::InstanceMethod("setPWMPulseWidth",
+                                  &RHSPlib::setPWMPulseWidth),
+          RHSPlib::InstanceMethod("getPWMPulseWidth",
+                                  &RHSPlib::getPWMPulseWidth),
+          RHSPlib::InstanceMethod("setPWMEnable", &RHSPlib::setPWMEnable),
+          RHSPlib::InstanceMethod("getPWMEnable", &RHSPlib::getPWMEnable),
       });
 
   Napi::FunctionReference *constructor = new Napi::FunctionReference();
@@ -1354,6 +1365,105 @@ Napi::Value RHSPlib::getMotorPIDCoefficients(const Napi::CallbackInfo &info) {
     pidCoeffObj.Set("D", _data.derivativeCoeff);
     return pidCoeffObj;
   });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::setPWMConfiguration(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t pwmChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint16_t framePeriod = info[1].As<Napi::Number>().Uint32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_pwm_setConfiguration(&this->obj, pwmChannel, framePeriod,
+                                         &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getPWMConfiguration(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t pwmChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = uint16_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_pwm_getConfiguration(&this->obj, pwmChannel, &_data,
+                                         &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Number::New(_env, _data); });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::setPWMPulseWidth(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t pwmChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint16_t pulseWidth = info[1].As<Napi::Number>().Uint32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_pwm_setPulseWidth(&this->obj, pwmChannel, pulseWidth,
+                                      &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getPWMPulseWidth(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t pwmChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = uint16_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_pwm_getPulseWidth(&this->obj, pwmChannel, &_data,
+                                      &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Number::New(_env, _data); });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::setPWMEnable(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t pwmChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t enable = info[1].As<Napi::Boolean>().Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code =
+        RHSPlib_pwm_setEnable(&this->obj, pwmChannel, enable, &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getPWMEnable(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t pwmChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = uint8_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code =
+        RHSPlib_pwm_getEnable(&this->obj, pwmChannel, &_data, &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Boolean::New(_env, _data); });
 
   QUEUE_WORKER(worker);
 }
