@@ -217,4 +217,12 @@ export declare class RHSPlib {
   getPWMPulseWidth(pwmChannel: number): Promise<{value: number, resultCode: number}>;
   setPWMEnable(pwmChannel: number, enable: boolean): Promise<{value: null, resultCode: number}>;
   getPWMEnable(pwmChannel: number): Promise<{value: boolean, resultCode: number}>;
+
+  // Servo
+  setServoConfiguration(servoChannel: number, framePeriod: number): Promise<{value: null, resultCode: number}>;
+  getServoConfiguration(servoChannel: number): Promise<{value: number, resultCode: number}>;
+  setServoPulseWidth(servoChannel: number, pulseWidth: number): Promise<{value: null, resultCode: number}>;
+  getServoPulseWidth(servoChannel: number): Promise<{value: number, resultCode: number}>;
+  setServoEnable(servoChannel: number, enable: boolean): Promise<{value: null, resultCode: number}>;
+  getServoEnable(servoChannel: number): Promise<{value: boolean, resultCode: number}>;
 }

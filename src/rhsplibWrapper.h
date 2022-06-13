@@ -92,6 +92,14 @@ class RHSPlib : public Napi::ObjectWrap<RHSPlib> {
   Napi::Value setPWMEnable(const Napi::CallbackInfo &info);
   Napi::Value getPWMEnable(const Napi::CallbackInfo &info);
 
+  /* Servo */
+  Napi::Value setServoConfiguration(const Napi::CallbackInfo &info);
+  Napi::Value getServoConfiguration(const Napi::CallbackInfo &info);
+  Napi::Value setServoPulseWidth(const Napi::CallbackInfo &info);
+  Napi::Value getServoPulseWidth(const Napi::CallbackInfo &info);
+  Napi::Value setServoEnable(const Napi::CallbackInfo &info);
+  Napi::Value getServoEnable(const Napi::CallbackInfo &info);
+
  private:
   RHSPlib_Module_T obj;
 };
