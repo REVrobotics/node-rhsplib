@@ -40,7 +40,8 @@
  * `_data` to get the work functions' return data
  */
 #define SET_WORKER_CALLBACK(NAME, RETURN, FUNCTION_BODY) \
-  NAME->SetCallback([=](Napi::Env _env, RETURN & _data) mutable##FUNCTION_BODY)
+  NAME->SetCallback([=](Napi::Env _env, int &_code,      \
+                        RETURN &_data) mutable##FUNCTION_BODY)
 
 /**
  * @brief Queue the worker and return its promise.
@@ -110,9 +111,10 @@ class RHSPlibWorker : public Napi::AsyncWorker {
    */
   void OnOK() override {
     Napi::Object resultObj = Napi::Object::New(Env());
-    resultObj.Set("value",
-                  (callbackFunction ? callbackFunction(Env(), returnData)
-                                    : Env().Null()));
+    resultObj.Set(
+        "value",
+        (callbackFunction ? callbackFunction(Env(), resultCode, returnData)
+                          : Env().Null()));
     resultObj.Set("resultCode", resultCode);
     deferred.Resolve(resultObj);
   }
@@ -126,7 +128,7 @@ class RHSPlibWorker : public Napi::AsyncWorker {
 
  private:
   std::function<void(int &, TReturn &)> workFunction;
-  std::function<Napi::Value(Napi::Env, TReturn &)> callbackFunction;
+  std::function<Napi::Value(Napi::Env, int &, TReturn &)> callbackFunction;
   Napi::Promise::Deferred deferred;
   TReturn returnData;
   int resultCode;
