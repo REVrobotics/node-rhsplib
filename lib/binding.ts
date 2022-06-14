@@ -137,92 +137,92 @@ export declare class Serial {
 
 export declare class RHSPlib {
   constructor();
-  open(serialPort: Serial, destAddress: number): Promise<{value: null, resultCode: number}>;
+  open(serialPort: Serial, destAddress: number): Promise<{resultCode: number}>;
   isOpened(): boolean;
   close(): void;
   setDestAddress(destAddress: number): void;
   getDestAddress(): number;
   setResponseTimeoutMs(responseTimeoutMs: number): void;
   getResponseTimeoutMs(): number;
-  sendWriteCommandInternal(packetTypeID: number, payload: number[]): Promise<{value: null, resultCode: number}>;
-  sendWriteCommand(packetTypeID: number, payload: number[]): Promise<{value: number[], resultCode: number}>;
-  sendReadCommandInternal(packetTypeID: number, payload: number[]): Promise<{value: null, resultCode: number}>;
-  sendReadCommand(packetTypeID: number, payload: number[]): Promise<{value: number[], resultCode: number}>;
-  getModuleStatus(clearStatusAfterResponse: boolean): Promise<{value: ModuleStatus, resultCode: number}>;
-  sendKeepAlive(): Promise<{value: null, resultCode: number}>;
-  sendFailSafe(): Promise<{value: null, resultCode: number}>;
-  setNewModuleAddress(newModuleAddress: number): Promise<{value: null, resultCode: number}>;
-  queryInterface(interfaceName: string): Promise<{value: ModuleInterface, resultCode: number}>;
-  setModuleLEDColor(red: number, green: number, blue: number): Promise<{value: null, resultCode: number}>;
-  getModuleLEDColor(): Promise<{value: RGB, resultCode: number}>;
-  setModuleLEDPattern(ledPattern: LEDPattern): Promise<{value: null, resultCode: number}>;
-  getModuleLEDPattern(): Promise<{value: LEDPattern, resultCode: number}>;
-  setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<{value: null, resultCode: number}>;
-  discovery(serialPort: Serial): Promise<{value: DiscoveredAddresses, resultCode: number}>;
-  getInterfacePacketID(interfaceName: string, functionNumber: number): Promise<{value: number, resultCode: number}>;
+  sendWriteCommandInternal(packetTypeID: number, payload: number[]): Promise<{resultCode: number}>;
+  sendWriteCommand(packetTypeID: number, payload: number[]): Promise<{value?: number[], resultCode: number}>;
+  sendReadCommandInternal(packetTypeID: number, payload: number[]): Promise<{resultCode: number}>;
+  sendReadCommand(packetTypeID: number, payload: number[]): Promise<{value?: number[], resultCode: number}>;
+  getModuleStatus(clearStatusAfterResponse: boolean): Promise<{value?: ModuleStatus, resultCode: number}>;
+  sendKeepAlive(): Promise<{resultCode: number}>;
+  sendFailSafe(): Promise<{resultCode: number}>;
+  setNewModuleAddress(newModuleAddress: number): Promise<{resultCode: number}>;
+  queryInterface(interfaceName: string): Promise<{value?: ModuleInterface, resultCode: number}>;
+  setModuleLEDColor(red: number, green: number, blue: number): Promise<{resultCode: number}>;
+  getModuleLEDColor(): Promise<{value?: RGB, resultCode: number}>;
+  setModuleLEDPattern(ledPattern: LEDPattern): Promise<{resultCode: number}>;
+  getModuleLEDPattern(): Promise<{value?: LEDPattern, resultCode: number}>;
+  setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<{resultCode: number}>;
+  discovery(serialPort: Serial): Promise<{value?: DiscoveredAddresses, resultCode: number}>;
+  getInterfacePacketID(interfaceName: string, functionNumber: number): Promise<{value?: number, resultCode: number}>;
 
   // Device Control
-  getBulkInputData(): Promise<{value: BulkInputData, resultCode: number}>;
-  getADC(): Promise<{value: number, resultCode: number}>;
-  setPhoneChargeControl(chargeEnable: boolean): Promise<{value: null, resultCode: number}>;
-  getPhoneChargeControl(): Promise<{value: boolean, resultCode: number}>;
-  injectDataLogHint(hintText: string): Promise<{value: null, resultCode: number}>;
-  readVersionString(): Promise<{value: string, resultCode: number}>;
-  readVersion(): Promise<{value: Version, resultCode: number}>;
-  setFTDIResetControl(ftdiResetControl: boolean): Promise<{value: null, resultCode: number}>;
-  getFTDIResetControl(): Promise<{value: boolean, resultCode: number}>;
+  getBulkInputData(): Promise<{value?: BulkInputData, resultCode: number}>;
+  getADC(): Promise<{value?: number, resultCode: number}>;
+  setPhoneChargeControl(chargeEnable: boolean): Promise<{resultCode: number}>;
+  getPhoneChargeControl(): Promise<{value?: boolean, resultCode: number}>;
+  injectDataLogHint(hintText: string): Promise<{resultCode: number}>;
+  readVersionString(): Promise<{value?: string, resultCode: number}>;
+  readVersion(): Promise<{value?: Version, resultCode: number}>;
+  setFTDIResetControl(ftdiResetControl: boolean): Promise<{resultCode: number}>;
+  getFTDIResetControl(): Promise<{value?: boolean, resultCode: number}>;
 
   // DIO
-  setDigitalSingleOutput(dioPin: number, value: boolean): Promise<{value: null, resultCode: number}>;
-  setDigitalAllOutputs(bitPackedField: number): Promise<{value: null, resultCode: number}>;
-  setDigitalDirection(dioPin: number, direction: DIODirection): Promise<{value: null, resultCode: number}>;
-  getDigitalDirection(dioPin: number): Promise<{value: DIODirection, resultCode: number}>;
-  getDigitalSingleInput(dioPin: number): Promise<{value: boolean, resultCode: number}>;
-  getDigitalAllInputs(): Promise<{value: number, resultCode: number}>;
+  setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<{resultCode: number}>;
+  setDigitalAllOutputs(bitPackedField: number): Promise<{resultCode: number}>;
+  setDigitalDirection(dioPin: number, direction: DIODirection): Promise<{resultCode: number}>;
+  getDigitalDirection(dioPin: number): Promise<{value?: DIODirection, resultCode: number}>;
+  getDigitalSingleInput(dioPin: number): Promise<{value?: boolean, resultCode: number}>;
+  getDigitalAllInputs(): Promise<{value?: number, resultCode: number}>;
   
   // I2C
-  setI2CChannelConfiguration(i2cChannel: number, speedCode: I2CSpeedCode): Promise<{value: null, resultCode: number}>;
-  getI2CChannelConfiguration(i2cChannel: number): Promise<{value: I2CSpeedCode, resultCode: number}>;
-  writeI2CSingleByte(i2cChannel: number, slaveAddress: number, byte: number): Promise<{value: null, resultCode: number}>;
-  writeI2CMultipleBytes(i2cChannel: number, slaveAddress: number, bytes: number[]): Promise<{value: null, resultCode: number}>;
-  getI2CWriteStatus(i2cChannel: number): Promise<{value: I2CWriteStatus, resultCode: number}>;
-  readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<{value: null, resultCode: number}>;
-  readI2CMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number): Promise<{value: null, resultCode: number}>;
-  writeI2CReadMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number, startAddress: number): Promise<{value: null, resultCode: number}>;
-  getI2CReadStatus(i2cChannel: number): Promise<{value: I2CReadStatus, resultCode: number}>;
+  setI2CChannelConfiguration(i2cChannel: number, speedCode: I2CSpeedCode): Promise<{resultCode: number}>;
+  getI2CChannelConfiguration(i2cChannel: number): Promise<{value?: I2CSpeedCode, resultCode: number}>;
+  writeI2CSingleByte(i2cChannel: number, slaveAddress: number, byte: number): Promise<{resultCode: number}>;
+  writeI2CMultipleBytes(i2cChannel: number, slaveAddress: number, bytes: number[]): Promise<{resultCode: number}>;
+  getI2CWriteStatus(i2cChannel: number): Promise<{value?: I2CWriteStatus, resultCode: number}>;
+  readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<{resultCode: number}>;
+  readI2CMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number): Promise<{resultCode: number}>;
+  writeI2CReadMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number, startAddress: number): Promise<{resultCode: number}>;
+  getI2CReadStatus(i2cChannel: number): Promise<{value?: I2CReadStatus, resultCode: number}>;
 
   // Motor
-  setMotorChannelMode(motorChannel: number, motorMode: number, floatAtZero: boolean): Promise<{value: null, resultCode: number}>;
-  getMotorChannelMode(motorChannel: number): Promise<{value: {motorMode: number, floatAtZero: boolean}, resultCode: number}>
-  setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<{value: null, resultCode: number}>;
-  getMotorChannelEnable(motorChannel: number): Promise<{value: boolean, resultCode: number}>;
-  setMotorChannelCurrentAlertLevel(motorChannel: number, currentLimit_mA: number): Promise<{value: null, resultCode: number}>;
-  getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<{value: number, resultCode: number}>;
-  resetMotorEncoder(motorChannel: number): Promise<{value: null, resultCode: number}>;
-  setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<{value: null, resultCode: number}>;
-  getMotorConstantPower(motorChannel: number): Promise<{value: number, resultCode: number}>;
-  setMotorTargetVelocity(motorChannel: number, velocity_cps: number): Promise<{value: null, resultCode: number}>;
-  getMotorTargetVelocity(motorChannel: number): Promise<{value: number, resultCode: number}>;
-  setMotorTargetPosition(motorChannel: number, targetPosition_counts: number, targetTolerance_counts: number): Promise<{value: null, resultCode: number}>;
-  getMotorTargetPosition(motorChannel: number): Promise<{value: {targetPosition: number, targetTolerance: number}, resultCode: number}>;
-  getMotorAtTarget(motorChannel: number): Promise<{value: boolean, resultCode: number}>;
-  getMotorEncoderPosition(motorChannel: number): Promise<{value: number, resultCode: number}>;
-  setMotorPIDCoefficients(motorChannel: number, motorMode: number, pid: PIDCoefficients): Promise<{value: null, resultCode: number}>;
-  getMotorPIDCoefficients(motorChannel: number, motorMode: number): Promise<{value: PIDCoefficients, resultCode: number}>;
+  setMotorChannelMode(motorChannel: number, motorMode: number, floatAtZero: boolean): Promise<{resultCode: number}>;
+  getMotorChannelMode(motorChannel: number): Promise<{value?: {motorMode: number, floatAtZero: boolean}, resultCode: number}>
+  setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<{resultCode: number}>;
+  getMotorChannelEnable(motorChannel: number): Promise<{value?: boolean, resultCode: number}>;
+  setMotorChannelCurrentAlertLevel(motorChannel: number, currentLimit_mA: number): Promise<{resultCode: number}>;
+  getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<{value?: number, resultCode: number}>;
+  resetMotorEncoder(motorChannel: number): Promise<{resultCode: number}>;
+  setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<{resultCode: number}>;
+  getMotorConstantPower(motorChannel: number): Promise<{value?: number, resultCode: number}>;
+  setMotorTargetVelocity(motorChannel: number, velocity_cps: number): Promise<{resultCode: number}>;
+  getMotorTargetVelocity(motorChannel: number): Promise<{value?: number, resultCode: number}>;
+  setMotorTargetPosition(motorChannel: number, targetPosition_counts: number, targetTolerance_counts: number): Promise<{resultCode: number}>;
+  getMotorTargetPosition(motorChannel: number): Promise<{value?: {targetPosition: number, targetTolerance: number}, resultCode: number}>;
+  getMotorAtTarget(motorChannel: number): Promise<{value?: boolean, resultCode: number}>;
+  getMotorEncoderPosition(motorChannel: number): Promise<{value?: number, resultCode: number}>;
+  setMotorPIDCoefficients(motorChannel: number, motorMode: number, pid: PIDCoefficients): Promise<{resultCode: number}>;
+  getMotorPIDCoefficients(motorChannel: number, motorMode: number): Promise<{value?: PIDCoefficients, resultCode: number}>;
 
   // PWM
-  setPWMConfiguration(pwmChannel: number, framePeriod: number): Promise<{value: null, resultCode: number}>;
-  getPWMConfiguration(pwmChannel: number): Promise<{value: number, resultCode: number}>;
-  setPWMPulseWidth(pwmChannel: number, pulseWidth: number): Promise<{value: null, resultCode: number}>;
-  getPWMPulseWidth(pwmChannel: number): Promise<{value: number, resultCode: number}>;
-  setPWMEnable(pwmChannel: number, enable: boolean): Promise<{value: null, resultCode: number}>;
-  getPWMEnable(pwmChannel: number): Promise<{value: boolean, resultCode: number}>;
+  setPWMConfiguration(pwmChannel: number, framePeriod: number): Promise<{resultCode: number}>;
+  getPWMConfiguration(pwmChannel: number): Promise<{value?: number, resultCode: number}>;
+  setPWMPulseWidth(pwmChannel: number, pulseWidth: number): Promise<{resultCode: number}>;
+  getPWMPulseWidth(pwmChannel: number): Promise<{value?: number, resultCode: number}>;
+  setPWMEnable(pwmChannel: number, enable: boolean): Promise<{resultCode: number}>;
+  getPWMEnable(pwmChannel: number): Promise<{value?: boolean, resultCode: number}>;
 
   // Servo
-  setServoConfiguration(servoChannel: number, framePeriod: number): Promise<{value: null, resultCode: number}>;
-  getServoConfiguration(servoChannel: number): Promise<{value: number, resultCode: number}>;
-  setServoPulseWidth(servoChannel: number, pulseWidth: number): Promise<{value: null, resultCode: number}>;
-  getServoPulseWidth(servoChannel: number): Promise<{value: number, resultCode: number}>;
-  setServoEnable(servoChannel: number, enable: boolean): Promise<{value: null, resultCode: number}>;
-  getServoEnable(servoChannel: number): Promise<{value: boolean, resultCode: number}>;
+  setServoConfiguration(servoChannel: number, framePeriod: number): Promise<{resultCode: number}>;
+  getServoConfiguration(servoChannel: number): Promise<{value?: number, resultCode: number}>;
+  setServoPulseWidth(servoChannel: number, pulseWidth: number): Promise<{resultCode: number}>;
+  getServoPulseWidth(servoChannel: number): Promise<{value?: number, resultCode: number}>;
+  setServoEnable(servoChannel: number, enable: boolean): Promise<{resultCode: number}>;
+  getServoEnable(servoChannel: number): Promise<{value?: boolean, resultCode: number}>;
 }

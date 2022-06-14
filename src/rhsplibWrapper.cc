@@ -955,13 +955,6 @@ Napi::Value RHSPlib::getI2CWriteStatus(const Napi::CallbackInfo &info) {
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
-    if (_code < 0) {
-      Napi::Object nullStatus = Napi::Object::New(_env);
-      nullStatus.Set("i2cTransactionStatus", 0);
-      nullStatus.Set("numBytesWritten", 0);
-      return nullStatus;
-    }
-
     Napi::Object i2cWriteStatus = Napi::Object::New(_env);
     i2cWriteStatus.Set("i2cTransactionStatus", _data.i2cTransactionStatus);
     i2cWriteStatus.Set("numBytesWritten", _data.numBytesWritten);
@@ -1038,14 +1031,6 @@ Napi::Value RHSPlib::getI2CReadStatus(const Napi::CallbackInfo &info) {
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
-    if (_code < 0) {
-      Napi::Object nullStatus = Napi::Object::New(_env);
-      nullStatus.Set("i2cTransactionStatus", 0);
-      nullStatus.Set("numBytesRead", 0);
-      nullStatus.Set("bytes", Napi::Array::New(_env, 0));
-      return nullStatus;
-    }
-
     Napi::Object i2cReadStatus = Napi::Object::New(_env);
     i2cReadStatus.Set("i2cTransactionStatus", _data.i2cTransactionStatus);
     i2cReadStatus.Set("numBytesRead", _data.numBytesRead);
