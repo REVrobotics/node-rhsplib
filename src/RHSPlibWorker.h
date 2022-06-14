@@ -111,11 +111,10 @@ class RHSPlibWorker : public Napi::AsyncWorker {
    */
   void OnOK() override {
     Napi::Object resultObj = Napi::Object::New(Env());
-    resultObj.Set(
-        "value",
-        (callbackFunction ? callbackFunction(Env(), resultCode, returnData)
-                          : Env().Null()));
     resultObj.Set("resultCode", resultCode);
+    if (resultCode >= 0 && callbackFunction) {
+      resultObj.Set("value", callbackFunction(Env(), resultCode, returnData));
+    }
     deferred.Resolve(resultObj);
   }
 
@@ -175,11 +174,9 @@ class RHSPlibWorker<void> : public Napi::AsyncWorker {
 
   /**
    * @brief Resolve the promise with an object that contains the `resultCode`
-   * and null as the value.
    */
   void OnOK() override {
     Napi::Object resultObj = Napi::Object::New(Env());
-    resultObj.Set("value", Env().Null());
     resultObj.Set("resultCode", resultCode);
     deferred.Resolve(resultObj);
   }
