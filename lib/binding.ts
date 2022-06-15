@@ -37,6 +37,11 @@ export enum DIODirection {
   Output
 }
 
+export enum I2CSpeedCode {
+  SpeedCode100_Kbps,
+  SpeedCode400_Kbps
+}
+
 export interface ModuleStatus {
   statusWord: number;
   motorAlerts: number;
@@ -106,6 +111,17 @@ export interface Version {
   hwType: number;
 }
 
+export interface I2CWriteStatus {
+  i2cTransactionStatus: number;
+  numBytesWritten: number;
+}
+
+export interface I2CReadStatus {
+  i2cTransactionStatus: number;
+  numBytesRead: number;
+  bytes: number[];
+}
+
 export declare class Serial {
   constructor();
   open(serialPortName: string, baudrate: number, databits: number, parity: SerialParity, stopbits: number, flowControl: SerialFlowControl): void;
@@ -158,4 +174,15 @@ export declare class RHSPlib {
   getDigitalDirection(dioPin: number): Promise<{value: DIODirection, resultCode: number}>;
   getDigitalSingleInput(dioPin: number): Promise<{value: boolean, resultCode: number}>;
   getDigitalAllInputs(): Promise<{value: number, resultCode: number}>;
+  
+  // I2C
+  setI2CChannelConfiguration(i2cChannel: number, speedCode: I2CSpeedCode): Promise<{value: null, resultCode: number}>;
+  getI2CChannelConfiguration(i2cChannel: number): Promise<{value: I2CSpeedCode, resultCode: number}>;
+  writeI2CSingleByte(i2cChannel: number, slaveAddress: number, byte: number): Promise<{value: null, resultCode: number}>;
+  writeI2CMultipleBytes(i2cChannel: number, slaveAddress: number, bytes: number[]): Promise<{value: null, resultCode: number}>;
+  getI2CWriteStatus(i2cChannel: number): Promise<{value: I2CWriteStatus, resultCode: number}>;
+  readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<{value: null, resultCode: number}>;
+  readI2CMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number): Promise<{value: null, resultCode: number}>;
+  writeI2CReadMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number, startAddress: number): Promise<{value: null, resultCode: number}>;
+  getI2CReadStatus(i2cChannel: number): Promise<{value: I2CReadStatus, resultCode: number}>;
 }

@@ -2,6 +2,7 @@
 
 #include <rev/RHSPlib_device_control.h>
 #include <rev/RHSPlib_dio.h>
+#include <rev/RHSPlib_i2c.h>
 
 #include "RHSPlibWorker.h"
 #include "serialWrapper.h"
@@ -74,6 +75,24 @@ Napi::Object RHSPlib::Init(Napi::Env env, Napi::Object exports) {
                                   &RHSPlib::getDigitalSingleInput),
           RHSPlib::InstanceMethod("getDigitalAllInputs",
                                   &RHSPlib::getDigitalAllInputs),
+          RHSPlib::InstanceMethod("setI2CChannelConfiguration",
+                                  &RHSPlib::setI2CChannelConfiguration),
+          RHSPlib::InstanceMethod("getI2CChannelConfiguration",
+                                  &RHSPlib::getI2CChannelConfiguration),
+          RHSPlib::InstanceMethod("writeI2CSingleByte",
+                                  &RHSPlib::writeI2CSingleByte),
+          RHSPlib::InstanceMethod("writeI2CMultipleBytes",
+                                  &RHSPlib::writeI2CMultipleBytes),
+          RHSPlib::InstanceMethod("getI2CWriteStatus",
+                                  &RHSPlib::getI2CWriteStatus),
+          RHSPlib::InstanceMethod("readI2CSingleByte",
+                                  &RHSPlib::readI2CSingleByte),
+          RHSPlib::InstanceMethod("readI2CMultipleBytes",
+                                  &RHSPlib::readI2CMultipleBytes),
+          RHSPlib::InstanceMethod("writeI2CReadMultipleBytes",
+                                  &RHSPlib::writeI2CReadMultipleBytes),
+          RHSPlib::InstanceMethod("getI2CReadStatus",
+                                  &RHSPlib::getI2CReadStatus),
       });
 
   Napi::FunctionReference *constructor = new Napi::FunctionReference();
@@ -785,6 +804,202 @@ Napi::Value RHSPlib::getDigitalAllInputs(const Napi::CallbackInfo &info) {
 
   SET_WORKER_CALLBACK(worker, retType,
                       { return Napi::Number::New(_env, _data); });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::setI2CChannelConfiguration(
+    const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t speedCode = info[1].As<Napi::Number>().Uint32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_i2c_configureChannel(&this->obj, i2cChannel, speedCode,
+                                         &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getI2CChannelConfiguration(
+    const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = uint8_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_i2c_configureQuery(&this->obj, i2cChannel, &_data,
+                                       &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Number::New(_env, _data); });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::writeI2CSingleByte(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t slaveAddress = info[1].As<Napi::Number>().Uint32Value();
+  uint8_t byte = info[2].As<Napi::Number>().Uint32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_i2c_writeSingleByte(&this->obj, i2cChannel, slaveAddress,
+                                        byte, &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::writeI2CMultipleBytes(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t slaveAddress = info[1].As<Napi::Number>().Uint32Value();
+  Napi::Array bytesArray = info[2].As<Napi::Array>();
+  uint8_t numBytes = bytesArray.Length();
+
+  uint8_t *bytes = new uint8_t[numBytes];
+  for (int i = 0; i < numBytes; i++) {
+    bytes[i] = bytesArray.Get(i).As<Napi::Number>().Uint32Value();
+  }
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_i2c_writeMultipleBytes(&this->obj, i2cChannel, slaveAddress,
+                                           numBytes, bytes, &nackReasonCode);
+    delete[] bytes;
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getI2CWriteStatus(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = struct {
+    uint8_t i2cTransactionStatus;
+    uint8_t numBytesWritten;
+  };
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_i2c_writeStatusQuery(
+        &this->obj, i2cChannel, &_data.i2cTransactionStatus,
+        &_data.numBytesWritten, &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType, {
+    if (_code < 0) {
+      Napi::Object nullStatus = Napi::Object::New(_env);
+      nullStatus.Set("i2cTransactionStatus", 0);
+      nullStatus.Set("numBytesWritten", 0);
+      return nullStatus;
+    }
+
+    Napi::Object i2cWriteStatus = Napi::Object::New(_env);
+    i2cWriteStatus.Set("i2cTransactionStatus", _data.i2cTransactionStatus);
+    i2cWriteStatus.Set("numBytesWritten", _data.numBytesWritten);
+    return i2cWriteStatus;
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::readI2CSingleByte(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t slaveAddress = info[1].As<Napi::Number>().Uint32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_i2c_readSingleByte(&this->obj, i2cChannel, slaveAddress,
+                                       &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::readI2CMultipleBytes(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t slaveAddress = info[1].As<Napi::Number>().Uint32Value();
+  uint8_t numBytesToRead = info[2].As<Napi::Number>().Uint32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_i2c_readMultipleBytes(&this->obj, i2cChannel, slaveAddress,
+                                          numBytesToRead, &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::writeI2CReadMultipleBytes(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t slaveAddress = info[1].As<Napi::Number>().Uint32Value();
+  uint8_t numBytesToRead = info[2].As<Napi::Number>().Uint32Value();
+  uint8_t startAddress = info[3].As<Napi::Number>().Uint32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_i2c_writeReadMultipleBytes(&this->obj, i2cChannel,
+                                               slaveAddress, numBytesToRead,
+                                               startAddress, &nackReasonCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RHSPlib::getI2CReadStatus(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
+
+  using retType = struct {
+    uint8_t i2cTransactionStatus;
+    uint8_t numBytesRead;
+    uint8_t bytes[100];
+  };
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_i2c_readStatusQuery(
+        &this->obj, i2cChannel, &_data.i2cTransactionStatus,
+        &_data.numBytesRead, _data.bytes, &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType, {
+    if (_code < 0) {
+      Napi::Object nullStatus = Napi::Object::New(_env);
+      nullStatus.Set("i2cTransactionStatus", 0);
+      nullStatus.Set("numBytesRead", 0);
+      nullStatus.Set("bytes", Napi::Array::New(_env, 0));
+      return nullStatus;
+    }
+
+    Napi::Object i2cReadStatus = Napi::Object::New(_env);
+    i2cReadStatus.Set("i2cTransactionStatus", _data.i2cTransactionStatus);
+    i2cReadStatus.Set("numBytesRead", _data.numBytesRead);
+    Napi::Array bytes = Napi::Array::New(_env, _data.numBytesRead);
+    for (int i = 0; i < _data.numBytesRead; i++) {
+      bytes[i] = _data.bytes[i];
+    }
+    i2cReadStatus.Set("bytes", bytes);
+    return i2cReadStatus;
+  });
 
   QUEUE_WORKER(worker);
 }
