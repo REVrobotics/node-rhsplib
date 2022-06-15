@@ -1,5 +1,7 @@
 #include "rhsplibWrapper.h"
 
+#include <rev/RHSPlib_device_control.h>
+
 #include "RHSPlibWorker.h"
 #include "serialWrapper.h"
 
@@ -43,6 +45,22 @@ Napi::Object RHSPlib::Init(Napi::Env env, Napi::Object exports) {
           RHSPlib::StaticMethod("discovery", &RHSPlib::discovery),
           RHSPlib::InstanceMethod("getInterfacePacketID",
                                   &RHSPlib::getInterfacePacketID),
+          RHSPlib::InstanceMethod("getBulkInputData",
+                                  &RHSPlib::getBulkInputData),
+          RHSPlib::InstanceMethod("getADC", &RHSPlib::getADC),
+          RHSPlib::InstanceMethod("setPhoneChargeControl",
+                                  &RHSPlib::setPhoneChargeControl),
+          RHSPlib::InstanceMethod("getPhoneChargeControl",
+                                  &RHSPlib::getPhoneChargeControl),
+          RHSPlib::InstanceMethod("injectDataLogHint",
+                                  &RHSPlib::injectDataLogHint),
+          RHSPlib::InstanceMethod("readVersionString",
+                                  &RHSPlib::readVersionString),
+          RHSPlib::InstanceMethod("readVersion", &RHSPlib::readVersion),
+          RHSPlib::InstanceMethod("setFTDIResetControl",
+                                  &RHSPlib::setFTDIResetControl),
+          RHSPlib::InstanceMethod("getFTDIResetControl",
+                                  &RHSPlib::getFTDIResetControl),
       });
 
   Napi::FunctionReference *constructor = new Napi::FunctionReference();
@@ -416,7 +434,7 @@ Napi::Value RHSPlib::getModuleLEDPattern(const Napi::CallbackInfo &info) {
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
-    Napi::Object ledPatternObj = Napi::Object::New(env);
+    Napi::Object ledPatternObj = Napi::Object::New(_env);
     ledPatternObj.Set("rgbtPatternStep0", _data.rgbtPatternStep0);
     ledPatternObj.Set("rgbtPatternStep1", _data.rgbtPatternStep1);
     ledPatternObj.Set("rgbtPatternStep2", _data.rgbtPatternStep2);
@@ -504,7 +522,185 @@ Napi::Value RHSPlib::getInterfacePacketID(const Napi::CallbackInfo &info) {
   });
 
   SET_WORKER_CALLBACK(worker, retType,
-                      { return Napi::Number::New(env, _data); });
+                      { return Napi::Number::New(_env, _data); });
+
+  worker->Queue();
+  return worker->GetPromise();
+}
+
+Napi::Value RHSPlib::getBulkInputData(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  using retType = RHSPlib_BulkInputData_T;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_deviceControl_getBulkInputData(&this->obj, &_data,
+                                                   &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType, {
+    Napi::Object bulkInputDataObj = Napi::Object::New(_env);
+    bulkInputDataObj.Set("digitalInputs", _data.digitalInputs);
+    bulkInputDataObj.Set("motor0position_enc", _data.motor0position_enc);
+    bulkInputDataObj.Set("motor1position_enc", _data.motor1position_enc);
+    bulkInputDataObj.Set("motor2position_enc", _data.motor2position_enc);
+    bulkInputDataObj.Set("motor3position_enc", _data.motor3position_enc);
+    bulkInputDataObj.Set("motorStatus", _data.motorStatus);
+    bulkInputDataObj.Set("motor0velocity_cps", _data.motor0velocity_cps);
+    bulkInputDataObj.Set("motor1velocity_cps", _data.motor1velocity_cps);
+    bulkInputDataObj.Set("motor2velocity_cps", _data.motor2velocity_cps);
+    bulkInputDataObj.Set("motor3velocity_cps", _data.motor3velocity_cps);
+    bulkInputDataObj.Set("analog0_mV", _data.analog0_mV);
+    bulkInputDataObj.Set("analog1_mV", _data.analog1_mV);
+    bulkInputDataObj.Set("analog2_mV", _data.analog2_mV);
+    bulkInputDataObj.Set("analog3_mV", _data.analog3_mV);
+    bulkInputDataObj.Set("attentionRequired", _data.attentionRequired);
+    return bulkInputDataObj;
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
+}
+
+Napi::Value RHSPlib::getADC(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t adcChannelToRead = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t rawMode = info[1].As<Napi::Number>().Uint32Value();
+
+  using retType = int16_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_deviceControl_getADC(&this->obj, adcChannelToRead, rawMode,
+                                         &_data, &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Number::New(_env, _data); });
+
+  worker->Queue();
+  return worker->GetPromise();
+}
+
+Napi::Value RHSPlib::setPhoneChargeControl(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t chargeEnable = info[0].As<Napi::Number>().Uint32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_deviceControl_phoneChargeControl(&this->obj, chargeEnable,
+                                                     &nackReasonCode);
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
+}
+
+Napi::Value RHSPlib::getPhoneChargeControl(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  using retType = uint8_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_deviceControl_phoneChargeQuery(&this->obj, &_data,
+                                                   &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Boolean::New(_env, _data); });
+
+  worker->Queue();
+  return worker->GetPromise();
+}
+
+Napi::Value RHSPlib::injectDataLogHint(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  char *hintText = &(info[0].As<Napi::String>().Utf8Value())[0];
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_deviceControl_injectDataLogHint(&this->obj, hintText,
+                                                    &nackReasonCode);
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
+}
+
+Napi::Value RHSPlib::readVersionString(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  using retType = struct {
+    uint8_t textLength;
+    char text[40];
+  };
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_deviceControl_readVersionString(
+        &this->obj, &_data.textLength, _data.text, &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType, {
+    return Napi::String::New(_env, _data.text, _data.textLength);
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
+}
+
+Napi::Value RHSPlib::readVersion(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  using retType = RHSPlib_Version_T;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code =
+        RHSPlib_deviceControl_readVersion(&this->obj, &_data, &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType, {
+    Napi::Object version = Napi::Object::New(_env);
+    version.Set("engineeringRevision", _data.engineeringRevision);
+    version.Set("minorVersion", _data.minorVersion);
+    version.Set("majorVersion", _data.majorVersion);
+    version.Set("hwRevision", _data.hwRevision);
+    version.Set("hwType", _data.hwType);
+    return version;
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
+}
+
+Napi::Value RHSPlib::setFTDIResetControl(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t ftdiResetControl = info[0].As<Napi::Number>().Uint32Value();
+
+  CREATE_VOID_WORKER(worker, env, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_deviceControl_ftdiResetControl(&this->obj, ftdiResetControl,
+                                                   &nackReasonCode);
+  });
+
+  worker->Queue();
+  return worker->GetPromise();
+}
+
+Napi::Value RHSPlib::getFTDIResetControl(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  using retType = uint8_t;
+  CREATE_WORKER(worker, env, retType, {
+    uint8_t nackReasonCode;
+    _code = RHSPlib_deviceControl_ftdiResetQuery(&this->obj, &_data,
+                                                 &nackReasonCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType,
+                      { return Napi::Boolean::New(_env, _data); });
 
   worker->Queue();
   return worker->GetPromise();

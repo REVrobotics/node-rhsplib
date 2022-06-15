@@ -74,6 +74,32 @@ export interface DiscoveredAddresses {
   numberOfChildModules: number;
 }
 
+export interface BulkInputData {
+  digitalInputs: number;
+  motor0position_enc: number;
+  motor1position_enc: number;
+  motor2position_enc: number;
+  motor3position_enc: number;
+  motorStatus: number;
+  motor0velocity_cps: number;
+  motor1velocity_cps: number;
+  motor2velocity_cps: number;
+  motor3velocity_cps: number;
+  analog0_mV: number;
+  analog1_mV: number;
+  analog2_mV: number;
+  analog3_mV: number;
+  attentionRequired: number;
+}
+
+export interface Version {
+  engineeringRevision: number;
+  minorVersion: number;
+  majorVersion: number;
+  hwRevision: number;
+  hwType: number;
+}
+
 export declare class Serial {
   constructor();
   open(serialPortName: string, baudrate: number, databits: number, parity: SerialParity, stopbits: number, flowControl: SerialFlowControl): void;
@@ -107,4 +133,15 @@ export declare class RHSPlib {
   setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<{value: null, resultCode: number}>;
   discovery(serialPort: Serial): Promise<{value: DiscoveredAddresses, resultCode: number}>;
   getInterfacePacketID(interfaceName: string, functionNumber: number): Promise<{value: number, resultCode: number}>;
+
+  // Device Control
+  getBulkInputData(): Promise<{value: BulkInputData, resultCode: number}>;
+  getADC(): Promise<{value: number, resultCode: number}>;
+  setPhoneChargeControl(chargeEnable: boolean): Promise<{value: null, resultCode: number}>;
+  getPhoneChargeControl(): Promise<{value: boolean, resultCode: number}>;
+  injectDataLogHint(hintText: string): Promise<{value: null, resultCode: number}>;
+  readVersionString(): Promise<{value: string, resultCode: number}>;
+  readVersion(): Promise<{value: Version, resultCode: number}>;
+  setFTDIResetControl(ftdiResetControl: boolean): Promise<{value: null, resultCode: number}>;
+  getFTDIResetControl(): Promise<{value: boolean, resultCode: number}>;
 }

@@ -34,6 +34,18 @@ class RHSPlib : public Napi::ObjectWrap<RHSPlib> {
   static Napi::Value discovery(const Napi::CallbackInfo &info);
   Napi::Value getInterfacePacketID(const Napi::CallbackInfo &info);
 
+  /* Device Control */
+
+  Napi::Value getBulkInputData(const Napi::CallbackInfo &info);
+  Napi::Value getADC(const Napi::CallbackInfo &info);
+  Napi::Value setPhoneChargeControl(const Napi::CallbackInfo &info);
+  Napi::Value getPhoneChargeControl(const Napi::CallbackInfo &info);
+  Napi::Value injectDataLogHint(const Napi::CallbackInfo &info);
+  Napi::Value readVersionString(const Napi::CallbackInfo &info);
+  Napi::Value readVersion(const Napi::CallbackInfo &info);
+  Napi::Value setFTDIResetControl(const Napi::CallbackInfo &info);
+  Napi::Value getFTDIResetControl(const Napi::CallbackInfo &info);
+
  private:
   RHSPlib_Module_T obj;
 };
