@@ -54,6 +54,17 @@ class RHSPlib : public Napi::ObjectWrap<RHSPlib> {
   Napi::Value getDigitalSingleInput(const Napi::CallbackInfo &info);
   Napi::Value getDigitalAllInputs(const Napi::CallbackInfo &info);
 
+  /* I2C */
+  Napi::Value setI2CChannelConfiguration(const Napi::CallbackInfo &info);
+  Napi::Value getI2CChannelConfiguration(const Napi::CallbackInfo &info);
+  Napi::Value writeI2CSingleByte(const Napi::CallbackInfo &info);
+  Napi::Value writeI2CMultipleBytes(const Napi::CallbackInfo &info);
+  Napi::Value getI2CWriteStatus(const Napi::CallbackInfo &info);
+  Napi::Value readI2CSingleByte(const Napi::CallbackInfo &info);
+  Napi::Value readI2CMultipleBytes(const Napi::CallbackInfo &info);
+  Napi::Value writeI2CReadMultipleBytes(const Napi::CallbackInfo &info);
+  Napi::Value getI2CReadStatus(const Napi::CallbackInfo &info);
+
  private:
   RHSPlib_Module_T obj;
 };
