@@ -22,6 +22,10 @@
       'libraries': [
         '<(module_root_dir)/RHSPlib/x86-64/RHSPlib.lib',
       ],
+      'copies':[{
+        'destination': './build/Release',
+        'files':['<(module_root_dir)/bin/*'],
+      }],
       'msvs_settings': {
         'VCCLCompilerTool': {
             'ExceptionHandling': 1,
