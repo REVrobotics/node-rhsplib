@@ -4,7 +4,8 @@
       'target_name': 'addon',
       'sources': [
         'src/addon.cc',
-        'src/rhsplibWrapper.cc'
+        'src/rhsplibWrapper.cc',
+        'src/serialWrapper.cc'
       ],
       'include_dirs': [
         'src/',
@@ -17,6 +18,9 @@
       ],
       'dependencies': [
         "<!(node -p \"require('node-addon-api').gyp\")"
+      ],
+      'libraries': [
+        '<(module_root_dir)/RHSPlib/x86-64/RHSPlib.lib',
       ],
       'msvs_settings': {
         'VCCLCompilerTool': {
