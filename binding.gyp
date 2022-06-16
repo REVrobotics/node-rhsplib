@@ -8,6 +8,8 @@
       ],
       'include_dirs': [
         'src/',
+        'RHSPlib/',
+        'RHSPlib/arch/includes/',
         "<!@(node -p \"require('node-addon-api').include\")"
       ],
       'defines': [
