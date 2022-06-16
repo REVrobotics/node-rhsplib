@@ -17,8 +17,7 @@
   },
   "scripts": {
     "install": "node-gyp rebuild",
-    "pretest": "node-gyp build && tsc",
-    "test": "node --napi-modules test/test_binding.js"
+    "prepublish": "node-gyp build && tsc"
   },
   "gypfile": true,
   "devDependencies": {
