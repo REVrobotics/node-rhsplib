@@ -1,6 +1,6 @@
 # node-rhsplib
 
-This package enables Node.js applications to use RHSPlib.
+This package enables Node.js applications to control devices that speak the REV Hub Serial Protocol (such as the REV Robotics Expansion Hub).
 
 ## Making a release
 
