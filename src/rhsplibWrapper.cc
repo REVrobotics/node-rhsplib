@@ -179,7 +179,7 @@ Napi::Value RHSPlib::open(const Napi::CallbackInfo &info) {
   uint8_t destAddress = info[1].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    _code = RHSPlib_open(&this->obj, &serialPort->getSerialObj(), destAddress);
+    _code = RHSPlib_open(&this->obj, serialPort->getSerialObj(), destAddress);
   });
 
   QUEUE_WORKER(worker);
@@ -561,7 +561,7 @@ Napi::Value RHSPlib::discovery(const Napi::CallbackInfo &info) {
 
   using retType = RHSPlib_DiscoveredAddresses_T;
   CREATE_WORKER(worker, env, retType, {
-    _code = RHSPlib_discovery(&serialPort->getSerialObj(), &_data);
+    _code = RHSPlib_discovery(serialPort->getSerialObj(), &_data);
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
