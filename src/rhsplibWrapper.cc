@@ -179,7 +179,7 @@ Napi::Value RHSPlib::open(const Napi::CallbackInfo &info) {
   uint8_t destAddress = info[1].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    _code = RHSPlib_open(&this->obj, &serialPort->getSerialObj(), destAddress);
+    _code = RHSPlib_open(&this->obj, serialPort->getSerialObj(), destAddress);
   });
 
   QUEUE_WORKER(worker);
@@ -392,7 +392,8 @@ Napi::Value RHSPlib::setNewModuleAddress(const Napi::CallbackInfo &info) {
 Napi::Value RHSPlib::queryInterface(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
-  char *interfaceName = &(info[0].As<Napi::String>().Utf8Value())[0];
+  std::string interfaceNameStr = info[0].As<Napi::String>().Utf8Value();
+  const char *interfaceName = &interfaceNameStr[0];
 
   using retType = RHSPlib_Module_Interface_T;
   CREATE_WORKER(worker, env, retType, {
@@ -560,7 +561,7 @@ Napi::Value RHSPlib::discovery(const Napi::CallbackInfo &info) {
 
   using retType = RHSPlib_DiscoveredAddresses_T;
   CREATE_WORKER(worker, env, retType, {
-    _code = RHSPlib_discovery(&serialPort->getSerialObj(), &_data);
+    _code = RHSPlib_discovery(serialPort->getSerialObj(), &_data);
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
@@ -584,7 +585,8 @@ Napi::Value RHSPlib::discovery(const Napi::CallbackInfo &info) {
 Napi::Value RHSPlib::getInterfacePacketID(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
-  char *interfaceName = &(info[0].As<Napi::String>().Utf8Value())[0];
+  std::string interfaceNameStr = info[0].As<Napi::String>().Utf8Value();
+  const char *interfaceName = &interfaceNameStr[0];
   uint16_t functionNumber = info[1].As<Napi::Number>().Uint32Value();
 
   using retType = uint16_t;
@@ -685,7 +687,8 @@ Napi::Value RHSPlib::getPhoneChargeControl(const Napi::CallbackInfo &info) {
 Napi::Value RHSPlib::injectDataLogHint(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
-  char *hintText = &(info[0].As<Napi::String>().Utf8Value())[0];
+  std::string hintTextStr = info[0].As<Napi::String>().Utf8Value();
+  const char *hintText = &hintTextStr[0];
 
   CREATE_VOID_WORKER(worker, env, {
     uint8_t nackReasonCode;

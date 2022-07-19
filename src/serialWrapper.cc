@@ -35,7 +35,8 @@ Serial::Serial(const Napi::CallbackInfo &info)
 Napi::Value Serial::open(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
-  const char *serialPortName = &(info[0].As<Napi::String>().Utf8Value())[0];
+  std::string serialPortNameStr = info[0].As<Napi::String>().Utf8Value();
+  const char *serialPortName = &serialPortNameStr[0];
   uint32_t baudrate = info[1].As<Napi::Number>().Uint32Value();
   uint32_t databits = info[2].As<Napi::Number>().Uint32Value();
   RHSPlib_Serial_Parity_T parity = static_cast<RHSPlib_Serial_Parity_T>(
