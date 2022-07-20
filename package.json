@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "author": "REV Robotics",
   "description": "Node addon for RHSPlib",
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "main": "dist/binding.js",
   "types": "dist/binding.d.ts",
   "repository": {
