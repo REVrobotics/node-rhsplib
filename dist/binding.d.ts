@@ -114,10 +114,17 @@ export interface PIDCoefficients {
 }
 export declare class Serial {
     constructor();
-    open(serialPortName: string, baudrate: number, databits: number, parity: SerialParity, stopbits: number, flowControl: SerialFlowControl): void;
+    open(serialPortName: string, baudrate: number, databits: number, parity: SerialParity, stopbits: number, flowControl: SerialFlowControl): Promise<{
+        resultCode: number;
+    }>;
     close(): void;
-    read(numBytesToRead: number): number[];
-    write(bytes: number[]): void;
+    read(numBytesToRead: number): Promise<{
+        resultCode: number;
+        value: number[];
+    }>;
+    write(bytes: number[]): Promise<{
+        resultCode: number;
+    }>;
 }
 export declare class RHSPlib {
     constructor();
