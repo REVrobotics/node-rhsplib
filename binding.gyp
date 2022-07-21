@@ -4,7 +4,7 @@
       'target_name': 'addon',
       'sources': [
         'src/addon.cc',
-        'src/rhsplibWrapper.cc',
+        'src/RevHubWrapper.cc',
         'src/serialWrapper.cc'
       ],
       'include_dirs': [

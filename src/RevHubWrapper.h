@@ -1,14 +1,14 @@
-#ifndef RHSPLIB_WRAPPER_H_
-#define RHSPLIB_WRAPPER_H_
+#ifndef REVHUB_WRAPPER_H_
+#define REVHUB_WRAPPER_H_
 
 #include <napi.h>
 #include <rev/RHSPlib.h>
 
-class RHSPlib : public Napi::ObjectWrap<RHSPlib> {
+class RevHub : public Napi::ObjectWrap<RevHub> {
  public:
   static Napi::Object Init(Napi::Env env, Napi::Object exports);
 
-  RHSPlib(const Napi::CallbackInfo &info);
+  RevHub(const Napi::CallbackInfo &info);
 
   Napi::Value open(const Napi::CallbackInfo &info);
   Napi::Value isOpened(const Napi::CallbackInfo &info);
@@ -31,7 +31,7 @@ class RHSPlib : public Napi::ObjectWrap<RHSPlib> {
   Napi::Value setModuleLEDPattern(const Napi::CallbackInfo &info);
   Napi::Value getModuleLEDPattern(const Napi::CallbackInfo &info);
   Napi::Value setDebugLogLevel(const Napi::CallbackInfo &info);
-  static Napi::Value discovery(const Napi::CallbackInfo &info);
+  static Napi::Value discoverRevHubs(const Napi::CallbackInfo &info);
   Napi::Value getInterfacePacketID(const Napi::CallbackInfo &info);
 
   /* Device Control */

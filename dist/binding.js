@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.I2CSpeedCode = exports.DIODirection = exports.VerbosityLevel = exports.DebugGroup = exports.SerialFlowControl = exports.SerialParity = void 0;
 var addon = require('bindings')('addon');
 module.exports.Serial = addon.Serial;
-module.exports.RHSPlib = addon.RHSPlib;
+module.exports.RevHub = addon.RevHub;
 var SerialParity;
 (function (SerialParity) {
     SerialParity[SerialParity["None"] = 0] = "None";

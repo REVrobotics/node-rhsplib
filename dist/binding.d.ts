@@ -126,7 +126,7 @@ export declare class Serial {
         resultCode: number;
     }>;
 }
-export declare class RHSPlib {
+export declare class RevHub {
     constructor();
     open(serialPort: Serial, destAddress: number): Promise<{
         resultCode: number;
@@ -185,7 +185,7 @@ export declare class RHSPlib {
     setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<{
         resultCode: number;
     }>;
-    static discovery(serialPort: Serial): Promise<{
+    static discoverRevHubs(serialPort: Serial): Promise<{
         value?: DiscoveredAddresses;
         resultCode: number;
     }>;
