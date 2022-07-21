@@ -1,3 +1,8 @@
+const addon = require('bindings')('addon');
+
+module.exports.Serial = addon.Serial;
+module.exports.RHSPlib = addon.RHSPlib;
+
 export enum SerialParity {
   None = 0,
   Odd,
