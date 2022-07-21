@@ -185,7 +185,7 @@ export declare class RHSPlib {
     setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<{
         resultCode: number;
     }>;
-    discovery(serialPort: Serial): Promise<{
+    static discovery(serialPort: Serial): Promise<{
         value?: DiscoveredAddresses;
         resultCode: number;
     }>;

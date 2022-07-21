@@ -159,7 +159,7 @@ export declare class RHSPlib {
   setModuleLEDPattern(ledPattern: LEDPattern): Promise<{resultCode: number}>;
   getModuleLEDPattern(): Promise<{value?: LEDPattern, resultCode: number}>;
   setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<{resultCode: number}>;
-  discovery(serialPort: Serial): Promise<{value?: DiscoveredAddresses, resultCode: number}>;
+  static discovery(serialPort: Serial): Promise<{value?: DiscoveredAddresses, resultCode: number}>;
   getInterfacePacketID(interfaceName: string, functionNumber: number): Promise<{value?: number, resultCode: number}>;
 
   // Device Control
