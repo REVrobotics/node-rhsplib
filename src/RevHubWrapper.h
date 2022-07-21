@@ -31,7 +31,7 @@ class RevHub : public Napi::ObjectWrap<RevHub> {
   Napi::Value setModuleLEDPattern(const Napi::CallbackInfo &info);
   Napi::Value getModuleLEDPattern(const Napi::CallbackInfo &info);
   Napi::Value setDebugLogLevel(const Napi::CallbackInfo &info);
-  static Napi::Value discovery(const Napi::CallbackInfo &info);
+  static Napi::Value discoverRevHubs(const Napi::CallbackInfo &info);
   Napi::Value getInterfacePacketID(const Napi::CallbackInfo &info);
 
   /* Device Control */

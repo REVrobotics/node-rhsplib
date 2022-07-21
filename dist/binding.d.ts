@@ -185,7 +185,7 @@ export declare class RevHub {
     setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<{
         resultCode: number;
     }>;
-    static discovery(serialPort: Serial): Promise<{
+    static discoverRevHubs(serialPort: Serial): Promise<{
         value?: DiscoveredAddresses;
         resultCode: number;
     }>;

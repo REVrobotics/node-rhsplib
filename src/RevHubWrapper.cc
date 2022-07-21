@@ -45,7 +45,7 @@ Napi::Object RevHub::Init(Napi::Env env, Napi::Object exports) {
           RevHub::InstanceMethod("getModuleLEDPattern",
                                  &RevHub::getModuleLEDPattern),
           RevHub::InstanceMethod("setDebugLogLevel", &RevHub::setDebugLogLevel),
-          RevHub::StaticMethod("discovery", &RevHub::discovery),
+          RevHub::StaticMethod("discoverRevHubs", &RevHub::discoverRevHubs),
           RevHub::InstanceMethod("getInterfacePacketID",
                                  &RevHub::getInterfacePacketID),
           RevHub::InstanceMethod("getBulkInputData", &RevHub::getBulkInputData),
@@ -546,7 +546,7 @@ Napi::Value RevHub::setDebugLogLevel(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RevHub::discovery(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::discoverRevHubs(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   Serial *serialPort =
