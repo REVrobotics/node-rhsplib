@@ -1,4 +1,4 @@
-#include "rhsplibWrapper.h"
+#include "RevHubWrapper.h"
 
 #include <rev/RHSPlib_device_control.h>
 #include <rev/RHSPlib_dio.h>
@@ -11,167 +11,160 @@
 #include "serialWrapper.h"
 
 // See https://github.com/nodejs/node-addon-api/blob/main/doc/object_wrap.md
-Napi::Object RHSPlib::Init(Napi::Env env, Napi::Object exports) {
+Napi::Object RevHub::Init(Napi::Env env, Napi::Object exports) {
   Napi::Function func = DefineClass(
-      env, "RHSPlib",
+      env, "RevHub",
       {
-          RHSPlib::InstanceMethod("open", &RHSPlib::open),
-          RHSPlib::InstanceMethod("isOpened", &RHSPlib::isOpened),
-          RHSPlib::InstanceMethod("close", &RHSPlib::close),
-          RHSPlib::InstanceMethod("setDestAddress", &RHSPlib::setDestAddress),
-          RHSPlib::InstanceMethod("getDestAddress", &RHSPlib::getDestAddress),
-          RHSPlib::InstanceMethod("setResponseTimeoutMs",
-                                  &RHSPlib::setResponseTimeoutMs),
-          RHSPlib::InstanceMethod("getResponseTimeoutMs",
-                                  &RHSPlib::getResponseTimeoutMs),
-          RHSPlib::InstanceMethod("sendWriteCommandInternal",
-                                  &RHSPlib::sendWriteCommandInternal),
-          RHSPlib::InstanceMethod("sendWriteCommand",
-                                  &RHSPlib::sendWriteCommand),
-          RHSPlib::InstanceMethod("sendReadCommandInternal",
-                                  &RHSPlib::sendReadCommandInternal),
-          RHSPlib::InstanceMethod("sendReadCommand", &RHSPlib::sendReadCommand),
-          RHSPlib::InstanceMethod("getModuleStatus", &RHSPlib::getModuleStatus),
-          RHSPlib::InstanceMethod("sendKeepAlive", &RHSPlib::sendKeepAlive),
-          RHSPlib::InstanceMethod("sendFailSafe", &RHSPlib::sendFailSafe),
-          RHSPlib::InstanceMethod("setNewModuleAddress",
-                                  &RHSPlib::setNewModuleAddress),
-          RHSPlib::InstanceMethod("queryInterface", &RHSPlib::queryInterface),
-          RHSPlib::InstanceMethod("setModuleLEDColor",
-                                  &RHSPlib::setModuleLEDColor),
-          RHSPlib::InstanceMethod("getModuleLEDColor",
-                                  &RHSPlib::getModuleLEDColor),
-          RHSPlib::InstanceMethod("setModuleLEDPattern",
-                                  &RHSPlib::setModuleLEDPattern),
-          RHSPlib::InstanceMethod("getModuleLEDPattern",
-                                  &RHSPlib::getModuleLEDPattern),
-          RHSPlib::InstanceMethod("setDebugLogLevel",
-                                  &RHSPlib::setDebugLogLevel),
-          RHSPlib::StaticMethod("discovery", &RHSPlib::discovery),
-          RHSPlib::InstanceMethod("getInterfacePacketID",
-                                  &RHSPlib::getInterfacePacketID),
-          RHSPlib::InstanceMethod("getBulkInputData",
-                                  &RHSPlib::getBulkInputData),
-          RHSPlib::InstanceMethod("getADC", &RHSPlib::getADC),
-          RHSPlib::InstanceMethod("setPhoneChargeControl",
-                                  &RHSPlib::setPhoneChargeControl),
-          RHSPlib::InstanceMethod("getPhoneChargeControl",
-                                  &RHSPlib::getPhoneChargeControl),
-          RHSPlib::InstanceMethod("injectDataLogHint",
-                                  &RHSPlib::injectDataLogHint),
-          RHSPlib::InstanceMethod("readVersionString",
-                                  &RHSPlib::readVersionString),
-          RHSPlib::InstanceMethod("readVersion", &RHSPlib::readVersion),
-          RHSPlib::InstanceMethod("setFTDIResetControl",
-                                  &RHSPlib::setFTDIResetControl),
-          RHSPlib::InstanceMethod("getFTDIResetControl",
-                                  &RHSPlib::getFTDIResetControl),
-          RHSPlib::InstanceMethod("setDigitalSingleOutput",
-                                  &RHSPlib::setDigitalSingleOutput),
-          RHSPlib::InstanceMethod("setDigitalAllOutputs",
-                                  &RHSPlib::setDigitalAllOutputs),
-          RHSPlib::InstanceMethod("setDigitalDirection",
-                                  &RHSPlib::setDigitalDirection),
-          RHSPlib::InstanceMethod("getDigitalDirection",
-                                  &RHSPlib::getDigitalDirection),
-          RHSPlib::InstanceMethod("getDigitalSingleInput",
-                                  &RHSPlib::getDigitalSingleInput),
-          RHSPlib::InstanceMethod("getDigitalAllInputs",
-                                  &RHSPlib::getDigitalAllInputs),
-          RHSPlib::InstanceMethod("setI2CChannelConfiguration",
-                                  &RHSPlib::setI2CChannelConfiguration),
-          RHSPlib::InstanceMethod("getI2CChannelConfiguration",
-                                  &RHSPlib::getI2CChannelConfiguration),
-          RHSPlib::InstanceMethod("writeI2CSingleByte",
-                                  &RHSPlib::writeI2CSingleByte),
-          RHSPlib::InstanceMethod("writeI2CMultipleBytes",
-                                  &RHSPlib::writeI2CMultipleBytes),
-          RHSPlib::InstanceMethod("getI2CWriteStatus",
-                                  &RHSPlib::getI2CWriteStatus),
-          RHSPlib::InstanceMethod("readI2CSingleByte",
-                                  &RHSPlib::readI2CSingleByte),
-          RHSPlib::InstanceMethod("readI2CMultipleBytes",
-                                  &RHSPlib::readI2CMultipleBytes),
-          RHSPlib::InstanceMethod("writeI2CReadMultipleBytes",
-                                  &RHSPlib::writeI2CReadMultipleBytes),
-          RHSPlib::InstanceMethod("getI2CReadStatus",
-                                  &RHSPlib::getI2CReadStatus),
-          RHSPlib::InstanceMethod("setMotorChannelMode",
-                                  &RHSPlib::setMotorChannelMode),
-          RHSPlib::InstanceMethod("getMotorChannelMode",
-                                  &RHSPlib::getMotorChannelMode),
-          RHSPlib::InstanceMethod("setMotorChannelEnable",
-                                  &RHSPlib::setMotorChannelEnable),
-          RHSPlib::InstanceMethod("getMotorChannelEnable",
-                                  &RHSPlib::getMotorChannelEnable),
-          RHSPlib::InstanceMethod("setMotorChannelCurrentAlertLevel",
-                                  &RHSPlib::setMotorChannelCurrentAlertLevel),
-          RHSPlib::InstanceMethod("getMotorChannelCurrentAlertLevel",
-                                  &RHSPlib::getMotorChannelCurrentAlertLevel),
-          RHSPlib::InstanceMethod("resetMotorEncoder",
-                                  &RHSPlib::resetMotorEncoder),
-          RHSPlib::InstanceMethod("setMotorConstantPower",
-                                  &RHSPlib::setMotorConstantPower),
-          RHSPlib::InstanceMethod("getMotorConstantPower",
-                                  &RHSPlib::getMotorConstantPower),
-          RHSPlib::InstanceMethod("setMotorTargetVelocity",
-                                  &RHSPlib::setMotorTargetVelocity),
-          RHSPlib::InstanceMethod("getMotorTargetVelocity",
-                                  &RHSPlib::getMotorTargetVelocity),
-          RHSPlib::InstanceMethod("setMotorTargetPosition",
-                                  &RHSPlib::setMotorTargetPosition),
-          RHSPlib::InstanceMethod("getMotorTargetPosition",
-                                  &RHSPlib::getMotorTargetPosition),
-          RHSPlib::InstanceMethod("getMotorAtTarget",
-                                  &RHSPlib::getMotorAtTarget),
-          RHSPlib::InstanceMethod("getMotorEncoderPosition",
-                                  &RHSPlib::getMotorEncoderPosition),
-          RHSPlib::InstanceMethod("setMotorPIDCoefficients",
-                                  &RHSPlib::setMotorPIDCoefficients),
-          RHSPlib::InstanceMethod("getMotorPIDCoefficients",
-                                  &RHSPlib::getMotorPIDCoefficients),
-          RHSPlib::InstanceMethod("setPWMConfiguration",
-                                  &RHSPlib::setPWMConfiguration),
-          RHSPlib::InstanceMethod("getPWMConfiguration",
-                                  &RHSPlib::getPWMConfiguration),
-          RHSPlib::InstanceMethod("setPWMPulseWidth",
-                                  &RHSPlib::setPWMPulseWidth),
-          RHSPlib::InstanceMethod("getPWMPulseWidth",
-                                  &RHSPlib::getPWMPulseWidth),
-          RHSPlib::InstanceMethod("setPWMEnable", &RHSPlib::setPWMEnable),
-          RHSPlib::InstanceMethod("getPWMEnable", &RHSPlib::getPWMEnable),
-          RHSPlib::InstanceMethod("setServoConfiguration",
-                                  &RHSPlib::setServoConfiguration),
-          RHSPlib::InstanceMethod("getServoConfiguration",
-                                  &RHSPlib::getServoConfiguration),
-          RHSPlib::InstanceMethod("setServoPulseWidth",
-                                  &RHSPlib::setServoPulseWidth),
-          RHSPlib::InstanceMethod("getServoPulseWidth",
-                                  &RHSPlib::getServoPulseWidth),
-          RHSPlib::InstanceMethod("setServoEnable", &RHSPlib::setServoEnable),
-          RHSPlib::InstanceMethod("getServoEnable", &RHSPlib::getServoEnable),
+          RevHub::InstanceMethod("open", &RevHub::open),
+          RevHub::InstanceMethod("isOpened", &RevHub::isOpened),
+          RevHub::InstanceMethod("close", &RevHub::close),
+          RevHub::InstanceMethod("setDestAddress", &RevHub::setDestAddress),
+          RevHub::InstanceMethod("getDestAddress", &RevHub::getDestAddress),
+          RevHub::InstanceMethod("setResponseTimeoutMs",
+                                 &RevHub::setResponseTimeoutMs),
+          RevHub::InstanceMethod("getResponseTimeoutMs",
+                                 &RevHub::getResponseTimeoutMs),
+          RevHub::InstanceMethod("sendWriteCommandInternal",
+                                 &RevHub::sendWriteCommandInternal),
+          RevHub::InstanceMethod("sendWriteCommand", &RevHub::sendWriteCommand),
+          RevHub::InstanceMethod("sendReadCommandInternal",
+                                 &RevHub::sendReadCommandInternal),
+          RevHub::InstanceMethod("sendReadCommand", &RevHub::sendReadCommand),
+          RevHub::InstanceMethod("getModuleStatus", &RevHub::getModuleStatus),
+          RevHub::InstanceMethod("sendKeepAlive", &RevHub::sendKeepAlive),
+          RevHub::InstanceMethod("sendFailSafe", &RevHub::sendFailSafe),
+          RevHub::InstanceMethod("setNewModuleAddress",
+                                 &RevHub::setNewModuleAddress),
+          RevHub::InstanceMethod("queryInterface", &RevHub::queryInterface),
+          RevHub::InstanceMethod("setModuleLEDColor",
+                                 &RevHub::setModuleLEDColor),
+          RevHub::InstanceMethod("getModuleLEDColor",
+                                 &RevHub::getModuleLEDColor),
+          RevHub::InstanceMethod("setModuleLEDPattern",
+                                 &RevHub::setModuleLEDPattern),
+          RevHub::InstanceMethod("getModuleLEDPattern",
+                                 &RevHub::getModuleLEDPattern),
+          RevHub::InstanceMethod("setDebugLogLevel", &RevHub::setDebugLogLevel),
+          RevHub::StaticMethod("discovery", &RevHub::discovery),
+          RevHub::InstanceMethod("getInterfacePacketID",
+                                 &RevHub::getInterfacePacketID),
+          RevHub::InstanceMethod("getBulkInputData", &RevHub::getBulkInputData),
+          RevHub::InstanceMethod("getADC", &RevHub::getADC),
+          RevHub::InstanceMethod("setPhoneChargeControl",
+                                 &RevHub::setPhoneChargeControl),
+          RevHub::InstanceMethod("getPhoneChargeControl",
+                                 &RevHub::getPhoneChargeControl),
+          RevHub::InstanceMethod("injectDataLogHint",
+                                 &RevHub::injectDataLogHint),
+          RevHub::InstanceMethod("readVersionString",
+                                 &RevHub::readVersionString),
+          RevHub::InstanceMethod("readVersion", &RevHub::readVersion),
+          RevHub::InstanceMethod("setFTDIResetControl",
+                                 &RevHub::setFTDIResetControl),
+          RevHub::InstanceMethod("getFTDIResetControl",
+                                 &RevHub::getFTDIResetControl),
+          RevHub::InstanceMethod("setDigitalSingleOutput",
+                                 &RevHub::setDigitalSingleOutput),
+          RevHub::InstanceMethod("setDigitalAllOutputs",
+                                 &RevHub::setDigitalAllOutputs),
+          RevHub::InstanceMethod("setDigitalDirection",
+                                 &RevHub::setDigitalDirection),
+          RevHub::InstanceMethod("getDigitalDirection",
+                                 &RevHub::getDigitalDirection),
+          RevHub::InstanceMethod("getDigitalSingleInput",
+                                 &RevHub::getDigitalSingleInput),
+          RevHub::InstanceMethod("getDigitalAllInputs",
+                                 &RevHub::getDigitalAllInputs),
+          RevHub::InstanceMethod("setI2CChannelConfiguration",
+                                 &RevHub::setI2CChannelConfiguration),
+          RevHub::InstanceMethod("getI2CChannelConfiguration",
+                                 &RevHub::getI2CChannelConfiguration),
+          RevHub::InstanceMethod("writeI2CSingleByte",
+                                 &RevHub::writeI2CSingleByte),
+          RevHub::InstanceMethod("writeI2CMultipleBytes",
+                                 &RevHub::writeI2CMultipleBytes),
+          RevHub::InstanceMethod("getI2CWriteStatus",
+                                 &RevHub::getI2CWriteStatus),
+          RevHub::InstanceMethod("readI2CSingleByte",
+                                 &RevHub::readI2CSingleByte),
+          RevHub::InstanceMethod("readI2CMultipleBytes",
+                                 &RevHub::readI2CMultipleBytes),
+          RevHub::InstanceMethod("writeI2CReadMultipleBytes",
+                                 &RevHub::writeI2CReadMultipleBytes),
+          RevHub::InstanceMethod("getI2CReadStatus", &RevHub::getI2CReadStatus),
+          RevHub::InstanceMethod("setMotorChannelMode",
+                                 &RevHub::setMotorChannelMode),
+          RevHub::InstanceMethod("getMotorChannelMode",
+                                 &RevHub::getMotorChannelMode),
+          RevHub::InstanceMethod("setMotorChannelEnable",
+                                 &RevHub::setMotorChannelEnable),
+          RevHub::InstanceMethod("getMotorChannelEnable",
+                                 &RevHub::getMotorChannelEnable),
+          RevHub::InstanceMethod("setMotorChannelCurrentAlertLevel",
+                                 &RevHub::setMotorChannelCurrentAlertLevel),
+          RevHub::InstanceMethod("getMotorChannelCurrentAlertLevel",
+                                 &RevHub::getMotorChannelCurrentAlertLevel),
+          RevHub::InstanceMethod("resetMotorEncoder",
+                                 &RevHub::resetMotorEncoder),
+          RevHub::InstanceMethod("setMotorConstantPower",
+                                 &RevHub::setMotorConstantPower),
+          RevHub::InstanceMethod("getMotorConstantPower",
+                                 &RevHub::getMotorConstantPower),
+          RevHub::InstanceMethod("setMotorTargetVelocity",
+                                 &RevHub::setMotorTargetVelocity),
+          RevHub::InstanceMethod("getMotorTargetVelocity",
+                                 &RevHub::getMotorTargetVelocity),
+          RevHub::InstanceMethod("setMotorTargetPosition",
+                                 &RevHub::setMotorTargetPosition),
+          RevHub::InstanceMethod("getMotorTargetPosition",
+                                 &RevHub::getMotorTargetPosition),
+          RevHub::InstanceMethod("getMotorAtTarget", &RevHub::getMotorAtTarget),
+          RevHub::InstanceMethod("getMotorEncoderPosition",
+                                 &RevHub::getMotorEncoderPosition),
+          RevHub::InstanceMethod("setMotorPIDCoefficients",
+                                 &RevHub::setMotorPIDCoefficients),
+          RevHub::InstanceMethod("getMotorPIDCoefficients",
+                                 &RevHub::getMotorPIDCoefficients),
+          RevHub::InstanceMethod("setPWMConfiguration",
+                                 &RevHub::setPWMConfiguration),
+          RevHub::InstanceMethod("getPWMConfiguration",
+                                 &RevHub::getPWMConfiguration),
+          RevHub::InstanceMethod("setPWMPulseWidth", &RevHub::setPWMPulseWidth),
+          RevHub::InstanceMethod("getPWMPulseWidth", &RevHub::getPWMPulseWidth),
+          RevHub::InstanceMethod("setPWMEnable", &RevHub::setPWMEnable),
+          RevHub::InstanceMethod("getPWMEnable", &RevHub::getPWMEnable),
+          RevHub::InstanceMethod("setServoConfiguration",
+                                 &RevHub::setServoConfiguration),
+          RevHub::InstanceMethod("getServoConfiguration",
+                                 &RevHub::getServoConfiguration),
+          RevHub::InstanceMethod("setServoPulseWidth",
+                                 &RevHub::setServoPulseWidth),
+          RevHub::InstanceMethod("getServoPulseWidth",
+                                 &RevHub::getServoPulseWidth),
+          RevHub::InstanceMethod("setServoEnable", &RevHub::setServoEnable),
+          RevHub::InstanceMethod("getServoEnable", &RevHub::getServoEnable),
       });
 
   Napi::FunctionReference *constructor = new Napi::FunctionReference();
 
   *constructor = Napi::Persistent(func);
-  exports.Set("RHSPlib", func);
+  exports.Set("RevHub", func);
 
   env.SetInstanceData<Napi::FunctionReference>(constructor);
 
   return exports;
 }
 
-RHSPlib::RHSPlib(const Napi::CallbackInfo &info)
-    : Napi::ObjectWrap<RHSPlib>(info) {
+RevHub::RevHub(const Napi::CallbackInfo &info)
+    : Napi::ObjectWrap<RevHub>(info) {
   Napi::Env env = info.Env();
 
   RHSPlib_init(&this->obj);
 
-  // TODO(jan): Non-default constructor that calls RHSPlib::open()
+  // TODO(jan): Non-default constructor that calls RevHub::open()
 }
 
-Napi::Value RHSPlib::open(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::open(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   Serial *serialPort =
@@ -185,19 +178,19 @@ Napi::Value RHSPlib::open(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::isOpened(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::isOpened(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   return Napi::Boolean::New(env, RHSPlib_isOpened(&this->obj));
 }
 
-void RHSPlib::close(const Napi::CallbackInfo &info) {
+void RevHub::close(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   RHSPlib_close(&this->obj);
 }
 
-void RHSPlib::setDestAddress(const Napi::CallbackInfo &info) {
+void RevHub::setDestAddress(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t destAddress = info[0].As<Napi::Number>().Uint32Value();
@@ -205,13 +198,13 @@ void RHSPlib::setDestAddress(const Napi::CallbackInfo &info) {
   RHSPlib_setDestAddress(&this->obj, destAddress);
 }
 
-Napi::Value RHSPlib::getDestAddress(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getDestAddress(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   return Napi::Number::New(env, RHSPlib_destAddress(&this->obj));
 }
 
-void RHSPlib::setResponseTimeoutMs(const Napi::CallbackInfo &info) {
+void RevHub::setResponseTimeoutMs(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint32_t responseTimeoutMs = info[0].As<Napi::Number>().Uint32Value();
@@ -219,13 +212,13 @@ void RHSPlib::setResponseTimeoutMs(const Napi::CallbackInfo &info) {
   RHSPlib_setResponseTimeoutMs(&this->obj, responseTimeoutMs);
 }
 
-Napi::Value RHSPlib::getResponseTimeoutMs(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getResponseTimeoutMs(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   return Napi::Number::New(env, RHSPlib_responseTimeoutMs(&this->obj));
 }
 
-Napi::Value RHSPlib::sendWriteCommandInternal(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::sendWriteCommandInternal(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint16_t packetTypeID = info[0].As<Napi::Number>().Uint32Value();
@@ -246,7 +239,7 @@ Napi::Value RHSPlib::sendWriteCommandInternal(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::sendWriteCommand(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::sendWriteCommand(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint16_t packetTypeID = info[0].As<Napi::Number>().Uint32Value();
@@ -278,7 +271,7 @@ Napi::Value RHSPlib::sendWriteCommand(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::sendReadCommandInternal(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::sendReadCommandInternal(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint16_t packetTypeID = info[0].As<Napi::Number>().Uint32Value();
@@ -299,7 +292,7 @@ Napi::Value RHSPlib::sendReadCommandInternal(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::sendReadCommand(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::sendReadCommand(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint16_t packetTypeID = info[0].As<Napi::Number>().Uint32Value();
@@ -331,7 +324,7 @@ Napi::Value RHSPlib::sendReadCommand(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getModuleStatus(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getModuleStatus(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t clearStatusAfterResponse = info[0].As<Napi::Boolean>().Value();
@@ -353,7 +346,7 @@ Napi::Value RHSPlib::getModuleStatus(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::sendKeepAlive(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::sendKeepAlive(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   CREATE_VOID_WORKER(worker, env, {
@@ -364,7 +357,7 @@ Napi::Value RHSPlib::sendKeepAlive(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::sendFailSafe(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::sendFailSafe(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   CREATE_VOID_WORKER(worker, env, {
@@ -375,7 +368,7 @@ Napi::Value RHSPlib::sendFailSafe(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setNewModuleAddress(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setNewModuleAddress(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t newModuleAddress = info[0].As<Napi::Number>().Uint32Value();
@@ -389,7 +382,7 @@ Napi::Value RHSPlib::setNewModuleAddress(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::queryInterface(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::queryInterface(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   std::string interfaceNameStr = info[0].As<Napi::String>().Utf8Value();
@@ -413,7 +406,7 @@ Napi::Value RHSPlib::queryInterface(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setModuleLEDColor(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setModuleLEDColor(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t red = info[0].As<Napi::Number>().Uint32Value();
@@ -429,7 +422,7 @@ Napi::Value RHSPlib::setModuleLEDColor(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getModuleLEDColor(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getModuleLEDColor(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   using retType = uint8_t *;
@@ -452,7 +445,7 @@ Napi::Value RHSPlib::getModuleLEDColor(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setModuleLEDPattern(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setModuleLEDPattern(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   Napi::Object ledPatternObj = info[0].As<Napi::Object>();
@@ -501,7 +494,7 @@ Napi::Value RHSPlib::setModuleLEDPattern(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getModuleLEDPattern(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getModuleLEDPattern(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   using retType = RHSPlib_LEDPattern_T;
@@ -534,7 +527,7 @@ Napi::Value RHSPlib::getModuleLEDPattern(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setDebugLogLevel(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setDebugLogLevel(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   RHSPlib_DebugGroupNumber_T debugGroupNumber =
@@ -553,7 +546,7 @@ Napi::Value RHSPlib::setDebugLogLevel(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::discovery(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::discovery(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   Serial *serialPort =
@@ -582,7 +575,7 @@ Napi::Value RHSPlib::discovery(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getInterfacePacketID(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getInterfacePacketID(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   std::string interfaceNameStr = info[0].As<Napi::String>().Utf8Value();
@@ -602,7 +595,7 @@ Napi::Value RHSPlib::getInterfacePacketID(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getBulkInputData(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getBulkInputData(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   using retType = RHSPlib_BulkInputData_T;
@@ -635,7 +628,7 @@ Napi::Value RHSPlib::getBulkInputData(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getADC(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getADC(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t adcChannelToRead = info[0].As<Napi::Number>().Uint32Value();
@@ -654,7 +647,7 @@ Napi::Value RHSPlib::getADC(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setPhoneChargeControl(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setPhoneChargeControl(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t chargeEnable = info[0].As<Napi::Boolean>().Value();
@@ -668,7 +661,7 @@ Napi::Value RHSPlib::setPhoneChargeControl(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getPhoneChargeControl(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getPhoneChargeControl(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   using retType = uint8_t;
@@ -684,7 +677,7 @@ Napi::Value RHSPlib::getPhoneChargeControl(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::injectDataLogHint(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::injectDataLogHint(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   std::string hintTextStr = info[0].As<Napi::String>().Utf8Value();
@@ -699,7 +692,7 @@ Napi::Value RHSPlib::injectDataLogHint(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::readVersionString(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::readVersionString(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   using retType = struct {
@@ -719,7 +712,7 @@ Napi::Value RHSPlib::readVersionString(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::readVersion(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::readVersion(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   using retType = RHSPlib_Version_T;
@@ -743,7 +736,7 @@ Napi::Value RHSPlib::readVersion(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setFTDIResetControl(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setFTDIResetControl(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t ftdiResetControl = info[0].As<Napi::Boolean>().Value();
@@ -757,7 +750,7 @@ Napi::Value RHSPlib::setFTDIResetControl(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getFTDIResetControl(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getFTDIResetControl(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   using retType = uint8_t;
@@ -773,7 +766,7 @@ Napi::Value RHSPlib::getFTDIResetControl(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setDigitalSingleOutput(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setDigitalSingleOutput(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t dioPin = info[0].As<Napi::Number>().Uint32Value();
@@ -788,7 +781,7 @@ Napi::Value RHSPlib::setDigitalSingleOutput(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setDigitalAllOutputs(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setDigitalAllOutputs(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t bitPackedField = info[0].As<Napi::Number>().Uint32Value();
@@ -802,7 +795,7 @@ Napi::Value RHSPlib::setDigitalAllOutputs(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setDigitalDirection(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setDigitalDirection(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t dioPin = info[0].As<Napi::Number>().Uint32Value();
@@ -817,7 +810,7 @@ Napi::Value RHSPlib::setDigitalDirection(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getDigitalDirection(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getDigitalDirection(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t dioPin = info[0].As<Napi::Number>().Uint32Value();
@@ -835,7 +828,7 @@ Napi::Value RHSPlib::getDigitalDirection(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getDigitalSingleInput(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getDigitalSingleInput(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t dioPin = info[0].As<Napi::Number>().Uint32Value();
@@ -853,7 +846,7 @@ Napi::Value RHSPlib::getDigitalSingleInput(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getDigitalAllInputs(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getDigitalAllInputs(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   using retType = uint8_t;
@@ -868,8 +861,7 @@ Napi::Value RHSPlib::getDigitalAllInputs(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setI2CChannelConfiguration(
-    const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setI2CChannelConfiguration(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -884,8 +876,7 @@ Napi::Value RHSPlib::setI2CChannelConfiguration(
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getI2CChannelConfiguration(
-    const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getI2CChannelConfiguration(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -903,7 +894,7 @@ Napi::Value RHSPlib::getI2CChannelConfiguration(
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::writeI2CSingleByte(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::writeI2CSingleByte(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -919,7 +910,7 @@ Napi::Value RHSPlib::writeI2CSingleByte(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::writeI2CMultipleBytes(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::writeI2CMultipleBytes(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -942,7 +933,7 @@ Napi::Value RHSPlib::writeI2CMultipleBytes(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getI2CWriteStatus(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getI2CWriteStatus(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -968,7 +959,7 @@ Napi::Value RHSPlib::getI2CWriteStatus(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::readI2CSingleByte(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::readI2CSingleByte(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -983,7 +974,7 @@ Napi::Value RHSPlib::readI2CSingleByte(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::readI2CMultipleBytes(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::readI2CMultipleBytes(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -999,7 +990,7 @@ Napi::Value RHSPlib::readI2CMultipleBytes(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::writeI2CReadMultipleBytes(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::writeI2CReadMultipleBytes(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1017,7 +1008,7 @@ Napi::Value RHSPlib::writeI2CReadMultipleBytes(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getI2CReadStatus(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getI2CReadStatus(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t i2cChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1049,7 +1040,7 @@ Napi::Value RHSPlib::getI2CReadStatus(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setMotorChannelMode(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setMotorChannelMode(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1065,7 +1056,7 @@ Napi::Value RHSPlib::setMotorChannelMode(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getMotorChannelMode(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getMotorChannelMode(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1092,7 +1083,7 @@ Napi::Value RHSPlib::getMotorChannelMode(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setMotorChannelEnable(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setMotorChannelEnable(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1107,7 +1098,7 @@ Napi::Value RHSPlib::setMotorChannelEnable(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getMotorChannelEnable(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getMotorChannelEnable(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1125,7 +1116,7 @@ Napi::Value RHSPlib::getMotorChannelEnable(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setMotorChannelCurrentAlertLevel(
+Napi::Value RevHub::setMotorChannelCurrentAlertLevel(
     const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
@@ -1141,7 +1132,7 @@ Napi::Value RHSPlib::setMotorChannelCurrentAlertLevel(
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getMotorChannelCurrentAlertLevel(
+Napi::Value RevHub::getMotorChannelCurrentAlertLevel(
     const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
@@ -1160,7 +1151,7 @@ Napi::Value RHSPlib::getMotorChannelCurrentAlertLevel(
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::resetMotorEncoder(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::resetMotorEncoder(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1174,7 +1165,7 @@ Napi::Value RHSPlib::resetMotorEncoder(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setMotorConstantPower(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setMotorConstantPower(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1189,7 +1180,7 @@ Napi::Value RHSPlib::setMotorConstantPower(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getMotorConstantPower(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getMotorConstantPower(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1207,7 +1198,7 @@ Napi::Value RHSPlib::getMotorConstantPower(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setMotorTargetVelocity(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setMotorTargetVelocity(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1222,7 +1213,7 @@ Napi::Value RHSPlib::setMotorTargetVelocity(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getMotorTargetVelocity(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getMotorTargetVelocity(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1240,7 +1231,7 @@ Napi::Value RHSPlib::getMotorTargetVelocity(const Napi::CallbackInfo &info) {
   return Napi::Number::New(env, 0);
 }
 
-Napi::Value RHSPlib::setMotorTargetPosition(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setMotorTargetPosition(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1257,7 +1248,7 @@ Napi::Value RHSPlib::setMotorTargetPosition(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getMotorTargetPosition(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getMotorTargetPosition(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1283,7 +1274,7 @@ Napi::Value RHSPlib::getMotorTargetPosition(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getMotorAtTarget(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getMotorAtTarget(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1301,7 +1292,7 @@ Napi::Value RHSPlib::getMotorAtTarget(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getMotorEncoderPosition(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getMotorEncoderPosition(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1319,7 +1310,7 @@ Napi::Value RHSPlib::getMotorEncoderPosition(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setMotorPIDCoefficients(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setMotorPIDCoefficients(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1339,7 +1330,7 @@ Napi::Value RHSPlib::setMotorPIDCoefficients(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getMotorPIDCoefficients(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getMotorPIDCoefficients(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1368,7 +1359,7 @@ Napi::Value RHSPlib::getMotorPIDCoefficients(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setPWMConfiguration(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setPWMConfiguration(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t pwmChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1383,7 +1374,7 @@ Napi::Value RHSPlib::setPWMConfiguration(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getPWMConfiguration(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getPWMConfiguration(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t pwmChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1401,7 +1392,7 @@ Napi::Value RHSPlib::getPWMConfiguration(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setPWMPulseWidth(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setPWMPulseWidth(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t pwmChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1416,7 +1407,7 @@ Napi::Value RHSPlib::setPWMPulseWidth(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getPWMPulseWidth(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getPWMPulseWidth(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t pwmChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1434,7 +1425,7 @@ Napi::Value RHSPlib::getPWMPulseWidth(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setPWMEnable(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setPWMEnable(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t pwmChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1449,7 +1440,7 @@ Napi::Value RHSPlib::setPWMEnable(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getPWMEnable(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getPWMEnable(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t pwmChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1467,7 +1458,7 @@ Napi::Value RHSPlib::getPWMEnable(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setServoConfiguration(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setServoConfiguration(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t servoChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1482,7 +1473,7 @@ Napi::Value RHSPlib::setServoConfiguration(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getServoConfiguration(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getServoConfiguration(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t servoChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1500,7 +1491,7 @@ Napi::Value RHSPlib::getServoConfiguration(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setServoPulseWidth(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setServoPulseWidth(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t servoChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1515,7 +1506,7 @@ Napi::Value RHSPlib::setServoPulseWidth(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getServoPulseWidth(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getServoPulseWidth(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t servoChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1533,7 +1524,7 @@ Napi::Value RHSPlib::getServoPulseWidth(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::setServoEnable(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setServoEnable(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t servoChannel = info[0].As<Napi::Number>().Uint32Value();
@@ -1548,7 +1539,7 @@ Napi::Value RHSPlib::setServoEnable(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
-Napi::Value RHSPlib::getServoEnable(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getServoEnable(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t servoChannel = info[0].As<Napi::Number>().Uint32Value();

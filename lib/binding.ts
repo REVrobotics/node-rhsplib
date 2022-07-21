@@ -1,7 +1,7 @@
 const addon = require('bindings')('addon');
 
 module.exports.Serial = addon.Serial;
-module.exports.RHSPlib = addon.RHSPlib;
+module.exports.RevHub = addon.RevHub;
 
 export enum SerialParity {
   None = 0,
@@ -141,7 +141,7 @@ export declare class Serial {
   write(bytes: number[]): Promise<{resultCode: number}>;
 }
 
-export declare class RHSPlib {
+export declare class RevHub {
   constructor();
   open(serialPort: Serial, destAddress: number): Promise<{resultCode: number}>;
   isOpened(): boolean;

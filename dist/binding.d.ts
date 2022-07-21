@@ -126,7 +126,7 @@ export declare class Serial {
         resultCode: number;
     }>;
 }
-export declare class RHSPlib {
+export declare class RevHub {
     constructor();
     open(serialPort: Serial, destAddress: number): Promise<{
         resultCode: number;
