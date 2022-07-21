@@ -1,3 +1,8 @@
+const addon = require('bindings')('addon');
+
+module.exports.Serial = addon.Serial;
+module.exports.RHSPlib = addon.RHSPlib;
+
 export enum SerialParity {
   None = 0,
   Odd,
@@ -130,10 +135,10 @@ export interface PIDCoefficients {
 
 export declare class Serial {
   constructor();
-  open(serialPortName: string, baudrate: number, databits: number, parity: SerialParity, stopbits: number, flowControl: SerialFlowControl): void;
+  open(serialPortName: string, baudrate: number, databits: number, parity: SerialParity, stopbits: number, flowControl: SerialFlowControl): Promise<{resultCode: number}>;
   close(): void;
-  read(numBytesToRead: number): number[];
-  write(bytes: number[]): void;
+  read(numBytesToRead: number): Promise<{resultCode: number, value: number[]}>;
+  write(bytes: number[]): Promise<{resultCode: number}>;
 }
 
 export declare class RHSPlib {
@@ -159,7 +164,7 @@ export declare class RHSPlib {
   setModuleLEDPattern(ledPattern: LEDPattern): Promise<{resultCode: number}>;
   getModuleLEDPattern(): Promise<{value?: LEDPattern, resultCode: number}>;
   setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<{resultCode: number}>;
-  discovery(serialPort: Serial): Promise<{value?: DiscoveredAddresses, resultCode: number}>;
+  static discovery(serialPort: Serial): Promise<{value?: DiscoveredAddresses, resultCode: number}>;
   getInterfacePacketID(interfaceName: string, functionNumber: number): Promise<{value?: number, resultCode: number}>;
 
   // Device Control
