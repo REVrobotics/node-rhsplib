@@ -3,6 +3,8 @@
 
 #include <napi.h>
 
+#include <mutex>
+
 /* Macros for writing lambda functions */
 
 /**
@@ -53,12 +55,22 @@
   return NAME->GetPromise();
 
 /**
+ * @brief Base class for the RHSPlibWorker. The sole responsibility of this
+ * class is to contain the static mutex that will be used by the templated
+ * RHSPlibWorker class.
+ */
+class RHSPlibWorkerBase {
+ protected:
+  static std::mutex m_mutex;
+};
+
+/**
  * @brief Async worker class for handling blocking calls from RHSPlib.
  *
  * @tparam TReturn Return type of the work function
  */
 template <typename TReturn>
-class RHSPlibWorker : public Napi::AsyncWorker {
+class RHSPlibWorker : public Napi::AsyncWorker, public RHSPlibWorkerBase {
  public:
   /**
    * @brief Create a worker and set the work function to be run asynchronously
@@ -102,7 +114,10 @@ class RHSPlibWorker : public Napi::AsyncWorker {
    * @brief Run the work function. `resultCode` and `returnData` are passed by
    * reference to be set by the work function.
    */
-  void Execute() override { workFunction(resultCode, returnData); }
+  void Execute() override {
+    std::scoped_lock<std::mutex> lock{m_mutex};
+    workFunction(resultCode, returnData);
+  }
 
   /**
    * @brief Run the callback function to prepare the data to be sent to
@@ -140,7 +155,7 @@ class RHSPlibWorker : public Napi::AsyncWorker {
  * @tparam
  */
 template <>
-class RHSPlibWorker<void> : public Napi::AsyncWorker {
+class RHSPlibWorker<void> : public Napi::AsyncWorker, public RHSPlibWorkerBase {
  public:
   /**
    * @brief Create a worker and set the work function to be run asynchronously
@@ -170,7 +185,10 @@ class RHSPlibWorker<void> : public Napi::AsyncWorker {
    * @brief Run the work function. `resultCode` is passed by reference to be set
    * by the work function.
    */
-  void Execute() override { workFunction(resultCode); }
+  void Execute() override {
+    std::scoped_lock<std::mutex> lock{m_mutex};
+    workFunction(resultCode);
+  }
 
   /**
    * @brief Resolve the promise with an object that contains the `resultCode`

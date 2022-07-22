@@ -5,7 +5,8 @@
       'sources': [
         'src/addon.cc',
         'src/RevHubWrapper.cc',
-        'src/serialWrapper.cc'
+        'src/serialWrapper.cc',
+        'src/RHSPlibWorker.cc'
       ],
       'include_dirs': [
         'src/',
