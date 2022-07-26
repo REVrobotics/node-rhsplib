@@ -20,13 +20,40 @@
       'dependencies': [
         "<!(node -p \"require('node-addon-api').gyp\")"
       ],
-      'libraries': [
-        '<(module_root_dir)/RHSPlib/x86-64/RHSPlib.lib',
+      'conditions': [
+        [
+          'OS=="win"', {
+            'libraries': [
+              '<(module_root_dir)/RHSPlib/x86-64/RHSPlib.lib',
+            ],
+            'copies':[{
+              'destination': '<(PRODUCT_DIR)',
+              'files':[
+                '<(module_root_dir)/bin/RHSPlib.dll',
+              ],
+            }],
+          }
+        ],
+        [
+          'OS=="linux"', {
+            'link_settings': {
+              'libraries': [
+                  '-L<(module_root_dir)/build/Release/',
+                  '-lRHSPlib'
+              ],
+              'ldflags': [
+                '-Wl,-rpath,<(module_root_dir)/build/Release/',
+              ]
+            },
+            'copies':[{
+              'destination': '<(PRODUCT_DIR)',
+              'files':[
+                '<(module_root_dir)/bin/libRHSPlib.so',
+              ],
+            }],
+          }
+        ]
       ],
-      'copies':[{
-        'destination': './build/Release',
-        'files':['<(module_root_dir)/bin/*'],
-      }],
       'msvs_settings': {
         'VCCLCompilerTool': {
             'ExceptionHandling': 1,

@@ -19,7 +19,7 @@
  */
 #define CREATE_WORKER(NAME, ENV, RETURN, FUNCTION_BODY) \
   auto NAME = new RHSPlibWorker<RETURN>(                \
-      ENV, [=](int &_code, RETURN &_data) mutable##FUNCTION_BODY)
+      ENV, [=](int &_code, RETURN &_data) mutable FUNCTION_BODY)
 
 /**
  * @brief Create a worker whose work function does not return a value (void).
@@ -31,7 +31,7 @@
  */
 #define CREATE_VOID_WORKER(NAME, ENV, FUNCTION_BODY) \
   auto NAME =                                        \
-      new RHSPlibWorker<void>(ENV, [=](int &_code) mutable##FUNCTION_BODY)
+      new RHSPlibWorker<void>(ENV, [=](int &_code) mutable FUNCTION_BODY)
 
 /**
  * @brief Set the callback function for a worker.
@@ -43,7 +43,7 @@
  */
 #define SET_WORKER_CALLBACK(NAME, RETURN, FUNCTION_BODY) \
   NAME->SetCallback([=](Napi::Env _env, int &_code,      \
-                        RETURN &_data) mutable##FUNCTION_BODY)
+                        RETURN &_data) mutable FUNCTION_BODY)
 
 /**
  * @brief Queue the worker and return its promise.
