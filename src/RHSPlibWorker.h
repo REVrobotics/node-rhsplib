@@ -2,7 +2,9 @@
 #define RHSPLIBWORKER_H_
 
 #include <napi.h>
+#include <rev/RHSPlib_errors.h>
 
+#include <map>
 #include <mutex>
 
 /* Macros for writing lambda functions */
@@ -53,6 +55,26 @@
 #define QUEUE_WORKER(NAME) \
   NAME->Queue();           \
   return NAME->GetPromise();
+
+const std::map<int, const char *> rhsplibErrors = {
+    {RHSPLIB_SERIAL_ERROR, "SerialGenericError"},
+    {RHSPLIB_SERIAL_ERROR_OPENING, "SerialOpenError"},
+    {RHSPLIB_SERIAL_ERROR_ARGS, "SerialArgsError"},
+    {RHSPLIB_SERIAL_ERROR_CONFIGURE, "SerialConfigureError"},
+    {RHSPLIB_SERIAL_ERROR_IO, "SerialIOError"},
+    {RHSPLIB_ERROR, "RevHubGenericError"},
+    {RHSPLIB_ERROR_RESPONSE_TIMEOUT, "RevHubResponseTimeoutError"},
+    {RHSPLIB_ERROR_MSG_NUMBER_MISMATCH, "RevHubMessageNumberMismatchError"},
+    {RHSPLIB_ERROR_NACK_RECEIVED, "RevHubNackReceivedError"},
+    {RHSPLIB_ERROR_SERIALPORT, "RevHubSerialPortError"},
+    {RHSPLIB_ERROR_COMMAND_NOT_SUPPORTED, "RevHubCommandNotSupportedError"},
+    {RHSPLIB_ERROR_UNEXPECTED_RESPONSE, "RevHubUnexpectedResponseError"},
+    {RHSPLIB_ERROR_ARG_0_OUT_OF_RANGE, "RevHubArg0OutofRangeError"},
+    {RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE, "RevHubArg1OutofRangeError"},
+    {RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE, "RevHubArg2OutofRangeError"},
+    {RHSPLIB_ERROR_ARG_3_OUT_OF_RANGE, "RevHubArg3OutofRangeError"},
+    {RHSPLIB_ERROR_ARG_4_OUT_OF_RANGE, "RevHubArg4OutofRangeError"},
+    {RHSPLIB_ERROR_ARG_5_OUT_OF_RANGE, "RevHubArg5OutofRangeError"}};
 
 /**
  * @brief Base class for the RHSPlibWorker. The sole responsibility of this
@@ -120,17 +142,18 @@ class RHSPlibWorker : public Napi::AsyncWorker, public RHSPlibWorkerBase {
   }
 
   /**
-   * @brief Run the callback function to prepare the data to be sent to
-   * javascript then resolve the promise with an object that contains the
-   * `resultCode` and javascript-ready value.
+   * @brief If the result code is non-negative (no error), run the call back
+   * function and resolve the promise on the return value. Otherwise, reject the
+   * promise with the associated error.
    */
   void OnOK() override {
-    Napi::Object resultObj = Napi::Object::New(Env());
-    resultObj.Set("resultCode", resultCode);
     if (resultCode >= 0 && callbackFunction) {
-      resultObj.Set("value", callbackFunction(Env(), resultCode, returnData));
+      deferred.Resolve(callbackFunction(Env(), resultCode, returnData));
+    } else {
+      Napi::Error error =
+          Napi::Error::New(Env(), rhsplibErrors.find(resultCode)->second);
+      deferred.Reject(error.Value());
     }
-    deferred.Resolve(resultObj);
   }
 
   /**
@@ -191,12 +214,17 @@ class RHSPlibWorker<void> : public Napi::AsyncWorker, public RHSPlibWorkerBase {
   }
 
   /**
-   * @brief Resolve the promise with an object that contains the `resultCode`
+   * @brief If the result code is non-negative (no error), resolve the promise
+   * with no value. Otherwise, reject the promise with the associated error.
    */
   void OnOK() override {
-    Napi::Object resultObj = Napi::Object::New(Env());
-    resultObj.Set("resultCode", resultCode);
-    deferred.Resolve(resultObj);
+    if (resultCode >= 0) {
+      deferred.Resolve(Env().Undefined());
+    } else {
+      Napi::Error error =
+          Napi::Error::New(Env(), rhsplibErrors.find(resultCode)->second);
+      deferred.Reject(error.Value());
+    }
   }
 
   /**
