@@ -34,6 +34,7 @@ typedef struct
     uint8_t	attentionRequired; // @TODO make sure this field is at right position. This field is undefined in version 1.8.2 and earlier
 } RHSPlib_BulkInputData_T;
 
+
 // RHSPlib version in bin format
 typedef struct
 {
