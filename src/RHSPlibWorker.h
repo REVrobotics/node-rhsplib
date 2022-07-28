@@ -150,8 +150,10 @@ class RHSPlibWorker : public Napi::AsyncWorker, public RHSPlibWorkerBase {
     if (resultCode >= 0 && callbackFunction) {
       deferred.Resolve(callbackFunction(Env(), resultCode, returnData));
     } else {
-      Napi::Error error =
-          Napi::Error::New(Env(), rhsplibErrors.find(resultCode)->second);
+      auto iterator = rhsplibErrors.find(resultCode);
+      Napi::Error error = Napi::Error::New(
+          Env(),
+          iterator != rhsplibErrors.end() ? iterator->second : "UnknownError");
       deferred.Reject(error.Value());
     }
   }
@@ -221,8 +223,10 @@ class RHSPlibWorker<void> : public Napi::AsyncWorker, public RHSPlibWorkerBase {
     if (resultCode >= 0) {
       deferred.Resolve(Env().Undefined());
     } else {
-      Napi::Error error =
-          Napi::Error::New(Env(), rhsplibErrors.find(resultCode)->second);
+      auto iterator = rhsplibErrors.find(resultCode);
+      Napi::Error error = Napi::Error::New(
+          Env(),
+          iterator != rhsplibErrors.end() ? iterator->second : "UnknownError");
       deferred.Reject(error.Value());
     }
   }
