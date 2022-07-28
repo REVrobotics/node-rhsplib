@@ -17,15 +17,9 @@
 #include <tchar.h>
 #endif
 
+#include "rev/RHSPlib_errors.h"
+
 #define RHSPLIB_SERIAL_INFINITE_TIMEOUT    -1
-
-#define RHSPLIB_SERIAL_NOERROR              0
-#define RHSPLIB_SERIAL_ERROR                -1
-#define RHSPLIB_SERIAL_ERROR_OPENING        -2
-#define RHSPLIB_SERIAL_ERROR_ARGS           -3
-#define RHSPLIB_SERIAL_ERROR_CONFIGURE      -4
-#define RHSPLIB_SERIAL_ERROR_IO             -5
-
 
 typedef enum
 {

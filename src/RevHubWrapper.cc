@@ -231,9 +231,8 @@ Napi::Value RevHub::sendWriteCommandInternal(const Napi::CallbackInfo &info) {
   }
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_sendWriteCommandInternal(
-        &this->obj, packetTypeID, payloadData, payloadSize, &nackReasonCode);
+        &this->obj, packetTypeID, payloadData, payloadSize, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -253,9 +252,8 @@ Napi::Value RevHub::sendWriteCommand(const Napi::CallbackInfo &info) {
 
   using retType = RHSPlib_PayloadData_T;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_sendWriteCommand(&this->obj, packetTypeID, payloadData,
-                                     payloadSize, &_data, &nackReasonCode);
+                                     payloadSize, &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
@@ -284,9 +282,8 @@ Napi::Value RevHub::sendReadCommandInternal(const Napi::CallbackInfo &info) {
   }
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_sendReadCommandInternal(
-        &this->obj, packetTypeID, payloadData, payloadSize, &nackReasonCode);
+        &this->obj, packetTypeID, payloadData, payloadSize, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -306,9 +303,8 @@ Napi::Value RevHub::sendReadCommand(const Napi::CallbackInfo &info) {
 
   using retType = RHSPlib_PayloadData_T;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_sendWriteCommand(&this->obj, packetTypeID, payloadData,
-                                     payloadSize, &_data, &nackReasonCode);
+                                     payloadSize, &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
@@ -331,9 +327,8 @@ Napi::Value RevHub::getModuleStatus(const Napi::CallbackInfo &info) {
 
   using retType = RHSPlib_ModuleStatus_T;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_getModuleStatus(&this->obj, clearStatusAfterResponse,
-                                    &_data, &nackReasonCode);
+                                    &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
@@ -349,10 +344,8 @@ Napi::Value RevHub::getModuleStatus(const Napi::CallbackInfo &info) {
 Napi::Value RevHub::sendKeepAlive(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
-  CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_sendKeepAlive(&this->obj, &nackReasonCode);
-  });
+  CREATE_VOID_WORKER(
+      worker, env, { _code = RHSPlib_sendKeepAlive(&this->obj, &_nackCode); });
 
   QUEUE_WORKER(worker);
 }
@@ -360,10 +353,8 @@ Napi::Value RevHub::sendKeepAlive(const Napi::CallbackInfo &info) {
 Napi::Value RevHub::sendFailSafe(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
-  CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_sendFailSafe(&this->obj, &nackReasonCode);
-  });
+  CREATE_VOID_WORKER(worker, env,
+                     { _code = RHSPlib_sendFailSafe(&this->obj, &_nackCode); });
 
   QUEUE_WORKER(worker);
 }
@@ -374,9 +365,8 @@ Napi::Value RevHub::setNewModuleAddress(const Napi::CallbackInfo &info) {
   uint8_t newModuleAddress = info[0].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_setNewModuleAddress(&this->obj, newModuleAddress,
-                                        &nackReasonCode);
+    _code =
+        RHSPlib_setNewModuleAddress(&this->obj, newModuleAddress, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -390,9 +380,8 @@ Napi::Value RevHub::queryInterface(const Napi::CallbackInfo &info) {
 
   using retType = RHSPlib_Module_Interface_T;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_queryInterface(&this->obj, interfaceName, &_data,
-                                   &nackReasonCode);
+    _code =
+        RHSPlib_queryInterface(&this->obj, interfaceName, &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
@@ -414,9 +403,7 @@ Napi::Value RevHub::setModuleLEDColor(const Napi::CallbackInfo &info) {
   uint8_t blue = info[2].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_setModuleLEDColor(&this->obj, red, green, blue,
-                                      &nackReasonCode);
+    _code = RHSPlib_setModuleLEDColor(&this->obj, red, green, blue, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -428,9 +415,9 @@ Napi::Value RevHub::getModuleLEDColor(const Napi::CallbackInfo &info) {
   using retType = uint8_t *;
   CREATE_WORKER(worker, env, retType, {
     _data = new uint8_t[3];
-    uint8_t nackReasonCode;
+
     _code = RHSPlib_getModuleLEDColor(&this->obj, &_data[0], &_data[1],
-                                      &_data[2], &nackReasonCode);
+                                      &_data[2], &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
@@ -486,9 +473,7 @@ Napi::Value RevHub::setModuleLEDPattern(const Napi::CallbackInfo &info) {
       ledPatternObj.Get("rgbtPatternStep15").As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
-    _code =
-        RHSPlib_setModuleLEDPattern(&this->obj, &ledPattern, &nackReasonCode);
+    _code = RHSPlib_setModuleLEDPattern(&this->obj, &ledPattern, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -499,8 +484,7 @@ Napi::Value RevHub::getModuleLEDPattern(const Napi::CallbackInfo &info) {
 
   using retType = RHSPlib_LEDPattern_T;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_getModuleLEDPattern(&this->obj, &_data, &nackReasonCode);
+    _code = RHSPlib_getModuleLEDPattern(&this->obj, &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
@@ -538,9 +522,8 @@ Napi::Value RevHub::setDebugLogLevel(const Napi::CallbackInfo &info) {
           info[1].As<Napi::Number>().Uint32Value());
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_setDebugLogLevel(&this->obj, debugGroupNumber,
-                                     verbosityLevel, &nackReasonCode);
+                                     verbosityLevel, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -584,9 +567,8 @@ Napi::Value RevHub::getInterfacePacketID(const Napi::CallbackInfo &info) {
 
   using retType = uint16_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_getInterfacePacketID(
-        &this->obj, interfaceName, functionNumber, &_data, &nackReasonCode);
+    _code = RHSPlib_getInterfacePacketID(&this->obj, interfaceName,
+                                         functionNumber, &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -600,9 +582,8 @@ Napi::Value RevHub::getBulkInputData(const Napi::CallbackInfo &info) {
 
   using retType = RHSPlib_BulkInputData_T;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_deviceControl_getBulkInputData(&this->obj, &_data,
-                                                   &nackReasonCode);
+    _code =
+        RHSPlib_deviceControl_getBulkInputData(&this->obj, &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
@@ -636,9 +617,8 @@ Napi::Value RevHub::getADC(const Napi::CallbackInfo &info) {
 
   using retType = int16_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_deviceControl_getADC(&this->obj, adcChannelToRead, rawMode,
-                                         &_data, &nackReasonCode);
+                                         &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -653,9 +633,8 @@ Napi::Value RevHub::setPhoneChargeControl(const Napi::CallbackInfo &info) {
   uint8_t chargeEnable = info[0].As<Napi::Boolean>().Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_deviceControl_phoneChargeControl(&this->obj, chargeEnable,
-                                                     &nackReasonCode);
+                                                     &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -666,9 +645,8 @@ Napi::Value RevHub::getPhoneChargeControl(const Napi::CallbackInfo &info) {
 
   using retType = uint8_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_deviceControl_phoneChargeQuery(&this->obj, &_data,
-                                                   &nackReasonCode);
+    _code =
+        RHSPlib_deviceControl_phoneChargeQuery(&this->obj, &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -684,9 +662,8 @@ Napi::Value RevHub::injectDataLogHint(const Napi::CallbackInfo &info) {
   const char *hintText = &hintTextStr[0];
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_deviceControl_injectDataLogHint(&this->obj, hintText,
-                                                    &nackReasonCode);
+                                                    &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -700,9 +677,8 @@ Napi::Value RevHub::readVersionString(const Napi::CallbackInfo &info) {
     char text[40];
   };
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_deviceControl_readVersionString(
-        &this->obj, &_data.textLength, _data.text, &nackReasonCode);
+        &this->obj, &_data.textLength, _data.text, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
@@ -717,9 +693,7 @@ Napi::Value RevHub::readVersion(const Napi::CallbackInfo &info) {
 
   using retType = RHSPlib_Version_T;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
-    _code =
-        RHSPlib_deviceControl_readVersion(&this->obj, &_data, &nackReasonCode);
+    _code = RHSPlib_deviceControl_readVersion(&this->obj, &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
@@ -742,9 +716,8 @@ Napi::Value RevHub::setFTDIResetControl(const Napi::CallbackInfo &info) {
   uint8_t ftdiResetControl = info[0].As<Napi::Boolean>().Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_deviceControl_ftdiResetControl(&this->obj, ftdiResetControl,
-                                                   &nackReasonCode);
+                                                   &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -755,9 +728,8 @@ Napi::Value RevHub::getFTDIResetControl(const Napi::CallbackInfo &info) {
 
   using retType = uint8_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_deviceControl_ftdiResetQuery(&this->obj, &_data,
-                                                 &nackReasonCode);
+    _code =
+        RHSPlib_deviceControl_ftdiResetQuery(&this->obj, &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -773,9 +745,7 @@ Napi::Value RevHub::setDigitalSingleOutput(const Napi::CallbackInfo &info) {
   uint8_t value = info[1].As<Napi::Boolean>().Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
-    _code =
-        RHSPlib_dio_setSingleOutput(&this->obj, dioPin, value, &nackReasonCode);
+    _code = RHSPlib_dio_setSingleOutput(&this->obj, dioPin, value, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -787,9 +757,7 @@ Napi::Value RevHub::setDigitalAllOutputs(const Napi::CallbackInfo &info) {
   uint8_t bitPackedField = info[0].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
-    _code =
-        RHSPlib_dio_setAllOutputs(&this->obj, bitPackedField, &nackReasonCode);
+    _code = RHSPlib_dio_setAllOutputs(&this->obj, bitPackedField, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -802,9 +770,7 @@ Napi::Value RevHub::setDigitalDirection(const Napi::CallbackInfo &info) {
   uint8_t direction = info[1].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_dio_setDirection(&this->obj, dioPin, direction,
-                                     &nackReasonCode);
+    _code = RHSPlib_dio_setDirection(&this->obj, dioPin, direction, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -817,9 +783,7 @@ Napi::Value RevHub::getDigitalDirection(const Napi::CallbackInfo &info) {
 
   using retType = uint8_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
-    _code =
-        RHSPlib_dio_getDirection(&this->obj, dioPin, &_data, &nackReasonCode);
+    _code = RHSPlib_dio_getDirection(&this->obj, dioPin, &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -835,9 +799,7 @@ Napi::Value RevHub::getDigitalSingleInput(const Napi::CallbackInfo &info) {
 
   using retType = uint8_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
-    _code =
-        RHSPlib_dio_getSingleInput(&this->obj, dioPin, &_data, &nackReasonCode);
+    _code = RHSPlib_dio_getSingleInput(&this->obj, dioPin, &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -851,8 +813,7 @@ Napi::Value RevHub::getDigitalAllInputs(const Napi::CallbackInfo &info) {
 
   using retType = uint8_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_dio_getAllInputs(&this->obj, &_data, &nackReasonCode);
+    _code = RHSPlib_dio_getAllInputs(&this->obj, &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -868,9 +829,8 @@ Napi::Value RevHub::setI2CChannelConfiguration(const Napi::CallbackInfo &info) {
   uint8_t speedCode = info[1].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_i2c_configureChannel(&this->obj, i2cChannel, speedCode,
-                                         &nackReasonCode);
+                                         &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -883,9 +843,8 @@ Napi::Value RevHub::getI2CChannelConfiguration(const Napi::CallbackInfo &info) {
 
   using retType = uint8_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_i2c_configureQuery(&this->obj, i2cChannel, &_data,
-                                       &nackReasonCode);
+    _code =
+        RHSPlib_i2c_configureQuery(&this->obj, i2cChannel, &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -902,9 +861,8 @@ Napi::Value RevHub::writeI2CSingleByte(const Napi::CallbackInfo &info) {
   uint8_t byte = info[2].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_i2c_writeSingleByte(&this->obj, i2cChannel, slaveAddress,
-                                        byte, &nackReasonCode);
+                                        byte, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -924,9 +882,8 @@ Napi::Value RevHub::writeI2CMultipleBytes(const Napi::CallbackInfo &info) {
   }
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_i2c_writeMultipleBytes(&this->obj, i2cChannel, slaveAddress,
-                                           numBytes, bytes, &nackReasonCode);
+                                           numBytes, bytes, &_nackCode);
     delete[] bytes;
   });
 
@@ -943,10 +900,9 @@ Napi::Value RevHub::getI2CWriteStatus(const Napi::CallbackInfo &info) {
     uint8_t numBytesWritten;
   };
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_i2c_writeStatusQuery(
-        &this->obj, i2cChannel, &_data.i2cTransactionStatus,
-        &_data.numBytesWritten, &nackReasonCode);
+    _code = RHSPlib_i2c_writeStatusQuery(&this->obj, i2cChannel,
+                                         &_data.i2cTransactionStatus,
+                                         &_data.numBytesWritten, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
@@ -966,9 +922,8 @@ Napi::Value RevHub::readI2CSingleByte(const Napi::CallbackInfo &info) {
   uint8_t slaveAddress = info[1].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_i2c_readSingleByte(&this->obj, i2cChannel, slaveAddress,
-                                       &nackReasonCode);
+                                       &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -982,9 +937,8 @@ Napi::Value RevHub::readI2CMultipleBytes(const Napi::CallbackInfo &info) {
   uint8_t numBytesToRead = info[2].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_i2c_readMultipleBytes(&this->obj, i2cChannel, slaveAddress,
-                                          numBytesToRead, &nackReasonCode);
+                                          numBytesToRead, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -999,10 +953,9 @@ Napi::Value RevHub::writeI2CReadMultipleBytes(const Napi::CallbackInfo &info) {
   uint8_t startAddress = info[3].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_i2c_writeReadMultipleBytes(&this->obj, i2cChannel,
                                                slaveAddress, numBytesToRead,
-                                               startAddress, &nackReasonCode);
+                                               startAddress, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -1019,10 +972,9 @@ Napi::Value RevHub::getI2CReadStatus(const Napi::CallbackInfo &info) {
     uint8_t bytes[100];
   };
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_i2c_readStatusQuery(
         &this->obj, i2cChannel, &_data.i2cTransactionStatus,
-        &_data.numBytesRead, _data.bytes, &nackReasonCode);
+        &_data.numBytesRead, _data.bytes, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
@@ -1048,9 +1000,8 @@ Napi::Value RevHub::setMotorChannelMode(const Napi::CallbackInfo &info) {
   uint8_t floatAtZero = info[2].As<Napi::Boolean>().Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_motor_setChannelMode(&this->obj, motorChannel, motorMode,
-                                         floatAtZero, &nackReasonCode);
+                                         floatAtZero, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -1066,10 +1017,9 @@ Napi::Value RevHub::getMotorChannelMode(const Napi::CallbackInfo &info) {
     uint8_t floatAtZero;
   };
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
     _code =
         RHSPlib_motor_getChannelMode(&this->obj, motorChannel, &_data.motorMode,
-                                     &_data.floatAtZero, &nackReasonCode);
+                                     &_data.floatAtZero, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
@@ -1090,9 +1040,8 @@ Napi::Value RevHub::setMotorChannelEnable(const Napi::CallbackInfo &info) {
   uint8_t enabled = info[1].As<Napi::Boolean>().Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_motor_setChannelEnable(&this->obj, motorChannel, enabled,
-                                           &nackReasonCode);
+                                           &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -1105,9 +1054,8 @@ Napi::Value RevHub::getMotorChannelEnable(const Napi::CallbackInfo &info) {
 
   using retType = uint8_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_motor_getChannelEnable(&this->obj, motorChannel, &_data,
-                                           &nackReasonCode);
+                                           &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -1124,9 +1072,8 @@ Napi::Value RevHub::setMotorChannelCurrentAlertLevel(
   uint16_t currentLimit_mA = info[1].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_motor_setChannelCurrentAlertLevel(
-        &this->obj, motorChannel, currentLimit_mA, &nackReasonCode);
+        &this->obj, motorChannel, currentLimit_mA, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -1140,9 +1087,8 @@ Napi::Value RevHub::getMotorChannelCurrentAlertLevel(
 
   using retType = uint16_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_motor_getChannelCurrentAlertLevel(&this->obj, motorChannel,
-                                                      &_data, &nackReasonCode);
+                                                      &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -1157,9 +1103,7 @@ Napi::Value RevHub::resetMotorEncoder(const Napi::CallbackInfo &info) {
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
-    _code =
-        RHSPlib_motor_resetEncoder(&this->obj, motorChannel, &nackReasonCode);
+    _code = RHSPlib_motor_resetEncoder(&this->obj, motorChannel, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -1172,9 +1116,8 @@ Napi::Value RevHub::setMotorConstantPower(const Napi::CallbackInfo &info) {
   int16_t powerLevel = info[1].As<Napi::Number>().Int32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_motor_setConstantPower(&this->obj, motorChannel, powerLevel,
-                                           &nackReasonCode);
+                                           &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -1187,9 +1130,8 @@ Napi::Value RevHub::getMotorConstantPower(const Napi::CallbackInfo &info) {
 
   using retType = int16_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_motor_getConstantPower(&this->obj, motorChannel, &_data,
-                                           &nackReasonCode);
+                                           &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -1205,9 +1147,8 @@ Napi::Value RevHub::setMotorTargetVelocity(const Napi::CallbackInfo &info) {
   int16_t motorVelocity = info[1].As<Napi::Number>().Int32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_motor_setTargetVelocity(&this->obj, motorChannel,
-                                            motorVelocity, &nackReasonCode);
+                                            motorVelocity, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -1220,9 +1161,8 @@ Napi::Value RevHub::getMotorTargetVelocity(const Napi::CallbackInfo &info) {
 
   using retType = int16_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_motor_getTargetVelocity(&this->obj, motorChannel, &_data,
-                                            &nackReasonCode);
+                                            &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -1239,10 +1179,8 @@ Napi::Value RevHub::setMotorTargetPosition(const Napi::CallbackInfo &info) {
   uint16_t targetTolerance = info[2].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_motor_setTargetPosition(&this->obj, motorChannel,
-                                            targetPosition, targetTolerance,
-                                            &nackReasonCode);
+    _code = RHSPlib_motor_setTargetPosition(
+        &this->obj, motorChannel, targetPosition, targetTolerance, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -1258,10 +1196,9 @@ Napi::Value RevHub::getMotorTargetPosition(const Napi::CallbackInfo &info) {
     uint16_t targetTolerance;
   };
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_motor_getTargetPosition(
-        &this->obj, motorChannel, &_data.targetPosition, &_data.targetTolerance,
-        &nackReasonCode);
+    _code = RHSPlib_motor_getTargetPosition(&this->obj, motorChannel,
+                                            &_data.targetPosition,
+                                            &_data.targetTolerance, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
@@ -1281,9 +1218,8 @@ Napi::Value RevHub::getMotorAtTarget(const Napi::CallbackInfo &info) {
 
   using retType = uint8_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_motor_getMotorAtTarget(&this->obj, motorChannel, &_data,
-                                           &nackReasonCode);
+                                           &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -1299,9 +1235,8 @@ Napi::Value RevHub::getMotorEncoderPosition(const Napi::CallbackInfo &info) {
 
   using retType = int32_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_motor_getEncoderPosition(&this->obj, motorChannel, &_data,
-                                             &nackReasonCode);
+                                             &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -1321,10 +1256,9 @@ Napi::Value RevHub::setMotorPIDCoefficients(const Napi::CallbackInfo &info) {
   int32_t derivativeCoeff = pid.Get("D").As<Napi::Number>().Int32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_motor_setPIDControlLoopCoefficients(
         &this->obj, motorChannel, motorMode, proportionalCoeff, integralCoeff,
-        derivativeCoeff, &nackReasonCode);
+        derivativeCoeff, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -1342,10 +1276,9 @@ Napi::Value RevHub::getMotorPIDCoefficients(const Napi::CallbackInfo &info) {
     int32_t derivativeCoeff;
   };
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_motor_getPIDControlLoopCoefficients(
         &this->obj, motorChannel, motorMode, &_data.proportionalCoeff,
-        &_data.integralCoeff, &_data.derivativeCoeff, &nackReasonCode);
+        &_data.integralCoeff, &_data.derivativeCoeff, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType, {
@@ -1366,9 +1299,8 @@ Napi::Value RevHub::setPWMConfiguration(const Napi::CallbackInfo &info) {
   uint16_t framePeriod = info[1].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_pwm_setConfiguration(&this->obj, pwmChannel, framePeriod,
-                                         &nackReasonCode);
+                                         &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -1381,9 +1313,8 @@ Napi::Value RevHub::getPWMConfiguration(const Napi::CallbackInfo &info) {
 
   using retType = uint16_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_pwm_getConfiguration(&this->obj, pwmChannel, &_data,
-                                         &nackReasonCode);
+                                         &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -1399,9 +1330,8 @@ Napi::Value RevHub::setPWMPulseWidth(const Napi::CallbackInfo &info) {
   uint16_t pulseWidth = info[1].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_pwm_setPulseWidth(&this->obj, pwmChannel, pulseWidth,
-                                      &nackReasonCode);
+                                      &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -1414,9 +1344,8 @@ Napi::Value RevHub::getPWMPulseWidth(const Napi::CallbackInfo &info) {
 
   using retType = uint16_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_pwm_getPulseWidth(&this->obj, pwmChannel, &_data,
-                                      &nackReasonCode);
+    _code =
+        RHSPlib_pwm_getPulseWidth(&this->obj, pwmChannel, &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -1432,9 +1361,7 @@ Napi::Value RevHub::setPWMEnable(const Napi::CallbackInfo &info) {
   uint8_t enable = info[1].As<Napi::Boolean>().Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
-    _code =
-        RHSPlib_pwm_setEnable(&this->obj, pwmChannel, enable, &nackReasonCode);
+    _code = RHSPlib_pwm_setEnable(&this->obj, pwmChannel, enable, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -1447,9 +1374,7 @@ Napi::Value RevHub::getPWMEnable(const Napi::CallbackInfo &info) {
 
   using retType = uint8_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
-    _code =
-        RHSPlib_pwm_getEnable(&this->obj, pwmChannel, &_data, &nackReasonCode);
+    _code = RHSPlib_pwm_getEnable(&this->obj, pwmChannel, &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -1465,9 +1390,8 @@ Napi::Value RevHub::setServoConfiguration(const Napi::CallbackInfo &info) {
   uint16_t framePeriod = info[1].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_servo_setConfiguration(&this->obj, servoChannel,
-                                           framePeriod, &nackReasonCode);
+                                           framePeriod, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -1480,9 +1404,8 @@ Napi::Value RevHub::getServoConfiguration(const Napi::CallbackInfo &info) {
 
   using retType = uint16_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_servo_getConfiguration(&this->obj, servoChannel, &_data,
-                                           &nackReasonCode);
+                                           &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -1498,9 +1421,8 @@ Napi::Value RevHub::setServoPulseWidth(const Napi::CallbackInfo &info) {
   uint16_t pulseWidth = info[1].As<Napi::Number>().Uint32Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_servo_setPulseWidth(&this->obj, servoChannel, pulseWidth,
-                                        &nackReasonCode);
+                                        &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -1513,9 +1435,8 @@ Napi::Value RevHub::getServoPulseWidth(const Napi::CallbackInfo &info) {
 
   using retType = uint16_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
     _code = RHSPlib_servo_getPulseWidth(&this->obj, servoChannel, &_data,
-                                        &nackReasonCode);
+                                        &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,
@@ -1531,9 +1452,8 @@ Napi::Value RevHub::setServoEnable(const Napi::CallbackInfo &info) {
   uint8_t enable = info[1].As<Napi::Boolean>().Value();
 
   CREATE_VOID_WORKER(worker, env, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_servo_setEnable(&this->obj, servoChannel, enable,
-                                    &nackReasonCode);
+    _code =
+        RHSPlib_servo_setEnable(&this->obj, servoChannel, enable, &_nackCode);
   });
 
   QUEUE_WORKER(worker);
@@ -1546,9 +1466,8 @@ Napi::Value RevHub::getServoEnable(const Napi::CallbackInfo &info) {
 
   using retType = uint8_t;
   CREATE_WORKER(worker, env, retType, {
-    uint8_t nackReasonCode;
-    _code = RHSPlib_servo_getEnable(&this->obj, servoChannel, &_data,
-                                    &nackReasonCode);
+    _code =
+        RHSPlib_servo_getEnable(&this->obj, servoChannel, &_data, &_nackCode);
   });
 
   SET_WORKER_CALLBACK(worker, retType,

@@ -2,7 +2,9 @@
 #define RHSPLIBWORKER_H_
 
 #include <napi.h>
+#include <rev/RHSPlib_errors.h>
 
+#include <map>
 #include <mutex>
 
 /* Macros for writing lambda functions */
@@ -18,8 +20,8 @@
  * set to the work function's return data
  */
 #define CREATE_WORKER(NAME, ENV, RETURN, FUNCTION_BODY) \
-  auto NAME = new RHSPlibWorker<RETURN>(                \
-      ENV, [=](int &_code, RETURN &_data) mutable FUNCTION_BODY)
+  auto NAME = new RHSPlibWorker<RETURN>(ENV, [=         \
+  ](int &_code, RETURN &_data, uint8_t &_nackCode) mutable FUNCTION_BODY)
 
 /**
  * @brief Create a worker whose work function does not return a value (void).
@@ -30,8 +32,8 @@
  * should be set to the work function's return code (int)
  */
 #define CREATE_VOID_WORKER(NAME, ENV, FUNCTION_BODY) \
-  auto NAME =                                        \
-      new RHSPlibWorker<void>(ENV, [=](int &_code) mutable FUNCTION_BODY)
+  auto NAME = new RHSPlibWorker<void>(               \
+      ENV, [=](int &_code, uint8_t &_nackCode) mutable FUNCTION_BODY)
 
 /**
  * @brief Set the callback function for a worker.
@@ -116,21 +118,25 @@ class RHSPlibWorker : public Napi::AsyncWorker, public RHSPlibWorkerBase {
    */
   void Execute() override {
     std::scoped_lock<std::mutex> lock{m_mutex};
-    workFunction(resultCode, returnData);
+    workFunction(resultCode, returnData, nackCode);
   }
 
   /**
-   * @brief Run the callback function to prepare the data to be sent to
-   * javascript then resolve the promise with an object that contains the
-   * `resultCode` and javascript-ready value.
+   * @brief If the result code is non-negative (no error), run the call back
+   * function and resolve the promise on the return value. Otherwise, reject the
+   * promise with the associated error.
    */
   void OnOK() override {
-    Napi::Object resultObj = Napi::Object::New(Env());
-    resultObj.Set("resultCode", resultCode);
     if (resultCode >= 0 && callbackFunction) {
-      resultObj.Set("value", callbackFunction(Env(), resultCode, returnData));
+      deferred.Resolve(callbackFunction(Env(), resultCode, returnData));
+    } else {
+      Napi::Object errorObj = Napi::Object::New(Env());
+      errorObj.Set("errorCode", resultCode);
+      if (resultCode == RHSPLIB_ERROR_NACK_RECEIVED) {
+        errorObj.Set("nackCode", nackCode);
+      }
+      deferred.Reject(errorObj);
     }
-    deferred.Resolve(resultObj);
   }
 
   /**
@@ -141,11 +147,12 @@ class RHSPlibWorker : public Napi::AsyncWorker, public RHSPlibWorkerBase {
   void OnError(const Napi::Error &e) override { deferred.Reject(e.Value()); }
 
  private:
-  std::function<void(int &, TReturn &)> workFunction;
+  std::function<void(int &, TReturn &, uint8_t &)> workFunction;
   std::function<Napi::Value(Napi::Env, int &, TReturn &)> callbackFunction;
   Napi::Promise::Deferred deferred;
   TReturn returnData;
   int resultCode;
+  uint8_t nackCode;
 };
 
 /**
@@ -187,16 +194,24 @@ class RHSPlibWorker<void> : public Napi::AsyncWorker, public RHSPlibWorkerBase {
    */
   void Execute() override {
     std::scoped_lock<std::mutex> lock{m_mutex};
-    workFunction(resultCode);
+    workFunction(resultCode, nackCode);
   }
 
   /**
-   * @brief Resolve the promise with an object that contains the `resultCode`
+   * @brief If the result code is non-negative (no error), resolve the promise
+   * with no value. Otherwise, reject the promise with the associated error.
    */
   void OnOK() override {
-    Napi::Object resultObj = Napi::Object::New(Env());
-    resultObj.Set("resultCode", resultCode);
-    deferred.Resolve(resultObj);
+    if (resultCode >= 0) {
+      deferred.Resolve(Env().Undefined());
+    } else {
+      Napi::Object errorObj = Napi::Object::New(Env());
+      errorObj.Set("errorCode", resultCode);
+      if (resultCode == RHSPLIB_ERROR_NACK_RECEIVED) {
+        errorObj.Set("nackCode", nackCode);
+      }
+      deferred.Reject(errorObj);
+    }
   }
 
   /**
@@ -207,9 +222,10 @@ class RHSPlibWorker<void> : public Napi::AsyncWorker, public RHSPlibWorkerBase {
   void OnError(const Napi::Error &e) override { deferred.Reject(e.Value()); }
 
  private:
-  std::function<void(int &)> workFunction;
+  std::function<void(int &, uint8_t &)> workFunction;
   Napi::Promise::Deferred deferred;
   int resultCode;
+  uint8_t nackCode;
 };
 
 #endif
