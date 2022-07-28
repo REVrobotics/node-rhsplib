@@ -56,26 +56,6 @@
   NAME->Queue();           \
   return NAME->GetPromise();
 
-const std::map<int, const char *> rhsplibErrors = {
-    {RHSPLIB_SERIAL_ERROR, "SerialGenericError"},
-    {RHSPLIB_SERIAL_ERROR_OPENING, "SerialOpenError"},
-    {RHSPLIB_SERIAL_ERROR_ARGS, "SerialArgsError"},
-    {RHSPLIB_SERIAL_ERROR_CONFIGURE, "SerialConfigureError"},
-    {RHSPLIB_SERIAL_ERROR_IO, "SerialIOError"},
-    {RHSPLIB_ERROR, "RevHubGenericError"},
-    {RHSPLIB_ERROR_RESPONSE_TIMEOUT, "RevHubResponseTimeoutError"},
-    {RHSPLIB_ERROR_MSG_NUMBER_MISMATCH, "RevHubMessageNumberMismatchError"},
-    {RHSPLIB_ERROR_NACK_RECEIVED, "RevHubNackReceivedError"},
-    {RHSPLIB_ERROR_SERIALPORT, "RevHubSerialPortError"},
-    {RHSPLIB_ERROR_COMMAND_NOT_SUPPORTED, "RevHubCommandNotSupportedError"},
-    {RHSPLIB_ERROR_UNEXPECTED_RESPONSE, "RevHubUnexpectedResponseError"},
-    {RHSPLIB_ERROR_ARG_0_OUT_OF_RANGE, "RevHubArg0OutofRangeError"},
-    {RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE, "RevHubArg1OutofRangeError"},
-    {RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE, "RevHubArg2OutofRangeError"},
-    {RHSPLIB_ERROR_ARG_3_OUT_OF_RANGE, "RevHubArg3OutofRangeError"},
-    {RHSPLIB_ERROR_ARG_4_OUT_OF_RANGE, "RevHubArg4OutofRangeError"},
-    {RHSPLIB_ERROR_ARG_5_OUT_OF_RANGE, "RevHubArg5OutofRangeError"}};
-
 /**
  * @brief Base class for the RHSPlibWorker. The sole responsibility of this
  * class is to contain the static mutex that will be used by the templated
@@ -150,11 +130,9 @@ class RHSPlibWorker : public Napi::AsyncWorker, public RHSPlibWorkerBase {
     if (resultCode >= 0 && callbackFunction) {
       deferred.Resolve(callbackFunction(Env(), resultCode, returnData));
     } else {
-      auto iterator = rhsplibErrors.find(resultCode);
-      Napi::Error error = Napi::Error::New(
-          Env(),
-          iterator != rhsplibErrors.end() ? iterator->second : "UnknownError");
-      deferred.Reject(error.Value());
+      Napi::Object errorObj = Napi::Object::New(Env());
+      errorObj.Set("errorCode", resultCode);
+      deferred.Reject(errorObj);
     }
   }
 
@@ -223,11 +201,9 @@ class RHSPlibWorker<void> : public Napi::AsyncWorker, public RHSPlibWorkerBase {
     if (resultCode >= 0) {
       deferred.Resolve(Env().Undefined());
     } else {
-      auto iterator = rhsplibErrors.find(resultCode);
-      Napi::Error error = Napi::Error::New(
-          Env(),
-          iterator != rhsplibErrors.end() ? iterator->second : "UnknownError");
-      deferred.Reject(error.Value());
+      Napi::Object errorObj = Napi::Object::New(Env());
+      errorObj.Set("errorCode", resultCode);
+      deferred.Reject(errorObj);
     }
   }
 
