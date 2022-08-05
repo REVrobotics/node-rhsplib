@@ -61,7 +61,10 @@
         },
       },
       'cflags_cc!': [
-        '-fno-exceptions'
+        '-fno-exceptions',
+      ],
+      'cflags_cc': [
+        '-std=c++17'
       ],
       'cflags!': [
         '-fno-exceptions'
