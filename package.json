@@ -15,9 +15,10 @@
     "node-gyp-build": "^4.6.0"
   },
   "devDependencies": {
-    "@types/node": "^17.0.35",
+    "@types/node": "^16.18.18",
     "prebuildify": "^5.0.1",
-    "node-gyp": "^9.0.0"
+    "node-gyp": "^9.0.0",
+    "typescript": "^5.0.2"
   },
   "scripts": {
     "install": "node-gyp-build",
