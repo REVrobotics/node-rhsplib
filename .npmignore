@@ -1,0 +1,7 @@
+build
+lib
+test
+.idea
+.vscode
+tsconfig.json
+.clang-format
