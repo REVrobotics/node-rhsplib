@@ -1,4 +1,5 @@
-const addon = require('bindings')('addon');
+import * as path from "path";
+const addon = require('node-gyp-build')(path.join(__dirname, '..'));
 
 module.exports.Serial = addon.Serial;
 module.exports.RevHub = addon.RevHub;
@@ -185,7 +186,7 @@ export declare class RevHub {
   getDigitalDirection(dioPin: number): Promise<DIODirection>;
   getDigitalSingleInput(dioPin: number): Promise<boolean>;
   getDigitalAllInputs(): Promise<number>;
-  
+
   // I2C
   setI2CChannelConfiguration(i2cChannel: number, speedCode: I2CSpeedCode): Promise<void>;
   getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode>;

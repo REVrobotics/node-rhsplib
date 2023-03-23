@@ -11,16 +11,18 @@
     "url": "git+https://github.com/REVrobotics/node-rhsplib.git"
   },
   "dependencies": {
-    "bindings": "^1.5.0",
-    "node-addon-api": "^5.0.0",
-    "node-gyp": "^9.0.0"
+    "node-addon-api": "^6.0.0",
+    "node-gyp-build": "^4.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^16.18.18",
+    "node-gyp": "^9.3.1",
+    "prebuildify": "^5.0.1",
+    "typescript": "^5.0.2"
   },
   "scripts": {
-    "install": "node-gyp rebuild",
-    "prepublish": "node-gyp build && tsc"
+    "install": "node-gyp-build",
+    "prepublishOnly": "prebuildify --napi && tsc"
   },
-  "gypfile": true,
-  "devDependencies": {
-    "@types/node": "^17.0.35"
-  }
+  "gypfile": true
 }

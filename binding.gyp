@@ -25,13 +25,7 @@
           'OS=="win"', {
             'libraries': [
               '<(module_root_dir)/RHSPlib/x86-64/RHSPlib.lib',
-            ],
-            'copies':[{
-              'destination': '<(PRODUCT_DIR)',
-              'files':[
-                '<(module_root_dir)/bin/RHSPlib.dll',
-              ],
-            }],
+            ]
           }
         ],
         [
