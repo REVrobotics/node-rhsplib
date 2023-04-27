@@ -47,7 +47,6 @@ Napi::Value Serial::open(const Napi::CallbackInfo &info) {
 
   CREATE_VOID_WORKER(worker, env, {
     const char *serialPortName = serialPortNameStr.c_str();
-    printf("Node-RHSPLib: opening serial port %s\n", serialPortName);
     _code = RHSPlib_serial_open(&this->serialPort, serialPortName, baudrate,
                                 databits, parity, stopbits, flowControl);
   });
