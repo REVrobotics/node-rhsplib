@@ -4,6 +4,7 @@
   "author": "REV Robotics",
   "description": "Node addon for RHSPlib",
   "license": "BSD-3-Clause",
+  "type": "module",
   "main": "dist/binding.js",
   "types": "dist/binding.d.ts",
   "repository": {
@@ -23,7 +24,7 @@
     "typescript": "^5.0.2"
   },
   "scripts": {
-    "sample": "tsc && node dist/sample/src/main.js",
+    "sample": "tsc --project sample/tsconfig.json && node dist/sample/src/main.js --list",
     "install": "node-gyp-build",
     "prepublishOnly": "prebuildify --napi && tsc"
   },

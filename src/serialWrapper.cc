@@ -5,7 +5,7 @@
 // See https://github.com/nodejs/node-addon-api/blob/main/doc/object_wrap.md
 Napi::Object Serial::Init(Napi::Env env, Napi::Object exports) {
   Napi::Function func =
-      DefineClass(env, "Serial",
+      DefineClass(env, "SerialInternal",
                   {
                       Serial::InstanceMethod("open", &Serial::open),
                       Serial::InstanceMethod("close", &Serial::close),
@@ -16,7 +16,7 @@ Napi::Object Serial::Init(Napi::Env env, Napi::Object exports) {
   Napi::FunctionReference *constructor = new Napi::FunctionReference();
 
   *constructor = Napi::Persistent(func);
-  exports.Set("Serial", func);
+  exports.Set("SerialInternal", func);
 
   env.SetInstanceData<Napi::FunctionReference>(constructor);
 

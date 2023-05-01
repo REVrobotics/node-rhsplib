@@ -1,7 +1,7 @@
 
 import { SerialPort } from "serialport";
-import {RevHub} from "./RevHub";
-import {openRevHub} from "./internal/RevHub";
+import {RevHub} from "./RevHub.js";
+import {openRevHub} from "./internal/RevHub.js";
 
 export async function getSerialPortPathForExHubSerial(
     serialNumber: string,

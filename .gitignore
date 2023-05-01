@@ -1,6 +1,6 @@
 build
 dist
-prebuilds
+dist/prebuilds
 
 # Logs
 logs
@@ -107,5 +107,4 @@ typings/
 # TernJS port file
 .tern-port
 
-# Webstorm
-.idea/
+RHSPlib.dll

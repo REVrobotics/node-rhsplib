@@ -148,7 +148,7 @@ Napi::Object RevHub::Init(Napi::Env env, Napi::Object exports) {
   Napi::FunctionReference *constructor = new Napi::FunctionReference();
 
   *constructor = Napi::Persistent(func);
-  exports.Set("RevHub", func);
+  exports.Set("RevHubInternal", func);
 
   env.SetInstanceData<Napi::FunctionReference>(constructor);
 

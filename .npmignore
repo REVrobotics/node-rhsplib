@@ -5,3 +5,5 @@ test
 .vscode
 tsconfig.json
 .clang-format
+dist/sample
+sample/

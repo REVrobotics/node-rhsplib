@@ -1,200 +1,144 @@
-import {RevHub} from "../RevHub";
+import {RevHub} from "../RevHub.js";
+import {getSerialPortPathForExHubSerial} from "../Discovery.js";
+import {Serial} from "../Serial.js";
+import {openSerial} from "./Serial.js";
+import * as path from "path";
+
+import { createRequire } from "node:module";
+import {fileURLToPath} from "url";
 import {
     BulkInputData, DebugGroup,
     DIODirection, DiscoveredAddresses,
     I2CReadStatus,
     I2CSpeedCode,
-    I2CWriteStatus,
-    LEDPattern, ModuleInterface,
-    ModuleStatus, PIDCoefficients,
-    RGB, SerialFlowControl, SerialParity, VerbosityLevel, Version
-} from "../binding";
-import {getSerialPortPathForExHubSerial} from "../Discovery";
-
-declare class RevHubInternal implements RevHub {
-    static discoverRevHubs(serialPort: Serial): Promise<DiscoveredAddresses>;
-    close(): void;
-
-    getADC(): Promise<number>;
-
-    getBulkInputData(): Promise<BulkInputData>;
-    getDestAddress(): number;
-
-    getDigitalAllInputs(): Promise<number>;
-
-    getDigitalDirection(dioPin: number): Promise<DIODirection>;
-
-    getDigitalSingleInput(dioPin: number): Promise<boolean>;
-
-    getFTDIResetControl(): Promise<boolean>;
-
-    getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode>;
-
-    getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus>;
-
-    getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus>;
-
-    getInterfacePacketID(interfaceName: string, functionNumber: number): Promise<number>;
-
-    getModuleLEDColor(): Promise<RGB>;
-
-    getModuleLEDPattern(): Promise<LEDPattern>;
-
-    getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus>;
-
-    getMotorAtTarget(motorChannel: number): Promise<boolean>;
-
-    getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<number>;
-
-    getMotorChannelEnable(motorChannel: number): Promise<boolean>;
-
-    getMotorChannelMode(motorChannel: number): Promise<{ motorMode: number; floatAtZero: boolean }>;
-
-    getMotorConstantPower(motorChannel: number): Promise<number>;
-
-    getMotorEncoderPosition(motorChannel: number): Promise<number>;
-
-    getMotorPIDCoefficients(motorChannel: number, motorMode: number): Promise<PIDCoefficients>;
-
-    getMotorTargetPosition(motorChannel: number): Promise<{ targetPosition: number; targetTolerance: number }>;
-
-    getMotorTargetVelocity(motorChannel: number): Promise<number>;
-
-    getPWMConfiguration(pwmChannel: number): Promise<number>;
-
-    getPWMEnable(pwmChannel: number): Promise<boolean>;
-
-    getPWMPulseWidth(pwmChannel: number): Promise<number>;
-
-    getPhoneChargeControl(): Promise<boolean>;
-
-    getResponseTimeoutMs(): number;
-
-    getServoConfiguration(servoChannel: number): Promise<number>;
-
-    getServoEnable(servoChannel: number): Promise<boolean>;
-
-    getServoPulseWidth(servoChannel: number): Promise<number>;
-
-    injectDataLogHint(hintText: string): Promise<void>;
-
-    isOpened(): boolean;
-
-    open(serialPort: Serial, destAddress: number): Promise<void>;
-
-    queryInterface(interfaceName: string): Promise<ModuleInterface>;
-
-    readI2CMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number): Promise<void>;
-
-    readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void>;
-
-    readVersion(): Promise<Version>;
-
-    readVersionString(): Promise<string>;
-
-    resetMotorEncoder(motorChannel: number): Promise<void>;
-
-    sendFailSafe(): Promise<void>;
-
-    sendKeepAlive(): Promise<void>;
-
-    sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
-
-    sendReadCommandInternal(packetTypeID: number, payload: number[]): Promise<void>;
-
-    sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
-
-    sendWriteCommandInternal(packetTypeID: number, payload: number[]): Promise<void>;
-
-    setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<void>;
-
-    setDestAddress(destAddress: number): void;
-
-    setDigitalAllOutputs(bitPackedField: number): Promise<void>;
-
-    setDigitalDirection(dioPin: number, direction: DIODirection): Promise<void>;
-
-    setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void>;
-
-    setFTDIResetControl(ftdiResetControl: boolean): Promise<void>;
-
-    setI2CChannelConfiguration(i2cChannel: number, speedCode: I2CSpeedCode): Promise<void>;
-
-    setModuleLEDColor(red: number, green: number, blue: number): Promise<void>;
-
-    setModuleLEDPattern(ledPattern: LEDPattern): Promise<void>;
-
-    setMotorChannelCurrentAlertLevel(motorChannel: number, currentLimit_mA: number): Promise<void>;
-
-    setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void>;
-
-    setMotorChannelMode(motorChannel: number, motorMode: number, floatAtZero: boolean): Promise<void>;
-
-    setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void>;
-
-    setMotorPIDCoefficients(motorChannel: number, motorMode: number, pid: PIDCoefficients): Promise<void>;
-
-    setMotorTargetPosition(motorChannel: number, targetPosition_counts: number, targetTolerance_counts: number): Promise<void>;
-
-    setMotorTargetVelocity(motorChannel: number, velocity_cps: number): Promise<void>;
-
-    setNewModuleAddress(newModuleAddress: number): Promise<void>;
-
-    setPWMConfiguration(pwmChannel: number, framePeriod: number): Promise<void>;
-
-    setPWMEnable(pwmChannel: number, enable: boolean): Promise<void>;
-
-    setPWMPulseWidth(pwmChannel: number, pulseWidth: number): Promise<void>;
-
-    setPhoneChargeControl(chargeEnable: boolean): Promise<void>;
-
-    setResponseTimeoutMs(responseTimeoutMs: number): void;
-
-    setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void>;
-
-    setServoEnable(servoChannel: number, enable: boolean): Promise<void>;
-
-    setServoPulseWidth(servoChannel: number, pulseWidth: number): Promise<void>;
-
-    writeI2CMultipleBytes(i2cChannel: number, slaveAddress: number, bytes: number[]): Promise<void>;
-
-    writeI2CReadMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number, startAddress: number): Promise<void>;
-
-    writeI2CSingleByte(i2cChannel: number, slaveAddress: number, byte: number): Promise<void>;
-}
+    I2CWriteStatus, LEDPattern, ModuleInterface, ModuleStatus,
+    PIDCoefficients, RGB, VerbosityLevel,
+    Version
+} from "../binding.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const require = createRequire(import.meta.url);
+
+const nodeGypBuild = require('node-gyp-build');
+const addon = nodeGypBuild(path.join(__dirname, '../..'));
 
 const openSerialMap = new Map<string, Serial>();
 
+declare class RevHubInternal {
+    constructor();
+    open(serialPort: Serial, destAddress: number): Promise<void>;
+    isOpened(): boolean;
+    close(): void;
+    setDestAddress(destAddress: number): void;
+    getDestAddress(): number;
+    setResponseTimeoutMs(responseTimeoutMs: number): void;
+    getResponseTimeoutMs(): number;
+    sendWriteCommandInternal(packetTypeID: number, payload: number[]): Promise<void>;
+    sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
+    sendReadCommandInternal(packetTypeID: number, payload: number[]): Promise<void>;
+    sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
+    getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus>;
+    sendKeepAlive(): Promise<void>;
+    sendFailSafe(): Promise<void>;
+    setNewModuleAddress(newModuleAddress: number): Promise<void>;
+    queryInterface(interfaceName: string): Promise<ModuleInterface>;
+    setModuleLEDColor(red: number, green: number, blue: number): Promise<void>;
+    getModuleLEDColor(): Promise<RGB>;
+    setModuleLEDPattern(ledPattern: LEDPattern): Promise<void>;
+    getModuleLEDPattern(): Promise<LEDPattern>;
+    setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<void>;
+    static discoverRevHubs(serialPort: Serial): Promise<DiscoveredAddresses>;
+    getInterfacePacketID(interfaceName: string, functionNumber: number): Promise<number>;
+
+    // Device Control
+    getBulkInputData(): Promise<BulkInputData>;
+    getADC(): Promise<number>;
+    setPhoneChargeControl(chargeEnable: boolean): Promise<void>;
+    getPhoneChargeControl(): Promise<boolean>;
+    injectDataLogHint(hintText: string): Promise<void>;
+    readVersionString(): Promise<string>;
+    readVersion(): Promise<Version>;
+    setFTDIResetControl(ftdiResetControl: boolean): Promise<void>;
+    getFTDIResetControl(): Promise<boolean>;
+
+    // DIO
+    setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void>;
+    setDigitalAllOutputs(bitPackedField: number): Promise<void>;
+    setDigitalDirection(dioPin: number, direction: DIODirection): Promise<void>;
+    getDigitalDirection(dioPin: number): Promise<DIODirection>;
+    getDigitalSingleInput(dioPin: number): Promise<boolean>;
+    getDigitalAllInputs(): Promise<number>;
+
+    // I2C
+    setI2CChannelConfiguration(i2cChannel: number, speedCode: I2CSpeedCode): Promise<void>;
+    getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode>;
+    writeI2CSingleByte(i2cChannel: number, slaveAddress: number, byte: number): Promise<void>;
+    writeI2CMultipleBytes(i2cChannel: number, slaveAddress: number, bytes: number[]): Promise<void>;
+    getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus>;
+    readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void>;
+    readI2CMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number): Promise<void>;
+    writeI2CReadMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number, startAddress: number): Promise<void>;
+    getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus>;
+
+    // Motor
+    setMotorChannelMode(motorChannel: number, motorMode: number, floatAtZero: boolean): Promise<void>;
+    getMotorChannelMode(motorChannel: number): Promise<{motorMode: number, floatAtZero: boolean}>
+    setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void>;
+    getMotorChannelEnable(motorChannel: number): Promise<boolean>;
+    setMotorChannelCurrentAlertLevel(motorChannel: number, currentLimit_mA: number): Promise<void>;
+    getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<number>;
+    resetMotorEncoder(motorChannel: number): Promise<void>;
+    setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void>;
+    getMotorConstantPower(motorChannel: number): Promise<number>;
+    setMotorTargetVelocity(motorChannel: number, velocity_cps: number): Promise<void>;
+    getMotorTargetVelocity(motorChannel: number): Promise<number>;
+    setMotorTargetPosition(motorChannel: number, targetPosition_counts: number, targetTolerance_counts: number): Promise<void>;
+    getMotorTargetPosition(motorChannel: number): Promise<{targetPosition: number, targetTolerance: number}>;
+    getMotorAtTarget(motorChannel: number): Promise<boolean>;
+    getMotorEncoderPosition(motorChannel: number): Promise<number>;
+    setMotorPIDCoefficients(motorChannel: number, motorMode: number, pid: PIDCoefficients): Promise<void>;
+    getMotorPIDCoefficients(motorChannel: number, motorMode: number): Promise<PIDCoefficients>;
+
+    // PWM
+    setPWMConfiguration(pwmChannel: number, framePeriod: number): Promise<void>;
+    getPWMConfiguration(pwmChannel: number): Promise<number>;
+    setPWMPulseWidth(pwmChannel: number, pulseWidth: number): Promise<void>;
+    getPWMPulseWidth(pwmChannel: number): Promise<number>;
+    setPWMEnable(pwmChannel: number, enable: boolean): Promise<void>;
+    getPWMEnable(pwmChannel: number): Promise<boolean>;
+
+    // Servo
+    setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void>;
+    getServoConfiguration(servoChannel: number): Promise<number>;
+    setServoPulseWidth(servoChannel: number, pulseWidth: number): Promise<void>;
+    getServoPulseWidth(servoChannel: number): Promise<number>;
+    setServoEnable(servoChannel: number, enable: boolean): Promise<void>;
+    getServoEnable(servoChannel: number): Promise<boolean>;
+}
+
 export async function openRevHub(serialNumber: string): Promise<RevHub> {
     let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
+    console.log(`Found device on Serial port ${serialPortPath}`);
 
     if(openSerialMap.get(serialPortPath) == undefined) {
-        let serial = new Serial();
-        await serial.open(serialPortPath,
-            460800,
-            8,
-            SerialParity.None,
-            1,
-            SerialFlowControl.None,);
-        openSerialMap.set(serialPortPath, serial);
+        openSerialMap.set(serialPortPath, await openSerial(serialPortPath));
     }
 
     let serial = openSerialMap.get(serialPortPath)!;
+    console.log("Got open Serial");
 
-    let parentHub = new RevHubInternal();
-    let discoveredModules = await RevHubInternal.discoverRevHubs(serial);
+    let parentHub = new (addon.RevHubInternal as typeof RevHubInternal)();
+
+    console.log("Discovering hubs");
+    let discoveredModules = await addon.RevHubInternal.discoverRevHubs(serial);
+    console.log("Hubs discovered");
     let parentAddress = discoveredModules.parentAddress; //ToDo(Landry): Figure out what happens if no discovery found
 
+    console.log("Opening parent hub");
     await parentHub.open(serial, parentAddress);
+    console.log(`Parent hub opened ${parentHub.getDestAddress()}`);
     await parentHub.queryInterface("DEKA");
 
     return parentHub;
-}
-
-declare class Serial {
-    constructor();
-    open(serialPortName: string, baudrate: number, databits: number, parity: SerialParity, stopbits: number, flowControl: SerialFlowControl): Promise<void>;
-    close(): void;
-    read(numBytesToRead: number): Promise<number[]>;
-    write(bytes: number[]): Promise<void>;
 }

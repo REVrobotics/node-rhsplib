@@ -1,6 +1,6 @@
 import {Command} from "commander";
-import {getConnectedExpansionHubs} from "../../lib/Discovery";
-import {RevHub} from "../../lib/RevHub";
+import {getConnectedExpansionHubs} from "../../lib/Discovery.js";
+import {RevHub} from "../../lib/RevHub.js";
 
 const program = new Command();
 
@@ -13,12 +13,9 @@ console.log("Starting...");
 
 if(options.list) {
     console.log("Starting to search Serial Ports")
-    getConnectedExpansionHubs().then((hubs) => {
-        hubs.forEach((hub) => {
-            toString(hub).then((str) => {
-                console.log(str);
-            })
-        })
+    const hubs: RevHub[] = await getConnectedExpansionHubs();
+    hubs.forEach(async (hub) => {
+        console.log(await toString(hub));
     })
 }
 
