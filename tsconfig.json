@@ -3,7 +3,7 @@
       "declaration": true,
       "module": "commonjs",
       "outDir": "./dist",
-      "rootDir": "./lib",
+      "rootDir": ".",
       "strict": true,
       "target": "es5",
       "types": [

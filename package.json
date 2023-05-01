@@ -12,15 +12,18 @@
   },
   "dependencies": {
     "node-addon-api": "^6.0.0",
-    "node-gyp-build": "^4.6.0"
+    "node-gyp-build": "^4.6.0",
+    "serialport": "^10.5.0"
   },
   "devDependencies": {
     "@types/node": "^16.18.18",
+    "commander": "^10.0.1",
     "node-gyp": "^9.3.1",
     "prebuildify": "^5.0.1",
     "typescript": "^5.0.2"
   },
   "scripts": {
+    "sample": "tsc && node dist/sample/src/main.js",
     "install": "node-gyp-build",
     "prepublishOnly": "prebuildify --napi && tsc"
   },

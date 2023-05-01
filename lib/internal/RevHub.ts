@@ -1,17 +1,18 @@
 import {RevHub} from "../RevHub";
 import {
     BulkInputData, DebugGroup,
-    DIODirection,
+    DIODirection, DiscoveredAddresses,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
     LEDPattern, ModuleInterface,
     ModuleStatus, PIDCoefficients,
-    RGB, VerbosityLevel, Version
+    RGB, SerialFlowControl, SerialParity, VerbosityLevel, Version
 } from "../binding";
-import {Serial} from "./Serial";
+import {getSerialPortPathForExHubSerial} from "../Discovery";
 
-declare class RevHubImplementation implements RevHub {
+declare class RevHubInternal implements RevHub {
+    static discoverRevHubs(serialPort: Serial): Promise<DiscoveredAddresses>;
     close(): void;
 
     getADC(): Promise<number>;
@@ -160,5 +161,40 @@ declare class RevHubImplementation implements RevHub {
     writeI2CReadMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number, startAddress: number): Promise<void>;
 
     writeI2CSingleByte(i2cChannel: number, slaveAddress: number, byte: number): Promise<void>;
+}
 
+const openSerialMap = new Map<string, Serial>();
+
+export async function openRevHub(serialNumber: string): Promise<RevHub> {
+    let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
+
+    if(openSerialMap.get(serialPortPath) == undefined) {
+        let serial = new Serial();
+        await serial.open(serialPortPath,
+            460800,
+            8,
+            SerialParity.None,
+            1,
+            SerialFlowControl.None,);
+        openSerialMap.set(serialPortPath, serial);
+    }
+
+    let serial = openSerialMap.get(serialPortPath)!;
+
+    let parentHub = new RevHubInternal();
+    let discoveredModules = await RevHubInternal.discoverRevHubs(serial);
+    let parentAddress = discoveredModules.parentAddress; //ToDo(Landry): Figure out what happens if no discovery found
+
+    await parentHub.open(serial, parentAddress);
+    await parentHub.queryInterface("DEKA");
+
+    return parentHub;
+}
+
+declare class Serial {
+    constructor();
+    open(serialPortName: string, baudrate: number, databits: number, parity: SerialParity, stopbits: number, flowControl: SerialFlowControl): Promise<void>;
+    close(): void;
+    read(numBytesToRead: number): Promise<number[]>;
+    write(bytes: number[]): Promise<void>;
 }
