@@ -1,8 +1,3 @@
-import * as path from "path";
-const addon = require('node-gyp-build')(path.join(__dirname, '..'));
-
-module.exports.Serial = addon.Serial;
-module.exports.RevHub = addon.RevHub;
 
 export enum SerialParity {
   None = 0,
