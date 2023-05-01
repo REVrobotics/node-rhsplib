@@ -22,7 +22,7 @@ if(options.list) {
 async function toString(hub: RevHub): Promise<string> {
     let result = `RevHub: ${hub.getDestAddress()}\n`;
 
-    for(let child of hub.children) {
+    for(const [_, child] of hub.children) {
         result += `\tRevHub: ${child.getDestAddress()}\n`;
     }
 

@@ -115,8 +115,6 @@ declare class NativeRevHub {
     getServoPulseWidth(servoChannel: number): Promise<number>;
     setServoEnable(servoChannel: number, enable: boolean): Promise<void>;
     getServoEnable(servoChannel: number): Promise<boolean>;
-
-    children: RevHub[];
 }
 
 class RevHubInternal implements RevHub {
@@ -125,7 +123,7 @@ class RevHubInternal implements RevHub {
     }
 
     nativeRevHub: NativeRevHub;
-    children: RevHub[] = [];
+    children: Map<number, RevHub> = new Map();
 
     close(): void {
     }
@@ -451,7 +449,7 @@ export async function openRevHub(serialNumber: string): Promise<RevHub> {
         await childHub.open(serial, address);
         await childHub.queryInterface("DEKA");
 
-        parentHub.children.push(childHub);
+        parentHub.children.set(address, childHub);
     }
 
     return parentHub;

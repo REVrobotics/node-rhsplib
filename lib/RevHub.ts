@@ -10,7 +10,7 @@ import {
 } from "./binding.js";
 
 export interface RevHub {
-    children: RevHub[];
+    children: Map<number, RevHub>;
 
     isOpened(): boolean;
     close(): void;
