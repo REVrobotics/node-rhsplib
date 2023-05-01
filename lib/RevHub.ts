@@ -10,6 +10,8 @@ import {
 } from "./binding.js";
 
 export interface RevHub {
+    children: RevHub[];
+
     isOpened(): boolean;
     close(): void;
     setDestAddress(destAddress: number): void;
