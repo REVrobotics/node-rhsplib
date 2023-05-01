@@ -130,14 +130,10 @@ export async function openRevHub(serialNumber: string): Promise<RevHub> {
 
     let parentHub = new (addon.RevHubInternal as typeof RevHubInternal)();
 
-    console.log("Discovering hubs");
     let discoveredModules = await addon.RevHubInternal.discoverRevHubs(serial);
-    console.log("Hubs discovered");
     let parentAddress = discoveredModules.parentAddress; //ToDo(Landry): Figure out what happens if no discovery found
 
-    console.log("Opening parent hub");
     await parentHub.open(serial, parentAddress);
-    console.log(`Parent hub opened ${parentHub.getDestAddress()}`);
     await parentHub.queryInterface("DEKA");
 
     return parentHub;
