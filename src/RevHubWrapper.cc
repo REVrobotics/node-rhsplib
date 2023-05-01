@@ -13,7 +13,7 @@
 // See https://github.com/nodejs/node-addon-api/blob/main/doc/object_wrap.md
 Napi::Object RevHub::Init(Napi::Env env, Napi::Object exports) {
   Napi::Function func = DefineClass(
-      env, "RevHub",
+      env, "RevHubImplementation",
       {
           RevHub::InstanceMethod("open", &RevHub::open),
           RevHub::InstanceMethod("isOpened", &RevHub::isOpened),
