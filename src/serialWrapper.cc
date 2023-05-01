@@ -36,7 +36,6 @@ Napi::Value Serial::open(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   std::string serialPortNameStr = info[0].As<Napi::String>().Utf8Value();
-  const char *serialPortName = &serialPortNameStr[0];
   uint32_t baudrate = info[1].As<Napi::Number>().Uint32Value();
   uint32_t databits = info[2].As<Napi::Number>().Uint32Value();
   RHSPlib_Serial_Parity_T parity = static_cast<RHSPlib_Serial_Parity_T>(
@@ -47,6 +46,7 @@ Napi::Value Serial::open(const Napi::CallbackInfo &info) {
           info[5].As<Napi::Number>().Uint32Value());
 
   CREATE_VOID_WORKER(worker, env, {
+    const char *serialPortName = serialPortNameStr.c_str();
     _code = RHSPlib_serial_open(&this->serialPort, serialPortName, baudrate,
                                 databits, parity, stopbits, flowControl);
   });
