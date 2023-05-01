@@ -15,6 +15,7 @@ import {
     PIDCoefficients, RGB, VerbosityLevel,
     Version
 } from "../binding.js";
+import {startKeepAlive} from "../keep-alive.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -135,6 +136,7 @@ export async function openRevHub(serialNumber: string): Promise<RevHub> {
 
     await parentHub.open(serial, parentAddress);
     await parentHub.queryInterface("DEKA");
+    startKeepAlive(parentHub, 1000);
 
     return parentHub;
 }

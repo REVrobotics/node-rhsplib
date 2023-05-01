@@ -24,7 +24,7 @@
     "typescript": "^5.0.2"
   },
   "scripts": {
-    "sample": "tsc --project sample/tsconfig.json && node dist/sample/src/main.js --list",
+    "sample": "tsc --project sample/tsconfig.json && node dist/sample/src/main.js --keep-alive",
     "install": "node-gyp-build",
     "prepublishOnly": "prebuildify --napi && tsc"
   },
