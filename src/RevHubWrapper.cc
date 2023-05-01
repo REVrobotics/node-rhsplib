@@ -376,10 +376,10 @@ Napi::Value RevHub::queryInterface(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   std::string interfaceNameStr = info[0].As<Napi::String>().Utf8Value();
-  const char *interfaceName = &interfaceNameStr[0];
 
   using retType = RHSPlib_Module_Interface_T;
   CREATE_WORKER(worker, env, retType, {
+    const char *interfaceName = interfaceNameStr.c_str();
     _code =
         RHSPlib_queryInterface(&this->obj, interfaceName, &_data, &_nackCode);
   });
@@ -562,11 +562,11 @@ Napi::Value RevHub::getInterfacePacketID(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   std::string interfaceNameStr = info[0].As<Napi::String>().Utf8Value();
-  const char *interfaceName = &interfaceNameStr[0];
   uint16_t functionNumber = info[1].As<Napi::Number>().Uint32Value();
 
   using retType = uint16_t;
   CREATE_WORKER(worker, env, retType, {
+    const char *interfaceName = interfaceNameStr.c_str();
     _code = RHSPlib_getInterfacePacketID(&this->obj, interfaceName,
                                          functionNumber, &_data, &_nackCode);
   });
@@ -657,11 +657,10 @@ Napi::Value RevHub::getPhoneChargeControl(const Napi::CallbackInfo &info) {
 
 Napi::Value RevHub::injectDataLogHint(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
-
   std::string hintTextStr = info[0].As<Napi::String>().Utf8Value();
-  const char *hintText = &hintTextStr[0];
 
   CREATE_VOID_WORKER(worker, env, {
+    const char *hintText = hintTextStr.c_str();
     _code = RHSPlib_deviceControl_injectDataLogHint(&this->obj, hintText,
                                                     &_nackCode);
   });
