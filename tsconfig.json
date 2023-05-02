@@ -6,7 +6,7 @@
       "outDir": "./dist",
       "rootDir": ".",
       "strict": true,
-      "target": "es5",
+      "target": "es2017",
       "esModuleInterop": true,
       "types": [
         "node"
