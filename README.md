@@ -7,7 +7,7 @@ This package enables Node.js applications to control devices that speak the REV 
 1. Check out the `main` branch
 2. Update `version` field in `package.json`
 3. Run `npm install`
-4. Commit change to git
+4. Commit package.json and package-lock.json to git
 5. Run `git tag v<version>`
 6. Run `git push`
 7. Run `git push --tags`
