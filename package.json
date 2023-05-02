@@ -24,7 +24,7 @@
     "typescript": "^5.0.2"
   },
   "scripts": {
-    "sample": "tsc && node dist/sample/main.js --list",
+    "sample": "tsc --project sample/tsconfig.json && node dist/sample/main.js --list",
     "install": "node-gyp-build \"node scripts/build-RHSPlib.mjs\"",
     "prepublishOnly": "prebuildify --napi && tsc"
   },
