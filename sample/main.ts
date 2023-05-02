@@ -5,7 +5,7 @@ import {RevHub} from "../lib/RevHub.js";
 const program = new Command();
 
 program.version('1.0.0')
-    .option('-l --list', 'List conected devices').parse(process.argv);
+    .option('-l --list', 'List connected devices').parse(process.argv);
 
 const options = program.opts();
 
