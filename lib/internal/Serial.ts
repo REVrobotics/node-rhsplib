@@ -25,20 +25,11 @@ export declare class Serial {
 
 export async function openSerial(serialPortPath: string): Promise<Serial> {
     let serial = new (addon.SerialInternal as typeof Serial)();
-    let i = 0;
-    while(i < 100) {
-        console.log(`Trying to open ${i}`);
-        i++;
-        try {
-            await serial.open(serialPortPath,
-                460800,
-                8,
-                SerialParity.None,
-                1,
-                SerialFlowControl.None);
-            console.log("Successful open");
-            break;
-        } catch {}
-    }
+    await serial.open(serialPortPath,
+        460800,
+        8,
+        SerialParity.None,
+        1,
+        SerialFlowControl.None);
     return serial;
 }
