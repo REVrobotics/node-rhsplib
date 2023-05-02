@@ -1,3 +1,5 @@
+export * from "./discovery.js"
+export * from "./RevHub.js"
 
 export enum SerialParity {
   None = 0,

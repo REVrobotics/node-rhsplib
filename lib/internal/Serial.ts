@@ -1,4 +1,4 @@
-import {SerialFlowControl, SerialParity} from "../binding.js";
+import {SerialFlowControl, SerialParity} from "../index.js";
 
 import * as path from "path";
 

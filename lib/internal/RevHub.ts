@@ -12,7 +12,7 @@ import {
     I2CWriteStatus, LEDPattern, ModuleInterface, ModuleStatus,
     PIDCoefficients, RGB, VerbosityLevel,
     Version
-} from "../binding.js";
+} from "../index.js";
 
 const scriptDirPath = path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);

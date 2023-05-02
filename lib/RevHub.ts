@@ -7,7 +7,7 @@ import {
     ModuleStatus, PIDCoefficients,
     RGB,
     VerbosityLevel, Version
-} from "./binding.js";
+} from "./index.js";
 
 export interface RevHub {
     isOpened(): boolean;
