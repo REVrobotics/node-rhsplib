@@ -21,7 +21,7 @@
     "typescript": "^5.0.2"
   },
   "scripts": {
-    "install": "node-gyp-build",
+    "install": "node-gyp-build \"node scripts/build-RHSPlib.mjs\"",
     "prepublishOnly": "prebuildify --napi && tsc"
   },
   "gypfile": true

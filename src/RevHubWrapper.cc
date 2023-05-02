@@ -1,11 +1,11 @@
 #include "RevHubWrapper.h"
 
-#include <rev/RHSPlib_device_control.h>
-#include <rev/RHSPlib_dio.h>
-#include <rev/RHSPlib_i2c.h>
-#include <rev/RHSPlib_motor.h>
-#include <rev/RHSPlib_pwm.h>
-#include <rev/RHSPlib_servo.h>
+#include <RHSPlib_device_control.h>
+#include <RHSPlib_dio.h>
+#include <RHSPlib_i2c.h>
+#include <RHSPlib_motor.h>
+#include <RHSPlib_pwm.h>
+#include <RHSPlib_servo.h>
 
 #include "RHSPlibWorker.h"
 #include "serialWrapper.h"

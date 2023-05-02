@@ -17,7 +17,7 @@
 #include <tchar.h>
 #endif
 
-#include "rev/RHSPlib_errors.h"
+#include "RHSPlib_errors.h"
 
 #define RHSPLIB_SERIAL_INFINITE_TIMEOUT    -1
 

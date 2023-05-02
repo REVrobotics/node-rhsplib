@@ -24,27 +24,43 @@
         [
           'OS=="win"', {
             'libraries': [
-              '<(module_root_dir)/RHSPlib/x86-64/RHSPlib.lib',
+              '<(module_root_dir)/RHSPlib/build/Release/RHSPlib.lib',
+            ],
+            'copies':[
+              {
+                'destination': '<(PRODUCT_DIR)',
+                'files':[
+                  '<(module_root_dir)/RHSPlib/build/Release/RHSPlib.dll',
+                ],
+              },
+              {
+                'destination': '<(module_root_dir)/prebuilds/win32-<(target_arch)',
+                'files':[
+                  '<(module_root_dir)/RHSPlib/build/Release/RHSPlib.dll',
+                ],
+              },
             ]
-          }
+         }
         ],
         [
           'OS=="linux"', {
             'link_settings': {
               'libraries': [
-                  '-L<(module_root_dir)/build/Release/',
+                  '-L<(module_root_dir)/RHSPlib/build/',
                   '-lRHSPlib'
               ],
               'ldflags': [
-                '-Wl,-rpath,<(module_root_dir)/build/Release/',
+                '-Wl,-rpath,<(module_root_dir)/RHSPlib/build/',
               ]
             },
-            'copies':[{
-              'destination': '<(PRODUCT_DIR)',
-              'files':[
-                '<(module_root_dir)/bin/libRHSPlib.so',
-              ],
-            }],
+            'copies':[
+              {
+                'destination': '<(PRODUCT_DIR)',
+                'files':[
+                  '<(module_root_dir)/RHSPlib/build/libRHSPlib.so',
+                ],
+              }
+            ],
           }
         ]
       ],

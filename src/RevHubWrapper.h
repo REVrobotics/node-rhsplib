@@ -2,7 +2,7 @@
 #define REVHUB_WRAPPER_H_
 
 #include <napi.h>
-#include <rev/RHSPlib.h>
+#include <RHSPlib.h>
 
 class RevHub : public Napi::ObjectWrap<RevHub> {
  public:

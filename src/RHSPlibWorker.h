@@ -2,7 +2,7 @@
 #define RHSPLIBWORKER_H_
 
 #include <napi.h>
-#include <rev/RHSPlib_errors.h>
+#include <RHSPlib_errors.h>
 
 #include <map>
 #include <mutex>
