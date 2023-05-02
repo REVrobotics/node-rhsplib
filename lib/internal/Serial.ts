@@ -1,5 +1,4 @@
 import {SerialFlowControl, SerialParity} from "../binding.js";
-import {Serial} from "../Serial.js";
 
 import * as path from "path";
 
@@ -13,7 +12,7 @@ const nodeGypBuild = require('node-gyp-build');
 
 const addon = nodeGypBuild(path.join(scriptDirPath, '..', '..', '..'));
 
-declare class SerialInternal implements Serial {
+export declare class Serial {
     constructor();
     close(): void;
 
@@ -25,7 +24,7 @@ declare class SerialInternal implements Serial {
 }
 
 export async function openSerial(serialPortPath: string): Promise<Serial> {
-    let serial = new (addon.SerialInternal as typeof SerialInternal)();
+    let serial = new (addon.SerialInternal as typeof Serial)();
     let i = 0;
     while(i < 100) {
         console.log(`Trying to open ${i}`);

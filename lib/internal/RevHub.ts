@@ -1,9 +1,7 @@
 import {RevHub} from "../RevHub.js";
 import {getSerialPortPathForExHubSerial} from "../discovery.js";
-import {Serial} from "../Serial.js";
-import {openSerial} from "./Serial.js";
+import {Serial, openSerial} from "./Serial.js";
 import * as path from "path";
-
 import { createRequire } from "node:module";
 import {fileURLToPath} from "url";
 import {
