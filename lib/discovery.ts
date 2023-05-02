@@ -18,6 +18,10 @@ export async function getPossibleExpansionHubSerialNumbers(): Promise<string[]> 
     return results;
 }
 
+/**
+ * Returns all connected RevHubs. The array contains parent RevHubs,
+ * and child hubs are available via {@link RevHub#children}.
+ */
 export async function getConnectedExpansionHubs(): Promise<RevHub[]> {
     let addresses = await getPossibleExpansionHubSerialNumbers();
 

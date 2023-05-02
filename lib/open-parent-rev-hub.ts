@@ -12,8 +12,19 @@ const require = createRequire(import.meta.url);
 const nodeGypBuild = require('node-gyp-build');
 const addon = nodeGypBuild(path.join(scriptDirPath, '..', '..'));
 
+/**
+ * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
+ * Serial object at that path. The {@link Serial} object should be removed from
+ * the map upon closing.
+ */
 const openSerialMap = new Map<string, Serial>();
 
+/**
+ * Opens a parent REV hub, given that you know its {@link serialNumber} (should start with DQ).
+ * Any children of this hub will be automatically discovered and initialized.
+ *
+ * @param serialNumber the serial number of the REV hub
+ */
 export async function openParentRevHub(serialNumber: string): Promise<RevHub> {
     let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
 
@@ -34,6 +45,12 @@ export async function openParentRevHub(serialNumber: string): Promise<RevHub> {
     return parentHub;
 }
 
+/**
+ * Detects the serial port that a hub with a given {@link serialNumber} is on.
+ *
+ * @throws Error if the {@link serialNumber} is not found
+ * @param serialNumber the serial number of the REV hub
+ */
 async function getSerialPortPathForExHubSerial(
     serialNumber: string,
 ): Promise<string> {
