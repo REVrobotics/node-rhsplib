@@ -59,13 +59,7 @@
                 'files':[
                   '<(module_root_dir)/RHSPlib/build/Release/libRHSPlib.so',
                 ],
-              },
-              {
-                'destination': '<(module_root_dir)/prebuilds/linux-<(target_arch)',
-                'files':[
-                  '<(module_root_dir)/RHSPlib/build/Release/libRHSPlib.so',
-                ],
-              },
+              }
             ],
           }
         ]
