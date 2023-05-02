@@ -1,5 +1,5 @@
 import {Command} from "commander";
-import {getConnectedExpansionHubs} from "../lib/discovery.js";
+import {getConnectedExpansionHubs} from "../lib/index.js";
 import {RevHub} from "../lib/RevHub.js";
 
 const program = new Command();

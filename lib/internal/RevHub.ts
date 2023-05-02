@@ -1,9 +1,4 @@
-import {RevHub} from "../RevHub.js";
-import {getSerialPortPathForExHubSerial} from "../discovery.js";
-import {Serial, openSerial} from "./Serial.js";
-import * as path from "path";
-import { createRequire } from "node:module";
-import {fileURLToPath} from "url";
+import {Serial} from "./Serial.js";
 import {
     BulkInputData, DebugGroup,
     DIODirection, DiscoveredAddresses,
@@ -14,15 +9,7 @@ import {
     Version
 } from "../index.js";
 
-const scriptDirPath = path.dirname(fileURLToPath(import.meta.url));
-const require = createRequire(import.meta.url);
-
-const nodeGypBuild = require('node-gyp-build');
-const addon = nodeGypBuild(path.join(scriptDirPath, '..', '..', '..'));
-
-const openSerialMap = new Map<string, Serial>();
-
-declare class RevHubInternal {
+export declare class RevHubInternal {
     constructor();
     open(serialPort: Serial, destAddress: number): Promise<void>;
     isOpened(): boolean;
@@ -112,24 +99,4 @@ declare class RevHubInternal {
     getServoPulseWidth(servoChannel: number): Promise<number>;
     setServoEnable(servoChannel: number, enable: boolean): Promise<void>;
     getServoEnable(servoChannel: number): Promise<boolean>;
-}
-
-export async function openRevHub(serialNumber: string): Promise<RevHub> {
-    let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
-
-    if(openSerialMap.get(serialPortPath) == undefined) {
-        openSerialMap.set(serialPortPath, await openSerial(serialPortPath));
-    }
-
-    let serial = openSerialMap.get(serialPortPath)!;
-
-    let parentHub = new (addon.RevHubInternal as typeof RevHubInternal)();
-
-    let discoveredModules = await addon.RevHubInternal.discoverRevHubs(serial);
-    let parentAddress = discoveredModules.parentAddress; //ToDo(Landry): Figure out what happens if no discovery found
-
-    await parentHub.open(serial, parentAddress);
-    await parentHub.queryInterface("DEKA");
-
-    return parentHub;
 }

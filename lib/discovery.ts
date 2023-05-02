@@ -1,20 +1,8 @@
 
 import { SerialPort } from "serialport";
 import {RevHub} from "./RevHub.js";
-import {openRevHub} from "./internal/RevHub.js";
+import {openParentRevHub} from "./open-parent-rev-hub.js";
 
-export async function getSerialPortPathForExHubSerial(
-    serialNumber: string,
-): Promise<string> {
-    const serialPorts = await SerialPort.list();
-    for (let i = 0; i < serialPorts.length; i++) {
-        const portInfo = serialPorts[i];
-        if (portInfo.serialNumber === serialNumber) {
-            return portInfo.path;
-        }
-    }
-    throw new Error(`Unable to find serial port for ${serialNumber}`);
-}
 
 export async function getPossibleExpansionHubSerialNumbers(): Promise<string[]> {
     const results: string[] = [];
@@ -36,7 +24,7 @@ export async function getConnectedExpansionHubs(): Promise<RevHub[]> {
     let hubs: RevHub[] = [];
 
     for(let address of addresses) {
-        let hub = await openRevHub(address);
+        let hub = await openParentRevHub(address);
         hubs.push(hub);
     }
 
