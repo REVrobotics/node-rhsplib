@@ -1,6 +1,6 @@
 export * from "./discovery.js"
 export * from "./RevHub.js"
-export * from "./open-parent-rev-hub.js"
+export * from "./open-rev-hub.js"
 
 export enum SerialParity {
   None = 0,

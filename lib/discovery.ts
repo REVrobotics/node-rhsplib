@@ -1,8 +1,7 @@
 
 import { SerialPort } from "serialport";
 import {RevHub} from "./RevHub.js";
-import {openParentRevHub} from "./open-parent-rev-hub.js";
-
+import {openParentRevHub} from "./open-rev-hub.js";
 
 export async function getPossibleExpansionHubSerialNumbers(): Promise<string[]> {
     const results: string[] = [];
