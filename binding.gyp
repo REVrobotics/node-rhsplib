@@ -46,18 +46,18 @@
           'OS=="linux"', {
             'link_settings': {
               'libraries': [
-                  '-L<(module_root_dir)/RHSPlib/build/Release/',
+                  '-L<(module_root_dir)/RHSPlib/build/',
                   '-lRHSPlib'
               ],
               'ldflags': [
-                '-Wl,-rpath,<(module_root_dir)/RHSPlib/build/Release/',
+                '-Wl,-rpath,<(module_root_dir)/RHSPlib/build/',
               ]
             },
             'copies':[
               {
                 'destination': '<(PRODUCT_DIR)',
                 'files':[
-                  '<(module_root_dir)/RHSPlib/build/Release/libRHSPlib.so',
+                  '<(module_root_dir)/RHSPlib/build/libRHSPlib.so',
                 ],
               }
             ],
