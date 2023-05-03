@@ -8,7 +8,6 @@ import {
     VerbosityLevel, Version
 } from "@rev-robotics/rhsplib";
 
-
 export interface RevHub {
     isOpened(): boolean;
     close(): void;

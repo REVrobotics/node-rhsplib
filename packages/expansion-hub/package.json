@@ -7,6 +7,10 @@
     "@rev-robotics/rhsplib": "*"
   },
   "devDependencies": {
+    "@types/node": "^16.18.18",
     "typescript": "^5.0.2"
+  },
+  "scripts": {
+    "build": "tsc"
   }
 }
