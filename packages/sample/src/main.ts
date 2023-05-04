@@ -16,7 +16,7 @@ if(options.list) {
     const hubs: RevHub[] = await getConnectedExpansionHubs();
     hubs.forEach(async (hub) => {
         console.log(await toString(hub));
-    })
+    });
 }
 
 async function toString(hub: RevHub): Promise<string> {

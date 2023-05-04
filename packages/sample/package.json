@@ -6,7 +6,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@rev-robotics/rhsplib": "*",
     "@rev-robotics/expansion-hub": "*",
     "commander": "^10.0.1"
   },
