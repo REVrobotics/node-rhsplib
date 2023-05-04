@@ -1,4 +1,4 @@
 
 export * from "./discovery"
 export * from "./open-rev-hub"
-export * from "./RevHub"
+export * from "./ExpansionHub"

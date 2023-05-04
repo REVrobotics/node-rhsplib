@@ -1,11 +1,7 @@
-import {RevHub} from "./RevHub";
-import {Serial, SerialParity, SerialFlowControl} from "@rev-robotics/rhsplib";
+import {ExpansionHub} from "./ExpansionHub";
+import {Serial, SerialParity, SerialFlowControl, RevHub as NativeRevHub} from "@rev-robotics/rhsplib";
 import {SerialPort} from "serialport";
-import path from "path";
-import {RevHubInternal} from "./internal/RevHub";
-
-const nodeGypBuild = require('node-gyp-build');
-const addon = nodeGypBuild(path.join(__dirname, '..', '..'));
+import {ExpansionHubInternal} from "./internal/RevHub";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
@@ -20,7 +16,7 @@ const openSerialMap = new Map<string, Serial>();
  *
  * @param serialNumber the serial number of the REV hub
  */
-export async function openParentRevHub(serialNumber: string): Promise<RevHub> {
+export async function openParentRevHub(serialNumber: string): Promise<ExpansionHub> {
     let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
 
     if(openSerialMap.get(serialPortPath) == undefined) {
@@ -29,9 +25,9 @@ export async function openParentRevHub(serialNumber: string): Promise<RevHub> {
 
     let serial = openSerialMap.get(serialPortPath)!;
 
-    let parentHub = new (addon.RevHubInternal as typeof RevHubInternal)();
+    let parentHub = new ExpansionHubInternal();
 
-    let discoveredModules = await addon.RevHubInternal.discoverRevHubs(serial);
+    let discoveredModules = await NativeRevHub.discoverRevHubs(serial);
     let parentAddress = discoveredModules.parentAddress;
 
     await parentHub.open(serial, parentAddress);
@@ -60,7 +56,7 @@ async function getSerialPortPathForExHubSerial(
 }
 
 async function openSerial(serialPortPath: string): Promise<Serial> {
-    let serial = new (addon.SerialInternal as typeof Serial)();
+    let serial = new Serial();
     await serial.open(serialPortPath,
         460800,
         8,
