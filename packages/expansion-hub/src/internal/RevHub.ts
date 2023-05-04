@@ -7,6 +7,7 @@ import {
     RevHub as NativeRevHub, RGB,
     Serial, VerbosityLevel, Version
 } from "@rev-robotics/rhsplib"
+import {nackCodeToError} from "../errors/nack-code-to-error";
 
 export class RevHubInternal implements RevHub {
     constructor() {
@@ -20,191 +21,191 @@ export class RevHubInternal implements RevHub {
     }
 
     open(serialPort: Serial, destAddress: number): Promise<void> {
-        return this.nativeRevHub.open(serialPort, destAddress);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.open(serialPort, destAddress) });
     }
 
     getADC(): Promise<number> {
-        return this.nativeRevHub.getADC();
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getADC() });
     }
 
     getBulkInputData(): Promise<BulkInputData> {
-        return this.nativeRevHub.getBulkInputData();
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getBulkInputData() });
     }
 
     getDestAddress(): number {
-        return this.nativeRevHub.getDestAddress();
+        return this.convertErrorSync(() => { return this.nativeRevHub.getDestAddress() });
     }
 
     getDigitalAllInputs(): Promise<number> {
-        return this.nativeRevHub.getDigitalAllInputs();
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getDigitalAllInputs() });
     }
 
     getDigitalDirection(dioPin: number): Promise<DIODirection> {
-        return this.nativeRevHub.getDigitalDirection(dioPin);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getDigitalDirection(dioPin) });
     }
 
     getDigitalSingleInput(dioPin: number): Promise<boolean> {
-        return this.nativeRevHub.getDigitalSingleInput(dioPin);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getDigitalSingleInput(dioPin) });
     }
 
     getFTDIResetControl(): Promise<boolean> {
-        return this.nativeRevHub.getFTDIResetControl();
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getFTDIResetControl() });
     }
 
     getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode> {
-        return this.nativeRevHub.getI2CChannelConfiguration(i2cChannel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getI2CChannelConfiguration(i2cChannel) });
     }
 
     getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus> {
-        return this.nativeRevHub.getI2CReadStatus(i2cChannel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getI2CReadStatus(i2cChannel) });
     }
 
     getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus> {
-        return this.nativeRevHub.getI2CWriteStatus(i2cChannel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getI2CWriteStatus(i2cChannel) });
     }
 
     getInterfacePacketID(interfaceName: string, functionNumber: number): Promise<number> {
-        return this.nativeRevHub.getInterfacePacketID(interfaceName, functionNumber);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getInterfacePacketID(interfaceName, functionNumber) });
     }
 
     getModuleLEDColor(): Promise<RGB> {
-        return this.nativeRevHub.getModuleLEDColor();
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getModuleLEDColor() });
     }
 
     getModuleLEDPattern(): Promise<LEDPattern> {
-        return this.nativeRevHub.getModuleLEDPattern();
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getModuleLEDPattern() });
     }
 
     getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus> {
-        return this.nativeRevHub.getModuleStatus(clearStatusAfterResponse);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getModuleStatus(clearStatusAfterResponse) });
     }
 
     getMotorAtTarget(motorChannel: number): Promise<boolean> {
-        return this.nativeRevHub.getMotorAtTarget(motorChannel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getMotorAtTarget(motorChannel) });
     }
 
     getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<number> {
-        return this.nativeRevHub.getMotorChannelCurrentAlertLevel(motorChannel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getMotorChannelCurrentAlertLevel(motorChannel) });
     }
 
     getMotorChannelEnable(motorChannel: number): Promise<boolean> {
-        return this.nativeRevHub.getMotorChannelEnable(motorChannel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getMotorChannelEnable(motorChannel) });
     }
 
     getMotorChannelMode(motorChannel: number): Promise<{ motorMode: number; floatAtZero: boolean }> {
-        return this.nativeRevHub.getMotorChannelMode(motorChannel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getMotorChannelMode(motorChannel) });
     }
 
     getMotorConstantPower(motorChannel: number): Promise<number> {
-        return this.nativeRevHub.getMotorConstantPower(motorChannel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getMotorConstantPower(motorChannel) });
     }
 
     getMotorEncoderPosition(motorChannel: number): Promise<number> {
-        return Promise.resolve(0);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getMotorEncoderPosition(motorChannel); });
     }
 
     getMotorPIDCoefficients(motorChannel: number, motorMode: number): Promise<PIDCoefficients> {
-        return this.nativeRevHub.getMotorPIDCoefficients(motorChannel, motorMode);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getMotorPIDCoefficients(motorChannel, motorMode) });
     }
 
     getMotorTargetPosition(motorChannel: number): Promise<{ targetPosition: number; targetTolerance: number }> {
-        return this.nativeRevHub.getMotorTargetPosition(motorChannel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getMotorTargetPosition(motorChannel) });
     }
 
     getMotorTargetVelocity(motorChannel: number): Promise<number> {
-        return this.nativeRevHub.getMotorTargetVelocity(motorChannel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getMotorTargetVelocity(motorChannel) });
     }
 
     getPWMConfiguration(pwmChannel: number): Promise<number> {
-        return this.nativeRevHub.getPWMConfiguration(pwmChannel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getPWMConfiguration(pwmChannel) });
     }
 
     getPWMEnable(pwmChannel: number): Promise<boolean> {
-        return this.nativeRevHub.getPWMEnable(pwmChannel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getPWMEnable(pwmChannel) });
     }
 
     getPWMPulseWidth(pwmChannel: number): Promise<number> {
-        return this.nativeRevHub.getPWMPulseWidth(pwmChannel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getPWMPulseWidth(pwmChannel) });
     }
 
     getPhoneChargeControl(): Promise<boolean> {
-        return this.nativeRevHub.getPhoneChargeControl();
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getPhoneChargeControl() });
     }
 
     getResponseTimeoutMs(): number {
-        return this.nativeRevHub.getResponseTimeoutMs();
+        return this.convertErrorSync(() => { return this.nativeRevHub.getResponseTimeoutMs() });
     }
 
     getServoConfiguration(servoChannel: number): Promise<number> {
-        return this.nativeRevHub.getServoConfiguration(servoChannel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getServoConfiguration(servoChannel) });
     }
 
     getServoEnable(servoChannel: number): Promise<boolean> {
-        return this.nativeRevHub.getServoEnable(servoChannel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getServoEnable(servoChannel) });
     }
 
     getServoPulseWidth(servoChannel: number): Promise<number> {
-        return this.nativeRevHub.getServoPulseWidth(servoChannel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.getServoPulseWidth(servoChannel) });
     }
 
     injectDataLogHint(hintText: string): Promise<void> {
-        return this.nativeRevHub.injectDataLogHint(hintText);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.injectDataLogHint(hintText) });
     }
 
     isOpened(): boolean {
-        return this.nativeRevHub.isOpened();
+        return this.convertErrorSync(() => { return this.nativeRevHub.isOpened() });
     }
 
     queryInterface(interfaceName: string): Promise<ModuleInterface> {
-        return this.nativeRevHub.queryInterface(interfaceName);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.queryInterface(interfaceName) });
     }
 
     readI2CMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number): Promise<void> {
-        return this.nativeRevHub.readI2CMultipleBytes(i2cChannel, slaveAddress, numBytesToRead);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.readI2CMultipleBytes(i2cChannel, slaveAddress, numBytesToRead) });
     }
 
     readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void> {
-        return this.nativeRevHub.readI2CSingleByte(i2cChannel, slaveAddress);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.readI2CSingleByte(i2cChannel, slaveAddress) });
     }
 
     readVersion(): Promise<Version> {
-        return this.nativeRevHub.readVersion();
+        return this.convertErrorPromise(() => { return this.nativeRevHub.readVersion() });
     }
 
     readVersionString(): Promise<string> {
-        return this.nativeRevHub.readVersionString();
+        return this.convertErrorPromise(() => { return this.nativeRevHub.readVersionString() });
     }
 
     resetMotorEncoder(motorChannel: number): Promise<void> {
-        return this.nativeRevHub.resetMotorEncoder(motorChannel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.resetMotorEncoder(motorChannel) });
     }
 
     sendFailSafe(): Promise<void> {
-        return this.nativeRevHub.sendFailSafe();
+        return this.convertErrorPromise(() => { return this.nativeRevHub.sendFailSafe() });
     }
 
     sendKeepAlive(): Promise<void> {
-        return this.nativeRevHub.sendKeepAlive();
+        return this.convertErrorPromise(() => { return this.nativeRevHub.sendKeepAlive() });
     }
 
     sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
-        return this.nativeRevHub.sendReadCommand(packetTypeID, payload);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.sendReadCommand(packetTypeID, payload) });
     }
 
     sendReadCommandInternal(packetTypeID: number, payload: number[]): Promise<void> {
-        return this.nativeRevHub.sendReadCommandInternal(packetTypeID, payload);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.sendReadCommandInternal(packetTypeID, payload) });
     }
 
     sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
-        return this.nativeRevHub.sendWriteCommand(packetTypeID, payload);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.sendWriteCommand(packetTypeID, payload) });
     }
 
     sendWriteCommandInternal(packetTypeID: number, payload: number[]): Promise<void> {
-        return this.nativeRevHub.sendWriteCommandInternal(packetTypeID, payload);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.sendWriteCommandInternal(packetTypeID, payload) });
     }
 
     setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<void> {
-        return this.nativeRevHub.setDebugLogLevel(debugGroup, verbosityLevel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setDebugLogLevel(debugGroup, verbosityLevel) });
     }
 
     setDestAddress(destAddress: number): void {
@@ -212,79 +213,79 @@ export class RevHubInternal implements RevHub {
     }
 
     setDigitalAllOutputs(bitPackedField: number): Promise<void> {
-        return this.nativeRevHub.setDigitalAllOutputs(bitPackedField);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setDigitalAllOutputs(bitPackedField) });
     }
 
     setDigitalDirection(dioPin: number, direction: DIODirection): Promise<void> {
-        return this.nativeRevHub.setDigitalDirection(dioPin, direction);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setDigitalDirection(dioPin, direction) });
     }
 
     setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void> {
-        return this.nativeRevHub.setDigitalSingleOutput(dioPin, value);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setDigitalSingleOutput(dioPin, value) });
     }
 
     setFTDIResetControl(ftdiResetControl: boolean): Promise<void> {
-        return this.nativeRevHub.setFTDIResetControl(ftdiResetControl);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setFTDIResetControl(ftdiResetControl) });
     }
 
     setI2CChannelConfiguration(i2cChannel: number, speedCode: I2CSpeedCode): Promise<void> {
-        return this.nativeRevHub.setI2CChannelConfiguration(i2cChannel, speedCode);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setI2CChannelConfiguration(i2cChannel, speedCode) });
     }
 
     setModuleLEDColor(red: number, green: number, blue: number): Promise<void> {
-        return this.nativeRevHub.setModuleLEDColor(red, green, blue);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setModuleLEDColor(red, green, blue) });
     }
 
     setModuleLEDPattern(ledPattern: LEDPattern): Promise<void> {
-        return this.nativeRevHub.setModuleLEDPattern(ledPattern);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setModuleLEDPattern(ledPattern) });
     }
 
     setMotorChannelCurrentAlertLevel(motorChannel: number, currentLimit_mA: number): Promise<void> {
-        return this.nativeRevHub.setMotorChannelCurrentAlertLevel(motorChannel, currentLimit_mA);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setMotorChannelCurrentAlertLevel(motorChannel, currentLimit_mA) });
     }
 
     setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void> {
-        return this.nativeRevHub.setMotorChannelEnable(motorChannel, enable);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setMotorChannelEnable(motorChannel, enable) });
     }
 
     setMotorChannelMode(motorChannel: number, motorMode: number, floatAtZero: boolean): Promise<void> {
-        return this.nativeRevHub.setMotorChannelMode(motorChannel, motorMode, floatAtZero);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setMotorChannelMode(motorChannel, motorMode, floatAtZero) });
     }
 
     setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
-        return this.nativeRevHub.setMotorConstantPower(motorChannel, powerLevel);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setMotorConstantPower(motorChannel, powerLevel) });
     }
 
     setMotorPIDCoefficients(motorChannel: number, motorMode: number, pid: PIDCoefficients): Promise<void> {
-        return this.nativeRevHub.setMotorPIDCoefficients(motorChannel, motorMode, pid);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setMotorPIDCoefficients(motorChannel, motorMode, pid) });
     }
 
     setMotorTargetPosition(motorChannel: number, targetPosition_counts: number, targetTolerance_counts: number): Promise<void> {
-        return this.nativeRevHub.setMotorTargetPosition(motorChannel, targetPosition_counts, targetTolerance_counts);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setMotorTargetPosition(motorChannel, targetPosition_counts, targetTolerance_counts) });
     }
 
     setMotorTargetVelocity(motorChannel: number, velocity_cps: number): Promise<void> {
-        return this.nativeRevHub.setMotorTargetVelocity(motorChannel, velocity_cps);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setMotorTargetVelocity(motorChannel, velocity_cps) });
     }
 
     setNewModuleAddress(newModuleAddress: number): Promise<void> {
-        return this.nativeRevHub.setNewModuleAddress(newModuleAddress);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setNewModuleAddress(newModuleAddress) });
     }
 
     setPWMConfiguration(pwmChannel: number, framePeriod: number): Promise<void> {
-        return this.nativeRevHub.setPWMConfiguration(pwmChannel, framePeriod);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setPWMConfiguration(pwmChannel, framePeriod) });
     }
 
     setPWMEnable(pwmChannel: number, enable: boolean): Promise<void> {
-        return this.nativeRevHub.setPWMEnable(pwmChannel, enable);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setPWMEnable(pwmChannel, enable) });
     }
 
     setPWMPulseWidth(pwmChannel: number, pulseWidth: number): Promise<void> {
-        return this.nativeRevHub.setPWMPulseWidth(pwmChannel, pulseWidth);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setPWMPulseWidth(pwmChannel, pulseWidth) });
     }
 
     setPhoneChargeControl(chargeEnable: boolean): Promise<void> {
-        return this.nativeRevHub.setPhoneChargeControl(chargeEnable);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setPhoneChargeControl(chargeEnable) });
     }
 
     setResponseTimeoutMs(responseTimeoutMs: number): void {
@@ -292,26 +293,52 @@ export class RevHubInternal implements RevHub {
     }
 
     setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void> {
-        return this.nativeRevHub.setServoConfiguration(servoChannel, framePeriod);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setServoConfiguration(servoChannel, framePeriod) });
     }
 
     setServoEnable(servoChannel: number, enable: boolean): Promise<void> {
-        return this.nativeRevHub.setServoEnable(servoChannel, enable);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setServoEnable(servoChannel, enable) });
     }
 
     setServoPulseWidth(servoChannel: number, pulseWidth: number): Promise<void> {
-        return this.nativeRevHub.setServoPulseWidth(servoChannel, pulseWidth);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.setServoPulseWidth(servoChannel, pulseWidth) });
     }
 
     writeI2CMultipleBytes(i2cChannel: number, slaveAddress: number, bytes: number[]): Promise<void> {
-        return this.nativeRevHub.writeI2CMultipleBytes(i2cChannel, slaveAddress, bytes);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.writeI2CMultipleBytes(i2cChannel, slaveAddress, bytes) });
     }
 
     writeI2CReadMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number, startAddress: number): Promise<void> {
-        return this.nativeRevHub.writeI2CReadMultipleBytes(i2cChannel, slaveAddress, numBytesToRead, startAddress);
+        return this.convertErrorPromise(() => { return this.nativeRevHub.writeI2CReadMultipleBytes(i2cChannel, slaveAddress, numBytesToRead, startAddress) });
     }
 
     writeI2CSingleByte(i2cChannel: number, slaveAddress: number, byte: number): Promise<void> {
-        return this.nativeRevHub.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
+        return this.convertErrorPromise(() => {
+            return  this.nativeRevHub.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
+        });
+    }
+
+    async convertErrorPromise<T>(block: () => Promise<T>): Promise<T> {
+        try {
+            return await block();
+        } catch (e: any) {
+            if(e.nackCode !== undefined) {
+                throw nackCodeToError(e.nackCode);
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    convertErrorSync<T>(block: () => T): T {
+        try {
+            return block();
+        } catch (e: any) {
+            if(e.nackCode !== undefined) {
+                throw nackCodeToError(e.nackCode);
+            } else {
+                throw e;
+            }
+        }
     }
 }
