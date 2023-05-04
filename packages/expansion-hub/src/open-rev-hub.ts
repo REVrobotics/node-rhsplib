@@ -33,6 +33,14 @@ export async function openParentRevHub(serialNumber: string): Promise<RevHub> {
     await parentHub.open(serial, parentAddress);
     await parentHub.queryInterface("DEKA");
 
+    for(let address of discoveredModules.childAddresses) {
+        let childHub = new RevHubInternal();
+        await childHub.open(serial, address);
+        await childHub.queryInterface("DEKA");
+
+        parentHub.children.set(address, childHub);
+    }
+
     return parentHub;
 }
 

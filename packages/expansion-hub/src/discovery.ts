@@ -28,6 +28,8 @@ export async function getConnectedExpansionHubs(): Promise<RevHub[]> {
     for(let address of addresses) {
         let hub = await openParentRevHub(address);
         hubs.push(hub);
+
+
     }
 
     return hubs;

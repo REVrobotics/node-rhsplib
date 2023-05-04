@@ -20,5 +20,11 @@ if(options.list) {
 }
 
 async function toString(hub: RevHub): Promise<string> {
-    return `RevHub: ${hub.getDestAddress()}`;
+    let result = `RevHub: ${hub.getDestAddress()}\n`;
+
+    for(const [_, child] of hub.children) {
+        result += `\tRevHub: ${child.getDestAddress()}\n`;
+    }
+
+    return result;
 }
