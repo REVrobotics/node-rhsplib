@@ -15,6 +15,7 @@ export class RevHubInternal implements RevHub {
 
     nativeRevHub: NativeRevHub;
     children: Map<number, RevHub> = new Map();
+    keepAliveTimer: NodeJS.Timer | undefined = undefined;
 
     close(): void {
     }

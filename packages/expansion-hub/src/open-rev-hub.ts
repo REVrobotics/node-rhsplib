@@ -2,6 +2,7 @@ import {RevHub} from "./RevHub";
 import {Serial, SerialParity, SerialFlowControl, RevHub as NativeRevHub} from "@rev-robotics/rhsplib";
 import {SerialPort} from "serialport";
 import {RevHubInternal} from "./internal/RevHub";
+import {startKeepAlive} from "./start-keep-alive";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
@@ -32,6 +33,7 @@ export async function openParentRevHub(serialNumber: string): Promise<RevHub> {
 
     await parentHub.open(serial, parentAddress);
     await parentHub.queryInterface("DEKA");
+    startKeepAlive(parentHub, 1000);
 
     return parentHub;
 }

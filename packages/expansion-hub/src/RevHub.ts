@@ -95,4 +95,6 @@ export interface RevHub {
     getServoPulseWidth(servoChannel: number): Promise<number>;
     setServoEnable(servoChannel: number, enable: boolean): Promise<void>;
     getServoEnable(servoChannel: number): Promise<boolean>;
+
+    keepAliveTimer: NodeJS.Timer | undefined
 }
