@@ -10,10 +10,15 @@ in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
+
+---
+
+Modified to use Object.setPrototypeOf instead of __proto__
+
  */
 export const {
     setPrototypeOf = function (obj: any, proto: any) {
-        obj.__proto__ = proto;
+        Object.setPrototypeOf(obj, proto);
         return obj;
     },
 } = Object;
