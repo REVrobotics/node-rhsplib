@@ -1,5 +1,11 @@
 import {Command} from "commander";
-import {getConnectedExpansionHubs, openParentRevHub} from "@rev-robotics/expansion-hub";
+import {
+    ExpansionHub,
+    getConnectedExpansionHubs,
+    MotorNotFullyConfiguredError,
+    NackError,
+    openParentRevHub
+} from "@rev-robotics/expansion-hub";
 import {RevHub} from "@rev-robotics/expansion-hub";
 
 const program = new Command();
@@ -15,7 +21,7 @@ console.log("Starting...");
 
 if(options.list) {
     console.log("Starting to search Serial Ports")
-    const hubs: RevHub[] = await getConnectedExpansionHubs();
+    const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
     hubs.forEach(async (hub) => {
         console.log(await toString(hub));
     });
@@ -23,14 +29,23 @@ if(options.list) {
 
 if(options.error) {
     try {
-        await openParentRevHub("a serial number that isn't correct")
+        let hubs = await getConnectedExpansionHubs();
+        //Motor Mode intentionally wrong to get error
+        await hubs[0].setMotorChannelMode(2, 1, false);
+        await hubs[0].setMotorConstantPower(2, 0);
+        await hubs[0].setMotorChannelEnable(2, true);
         console.log("Expected error, but got none")
-    } catch(e) {
+    } catch(e: any) {
+        console.log(e.message)
+        console.log(e.stackTrace)
         console.log("Correctly got error.")
         console.log(`Error is:\n\t${e}`)
+
+        console.log(`Is error a nack? ${e instanceof NackError}`);
+        console.log(`Is error a motor config error? ${e instanceof MotorNotFullyConfiguredError}`);
     }
 }
 
-async function toString(hub: RevHub): Promise<string> {
+async function toString(hub: ExpansionHub): Promise<string> {
     return `RevHub: ${hub.getDestAddress()}`;
 }
