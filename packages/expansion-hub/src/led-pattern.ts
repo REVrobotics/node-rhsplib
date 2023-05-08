@@ -1,9 +1,22 @@
 import {LEDPattern} from "@rev-robotics/rhsplib";
 
+/**
+ * Create the value representing an LED step.
+ *
+ * @param t time in seconds
+ * @param r red value (0 to 255)
+ * @param g green value (0 to 255)
+ * @param b blue value (0 to 255)
+ */
 export function createLEDPatternStep(t: number, r: number, g: number, b: number): number {
-    return (r & 0xFF) << 24 | (g & 0xFF) << 16 | (b & 0xFF) << 8 | (t & 0xFF);
+    return (r & 0xFF) << 24 | (g & 0xFF) << 16 | (b & 0xFF) << 8 | (t*10 & 0xFF);
 }
 
+/**
+ * Set a pattern for the built-in LED on the expansion hub.
+ *
+ * @param ledSteps list of led steps created using {@link createLEDPatternStep}
+ */
 export function createLEDPattern(ledSteps: number[]): LEDPattern {
     return {
         rgbtPatternStep0: getOrZero(ledSteps, 0),
