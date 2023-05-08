@@ -1,4 +1,4 @@
-import {NackError} from "./NackError.js";
+import {NackError, setPrototypeOf} from "./NackError.js";
 
 export class ParameterOutOfRangeError extends NackError {
     parameterIndex: number;
@@ -6,5 +6,6 @@ export class ParameterOutOfRangeError extends NackError {
         super(parameterIndex);
 
         this.parameterIndex = parameterIndex;
+        setPrototypeOf(this, ParameterOutOfRangeError.prototype);
     }
 }

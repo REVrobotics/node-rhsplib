@@ -1,12 +1,10 @@
 import {Command} from "commander";
 import {
     ExpansionHub,
-    getConnectedExpansionHubs,
+    getConnectedExpansionHubs, MotorCommandNotValidError,
     MotorNotFullyConfiguredError,
-    NackError,
-    openParentRevHub
+    NackError
 } from "@rev-robotics/expansion-hub";
-import {RevHub} from "@rev-robotics/expansion-hub";
 
 const program = new Command();
 
@@ -42,7 +40,10 @@ if(options.error) {
         console.log(`Error is:\n\t${e}`)
 
         console.log(`Is error a nack? ${e instanceof NackError}`);
-        console.log(`Is error a motor config error? ${e instanceof MotorNotFullyConfiguredError}`);
+        if(e instanceof NackError) {
+            console.log(`Code is ${e.nackCode}`);
+        }
+        console.log(`Is error a motor command error? ${e instanceof MotorNotFullyConfiguredError}`);
     }
 }
 

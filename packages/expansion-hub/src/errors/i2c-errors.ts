@@ -1,14 +1,16 @@
-import {NackError} from "./NackError.js";
+import {NackError, setPrototypeOf} from "./NackError.js";
 
 export class I2cMasterBusyError extends NackError {
     constructor() {
         super(40);
+        setPrototypeOf(this, I2cMasterBusyError.prototype);
     }
 }
 
 export class I2cOperationInProgressError extends NackError {
     constructor() {
         super(41);
+        setPrototypeOf(this, I2cOperationInProgressError.prototype);
     }
 }
 

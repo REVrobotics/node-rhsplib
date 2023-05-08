@@ -1,4 +1,4 @@
-import {NackError} from "./NackError.js";
+import {NackError, setPrototypeOf} from "./NackError.js";
 
 export class GpioNotConfiguredForOutputError extends NackError {
     gpioIndex: number;
@@ -6,12 +6,14 @@ export class GpioNotConfiguredForOutputError extends NackError {
         super(gpioIndex-10);
 
         this.gpioIndex = gpioIndex;
+        setPrototypeOf(this, GpioNotConfiguredForOutputError.prototype);
     }
 }
 
 export class NoGpioPinsConfiguredForOutputError extends NackError {
     constructor() {
         super(18);
+        setPrototypeOf(this, NoGpioPinsConfiguredForOutputError.prototype);
     }
 }
 

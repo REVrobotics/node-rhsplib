@@ -9,6 +9,7 @@ import {
 } from "@rev-robotics/rhsplib"
 import {nackCodeToError} from "../errors/nack-code-to-error";
 import {RevHubType} from "../RevHubType";
+import {ParameterOutOfRangeError} from "../errors/ParameterOutOfRangeError";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor() {
@@ -337,6 +338,10 @@ export class ExpansionHubInternal implements ExpansionHub {
         try {
             return block();
         } catch (e: any) {
+            if(e.errorCode >= -55 && e.errorCode <= -50) {
+                let index = -(e.errorCode + 50);
+                throw new ParameterOutOfRangeError(index);
+            }
             if(e.nackCode !== undefined) {
                 throw nackCodeToError(e.nackCode);
             } else {
