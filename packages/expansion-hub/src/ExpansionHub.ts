@@ -98,5 +98,4 @@ export interface ExpansionHub extends RevHub {
     getServoEnable(servoChannel: number): Promise<boolean>;
 
     children: Map<number, ExpansionHub>;
-    keepAliveTimer: NodeJS.Timer | undefined
 }
