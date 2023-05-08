@@ -1,7 +1,7 @@
 import {ExpansionHub} from "./ExpansionHub";
 import {Serial, SerialParity, SerialFlowControl, RevHub as NativeRevHub} from "@rev-robotics/rhsplib";
 import {SerialPort} from "serialport";
-import {ExpansionHubInternal} from "./internal/RevHub";
+import {ExpansionHubInternal} from "./internal/ExpansionHub";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
