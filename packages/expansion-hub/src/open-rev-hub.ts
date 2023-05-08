@@ -12,7 +12,6 @@ const openSerialMap = new Map<string, Serial>();
 
 /**
  * Opens a parent REV hub, given that you know its {@link serialNumber} (should start with DQ).
- * Any children of this hub will be automatically discovered and initialized.
  *
  * @param serialNumber the serial number of the REV hub
  */
