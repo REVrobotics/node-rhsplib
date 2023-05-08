@@ -1,4 +1,4 @@
-import {RevHub} from "../RevHub";
+import {ExpansionHub} from "../ExpansionHub";
 import {
     BulkInputData, DebugGroup,
     DIODirection,
@@ -7,15 +7,17 @@ import {
     RevHub as NativeRevHub, RGB,
     Serial, VerbosityLevel, Version
 } from "@rev-robotics/rhsplib"
+import {RevHubType} from "../RevHubType";
 
-export class RevHubInternal implements RevHub {
+export class ExpansionHubInternal implements ExpansionHub {
     constructor() {
         this.nativeRevHub = new NativeRevHub();
     }
 
     nativeRevHub: NativeRevHub;
-    children: Map<number, RevHub> = new Map();
     keepAliveTimer: NodeJS.Timer | undefined = undefined;
+    children: Map<number, ExpansionHub> = new Map();
+    type = RevHubType.ExpansionHub;
 
     close(): void {
     }

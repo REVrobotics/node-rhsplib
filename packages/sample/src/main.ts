@@ -1,6 +1,5 @@
 import {Command} from "commander";
-import {getConnectedExpansionHubs} from "@rev-robotics/expansion-hub";
-import {RevHub} from "@rev-robotics/expansion-hub";
+import {ExpansionHub, getConnectedExpansionHubs} from "@rev-robotics/expansion-hub";
 
 const program = new Command();
 
@@ -13,12 +12,12 @@ console.log("Starting...");
 
 if(options.list) {
     console.log("Starting to search Serial Ports")
-    const hubs: RevHub[] = await getConnectedExpansionHubs();
+    const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
     hubs.forEach(async (hub) => {
         console.log(await toString(hub));
     });
 }
 
-async function toString(hub: RevHub): Promise<string> {
+async function toString(hub: ExpansionHub): Promise<string> {
     return `RevHub: ${hub.getDestAddress()}`;
 }

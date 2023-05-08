@@ -1,7 +1,7 @@
-import {RevHub} from "./RevHub";
+import {ExpansionHub} from "./ExpansionHub";
 import {Serial, SerialParity, SerialFlowControl, RevHub as NativeRevHub} from "@rev-robotics/rhsplib";
 import {SerialPort} from "serialport";
-import {RevHubInternal} from "./internal/RevHub";
+import {ExpansionHubInternal} from "./internal/ExpansionHub";
 import {startKeepAlive} from "./start-keep-alive";
 
 /**
@@ -13,11 +13,10 @@ const openSerialMap = new Map<string, Serial>();
 
 /**
  * Opens a parent REV hub, given that you know its {@link serialNumber} (should start with DQ).
- * Any children of this hub will be automatically discovered and initialized.
  *
  * @param serialNumber the serial number of the REV hub
  */
-export async function openParentRevHub(serialNumber: string): Promise<RevHub> {
+export async function openParentRevHub(serialNumber: string): Promise<ExpansionHub> {
     let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
 
     if(openSerialMap.get(serialPortPath) == undefined) {
@@ -26,7 +25,7 @@ export async function openParentRevHub(serialNumber: string): Promise<RevHub> {
 
     let serial = openSerialMap.get(serialPortPath)!;
 
-    let parentHub = new RevHubInternal();
+    let parentHub = new ExpansionHubInternal();
 
     let discoveredModules = await NativeRevHub.discoverRevHubs(serial);
     let parentAddress = discoveredModules.parentAddress;
