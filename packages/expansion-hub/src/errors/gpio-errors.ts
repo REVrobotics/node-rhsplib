@@ -23,11 +23,13 @@ export class GpioNotConfiguredForInputError extends NackError {
         super(gpioIndex-20);
 
         this.gpioIndex = gpioIndex;
+        setPrototypeOf(this, GpioNotConfiguredForInputError.prototype);
     }
 }
 
 export class NoGpioPinsConfiguredForInputError extends NackError {
     constructor() {
         super(28);
+        setPrototypeOf(this, NoGpioPinsConfiguredForInputError.prototype);
     }
 }

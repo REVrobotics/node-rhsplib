@@ -17,5 +17,6 @@ export class CommandRoutingError extends NackError {
 export class PacketTypeIDUnknownError extends NackError {
     constructor() {
         super(255);
+        setPrototypeOf(this, PacketTypeIDUnknownError.prototype);
     }
 }
