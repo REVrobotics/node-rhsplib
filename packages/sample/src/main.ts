@@ -1,6 +1,10 @@
 import {Command} from "commander";
-import {createLEDPattern, createLEDPatternStep, getConnectedExpansionHubs} from "@rev-robotics/expansion-hub";
-import {RevHub} from "@rev-robotics/expansion-hub";
+import {
+    createLEDPattern,
+    createLEDPatternStep,
+    ExpansionHub,
+    getConnectedExpansionHubs
+} from "@rev-robotics/expansion-hub";
 
 const program = new Command();
 
@@ -15,14 +19,14 @@ console.log("Starting...");
 
 if(options.list) {
     console.log("Starting to search Serial Ports")
-    const hubs: RevHub[] = await getConnectedExpansionHubs();
+    const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
     hubs.forEach(async (hub) => {
         console.log(await toString(hub));
     });
 }
 
 if(options.led) {
-    const hubs: RevHub[] = await getConnectedExpansionHubs();
+    const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
     const steps = [
         createLEDPatternStep(10, 0, 255, 0), //green
         createLEDPatternStep(10, 255, 0, 0), //red
@@ -39,6 +43,6 @@ if(options.led) {
     }, 1000);
 }
 
-async function toString(hub: RevHub): Promise<string> {
+async function toString(hub: ExpansionHub): Promise<string> {
     return `RevHub: ${hub.getDestAddress()}`;
 }
