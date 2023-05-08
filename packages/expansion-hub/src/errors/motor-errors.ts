@@ -10,14 +10,14 @@ export class MotorNotFullyConfiguredError extends NackError {
 
 export class MotorCommandNotValidError extends NackError {
     constructor() {
-        super(51);
+        super(51, "Motor command is not valid");
         setPrototypeOf(this, MotorCommandNotValidError.prototype);
     }
 }
 
 export class BatteryTooLowToRunMotorError extends BatteryTooLowError {
     constructor() {
-        super(52);
+        super(52, "Battery is too low to run motors");
         setPrototypeOf(this, BatteryTooLowToRunMotorError.prototype);
     }
 }
