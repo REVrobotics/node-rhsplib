@@ -28,11 +28,11 @@ if(options.list) {
 if(options.led) {
     const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
     const steps = [
-        createLEDPatternStep(10, 0, 255, 0), //green
-        createLEDPatternStep(10, 255, 0, 0), //red
-        createLEDPatternStep(10, 0, 0, 255), //blue
-        createLEDPatternStep(10, 255, 0, 255), //magenta
-        createLEDPatternStep(10, 255, 255, 0), //yellow
+        createLEDPatternStep(1, 0, 255, 0), //green
+        createLEDPatternStep(1, 255, 0, 0), //red
+        createLEDPatternStep(1, 0, 0, 255), //blue
+        createLEDPatternStep(1, 255, 0, 255), //magenta
+        createLEDPatternStep(1, 255, 255, 0), //yellow
     ]
     await hubs[0].sendKeepAlive();
     const pattern = createLEDPattern(steps);
