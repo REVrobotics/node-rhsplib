@@ -1,4 +1,4 @@
-import {RevHub} from "../RevHub";
+import {ExpansionHub} from "../ExpansionHub";
 import {
     BulkInputData, DebugGroup,
     DIODirection,
@@ -8,14 +8,17 @@ import {
     Serial, VerbosityLevel, Version
 } from "@rev-robotics/rhsplib"
 import {nackCodeToError} from "../errors/nack-code-to-error";
+import {RevHubType} from "../RevHubType";
 
-export class RevHubInternal implements RevHub {
+export class ExpansionHubInternal implements ExpansionHub {
     constructor() {
         this.nativeRevHub = new NativeRevHub();
     }
 
     nativeRevHub: NativeRevHub;
-    children: Map<number, RevHub> = new Map();
+    children: Map<number, ExpansionHub> = new Map();
+
+    type = RevHubType.ExpansionHub;
 
     close(): void {
     }
