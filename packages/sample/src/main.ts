@@ -1,7 +1,7 @@
 import {Command} from "commander";
 import {
     ExpansionHub,
-    getConnectedExpansionHubs, MotorCommandNotValidError,
+    getConnectedExpansionHubs,
     MotorNotFullyConfiguredError,
     NackError
 } from "@rev-robotics/expansion-hub";

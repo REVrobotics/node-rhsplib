@@ -10,7 +10,8 @@
     "commander": "^10.0.1"
   },
   "scripts": {
-    "error": "tsc && node dist/main.js -e",
-    "build": "tsc"
+    "build": "tsc",
+    "list": "node dist/main.js -l",
+    "error": "tsc && node dist/main.js -e"
   }
 }
