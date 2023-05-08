@@ -1,18 +1,7 @@
 {
-    "compilerOptions": {
-      "declaration": true,
-      "module": "commonjs",
-      "outDir": "./dist",
-      "rootDir": "./src",
-      "esModuleInterop": true,
-      "strict": true,
-      "target": "es5",
-      "types": [
-        "node"
-      ],
-      "typeRoots": [
-        "node_modules/@types"
-      ]
-    }
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src"
   }
-  
+}
