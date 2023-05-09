@@ -15,7 +15,7 @@ const openSerialMap = new Map<string, Serial>();
  *
  * @param serialNumber the serial number of the REV hub
  */
-export async function openParentRevHub(serialNumber: string): Promise<ExpansionHub> {
+export async function openExpansionHubWithChildren(serialNumber: string): Promise<ExpansionHub> {
     let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
 
     if(openSerialMap.get(serialPortPath) == undefined) {
