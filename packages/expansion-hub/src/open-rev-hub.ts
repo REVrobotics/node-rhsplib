@@ -24,7 +24,7 @@ export async function openParentRevHub(serialNumber: string): Promise<ExpansionH
 
     let serial = openSerialMap.get(serialPortPath)!;
 
-    let parentHub = new ExpansionHubInternal();
+    let parentHub = new ExpansionHubInternal(true, serial);
 
     let discoveredModules = await NativeRevHub.discoverRevHubs(serial);
     let parentAddress = discoveredModules.parentAddress;
@@ -52,6 +52,21 @@ async function getSerialPortPathForExHubSerial(
         }
     }
     throw new Error(`Unable to find serial port for ${serialNumber}`);
+}
+
+/**
+ * Closes the given Serial port and removes it from the open serial ports
+ * list. This should be the preferred way to close a Serial port.
+ *
+ * @param serial the Serial port to close
+ */
+export function closeSerial(serial: Serial) {
+    for(let [path, port] of openSerialMap.entries()) {
+        if(port === serial) {
+            openSerialMap.delete(path);
+        }
+    }
+    serial.close();
 }
 
 async function openSerial(serialPortPath: string): Promise<Serial> {

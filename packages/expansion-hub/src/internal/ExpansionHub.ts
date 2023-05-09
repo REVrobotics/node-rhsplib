@@ -8,18 +8,36 @@ import {
     Serial, VerbosityLevel, Version
 } from "@rev-robotics/rhsplib"
 import {RevHubType} from "../RevHubType";
+import {closeSerial} from "../open-rev-hub";
 
 export class ExpansionHubInternal implements ExpansionHub {
-    constructor() {
+    constructor(isParent: boolean, serial: Serial) {
         this.nativeRevHub = new NativeRevHub();
+        this.isParent = isParent;
+        this.serial = serial;
     }
 
     nativeRevHub: NativeRevHub;
     children: Map<number, ExpansionHub> = new Map();
+    isParent: boolean
+    serial: Serial
 
     type = RevHubType.ExpansionHub;
 
+    /**
+     * Closes this hub and releases any resources bound to it.
+     * If this hub is a parent hub, the Serial port will be closed
+     * and all children will be closed as well. Do not use this hub after
+     * it is closed.
+     */
     close(): void {
+        //Closing a parent closes the serial port and all children
+        if(this.isParent) {
+            closeSerial(this.serial);
+            this.children.forEach((child) => {
+                child.close();
+            })
+        }
     }
 
     open(serialPort: Serial, destAddress: number): Promise<void> {
