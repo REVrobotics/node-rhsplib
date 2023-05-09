@@ -21,12 +21,12 @@ async function getPossibleExpansionHubSerialNumbers(): Promise<string[]> {
  * and child hubs are available via {@link ExpansionHub#children}.
  */
 export async function getConnectedExpansionHubs(): Promise<ExpansionHub[]> {
-    let addresses = await getPossibleExpansionHubSerialNumbers();
+    let serialNumbers = await getPossibleExpansionHubSerialNumbers();
 
     let hubs: ExpansionHub[] = [];
 
-    for(let address of addresses) {
-        let hub = await openExpansionHubWithChildren(address);
+    for(let serialNumber of serialNumbers) {
+        let hub = await openExpansionHubWithChildren(serialNumber);
         hubs.push(hub);
     }
 
