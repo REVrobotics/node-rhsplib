@@ -2,7 +2,7 @@ import {NackError, setPrototypeOf} from "./NackError.js";
 
 export class I2cMasterBusyError extends NackError {
     constructor() {
-        super(40, "I2C Master busy");
+        super(40, "I2C Controller busy");
         setPrototypeOf(this, I2cMasterBusyError.prototype);
     }
 }
