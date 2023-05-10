@@ -1,5 +1,6 @@
 import {Command} from "commander";
 import {ExpansionHub, getConnectedExpansionHubs} from "@rev-robotics/expansion-hub";
+import {RevHub} from "@rev-robotics/expansion-hub";
 
 const program = new Command();
 
@@ -18,14 +19,12 @@ if(options.list) {
     });
 }
 
-async function toString(hub: ExpansionHub): Promise<string> {
-    let result = `RevHub: ${hub.getDestAddress()}\n`;
+async function toString(hub: RevHub): Promise<string> {
+    let result = `RevHub: ${hub.moduleAddress}\n`;
 
     if(hub.isParent()) {
         for(const child of hub.getChildren()) {
-            if(child.isExpansionHub()) {
-                result += `\tRevHub: ${child.getDestAddress()}\n`;
-            }
+            result += `\tRevHub: ${child.moduleAddress}\n`;
         }
     }
 

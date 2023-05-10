@@ -18,9 +18,10 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     hubIsParent: boolean;
-    serialPort: Serial | undefined;
+    serialPort!: Serial;
     serialNumber: string | undefined;
     nativeRevHub: NativeRevHub;
+    moduleAddress!: number
     private children: RevHub[] = [];
 
     type = RevHubType.ExpansionHub;
@@ -38,6 +39,7 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     open(serialPort: Serial, destAddress: number): Promise<void> {
         this.serialPort = serialPort;
+        this.moduleAddress = destAddress;
         return this.nativeRevHub.open(serialPort, destAddress);
     }
 
