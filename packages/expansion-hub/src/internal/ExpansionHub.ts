@@ -43,6 +43,18 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.open(serialPort, destAddress);
     }
 
+    get isOpen(): boolean {
+        return this.isOpened();
+    }
+
+    get responseTimeoutMs(): number {
+        return this.getResponseTimeoutMs();
+    }
+
+    set responseTimeoutMs(timeout: number) {
+        this.setResponseTimeoutMs(timeout);
+    }
+
     getADC(): Promise<number> {
         return this.nativeRevHub.getADC();
     }
@@ -288,6 +300,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     setNewModuleAddress(newModuleAddress: number): Promise<void> {
+        this.moduleAddress = newModuleAddress;
         return this.nativeRevHub.setNewModuleAddress(newModuleAddress);
     }
 
