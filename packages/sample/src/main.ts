@@ -21,8 +21,12 @@ if(options.list) {
 async function toString(hub: ExpansionHub): Promise<string> {
     let result = `RevHub: ${hub.getDestAddress()}\n`;
 
-    for(const [_, child] of hub.children) {
-        result += `\tRevHub: ${child.getDestAddress()}\n`;
+    if(hub.isParent()) {
+        for(const child of hub.getChildren()) {
+            if(child.isExpansionHub()) {
+                result += `\tRevHub: ${child.getDestAddress()}\n`;
+            }
+        }
     }
 
     return result;

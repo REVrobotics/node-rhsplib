@@ -24,7 +24,7 @@ export async function openExpansionHubWithChildren(serialNumber: string): Promis
 
     let serial = openSerialMap.get(serialPortPath)!;
 
-    let parentHub = new ExpansionHubInternal();
+    let parentHub = new ExpansionHubInternal(true, serialNumber);
 
     let discoveredModules = await NativeRevHub.discoverRevHubs(serial);
     let parentAddress = discoveredModules.parentAddress;
@@ -33,11 +33,11 @@ export async function openExpansionHubWithChildren(serialNumber: string): Promis
     await parentHub.queryInterface("DEKA");
 
     for(let address of discoveredModules.childAddresses) {
-        let childHub = new ExpansionHubInternal();
+        let childHub = new ExpansionHubInternal(false);
         await childHub.open(serial, address);
         await childHub.queryInterface("DEKA");
 
-        parentHub.children.set(address, childHub);
+        parentHub.addChild(childHub);
     }
 
     return parentHub;

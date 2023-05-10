@@ -8,16 +8,29 @@ import {
     Serial, VerbosityLevel, Version
 } from "@rev-robotics/rhsplib"
 import {RevHubType} from "../RevHubType";
+import {ParentRevHub, RevHub} from "../RevHub";
 
 export class ExpansionHubInternal implements ExpansionHub {
-    constructor() {
+    constructor(isParent: boolean, serialNumber: string | undefined = undefined) {
         this.nativeRevHub = new NativeRevHub();
+        this.hubIsParent = isParent;
+        this.serialNumber = serialNumber;
     }
 
+    hubIsParent: boolean
+    serialNumber: string | undefined;
     nativeRevHub: NativeRevHub;
-    children: Map<number, ExpansionHub> = new Map();
+    private children: RevHub[] = [];
 
     type = RevHubType.ExpansionHub;
+
+    isParent(): this is ParentRevHub {
+        return this.hubIsParent;
+    }
+
+    isExpansionHub(): this is ExpansionHub {
+        return true;
+    }
 
     close(): void {
     }
@@ -316,5 +329,13 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     writeI2CSingleByte(i2cChannel: number, slaveAddress: number, byte: number): Promise<void> {
         return this.nativeRevHub.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
+    }
+
+    getChildren(): ReadonlyArray<RevHub> {
+        return this.children;
+    }
+
+    addChild(hub: RevHub) {
+        this.children.push(hub);
     }
 }
