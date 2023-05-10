@@ -2,6 +2,7 @@ import {ExpansionHub} from "./ExpansionHub";
 import {Serial, SerialParity, SerialFlowControl, RevHub as NativeRevHub} from "@rev-robotics/rhsplib";
 import {SerialPort} from "serialport";
 import {ExpansionHubInternal} from "./internal/ExpansionHub";
+import {ParentRevHub} from "./RevHub";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
@@ -9,6 +10,35 @@ import {ExpansionHubInternal} from "./internal/ExpansionHub";
  * the map upon closing.
  */
 const openSerialMap = new Map<string, Serial>();
+
+/**
+ * Opens a parent Rev Hub with a known address. Does not discover or open any child hubs.
+ * Call {@link ExpansionHub#addChildByAddress} to add known children.
+ *
+ * @param serialNumber
+ * @param moduleAddress
+ */
+export async function openParentExpansionHub(serialNumber: string, moduleAddress: number):
+    Promise<ParentRevHub & ExpansionHub> {
+    let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
+
+    if(openSerialMap.get(serialPortPath) == undefined) {
+        openSerialMap.set(serialPortPath, await openSerial(serialPortPath));
+    }
+
+    let serial = openSerialMap.get(serialPortPath)!;
+
+    let parentHub = new ExpansionHubInternal(true, serialNumber);
+
+    await parentHub.open(serial, moduleAddress);
+    await parentHub.queryInterface("DEKA");
+
+    if(parentHub.isParent()) {
+        return parentHub;
+    } else {
+        throw new Error(`Hub at ${serialNumber} with moduleAddress ${moduleAddress} is not a parent`);
+    }
+}
 
 /**
  * Opens a parent REV hub, given that you know its {@link serialNumber} (should start with DQ).
@@ -24,20 +54,12 @@ export async function openExpansionHubWithChildren(serialNumber: string): Promis
 
     let serial = openSerialMap.get(serialPortPath)!;
 
-    let parentHub = new ExpansionHubInternal(true, serialNumber);
-
     let discoveredModules = await NativeRevHub.discoverRevHubs(serial);
     let parentAddress = discoveredModules.parentAddress;
-
-    await parentHub.open(serial, parentAddress);
-    await parentHub.queryInterface("DEKA");
+    let parentHub = await openParentExpansionHub(serialNumber, parentAddress);
 
     for(let address of discoveredModules.childAddresses) {
-        let childHub = new ExpansionHubInternal(false);
-        await childHub.open(serial, address);
-        await childHub.queryInterface("DEKA");
-
-        parentHub.addChild(childHub);
+        await parentHub.addChildByAddress(address);
     }
 
     return parentHub;

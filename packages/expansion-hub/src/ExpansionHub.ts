@@ -96,4 +96,11 @@ export interface ExpansionHub extends RevHub {
     getServoPulseWidth(servoChannel: number): Promise<number>;
     setServoEnable(servoChannel: number, enable: boolean): Promise<void>;
     getServoEnable(servoChannel: number): Promise<boolean>;
+
+    /**
+     * Adds a child to the ExpansionHub using a known address
+     *
+     * @param moduleAddress
+     */
+    addChildByAddress(moduleAddress: number): Promise<RevHub>
 }

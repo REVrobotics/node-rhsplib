@@ -17,7 +17,8 @@ export class ExpansionHubInternal implements ExpansionHub {
         this.serialNumber = serialNumber;
     }
 
-    hubIsParent: boolean
+    hubIsParent: boolean;
+    serialPort: Serial | undefined;
     serialNumber: string | undefined;
     nativeRevHub: NativeRevHub;
     private children: RevHub[] = [];
@@ -36,6 +37,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     open(serialPort: Serial, destAddress: number): Promise<void> {
+        this.serialPort = serialPort;
         return this.nativeRevHub.open(serialPort, destAddress);
     }
 
@@ -335,7 +337,20 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.children;
     }
 
-    addChild(hub: RevHub) {
+    addChild(hub: RevHub): void {
         this.children.push(hub);
+    }
+
+    async addChildByAddress(moduleAddress: number): Promise<RevHub> {
+        if(this.serialPort === undefined) {
+            throw new Error("Parent hub is not initialized. Can't add child.")
+        }
+        let childHub = new ExpansionHubInternal(false);
+        await childHub.open(this.serialPort!, moduleAddress);
+        await childHub.queryInterface("DEKA");
+
+        this.addChild(childHub);
+
+        return childHub;
     }
 }
