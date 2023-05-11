@@ -13,7 +13,8 @@ const openSerialMap = new Map<string, Serial>();
 
 /**
  * Opens a parent Rev Hub with a known address. Does not discover or open any child hubs.
- * Call {@link ExpansionHub#addChildByAddress} to add known children.
+ * Call {@link ExpansionHub#addChildByAddress} to add known children. The serial number
+ * should start with 'DQ'.
  *
  * @param serialNumber
  * @param moduleAddress
