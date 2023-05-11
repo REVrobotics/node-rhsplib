@@ -8,6 +8,8 @@ import {
     Serial, VerbosityLevel, Version
 } from "@rev-robotics/rhsplib"
 import {RevHubType} from "../RevHubType";
+import {EventEmitter} from "events";
+import {RevHub} from "../RevHub";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor() {
@@ -18,6 +20,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     keepAliveTimer: NodeJS.Timer | undefined = undefined;
     children: Map<number, ExpansionHub> = new Map();
     type = RevHubType.ExpansionHub;
+    emitter = new EventEmitter();
 
     close(): void {
     }
@@ -316,5 +319,10 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     writeI2CSingleByte(i2cChannel: number, slaveAddress: number, byte: number): Promise<void> {
         return this.nativeRevHub.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
+    }
+
+    on(eventName: string | symbol, listener: (...args: any[]) => void): RevHub {
+        this.emitter.on(eventName, listener);
+        return this;
     }
 }

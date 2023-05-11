@@ -10,7 +10,9 @@ export function startKeepAlive(hub: ExpansionHubInternal, interval: number) {
         //stop existing keep alive timer, so we can start a new one.
         clearInterval(hub.keepAliveTimer);
     }
-    hub.keepAliveTimer = setInterval(async () => {
-        await hub.sendKeepAlive();
+    hub.keepAliveTimer = setInterval(() => {
+        hub.sendKeepAlive().catch((e: any) => {
+            hub.emitter.emit("keep-alive-error", e);
+        });
     }, interval);
 }
