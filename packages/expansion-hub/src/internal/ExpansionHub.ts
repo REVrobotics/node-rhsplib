@@ -20,7 +20,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     keepAliveTimer: NodeJS.Timer | undefined = undefined;
     children: Map<number, ExpansionHub> = new Map();
     type = RevHubType.ExpansionHub;
-    emitter = new EventEmitter();
+    private emitter = new EventEmitter();
 
     close(): void {
     }
@@ -327,8 +327,12 @@ export class ExpansionHubInternal implements ExpansionHub {
      * @param eventName
      * @param listener
      */
-    on(eventName: "error", listener: (...args: any[]) => void): RevHub {
+    on(eventName: "error", listener: (event: Event) => void): RevHub {
         this.emitter.on(eventName, listener);
         return this;
+    }
+
+    emitError(error: Error) {
+        this.emitter.emit("error", error);
     }
 }
