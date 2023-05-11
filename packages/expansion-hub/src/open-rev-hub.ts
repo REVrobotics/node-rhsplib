@@ -2,7 +2,6 @@ import {ExpansionHub, ParentExpansionHub} from "./ExpansionHub";
 import {Serial, SerialParity, SerialFlowControl, RevHub as NativeRevHub} from "@rev-robotics/rhsplib";
 import {SerialPort} from "serialport";
 import {ExpansionHubInternal} from "./internal/ExpansionHub";
-import {ParentRevHub} from "./RevHub";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
@@ -46,7 +45,7 @@ export async function openParentExpansionHub(serialNumber: string, moduleAddress
  *
  * @param serialNumber the serial number of the REV hub
  */
-export async function openExpansionHubWithChildren(serialNumber: string): Promise<ExpansionHub> {
+export async function openExpansionHubWithChildren(serialNumber: string): Promise<ParentExpansionHub> {
     let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
 
     if(openSerialMap.get(serialPortPath) == undefined) {
