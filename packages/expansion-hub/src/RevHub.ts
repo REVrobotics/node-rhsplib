@@ -7,6 +7,14 @@ export interface RevHub {
     isExpansionHub(): this is ExpansionHub;
 
     readonly moduleAddress: number
+
+    /**
+     * Listen for errors that do not happen as a result of a specific function call
+     *
+     * @param eventName
+     * @param listener
+     */
+    on(eventName: "error", listener: (error: Error) => void): RevHub
 }
 
 export interface ParentRevHub extends RevHub {

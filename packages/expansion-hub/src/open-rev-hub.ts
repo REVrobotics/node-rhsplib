@@ -2,6 +2,7 @@ import {ExpansionHub, ParentExpansionHub} from "./ExpansionHub";
 import {Serial, SerialParity, SerialFlowControl, RevHub as NativeRevHub, RevHub} from "@rev-robotics/rhsplib";
 import {SerialPort} from "serialport";
 import {ExpansionHubInternal} from "./internal/ExpansionHub";
+import {startKeepAlive} from "./start-keep-alive";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
@@ -66,11 +67,19 @@ export async function openExpansionHubAndAllChildren(serialNumber: string): Prom
 
     let discoveredModules = await NativeRevHub.discoverRevHubs(serial);
     let parentAddress = discoveredModules.parentAddress;
-    let parentHub = await openParentExpansionHub(serialNumber, parentAddress);
+    let parentHub =
+        await openParentExpansionHub(serialNumber, parentAddress) as ParentExpansionHub & ExpansionHubInternal;
 
     for(let address of discoveredModules.childAddresses) {
-        await parentHub.addChildByAddress(address);
+        let hub = await parentHub.addChildByAddress(address);
+        if(hub.isExpansionHub()) {
+            startKeepAlive(hub as ExpansionHubInternal, 1000)
+        }
     }
+
+    await parentHub.open(serial, parentAddress);
+    await parentHub.queryInterface("DEKA");
+    startKeepAlive(parentHub, 1000);
 
     return parentHub;
 }
