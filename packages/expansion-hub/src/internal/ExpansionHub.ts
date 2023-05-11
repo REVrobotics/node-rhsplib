@@ -327,7 +327,7 @@ export class ExpansionHubInternal implements ExpansionHub {
      * @param eventName
      * @param listener
      */
-    on(eventName: "error", listener: (event: Event) => void): RevHub {
+    on(eventName: "error", listener: (error: Error) => void): RevHub {
         this.emitter.on(eventName, listener);
         return this;
     }
