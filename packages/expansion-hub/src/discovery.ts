@@ -2,7 +2,7 @@ import { SerialPort } from "serialport";
 import {ExpansionHub} from "./ExpansionHub";
 import {openExpansionHubWithChildren} from "./open-rev-hub";
 
-async function getPossibleExpansionHubSerialNumbers(): Promise<string[]> {
+export async function getPossibleExpansionHubSerialNumbers(): Promise<string[]> {
     const results: string[] = [];
     const serialPorts = await SerialPort.list();
     for (let i = 0; i < serialPorts.length; i++) {

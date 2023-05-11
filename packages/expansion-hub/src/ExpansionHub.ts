@@ -7,7 +7,7 @@ import {
     RGB,
     VerbosityLevel, Version
 } from "@rev-robotics/rhsplib";
-import {ParentRevHub, RevHub} from "./RevHub";
+import {RevHub} from "./RevHub";
 
 export interface ExpansionHub extends RevHub {
     isOpened(): boolean;
