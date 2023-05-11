@@ -14,5 +14,5 @@ export interface ParentRevHub extends RevHub {
     addChild(hub: RevHub): void;
     addChildByAddress(moduleAddress: number): Promise<RevHub>;
 
-    serialNumber: string
+    readonly serialNumber: string
 }
