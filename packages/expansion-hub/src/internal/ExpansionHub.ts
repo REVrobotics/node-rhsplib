@@ -8,6 +8,8 @@ import {
     Serial, VerbosityLevel, Version
 } from "@rev-robotics/rhsplib"
 import {RevHubType} from "../RevHubType";
+import {EventEmitter} from "events";
+import {RevHub} from "../RevHub";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor() {
@@ -15,11 +17,14 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     nativeRevHub: NativeRevHub;
+    keepAliveTimer: NodeJS.Timer | undefined = undefined;
     children: Map<number, ExpansionHub> = new Map();
-
     type = RevHubType.ExpansionHub;
+    private emitter = new EventEmitter();
 
     close(): void {
+        clearInterval(this.keepAliveTimer);
+        this.keepAliveTimer = undefined;
     }
 
     open(serialPort: Serial, destAddress: number): Promise<void> {
@@ -316,5 +321,20 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     writeI2CSingleByte(i2cChannel: number, slaveAddress: number, byte: number): Promise<void> {
         return this.nativeRevHub.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
+    }
+
+    /**
+     * Listen for errors that do not happen as a result of a specific function call
+     *
+     * @param eventName
+     * @param listener
+     */
+    on(eventName: "error", listener: (error: Error) => void): RevHub {
+        this.emitter.on(eventName, listener);
+        return this;
+    }
+
+    emitError(error: Error) {
+        this.emitter.emit("error", error);
     }
 }
