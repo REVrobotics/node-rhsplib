@@ -12,7 +12,7 @@ export function startKeepAlive(hub: ExpansionHubInternal, interval: number) {
     }
     hub.keepAliveTimer = setInterval(() => {
         hub.sendKeepAlive().catch((e: any) => {
-            hub.emitter.emit("keep-alive-error", e);
+            hub.emitter.emit("error", e);
         });
     }, interval);
 }

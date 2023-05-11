@@ -321,7 +321,12 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
     }
 
-    on(eventName: string | symbol, listener: (...args: any[]) => void): RevHub {
+    /**
+     *
+     * @param eventName
+     * @param listener
+     */
+    on(eventName: "error", listener: (...args: any[]) => void): RevHub {
         this.emitter.on(eventName, listener);
         return this;
     }
