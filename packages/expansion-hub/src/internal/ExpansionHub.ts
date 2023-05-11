@@ -322,6 +322,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     /**
+     * Listen for errors that can't be handled in the library
      *
      * @param eventName
      * @param listener
