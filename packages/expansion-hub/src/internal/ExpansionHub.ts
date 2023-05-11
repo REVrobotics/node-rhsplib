@@ -23,6 +23,8 @@ export class ExpansionHubInternal implements ExpansionHub {
     private emitter = new EventEmitter();
 
     close(): void {
+        clearInterval(this.keepAliveTimer);
+        this.keepAliveTimer = undefined;
     }
 
     open(serialPort: Serial, destAddress: number): Promise<void> {
