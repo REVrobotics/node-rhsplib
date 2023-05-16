@@ -25,7 +25,11 @@ export class ExpansionHubInternal implements ExpansionHub {
     serialNumber: string | undefined;
     nativeRevHub: NativeRevHub;
     moduleAddress!: number
-    private children: RevHub[] = [];
+    private mutableChildren: RevHub[] = [];
+
+    get children(): ReadonlyArray<RevHub> {
+        return this.mutableChildren
+    }
 
     keepAliveTimer?: NodeJS.Timer;
     type = RevHubType.ExpansionHub;
@@ -356,11 +360,11 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     getChildren(): ReadonlyArray<RevHub> {
-        return this.children;
+        return this.mutableChildren;
     }
 
     addChild(hub: RevHub): void {
-        this.children.push(hub);
+        this.mutableChildren.push(hub);
     }
 
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {

@@ -31,7 +31,7 @@ async function toString(hub: RevHub): Promise<string> {
     }
 
     if(hub.isParent()) {
-        for(const child of hub.getChildren()) {
+        for(const child of hub.children) {
             result += `\tRevHub: ${child.moduleAddress}\n`;
         }
     }
