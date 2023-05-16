@@ -12,7 +12,9 @@ import {ParentRevHub, RevHub} from "../RevHub";
 import {EventEmitter} from "events";
 
 export class ExpansionHubInternal implements ExpansionHub {
-    constructor(isParent: boolean, serialNumber: string | undefined = undefined) {
+    constructor(isParent: true, serialNumber: string);
+    constructor(isParent: false);
+    constructor(isParent: boolean, serialNumber?: string) {
         this.nativeRevHub = new NativeRevHub();
         this.hubIsParent = isParent;
         this.serialNumber = serialNumber;
@@ -24,7 +26,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     nativeRevHub: NativeRevHub;
     moduleAddress!: number
     private children: RevHub[] = [];
-    keepAliveTimer: NodeJS.Timer | undefined = undefined;
+    keepAliveTimer?: NodeJS.Timer;
     type = RevHubType.ExpansionHub;
     private emitter = new EventEmitter();
 
