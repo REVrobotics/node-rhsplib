@@ -8,19 +8,35 @@ import {
     Serial, VerbosityLevel, Version
 } from "@rev-robotics/rhsplib"
 import {RevHubType} from "../RevHubType";
+import {ParentRevHub, RevHub} from "../RevHub";
 import {EventEmitter} from "events";
-import {RevHub} from "../RevHub";
 
 export class ExpansionHubInternal implements ExpansionHub {
-    constructor() {
+    constructor(isParent: true, serialNumber: string);
+    constructor(isParent: false);
+    constructor(isParent: boolean, serialNumber?: string) {
         this.nativeRevHub = new NativeRevHub();
+        this.hubIsParent = isParent;
+        this.serialNumber = serialNumber;
     }
 
+    hubIsParent: boolean;
+    serialPort!: Serial;
+    serialNumber: string | undefined;
     nativeRevHub: NativeRevHub;
-    keepAliveTimer: NodeJS.Timer | undefined = undefined;
-    children: Map<number, ExpansionHub> = new Map();
+    moduleAddress!: number
+    private children: RevHub[] = [];
+    keepAliveTimer?: NodeJS.Timer;
     type = RevHubType.ExpansionHub;
     private emitter = new EventEmitter();
+
+    isParent(): this is ParentRevHub {
+        return this.hubIsParent;
+    }
+
+    isExpansionHub(): this is ExpansionHub {
+        return true;
+    }
 
     close(): void {
         clearInterval(this.keepAliveTimer);
@@ -28,6 +44,8 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     open(serialPort: Serial, destAddress: number): Promise<void> {
+        this.serialPort = serialPort;
+        this.moduleAddress = destAddress;
         return this.nativeRevHub.open(serialPort, destAddress);
     }
 
@@ -321,6 +339,27 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     writeI2CSingleByte(i2cChannel: number, slaveAddress: number, byte: number): Promise<void> {
         return this.nativeRevHub.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
+    }
+
+    getChildren(): ReadonlyArray<RevHub> {
+        return this.children;
+    }
+
+    addChild(hub: RevHub): void {
+        this.children.push(hub);
+    }
+
+    async addChildByAddress(moduleAddress: number): Promise<RevHub> {
+        if (this.serialPort === undefined) {
+            throw new Error("Parent hub is not initialized. Can't add child.")
+        }
+        let childHub = new ExpansionHubInternal(false);
+        await childHub.open(this.serialPort!, moduleAddress);
+        await childHub.queryInterface("DEKA");
+
+        this.addChild(childHub);
+
+        return childHub;
     }
 
     /**

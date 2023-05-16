@@ -7,7 +7,9 @@ import {
     RGB,
     VerbosityLevel, Version
 } from "@rev-robotics/rhsplib";
-import {RevHub} from "./RevHub";
+import {ParentRevHub, RevHub} from "./RevHub";
+
+export type ParentExpansionHub = ParentRevHub & ExpansionHub
 
 export interface ExpansionHub extends RevHub {
     isOpened(): boolean;
@@ -96,6 +98,4 @@ export interface ExpansionHub extends RevHub {
     getServoPulseWidth(servoChannel: number): Promise<number>;
     setServoEnable(servoChannel: number, enable: boolean): Promise<void>;
     getServoEnable(servoChannel: number): Promise<boolean>;
-
-    children: Map<number, ExpansionHub>;
 }
