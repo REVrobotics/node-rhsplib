@@ -10,6 +10,8 @@ import {
 import {nackCodeToError} from "../errors/nack-code-to-error";
 import {RevHubType} from "../RevHubType";
 import {ParameterOutOfRangeError} from "../errors/ParameterOutOfRangeError";
+import {EventEmitter} from "events";
+import {RevHub} from "../RevHub";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor() {
@@ -17,11 +19,14 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     nativeRevHub: NativeRevHub;
+    keepAliveTimer: NodeJS.Timer | undefined = undefined;
     children: Map<number, ExpansionHub> = new Map();
-
     type = RevHubType.ExpansionHub;
+    private emitter = new EventEmitter();
 
     close(): void {
+        clearInterval(this.keepAliveTimer);
+        this.keepAliveTimer = undefined;
     }
 
     open(serialPort: Serial, destAddress: number): Promise<void> {
@@ -348,5 +353,20 @@ export class ExpansionHubInternal implements ExpansionHub {
                 throw e;
             }
         }
+    }
+
+    /**
+     * Listen for errors that do not happen as a result of a specific function call
+     *
+     * @param eventName
+     * @param listener
+     */
+    on(eventName: "error", listener: (error: Error) => void): RevHub {
+        this.emitter.on(eventName, listener);
+        return this;
+    }
+
+    emitError(error: Error) {
+        this.emitter.emit("error", error);
     }
 }
