@@ -5,7 +5,8 @@ const program = new Command();
 
 program.version('1.0.0')
     .option('-l --list', 'List connected devices')
-    .option('-m --motor <index>', 'Set motor index. Must also include -p')
+    .option('-c --count <counts>', 'Set encoder count.')
+    .option('-m --motor <index>', 'Set motor index. Must also include -p or -c')
     .option('-p --power <power>', 'Set motor power')
     .parse(process.argv);
 
@@ -21,15 +22,26 @@ if(options.list) {
     });
 }
 
+if(options.count) {
+    let index = (options.motor) ? Number(options.motor) : 1;
+    let counts = Number(options.count);
+
+    const hubs = await getConnectedExpansionHubs();
+    let hub = hubs[0];
+
+    await hub.setMotorChannelMode(index, 2, true);
+    await hub.setMotorTargetPosition(index, counts, 100);
+    await hub.setMotorChannelEnable(index, true);
+}
+
 if(options.power) {
     let index: number = (options.motor) ? Number(options.motor) : 1;
     let power: number = Number(options.power);
 
     const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
-    let hub = hubs[0]
+    let hub = hubs[0];
 
     await hub.setMotorChannelMode(index, 0, true);
-    console.log(`Power is ${power}, type is ${typeof power}`)
     await hub.setMotorConstantPower(index, power);
     await hub.setMotorChannelEnable(index, true);
 }

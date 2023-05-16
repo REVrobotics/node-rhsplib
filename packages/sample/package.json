@@ -12,6 +12,7 @@
   "scripts": {
     "build": "tsc",
     "list": "node dist/main.js -l",
-    "motor": "node dist/main.js -p 60"
+    "motor": "node dist/main.js -p 60",
+    "motor-position": "node dist/main.js --count 30000 && node dist/main.js --count 20"
   }
 }
