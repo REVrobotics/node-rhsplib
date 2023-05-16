@@ -48,10 +48,10 @@ export async function openParentExpansionHub(serialNumber: string, moduleAddress
 }
 
 /**
- * Opens a parent REV hub, given that you know its {@link serialNumber} (should start with DQ).
+ * Opens a parent REV hub, given that you know its {@link serialNumber}, as well as all children.
  * Determining the addresses of the parent and child hubs will take upwards of a second.
  *
- * @param serialNumber the serial number of the REV hub
+ * @param serialNumber the serial number of the REV hub (should start with DQ)
  */
 export async function openExpansionHubAndAllChildren(serialNumber: string): Promise<ParentExpansionHub> {
     let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
