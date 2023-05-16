@@ -5,8 +5,7 @@
       "options": {
         "cacheableOperations": [
           "build",
-          "install",
-          "list"
+          "install"
         ]
       }
     }
@@ -31,11 +30,6 @@
     "prepublishOnly": {
       "dependsOn": [
         "^prepublishOnly"
-      ]
-    },
-    "list": {
-      "dependsOn": [
-        "^list"
       ]
     }
   }
