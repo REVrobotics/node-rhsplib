@@ -359,10 +359,6 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
     }
 
-    getChildren(): ReadonlyArray<RevHub> {
-        return this.mutableChildren;
-    }
-
     addChild(hub: RevHub): void {
         this.mutableChildren.push(hub);
     }
