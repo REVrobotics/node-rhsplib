@@ -5,7 +5,8 @@ const program = new Command();
 
 program.version('1.0.0')
     .option('-l --list', 'List connected devices')
-    .option('-m --motor <power>', 'Set motor power')
+    .option('-m --motor <index>', 'Set motor index. Must also include -p')
+    .option('-p --power <power>', 'Set motor power')
     .parse(process.argv);
 
 const options = program.opts();
@@ -20,16 +21,17 @@ if(options.list) {
     });
 }
 
-if(options.motor) {
-    let power: number = Number(options.motor);
+if(options.power) {
+    let index: number = (options.motor) ? Number(options.motor) : 1;
+    let power: number = Number(options.power);
 
     const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
     let hub = hubs[0]
 
-    await hub.setMotorChannelMode(1, 0, true);
+    await hub.setMotorChannelMode(index, 0, true);
     console.log(`Power is ${power}, type is ${typeof power}`)
-    await hub.setMotorConstantPower(1, power);
-    await hub.setMotorChannelEnable(1, true);
+    await hub.setMotorConstantPower(index, power);
+    await hub.setMotorChannelEnable(index, true);
 }
 
 async function toString(hub: ExpansionHub): Promise<string> {
