@@ -38,10 +38,8 @@ if(options.error) {
         await hubs[0].setMotorChannelEnable(2, true);
         console.log("Expected error, but got none")
     } catch(e: any) {
-        console.log(e.message)
-        console.log(e.stackTrace)
-        console.log("Correctly got error.")
-        console.log(`Error is:\n\t${e}`)
+        console.log(e.message);
+        console.log(`Error is:\n\t${e}`);
 
         console.log(`Is error a nack? ${e instanceof NackError}`);
         if(e instanceof NackError) {
