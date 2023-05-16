@@ -22,8 +22,7 @@ const openSerialMap = new Map<string, Serial>();
  * @param serialNumber
  * @param moduleAddress
  */
-export async function openParentExpansionHub(serialNumber: string,
-                                             moduleAddress?: number):
+export async function openParentExpansionHub(serialNumber: string, moduleAddress?: number):
     Promise<ParentExpansionHub> {
     let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
 
