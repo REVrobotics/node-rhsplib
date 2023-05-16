@@ -9,6 +9,8 @@ import {
 } from "@rev-robotics/rhsplib";
 import {ParentRevHub, RevHub} from "./RevHub";
 
+export type ParentExpansionHub = ParentRevHub & ExpansionHub
+
 export interface ExpansionHub extends RevHub {
     readonly isOpen: boolean
     responseTimeoutMs: number;
