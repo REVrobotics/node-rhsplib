@@ -12,15 +12,13 @@ import {startKeepAlive} from "./start-keep-alive";
 const openSerialMap = new Map<string, Serial>();
 
 /**
- * Opens a parent Rev Hub. Does not discover or open any child hubs.
- * If {@link moduleAddress} is not provided (or is undefined), it will take upwards of a second to
- * learn the address of the parent hub.
+ * Opens a parent Expansion Hub. Does not open any child hubs.
  *
- * Call {@link ExpansionHub#addChildByAddress} to add known children. The serial number
- * should start with 'DQ'.
+ * Call {@link ExpansionHub#addChildByAddress} to add known children.
  *
- * @param serialNumber
- * @param moduleAddress
+ * @param serialNumber The serial number of the Expansion Hub (should start with "DQ")
+ * @param moduleAddress The module address of the parent (if this is not provided, it will take upwards of a second to
+ * find the address of the parent hub).
  */
 export async function openParentExpansionHub(serialNumber: string, moduleAddress?: number):
     Promise<ParentExpansionHub> {
