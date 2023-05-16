@@ -3,6 +3,7 @@ import {Serial, SerialParity, SerialFlowControl, RevHub as NativeRevHub} from "@
 import {SerialPort} from "serialport";
 import {ExpansionHubInternal} from "./internal/ExpansionHub";
 import {ParentRevHub} from "./RevHub";
+import {startKeepAlive} from "./start-keep-alive";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open

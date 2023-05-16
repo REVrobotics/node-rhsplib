@@ -15,6 +15,10 @@ if(options.list) {
     console.log("Starting to search Serial Ports")
     const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
     hubs.forEach(async (hub) => {
+        hub.on("error", (e) => {
+            console.log(`Got error:`);
+            console.log(e);
+        });
         console.log(await toString(hub));
     });
 }

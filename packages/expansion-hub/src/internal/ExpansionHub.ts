@@ -9,6 +9,7 @@ import {
 } from "@rev-robotics/rhsplib"
 import {RevHubType} from "../RevHubType";
 import {ParentRevHub, RevHub} from "../RevHub";
+import {EventEmitter} from "events";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: boolean, serialNumber: string | undefined = undefined) {
@@ -24,7 +25,9 @@ export class ExpansionHubInternal implements ExpansionHub {
     moduleAddress!: number
     private children: RevHub[] = [];
 
+    keepAliveTimer: NodeJS.Timer | undefined = undefined;
     type = RevHubType.ExpansionHub;
+    private emitter = new EventEmitter();
 
     isParent(): this is ParentRevHub {
         return this.hubIsParent;
@@ -35,6 +38,8 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     close(): void {
+        clearInterval(this.keepAliveTimer);
+        this.keepAliveTimer = undefined;
     }
 
     open(serialPort: Serial, destAddress: number): Promise<void> {
@@ -357,7 +362,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {
-        if(this.serialPort === undefined) {
+        if (this.serialPort === undefined) {
             throw new Error("Parent hub is not initialized. Can't add child.")
         }
         let childHub = new ExpansionHubInternal(false);
@@ -367,5 +372,19 @@ export class ExpansionHubInternal implements ExpansionHub {
         this.addChild(childHub);
 
         return childHub;
+    }
+    /**
+     * Listen for errors that do not happen as a result of a specific function call
+     *
+     * @param eventName
+     * @param listener
+     */
+    on(eventName: "error", listener: (error: Error) => void): RevHub {
+        this.emitter.on(eventName, listener);
+        return this;
+    }
+
+    emitError(error: Error) {
+        this.emitter.emit("error", error);
     }
 }
