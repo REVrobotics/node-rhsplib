@@ -2,11 +2,11 @@ import {RevHubType} from "./RevHubType";
 import {ExpansionHub} from "./ExpansionHub";
 
 export interface RevHub {
+    readonly moduleAddress: number
     type: RevHubType;
+
     isParent(): this is ParentRevHub;
     isExpansionHub(): this is ExpansionHub;
-
-    readonly moduleAddress: number
 
     /**
      * Listen for errors that do not happen as a result of a specific function call
@@ -19,7 +19,8 @@ export interface RevHub {
 
 export interface ParentRevHub extends RevHub {
     readonly children: ReadonlyArray<RevHub>;
+    readonly serialNumber: string
+
     addChild(hub: RevHub): void;
     addChildByAddress(moduleAddress: number): Promise<RevHub>;
-    readonly serialNumber: string
 }
