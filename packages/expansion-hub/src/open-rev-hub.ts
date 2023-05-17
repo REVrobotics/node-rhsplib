@@ -1,15 +1,15 @@
 import {ExpansionHub, ParentExpansionHub} from "./ExpansionHub";
-import {Serial, SerialParity, SerialFlowControl, RevHub as NativeRevHub, RevHub} from "@rev-robotics/rhsplib";
-import {SerialPort} from "serialport";
+import {Serial as SerialPort, SerialParity, SerialFlowControl, RevHub as NativeRevHub, RevHub} from "@rev-robotics/rhsplib";
+import {SerialPort as SerialLister} from "serialport"
 import {ExpansionHubInternal} from "./internal/ExpansionHub";
 import {startKeepAlive} from "./start-keep-alive";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
- * Serial object at that path. The {@link Serial} object should be removed from
+ * Serial object at that path. The {@link SerialPort} object should be removed from
  * the map upon closing.
  */
-const openSerialMap = new Map<string, Serial>();
+const openSerialMap = new Map<string, SerialPort>();
 
 /**
  * Opens a parent Expansion Hub. Does not open any child hubs.
@@ -37,8 +37,9 @@ export async function openParentExpansionHub(serialNumber: string, moduleAddress
         moduleAddress = addresses.parentAddress;
     }
 
-    await parentHub.open(serial, moduleAddress);
+    await parentHub.open(moduleAddress);
     await parentHub.queryInterface("DEKA");
+    startKeepAlive(parentHub, 1000);
 
     if(parentHub.isParent()) {
         return parentHub;
@@ -74,10 +75,6 @@ export async function openExpansionHubAndAllChildren(serialNumber: string): Prom
         }
     }
 
-    await parentHub.open(serial, parentAddress);
-    await parentHub.queryInterface("DEKA");
-    startKeepAlive(parentHub, 1000);
-
     return parentHub;
 }
 
@@ -90,7 +87,7 @@ export async function openExpansionHubAndAllChildren(serialNumber: string): Prom
 async function getSerialPortPathForExHubSerial(
     serialNumber: string,
 ): Promise<string> {
-    const serialPorts = await SerialPort.list();
+    const serialPorts = await SerialLister.list();
     for (let i = 0; i < serialPorts.length; i++) {
         const portInfo = serialPorts[i];
         if (portInfo.serialNumber === serialNumber) {
@@ -104,19 +101,19 @@ async function getSerialPortPathForExHubSerial(
  * Closes the given Serial port and removes it from the open serial ports
  * list. This should be the preferred way to close a Serial port.
  *
- * @param serial the Serial port to close
+ * @param serialPort the Serial port to close
  */
-export function closeSerial(serial: Serial) {
+export function closeSerial(serialPort: SerialPort) {
     for(let [path, port] of openSerialMap.entries()) {
-        if(port === serial) {
+        if(port === serialPort) {
             openSerialMap.delete(path);
         }
     }
-    serial.close();
+    serialPort.close();
 }
 
-async function openSerial(serialPortPath: string): Promise<Serial> {
-    let serial = new Serial();
+async function openSerial(serialPortPath: string): Promise<SerialPort> {
+    let serial = new SerialPort();
     await serial.open(serialPortPath,
         460800,
         8,

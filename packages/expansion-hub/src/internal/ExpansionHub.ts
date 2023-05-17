@@ -5,7 +5,7 @@ import {
     I2CReadStatus,
     I2CSpeedCode, I2CWriteStatus, LEDPattern, ModuleInterface, ModuleStatus, PIDCoefficients,
     RevHub as NativeRevHub, RGB,
-    Serial, VerbosityLevel, Version
+    Serial as SerialPort, VerbosityLevel, Version
 } from "@rev-robotics/rhsplib"
 import {closeSerial} from "../open-rev-hub";
 import {ParentRevHub, RevHub} from "../RevHub";
@@ -13,20 +13,19 @@ import {EventEmitter} from "events";
 import {RevHubType} from "../RevHubType";
 
 export class ExpansionHubInternal implements ExpansionHub {
-    constructor(isParent: true, serial: Serial, serialNumber: string);
-    constructor(isParent: false);
-    constructor(isParent: boolean, serial?: Serial, serialNumber?: string) {
+    constructor(isParent: true, serial: SerialPort, serialNumber: string);
+    constructor(isParent: false, serial: SerialPort);
+    constructor(isParent: boolean, serialPort: SerialPort, serialNumber?: string) {
         this.nativeRevHub = new NativeRevHub();
         this.hubIsParent = isParent;
         this.serialNumber = serialNumber;
-        this.serial = serial;
+        this.serialPort = serialPort;
     }
 
     hubIsParent: boolean;
-    serialPort!: Serial;
+    serialPort: SerialPort;
     serialNumber: string | undefined;
     nativeRevHub: NativeRevHub;
-    serial?: Serial;
     moduleAddress!: number
     private children: RevHub[] = [];
     keepAliveTimer?: NodeJS.Timer;
@@ -51,7 +50,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     close(): void {
         //Closing a parent closes the serial port and all children
         if(this.isParent()) {
-            if(this.serial) closeSerial(this.serial);
+            if(this.serialPort) closeSerial(this.serialPort);
             this.children.forEach((child) => {
                 if(child.isExpansionHub()) {
                     child.close();
@@ -63,10 +62,9 @@ export class ExpansionHubInternal implements ExpansionHub {
         this.keepAliveTimer = undefined;
     }
 
-    open(serialPort: Serial, destAddress: number): Promise<void> {
-        this.serialPort = serialPort;
+    open(destAddress: number): Promise<void> {
         this.moduleAddress = destAddress;
-        return this.nativeRevHub.open(serialPort, destAddress);
+        return this.nativeRevHub.open(this.serialPort, destAddress);
     }
 
     getADC(): Promise<number> {
@@ -370,11 +368,8 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {
-        if (this.serialPort === undefined) {
-            throw new Error("Parent hub is not initialized. Can't add child.")
-        }
-        let childHub = new ExpansionHubInternal(false);
-        await childHub.open(this.serialPort!, moduleAddress);
+        let childHub = new ExpansionHubInternal(false, this.serialPort);
+        await childHub.open(moduleAddress);
         await childHub.queryInterface("DEKA");
 
         this.addChild(childHub);

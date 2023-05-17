@@ -22,8 +22,13 @@ if(options.list) {
             console.log(e);
         });
         console.log(await toString(hub));
-        hub.close();
     });
+
+    setTimeout(() => {
+        hubs.forEach(async (hub) => {
+            hub.close();
+        })
+    }, 2000);
 }
 
 if(options.close) {
