@@ -74,10 +74,6 @@ export async function openExpansionHubAndAllChildren(serialNumber: string): Prom
         }
     }
 
-    await parentHub.open(serial, parentAddress);
-    await parentHub.queryInterface("DEKA");
-    startKeepAlive(parentHub, 1000);
-
     return parentHub;
 }
 
