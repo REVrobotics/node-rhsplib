@@ -226,16 +226,8 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.sendReadCommand(packetTypeID, payload);
     }
 
-    sendReadCommandInternal(packetTypeID: number, payload: number[]): Promise<void> {
-        return this.nativeRevHub.sendReadCommandInternal(packetTypeID, payload);
-    }
-
     sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
         return this.nativeRevHub.sendWriteCommand(packetTypeID, payload);
-    }
-
-    sendWriteCommandInternal(packetTypeID: number, payload: number[]): Promise<void> {
-        return this.nativeRevHub.sendWriteCommandInternal(packetTypeID, payload);
     }
 
     setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<void> {

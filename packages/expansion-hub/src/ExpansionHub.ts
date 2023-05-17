@@ -15,9 +15,7 @@ export interface ExpansionHub extends RevHub {
     readonly isOpen: boolean
     responseTimeoutMs: number;
     close(): void;
-    sendWriteCommandInternal(packetTypeID: number, payload: number[]): Promise<void>;
     sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
-    sendReadCommandInternal(packetTypeID: number, payload: number[]): Promise<void>;
     sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
     getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus>;
     sendKeepAlive(): Promise<void>;
