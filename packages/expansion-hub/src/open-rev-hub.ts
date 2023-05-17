@@ -1,7 +1,8 @@
-import {ExpansionHub} from "./ExpansionHub";
-import {Serial, SerialParity, SerialFlowControl, RevHub as NativeRevHub} from "@rev-robotics/rhsplib";
+import {ExpansionHub, ParentExpansionHub} from "./ExpansionHub";
+import {Serial, SerialParity, SerialFlowControl, RevHub as NativeRevHub, RevHub} from "@rev-robotics/rhsplib";
 import {SerialPort} from "serialport";
 import {ExpansionHubInternal} from "./internal/ExpansionHub";
+import {startKeepAlive} from "./start-keep-alive";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
@@ -11,11 +12,16 @@ import {ExpansionHubInternal} from "./internal/ExpansionHub";
 const openSerialMap = new Map<string, Serial>();
 
 /**
- * Opens a parent REV hub, given that you know its {@link serialNumber} (should start with DQ).
+ * Opens a parent Expansion Hub. Does not open any child hubs.
  *
- * @param serialNumber the serial number of the REV hub
+ * Call {@link ExpansionHub#addChildByAddress} to add known children.
+ *
+ * @param serialNumber The serial number of the Expansion Hub (should start with "DQ")
+ * @param moduleAddress The module address of the parent (if this is not provided, it will take upwards of a second to
+ * find the address of the parent hub).
  */
-export async function openParentRevHub(serialNumber: string): Promise<ExpansionHub> {
+export async function openParentExpansionHub(serialNumber: string, moduleAddress?: number):
+    Promise<ParentExpansionHub> {
     let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
 
     if(openSerialMap.get(serialPortPath) == undefined) {
@@ -24,13 +30,53 @@ export async function openParentRevHub(serialNumber: string): Promise<ExpansionH
 
     let serial = openSerialMap.get(serialPortPath)!;
 
-    let parentHub = new ExpansionHubInternal(true, serial);
+    let parentHub = new ExpansionHubInternal(true, serial, serialNumber);
+
+    if(moduleAddress === undefined) {
+        let addresses = await RevHub.discoverRevHubs(serial);
+        moduleAddress = addresses.parentAddress;
+    }
+
+    await parentHub.open(serial, moduleAddress);
+    await parentHub.queryInterface("DEKA");
+
+    if(parentHub.isParent()) {
+        return parentHub;
+    } else {
+        throw new Error(`Hub at ${serialNumber} with moduleAddress ${moduleAddress} is not a parent`);
+    }
+}
+
+/**
+ * Opens a parent REV hub, given that you know its {@link serialNumber}, as well as all children.
+ * Determining the addresses of the parent and child hubs will take upwards of a second.
+ *
+ * @param serialNumber the serial number of the REV hub (should start with DQ)
+ */
+export async function openExpansionHubAndAllChildren(serialNumber: string): Promise<ParentExpansionHub> {
+    let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
+
+    if(openSerialMap.get(serialPortPath) == undefined) {
+        openSerialMap.set(serialPortPath, await openSerial(serialPortPath));
+    }
+
+    let serial = openSerialMap.get(serialPortPath)!;
 
     let discoveredModules = await NativeRevHub.discoverRevHubs(serial);
     let parentAddress = discoveredModules.parentAddress;
+    let parentHub =
+        await openParentExpansionHub(serialNumber, parentAddress) as ParentExpansionHub & ExpansionHubInternal;
+
+    for(let address of discoveredModules.childAddresses) {
+        let hub = await parentHub.addChildByAddress(address);
+        if(hub.isExpansionHub()) {
+            startKeepAlive(hub as ExpansionHubInternal, 1000)
+        }
+    }
 
     await parentHub.open(serial, parentAddress);
     await parentHub.queryInterface("DEKA");
+    startKeepAlive(parentHub, 1000);
 
     return parentHub;
 }

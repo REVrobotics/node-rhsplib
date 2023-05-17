@@ -7,22 +7,40 @@ import {
     RevHub as NativeRevHub, RGB,
     Serial, VerbosityLevel, Version
 } from "@rev-robotics/rhsplib"
-import {RevHubType} from "../RevHubType";
 import {closeSerial} from "../open-rev-hub";
+import {ParentRevHub, RevHub} from "../RevHub";
+import {EventEmitter} from "events";
+import {RevHubType} from "../RevHubType";
 
 export class ExpansionHubInternal implements ExpansionHub {
-    constructor(isParent: boolean, serial: Serial) {
+    constructor(isParent: true, serial: Serial, serialNumber: string);
+    constructor(isParent: false);
+    constructor(isParent: boolean, serial?: Serial, serialNumber?: string) {
         this.nativeRevHub = new NativeRevHub();
-        this.isParent = isParent;
+        this.hubIsParent = isParent;
+        this.serialNumber = serialNumber;
         this.serial = serial;
     }
 
+    hubIsParent: boolean;
+    serialPort!: Serial;
+    serialNumber: string | undefined;
     nativeRevHub: NativeRevHub;
-    children: Map<number, ExpansionHub> = new Map();
-    isParent: boolean
-    serial: Serial
+    serial?: Serial;
+    moduleAddress!: number
+    private children: RevHub[] = [];
+    keepAliveTimer?: NodeJS.Timer;
 
     type = RevHubType.ExpansionHub;
+    private emitter = new EventEmitter();
+
+    isParent(): this is ParentRevHub {
+        return this.hubIsParent;
+    }
+
+    isExpansionHub(): this is ExpansionHub {
+        return true;
+    }
 
     /**
      * Closes this hub and releases any resources bound to it.
@@ -32,15 +50,22 @@ export class ExpansionHubInternal implements ExpansionHub {
      */
     close(): void {
         //Closing a parent closes the serial port and all children
-        if(this.isParent) {
-            closeSerial(this.serial);
+        if(this.isParent()) {
+            if(this.serial) closeSerial(this.serial);
             this.children.forEach((child) => {
-                child.close();
+                if(child.isExpansionHub()) {
+                    child.close();
+                }
             })
         }
+
+        clearInterval(this.keepAliveTimer);
+        this.keepAliveTimer = undefined;
     }
 
     open(serialPort: Serial, destAddress: number): Promise<void> {
+        this.serialPort = serialPort;
+        this.moduleAddress = destAddress;
         return this.nativeRevHub.open(serialPort, destAddress);
     }
 
@@ -334,5 +359,41 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     writeI2CSingleByte(i2cChannel: number, slaveAddress: number, byte: number): Promise<void> {
         return this.nativeRevHub.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
+    }
+
+    getChildren(): ReadonlyArray<RevHub> {
+        return this.children;
+    }
+
+    addChild(hub: RevHub): void {
+        this.children.push(hub);
+    }
+
+    async addChildByAddress(moduleAddress: number): Promise<RevHub> {
+        if (this.serialPort === undefined) {
+            throw new Error("Parent hub is not initialized. Can't add child.")
+        }
+        let childHub = new ExpansionHubInternal(false);
+        await childHub.open(this.serialPort!, moduleAddress);
+        await childHub.queryInterface("DEKA");
+
+        this.addChild(childHub);
+
+        return childHub;
+    }
+
+    /**
+     * Listen for errors that do not happen as a result of a specific function call
+     *
+     * @param eventName
+     * @param listener
+     */
+    on(eventName: "error", listener: (error: Error) => void): RevHub {
+        this.emitter.on(eventName, listener);
+        return this;
+    }
+
+    emitError(error: Error) {
+        this.emitter.emit("error", error);
     }
 }
