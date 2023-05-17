@@ -6,7 +6,6 @@ const program = new Command();
 
 program.version('1.0.0')
     .option('-l --list', 'List connected devices')
-    .option('-c --close', 'Test closing a hub')
     .parse(process.argv);
 
 const options = program.opts();
@@ -29,16 +28,6 @@ if(options.list) {
             hub.close();
         })
     }, 2000);
-}
-
-if(options.close) {
-    for(let i = 0; i < 10; i++) {
-        const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
-        hubs.forEach(async (hub) => {
-            console.log(await toString(hub));
-            hub.close();
-        });
-    }
 }
 
 async function toString(hub: RevHub): Promise<string> {
