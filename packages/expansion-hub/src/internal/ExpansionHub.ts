@@ -41,12 +41,6 @@ export class ExpansionHubInternal implements ExpansionHub {
         return true;
     }
 
-    /**
-     * Closes this hub and releases any resources bound to it.
-     * If this hub is a parent hub, the Serial port will be closed
-     * and all children will be closed as well. Do not use this hub after
-     * it is closed.
-     */
     close(): void {
         //Closing a parent closes the serial port and all children
         if(this.isParent()) {
