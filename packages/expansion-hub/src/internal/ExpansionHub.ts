@@ -55,15 +55,15 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     get isOpen(): boolean {
-        return this.isOpened();
+        return this.nativeRevHub.isOpened();
     }
 
     get responseTimeoutMs(): number {
-        return this.getResponseTimeoutMs();
+        return this.nativeRevHub.getResponseTimeoutMs();
     }
 
     set responseTimeoutMs(timeout: number) {
-        this.setResponseTimeoutMs(timeout);
+        this.nativeRevHub.setResponseTimeoutMs(timeout);
     }
 
     getADC(): Promise<number> {
@@ -174,10 +174,6 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.getPhoneChargeControl();
     }
 
-    getResponseTimeoutMs(): number {
-        return this.nativeRevHub.getResponseTimeoutMs();
-    }
-
     getServoConfiguration(servoChannel: number): Promise<number> {
         return this.nativeRevHub.getServoConfiguration(servoChannel);
     }
@@ -192,10 +188,6 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     injectDataLogHint(hintText: string): Promise<void> {
         return this.nativeRevHub.injectDataLogHint(hintText);
-    }
-
-    isOpened(): boolean {
-        return this.nativeRevHub.isOpened();
     }
 
     queryInterface(interfaceName: string): Promise<ModuleInterface> {
@@ -329,10 +321,6 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     setPhoneChargeControl(chargeEnable: boolean): Promise<void> {
         return this.nativeRevHub.setPhoneChargeControl(chargeEnable);
-    }
-
-    setResponseTimeoutMs(responseTimeoutMs: number): void {
-        this.nativeRevHub.setResponseTimeoutMs(responseTimeoutMs);
     }
 
     setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void> {
