@@ -27,7 +27,12 @@ export class ExpansionHubInternal implements ExpansionHub {
     serialNumber: string | undefined;
     nativeRevHub: NativeRevHub;
     moduleAddress!: number
-    private children: RevHub[] = [];
+    private mutableChildren: RevHub[] = [];
+
+    get children(): ReadonlyArray<RevHub> {
+        return this.mutableChildren
+    }
+
     keepAliveTimer?: NodeJS.Timer;
 
     type = RevHubType.ExpansionHub;
@@ -59,6 +64,18 @@ export class ExpansionHubInternal implements ExpansionHub {
     open(destAddress: number): Promise<void> {
         this.moduleAddress = destAddress;
         return this.nativeRevHub.open(this.serialPort, destAddress);
+    }
+
+    get isOpen(): boolean {
+        return this.nativeRevHub.isOpened();
+    }
+
+    get responseTimeoutMs(): number {
+        return this.nativeRevHub.getResponseTimeoutMs();
+    }
+
+    set responseTimeoutMs(timeout: number) {
+        this.nativeRevHub.setResponseTimeoutMs(timeout);
     }
 
     getADC(): Promise<number> {
@@ -169,10 +186,6 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.getPhoneChargeControl();
     }
 
-    getResponseTimeoutMs(): number {
-        return this.nativeRevHub.getResponseTimeoutMs();
-    }
-
     getServoConfiguration(servoChannel: number): Promise<number> {
         return this.nativeRevHub.getServoConfiguration(servoChannel);
     }
@@ -187,10 +200,6 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     injectDataLogHint(hintText: string): Promise<void> {
         return this.nativeRevHub.injectDataLogHint(hintText);
-    }
-
-    isOpened(): boolean {
-        return this.nativeRevHub.isOpened();
     }
 
     queryInterface(interfaceName: string): Promise<ModuleInterface> {
@@ -229,16 +238,8 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.sendReadCommand(packetTypeID, payload);
     }
 
-    sendReadCommandInternal(packetTypeID: number, payload: number[]): Promise<void> {
-        return this.nativeRevHub.sendReadCommandInternal(packetTypeID, payload);
-    }
-
     sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
         return this.nativeRevHub.sendWriteCommand(packetTypeID, payload);
-    }
-
-    sendWriteCommandInternal(packetTypeID: number, payload: number[]): Promise<void> {
-        return this.nativeRevHub.sendWriteCommandInternal(packetTypeID, payload);
     }
 
     setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<void> {
@@ -306,6 +307,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     setNewModuleAddress(newModuleAddress: number): Promise<void> {
+        this.moduleAddress = newModuleAddress;
         return this.nativeRevHub.setNewModuleAddress(newModuleAddress);
     }
 
@@ -323,10 +325,6 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     setPhoneChargeControl(chargeEnable: boolean): Promise<void> {
         return this.nativeRevHub.setPhoneChargeControl(chargeEnable);
-    }
-
-    setResponseTimeoutMs(responseTimeoutMs: number): void {
-        this.nativeRevHub.setResponseTimeoutMs(responseTimeoutMs);
     }
 
     setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void> {
@@ -353,12 +351,8 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
     }
 
-    getChildren(): ReadonlyArray<RevHub> {
-        return this.children;
-    }
-
     addChild(hub: RevHub): void {
-        this.children.push(hub);
+        this.mutableChildren.push(hub);
     }
 
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {

@@ -12,7 +12,8 @@ import {ParentRevHub, RevHub} from "./RevHub";
 export type ParentExpansionHub = ParentRevHub & ExpansionHub
 
 export interface ExpansionHub extends RevHub {
-    isOpened(): boolean;
+    readonly isOpen: boolean
+    responseTimeoutMs: number;
 
     /**
      * Closes this hub and releases any resources bound to it.
@@ -21,13 +22,7 @@ export interface ExpansionHub extends RevHub {
      * it is closed.
      */
     close(): void;
-    setDestAddress(destAddress: number): void;
-    getDestAddress(): number;
-    setResponseTimeoutMs(responseTimeoutMs: number): void;
-    getResponseTimeoutMs(): number;
-    sendWriteCommandInternal(packetTypeID: number, payload: number[]): Promise<void>;
     sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
-    sendReadCommandInternal(packetTypeID: number, payload: number[]): Promise<void>;
     sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
     getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus>;
     sendKeepAlive(): Promise<void>;
@@ -89,14 +84,6 @@ export interface ExpansionHub extends RevHub {
     getMotorEncoderPosition(motorChannel: number): Promise<number>;
     setMotorPIDCoefficients(motorChannel: number, motorMode: number, pid: PIDCoefficients): Promise<void>;
     getMotorPIDCoefficients(motorChannel: number, motorMode: number): Promise<PIDCoefficients>;
-
-    // PWM
-    setPWMConfiguration(pwmChannel: number, framePeriod: number): Promise<void>;
-    getPWMConfiguration(pwmChannel: number): Promise<number>;
-    setPWMPulseWidth(pwmChannel: number, pulseWidth: number): Promise<void>;
-    getPWMPulseWidth(pwmChannel: number): Promise<number>;
-    setPWMEnable(pwmChannel: number, enable: boolean): Promise<void>;
-    getPWMEnable(pwmChannel: number): Promise<boolean>;
 
     // Servo
     setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void>;
