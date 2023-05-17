@@ -13,6 +13,6 @@
     "build": "tsc",
     "list": "node dist/main.js -l",
     "motor": "node dist/main.js -p 0.60",
-    "motor-position": "node dist/main.js --count 30000 && node dist/main.js --count 20"
+    "motor-position": "node dist/main.js --count 3000"
   }
 }

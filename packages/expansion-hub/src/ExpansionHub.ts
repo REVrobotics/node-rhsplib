@@ -7,18 +7,22 @@ import {
     RGB,
     VerbosityLevel, Version
 } from "@rev-robotics/rhsplib";
-import {RevHub} from "./RevHub";
+import {ParentRevHub, RevHub} from "./RevHub";
+
+export type ParentExpansionHub = ParentRevHub & ExpansionHub
 
 export interface ExpansionHub extends RevHub {
-    isOpened(): boolean;
+    readonly isOpen: boolean
+    responseTimeoutMs: number;
+
+    /**
+     * Closes this hub and releases any resources bound to it.
+     * If this hub is a parent hub, the serial port will be closed
+     * and all children will be closed as well. Do not use this hub after
+     * it has been closed.
+     */
     close(): void;
-    setDestAddress(destAddress: number): void;
-    getDestAddress(): number;
-    setResponseTimeoutMs(responseTimeoutMs: number): void;
-    getResponseTimeoutMs(): number;
-    sendWriteCommandInternal(packetTypeID: number, payload: number[]): Promise<void>;
     sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
-    sendReadCommandInternal(packetTypeID: number, payload: number[]): Promise<void>;
     sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
     getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus>;
     sendKeepAlive(): Promise<void>;
@@ -99,14 +103,6 @@ export interface ExpansionHub extends RevHub {
     setMotorPIDCoefficients(motorChannel: number, motorMode: number, pid: PIDCoefficients): Promise<void>;
     getMotorPIDCoefficients(motorChannel: number, motorMode: number): Promise<PIDCoefficients>;
 
-    // PWM
-    setPWMConfiguration(pwmChannel: number, framePeriod: number): Promise<void>;
-    getPWMConfiguration(pwmChannel: number): Promise<number>;
-    setPWMPulseWidth(pwmChannel: number, pulseWidth: number): Promise<void>;
-    getPWMPulseWidth(pwmChannel: number): Promise<number>;
-    setPWMEnable(pwmChannel: number, enable: boolean): Promise<void>;
-    getPWMEnable(pwmChannel: number): Promise<boolean>;
-
     // Servo
     setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void>;
     getServoConfiguration(servoChannel: number): Promise<number>;
@@ -114,6 +110,4 @@ export interface ExpansionHub extends RevHub {
     getServoPulseWidth(servoChannel: number): Promise<number>;
     setServoEnable(servoChannel: number, enable: boolean): Promise<void>;
     getServoEnable(servoChannel: number): Promise<boolean>;
-
-    children: Map<number, ExpansionHub>;
 }
