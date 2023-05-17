@@ -7,7 +7,7 @@ import {
     RevHub as NativeRevHub, RGB,
     Serial as SerialPort, VerbosityLevel, Version
 } from "@rev-robotics/rhsplib"
-import {closeSerial} from "../open-rev-hub";
+import {closeSerialPort} from "../open-rev-hub";
 import {ParentRevHub, RevHub} from "../RevHub";
 import {EventEmitter} from "events";
 import {RevHubType} from "../RevHubType";
@@ -49,7 +49,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     close(): void {
         //Closing a parent closes the serial port and all children
         if(this.isParent()) {
-            if(this.serialPort) closeSerial(this.serialPort);
+            if(this.serialPort) closeSerialPort(this.serialPort);
             this.children.forEach((child) => {
                 if(child.isExpansionHub()) {
                     child.close();

@@ -25,15 +25,15 @@ export async function openParentExpansionHub(serialNumber: string, moduleAddress
     let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
 
     if(openSerialMap.get(serialPortPath) == undefined) {
-        openSerialMap.set(serialPortPath, await openSerial(serialPortPath));
+        openSerialMap.set(serialPortPath, await openSerialPort(serialPortPath));
     }
 
-    let serial = openSerialMap.get(serialPortPath)!;
+    let serialPort = openSerialMap.get(serialPortPath)!;
 
-    let parentHub = new ExpansionHubInternal(true, serial, serialNumber);
+    let parentHub = new ExpansionHubInternal(true, serialPort, serialNumber);
 
     if(moduleAddress === undefined) {
-        let addresses = await RevHub.discoverRevHubs(serial);
+        let addresses = await RevHub.discoverRevHubs(serialPort);
         moduleAddress = addresses.parentAddress;
     }
 
@@ -58,12 +58,12 @@ export async function openExpansionHubAndAllChildren(serialNumber: string): Prom
     let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
 
     if(openSerialMap.get(serialPortPath) == undefined) {
-        openSerialMap.set(serialPortPath, await openSerial(serialPortPath));
+        openSerialMap.set(serialPortPath, await openSerialPort(serialPortPath));
     }
 
-    let serial = openSerialMap.get(serialPortPath)!;
+    let serialPort = openSerialMap.get(serialPortPath)!;
 
-    let discoveredModules = await NativeRevHub.discoverRevHubs(serial);
+    let discoveredModules = await NativeRevHub.discoverRevHubs(serialPort);
     let parentAddress = discoveredModules.parentAddress;
     let parentHub =
         await openParentExpansionHub(serialNumber, parentAddress) as ParentExpansionHub & ExpansionHubInternal;
@@ -103,7 +103,7 @@ async function getSerialPortPathForExHubSerial(
  *
  * @param serialPort the Serial port to close
  */
-export function closeSerial(serialPort: SerialPort) {
+export function closeSerialPort(serialPort: SerialPort) {
     for(let [path, port] of openSerialMap.entries()) {
         if(port === serialPort) {
             openSerialMap.delete(path);
@@ -112,7 +112,7 @@ export function closeSerial(serialPort: SerialPort) {
     serialPort.close();
 }
 
-async function openSerial(serialPortPath: string): Promise<SerialPort> {
+async function openSerialPort(serialPortPath: string): Promise<SerialPort> {
     let serial = new SerialPort();
     await serial.open(serialPortPath,
         460800,
