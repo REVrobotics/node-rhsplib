@@ -14,6 +14,13 @@ export type ParentExpansionHub = ParentRevHub & ExpansionHub
 export interface ExpansionHub extends RevHub {
     readonly isOpen: boolean
     responseTimeoutMs: number;
+
+    /**
+     * Closes this hub and releases any resources bound to it.
+     * If this hub is a parent hub, the serial port will be closed
+     * and all children will be closed as well. Do not use this hub after
+     * it has been closed.
+     */
     close(): void;
     sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
     sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]>;

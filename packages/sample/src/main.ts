@@ -5,7 +5,8 @@ import {RevHub} from "@rev-robotics/expansion-hub";
 const program = new Command();
 
 program.version('1.0.0')
-    .option('-l --list', 'List connected devices').parse(process.argv);
+    .option('-l --list', 'List connected devices')
+    .parse(process.argv);
 
 const options = program.opts();
 
@@ -21,6 +22,12 @@ if(options.list) {
         });
         console.log(await toString(hub));
     });
+
+    setTimeout(() => {
+        hubs.forEach(async (hub) => {
+            hub.close();
+        })
+    }, 2000);
 }
 
 async function toString(hub: RevHub): Promise<string> {
