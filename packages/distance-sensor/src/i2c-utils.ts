@@ -74,12 +74,35 @@ export async function readShort(
     return (bytes[0] << 8) | bytes[1];
 }
 
+export async function writeInt(
+    hub: ExpansionHub,
+    channel: number,
+    address: number,
+    register: number,
+    value: number,
+) {
+    await hub.writeI2CMultipleBytes(channel, address, [
+        register,
+        ...intToByteArray(value),
+    ]);
+}
+
 function shortToByteArray(value: number) {
-    // we want to represent the input as a 2-bytes array
     const byteArray = [0, 0];
 
     byteArray[0] = (value & 0xff00) >> 1;
     byteArray[1] = value & 0xff;
+
+    return byteArray;
+}
+
+function intToByteArray(value: number): number[] {
+    const byteArray = [0, 0, 0, 0];
+
+    byteArray[0] = (value & 0xff000000) >> 24;
+    byteArray[1] = (value & 0xff0000) >> 16;
+    byteArray[2] = (value & 0xff00) >> 8;
+    byteArray[3] = value & 0xff;
 
     return byteArray;
 }
