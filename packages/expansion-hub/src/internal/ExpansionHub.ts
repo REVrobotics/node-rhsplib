@@ -254,11 +254,6 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.setMotorChannelMode(motorChannel, motorMode, floatAtZero);
     }
 
-    /**
-     * Set the power for a motor
-     * @param motorChannel the motor
-     * @param powerLevel power in range [-1,1]
-     */
     setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
         return this.nativeRevHub.setMotorConstantPower(motorChannel, powerLevel*32_767);
     }

@@ -63,13 +63,31 @@ export interface ExpansionHub extends RevHub {
     getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus>;
 
     // Motor
+    /**
+     * Configure a specific motor
+     * @param motorChannel
+     * @param motorMode 0 for constant power, 1 for constant velocity, 2 for position
+     * @param floatAtZero whether to coast or break when power is set to 0
+     */
     setMotorChannelMode(motorChannel: number, motorMode: number, floatAtZero: boolean): Promise<void>;
     getMotorChannelMode(motorChannel: number): Promise<{motorMode: number, floatAtZero: boolean}>
+
+    /**
+     * Enable a motor. The motor must be configured before enabling.
+     * @param motorChannel
+     * @param enable
+     */
     setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void>;
     getMotorChannelEnable(motorChannel: number): Promise<boolean>;
     setMotorChannelCurrentAlertLevel(motorChannel: number, currentLimit_mA: number): Promise<void>;
     getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<number>;
     resetMotorEncoder(motorChannel: number): Promise<void>;
+
+    /**
+     * Set the power for a motor
+     * @param motorChannel the motor
+     * @param powerLevel power in range [-1,1]
+     */
     setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void>;
     getMotorConstantPower(motorChannel: number): Promise<number>;
     setMotorTargetVelocity(motorChannel: number, velocity_cps: number): Promise<void>;
