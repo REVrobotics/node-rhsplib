@@ -38,13 +38,19 @@ if(options.distance) {
     console.log("Checking sensor type");
 
     console.log(`Is 2m distance sensor? ${await sensor.is2mDistanceSensor()}`)
-    if(! (await sensor.is2mDistanceSensor())) {
+    if(!(await sensor.is2mDistanceSensor())) {
         console.log("Sensor is not a valid distance sensor!");
     }
 
     console.log("Initializing sensor");
 
     await sensor.initialize();
+
+    setInterval(async () => {
+        let distance = await sensor.getDistanceMillimeters();
+
+        console.log(`Distance is ${distance}mm`);
+    }, 1000);
 }
 
 async function toString(hub: RevHub): Promise<string> {

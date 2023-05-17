@@ -1,7 +1,7 @@
 import {ExpansionHub} from "@rev-robotics/expansion-hub";
 import {
     readRegister,
-    readRegisterMultipleBytes, readShort,
+    readRegisterMultipleBytes, readShort, writeInt,
     writeRegister,
     writeRegisterMultipleBytes,
     writeShort
@@ -18,6 +18,7 @@ export class DistanceSensor {
     private address: number = 0x52/2;
     private spadCount = 0;
     private spadTypeIsAperture = false;
+    private stopValue = 0;
 
     async is2mDistanceSensor(): Promise<boolean> {
         if ((await this.readRegister(0xc0)) != 0xee) return false;
@@ -27,13 +28,28 @@ export class DistanceSensor {
         else return true;
     }
 
+    async getDistanceMillimeters(): Promise<number> {
+        try {
+            let range = await this.readShort(0x14 + 10);
+            await this.writeRegister(0x0b, 0x01);
+
+            return range;
+        } catch(e) {
+            console.log("Got error:");
+            console.log(e);
+        }
+        return -1;
+    }
+
     async initialize() {
+        //set I2C standard mode
         await this.writeRegister(0x88, 0x00);
+
         await this.writeRegister(0x80, 0x01);
         await this.writeRegister(0xff, 0x01);
         await this.writeRegister(0x00, 0x00);
 
-        let stopValue = await this.readRegister(0x91);
+        this.stopValue = await this.readRegister(0x91);
 
         await this.writeRegister(0x00, 0x01);
         await this.writeRegister(0xff, 0x00);
@@ -56,21 +72,30 @@ export class DistanceSensor {
         await this.writeRegister(0xff, 0x00);
         await this.writeRegister(0xb6, 0xb4);
 
+        console.log(refSpadMap.map((n) => n.toString(2).padStart(8, '0')));
+
         let firstSpadToEnable = (this.spadTypeIsAperture) ? 12 : 0;
         let spadsEnabled = 0;
 
-        for(let i = 0; i < 48; i++) {
-            if(i < firstSpadToEnable || spadsEnabled == this.spadCount) {
-                refSpadMap[i/8] &= ~(1 << (i%8));
-            } else if(((refSpadMap[i/8] >> (i%8)) & 0x01) != 0) {
+        console.log(`Spad count: ${this.spadCount}`);
+        console.log(`First spad to enable is ${firstSpadToEnable}`);
+
+        for (let i = 0; i < 48; i++) {
+            let mapIndex = Math.floor(i / 8);
+            if (i < firstSpadToEnable || spadsEnabled == this.spadCount) {
+                refSpadMap[i / 8] &= ~(1 << (i % 8));
+            } else if (((refSpadMap[mapIndex] >> (i % 8)) & 0x1) != 0) {
                 spadsEnabled++;
             }
         }
 
-        console.log(refSpadMap);
+        console.log(`Spads Enabled: ${spadsEnabled}`);
+
+        console.log(refSpadMap.map((n) => n.toString(2).padStart(8, '0')));
+
+        await this.writeMultipleBytes(0xb0, refSpadMap);
 
         //begin load tuning settings
-        await this.writeMultipleBytes(0xb0, refSpadMap);
 
         await this.writeRegister(0xFF, 0x01);
         await this.writeRegister(0x00, 0x00);
@@ -171,11 +196,13 @@ export class DistanceSensor {
         await this.writeRegister(0x84, await this.readRegister(0x84) & ~0x10); //active low
         await this.writeRegister(0x0b, 0x01);
 
-        let measurementTimingBudget = this.getMeasurementTimingBudget();
+        let measurementTimingBudget = await this.getMeasurementTimingBudget();
+        console.log(`Timing budget: ${measurementTimingBudget}`);
 
         await this.writeRegister(0x01, 0xE8);
 
         //set measurement timing budget
+        await this.setMeasurementTimingBudget(measurementTimingBudget);
 
         await this.writeRegister(0x01, 0x01);
         if(!await this.performCalibration(0x40)) return false;
@@ -185,6 +212,28 @@ export class DistanceSensor {
 
         //Restore previous config
         await this.writeRegister(0x01, 0xE8);
+
+        console.log("Starting continuous");
+        await this.startContinuous(0);
+    }
+
+    private async startContinuous(periodMs: number = 0) {
+        await this.writeRegister(0x80, 0x01);
+        await this.writeRegister(0xff, 0x01);
+        await this.writeRegister(0x00, 0x00);
+        await this.writeRegister(0x91, this.stopValue);
+        await this.writeRegister(0x00, 0x01);
+        await this.writeRegister(0xFF, 0x00);
+        await this.writeRegister(0x80, 0x00);
+
+        if(periodMs != 0) {
+            let calibrateValue = await this.readShort(0xf8);
+            if(calibrateValue != 0) {
+                periodMs *= calibrateValue;
+            }
+
+            await this.writeInt(0x04, periodMs);
+        }
     }
 
     private async performCalibration(input: number): Promise<boolean> {
@@ -192,6 +241,48 @@ export class DistanceSensor {
 
         await this.writeRegister(0x0B, 0x01);
         await this.writeRegister(0x00, 0x00);
+
+        return true;
+    }
+
+    private async setMeasurementTimingBudget(budget: number): Promise<boolean> {
+        if(budget < 20000) return false;
+
+        let usedBudget = 1320 + 960;
+
+        let enables = await this.getSequenceStepEnables();
+        let timeouts = await this.getSequenceStepTimeouts(enables);
+
+        if(enables.tcc) {
+            usedBudget += timeouts.msrc_dss_tcc_us + 590;
+        }
+
+        if(enables.dss) {
+            usedBudget += 2 * (timeouts.msrc_dss_tcc_us + 690);
+        } else if(enables.msrc) {
+            usedBudget += timeouts.msrc_dss_tcc_us + 660;
+        }
+
+        if(enables.pre_range) {
+            usedBudget += timeouts.pre_range_us + 660;
+        }
+
+        if(enables.final_range) {
+            usedBudget += 550;
+
+            if(usedBudget > budget) return false;
+
+            let finalTimeout = budget - usedBudget;
+
+            let finalTimeoutMclks = this.timeoutMclksToMicroseconds(finalTimeout,
+                timeouts.final_range_vcsel_period_pclks);
+
+            if(enables.pre_range) {
+                finalTimeoutMclks += timeouts.pre_range_mclks;
+            }
+
+            await this.writeShort(0x71, this.encodeTimeout(finalTimeoutMclks));
+        }
 
         return true;
     }
@@ -248,6 +339,22 @@ export class DistanceSensor {
         return result;
     }
 
+    private encodeTimeout(mclks: number): number {
+        if(mclks> 0) {
+            let leastSignificantByte = mclks-1;
+            let mostSignificantByte = 0;
+
+            while((leastSignificantByte & 0xFFFFFF00) > 0) {
+                leastSignificantByte >>= 1;
+                mostSignificantByte++;
+            }
+
+            return (mostSignificantByte << 8) | (leastSignificantByte & 0xFF);
+        } else {
+            return 0;
+        }
+    }
+
     private decodeTimeout(value: number): number {
         return ((value & 0x00FF) << ((value & 0xFF00) >> 8)) + 1;
     }
@@ -290,8 +397,8 @@ export class DistanceSensor {
         await this.writeRegister(0x80, 0x01);
         await this.writeRegister(0xFF, 0x01);
         await this.writeRegister(0x00, 0x00);
-        await this.writeRegister(0xFF, 0x06);
 
+        await this.writeRegister(0xFF, 0x06);
         await this.writeRegister(0x83, await this.readRegister(0x83) | 0x04);
         await this.writeRegister(0xFF, 0x07);
         await this.writeRegister(0x81, 0x01);
@@ -307,7 +414,7 @@ export class DistanceSensor {
         let tmp = await this.readRegister(0x92);
 
         this.spadCount = tmp & 0x7f;
-        this.spadTypeIsAperture = ((tmp >> 7) & 0x01) == 0;
+        this.spadTypeIsAperture = ((tmp >> 7) & 0x01) != 0;
 
         await this.writeRegister(0x81, 0x00);
         await this.writeRegister(0xff, 0x06);
@@ -341,6 +448,10 @@ export class DistanceSensor {
 
     private async readShort(register: number): Promise<number> {
         return await readShort(this.hub, this.channel, this.address, register);
+    }
+
+    private async writeInt(register: number, value: number) {
+        await writeInt(this.hub, this.channel, this.address, register, value);
     }
 }
 
