@@ -1,11 +1,14 @@
 import {Command} from "commander";
 import {ExpansionHub, getConnectedExpansionHubs} from "@rev-robotics/expansion-hub";
 import {RevHub} from "@rev-robotics/expansion-hub";
+import {DistanceSensor} from "@rev-robotics/distance-sensor";
 
 const program = new Command();
 
 program.version('1.0.0')
-    .option('-l --list', 'List connected devices').parse(process.argv);
+    .option('-l --list', 'List connected devices')
+    .option('-d --distance <channel>', 'Print distance sensor output')
+    .parse(process.argv);
 
 const options = program.opts();
 
@@ -21,6 +24,27 @@ if(options.list) {
         });
         console.log(await toString(hub));
     });
+}
+
+if(options.distance) {
+    let channel = Number(options.distance)
+    console.log(`Channel number is ${channel}`);
+
+    let hubs = await getConnectedExpansionHubs();
+    let hub = hubs[0];
+
+    let sensor = new DistanceSensor(hub, channel);
+
+    console.log("Checking sensor type");
+
+    console.log(`Is 2m distance sensor? ${await sensor.is2mDistanceSensor()}`)
+    if(! (await sensor.is2mDistanceSensor())) {
+        console.log("Sensor is not a valid distance sensor!");
+    }
+
+    console.log("Initializing sensor");
+
+    await sensor.initialize();
 }
 
 async function toString(hub: RevHub): Promise<string> {

@@ -7,10 +7,12 @@
   "type": "module",
   "dependencies": {
     "@rev-robotics/expansion-hub": "*",
+    "@rev-robotics/distance-sensor": "*",
     "commander": "^10.0.1"
   },
   "scripts": {
     "build": "tsc",
+    "distance": "node dist/main.js -d 1",
     "list": "node dist/main.js -l"
   }
 }
