@@ -94,7 +94,7 @@ if(options.distance) {
     setTimeout(async () => {
         clearInterval(timer);
         hub.close();
-    }, 10000);
+    }, 20000);
 }
 
 async function toString(hub: RevHub): Promise<string> {
