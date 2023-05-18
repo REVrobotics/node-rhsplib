@@ -7,6 +7,8 @@ import {
     writeShort
 } from "./i2c-utils";
 
+import * as register from './registers';
+
 export class DistanceSensor {
     constructor(hub: ExpansionHub, channel: number) {
         this.hub = hub;
@@ -30,8 +32,8 @@ export class DistanceSensor {
 
     async getDistanceMillimeters(): Promise<number> {
         try {
-            let range = await this.readShort(0x14 + 10);
-            await this.writeRegister(0x0b, 0x01);
+            let range = await this.readShort(register.RESULT_RANGE_STATUS  + 10);
+            await this.writeRegister(register.SYSTEM_INTERRUPT_CLEAR, 0x01);
 
             return range;
         } catch(e) {
@@ -41,8 +43,7 @@ export class DistanceSensor {
         return -1;
     }
 
-    async initialize() {
-        //set I2C standard mode
+    async initData() {
         await this.writeRegister(0x88, 0x00);
 
         await this.writeRegister(0x80, 0x01);
@@ -51,45 +52,14 @@ export class DistanceSensor {
 
         this.stopValue = await this.readRegister(0x91);
 
+        console.log(`Stop Value: ${this.stopValue}`);
+
         await this.writeRegister(0x00, 0x01);
         await this.writeRegister(0xff, 0x00);
         await this.writeRegister(0x80, 0x00);
+    }
 
-        let msgConfigControl = (await this.readRegister(0x60)) | 0x12;
-        await this.writeRegister(0x60, msgConfigControl);
-
-        await this.setSignalRateLimit(0.25);
-
-        await this.writeRegister(0x01, 0xff);
-
-        await this.getSpadInfo();
-
-        let refSpadMap = await this.readMultipleBytes(0xb0, 6);
-
-        await this.writeRegister(0xff, 0x01);
-        await this.writeRegister(0x4f, 0x00);
-        await this.writeRegister(0x4e, 0x2c);
-        await this.writeRegister(0xff, 0x00);
-        await this.writeRegister(0xb6, 0xb4);
-
-        let firstSpadToEnable = (this.spadTypeIsAperture) ? 12 : 0;
-        let spadsEnabled = 0;
-
-        for (let i = 0; i < 48; i++) {
-            let mapIndex = Math.floor(i / 8);
-            if (i < firstSpadToEnable || spadsEnabled == this.spadCount) {
-                refSpadMap[mapIndex] &= ~(1 << (i % 8)); //disable this spad.
-            } else if (((refSpadMap[mapIndex] >> (i % 8)) & 0x1) != 0) {
-                spadsEnabled++;
-            }
-        }
-
-        console.log(refSpadMap.map((n) => n.toString(2).padStart(8, '0')));
-
-        await this.writeMultipleBytes(0xb0, refSpadMap);
-
-        //begin load tuning settings
-
+    async loadTuningSettings() {
         await this.writeRegister(0xFF, 0x01);
         await this.writeRegister(0x00, 0x00);
 
@@ -183,33 +153,71 @@ export class DistanceSensor {
         await this.writeRegister(0x00, 0x01);
         await this.writeRegister(0xFF, 0x00);
         await this.writeRegister(0x80, 0x00);
-        // end load tuning settings
+    }
 
-        await this.writeRegister(0x0a, 0x04);
-        await this.writeRegister(0x84, (await this.readRegister(0x84)) & ~0x10); //active low
-        await this.writeRegister(0x0b, 0x01);
+    async initialize() {
+        //set I2C standard mode
+        await this.initData();
+
+        let msgConfigControl = (await this.readRegister(register.MSRC_CONFIG_CONTROL)) | 0x12;
+        await this.writeRegister(register.MSRC_CONFIG_CONTROL, msgConfigControl);
+
+        await this.setSignalRateLimit(0.25);
+
+        await this.writeRegister(register.SYSTEM_SEQUENCE_CONFIG, 0xff);
+
+        await this.getSpadInfo();
+
+        let refSpadMap = await this.readMultipleBytes(register.GLOBAL_CONFIG_SPAD_ENABLES_REF_0, 6);
+
+        await this.writeRegister(0xff, 0x01);
+        await this.writeRegister(register.DYNAMIC_SPAD_REF_EN_START_OFFSET, 0x00);
+        await this.writeRegister(register.DYNAMIC_SPAD_NUM_REQUESTED_REF_SPAD, 0x2c);
+        await this.writeRegister(0xff, 0x00);
+        await this.writeRegister(register.GLOBAL_CONFIG_REF_EN_START_SELECT, 0xb4);
+
+        let firstSpadToEnable = (this.spadTypeIsAperture) ? 12 : 0;
+        let spadsEnabled = 0;
+
+        for (let i = 0; i < 48; i++) {
+            let mapIndex = Math.floor(i / 8);
+            if (i < firstSpadToEnable || spadsEnabled == this.spadCount) {
+                refSpadMap[mapIndex] &= ~(1 << (i % 8)); //disable this spad.
+            } else if (((refSpadMap[mapIndex] >> (i % 8)) & 0x1) != 0) {
+                spadsEnabled++;
+            }
+        }
+
+        await this.writeMultipleBytes(register.GLOBAL_CONFIG_SPAD_ENABLES_REF_0, refSpadMap);
+
+        await this.loadTuningSettings()
+
+        await this.writeRegister(register.SYSTEM_INTERRUPT_CONFIG_GPIO, 0x04);
+        await this.writeRegister(register.GPIO_HV_MUX_ACTIVE_HIGH,
+            (await this.readRegister(register.GPIO_HV_MUX_ACTIVE_HIGH)) & ~0x10); //active low
+        await this.writeRegister(register.SYSTEM_INTERRUPT_CLEAR, 0x01);
 
         let measurementTimingBudget = await this.getMeasurementTimingBudget();
         console.log(`Timing budget: ${measurementTimingBudget}`);
 
-        await this.writeRegister(0x01, 0xE8);
+        await this.writeRegister(register.SYSTEM_SEQUENCE_CONFIG, 0xE8);
 
         //set measurement timing budget
         await this.setMeasurementTimingBudget(measurementTimingBudget);
 
-        // await this.writeRegister(0x01, 0x01);
+        // await this.writeRegister(SYSTEM_SEQUENCE_CONFIG, 0x01);
         // if(!await this.performCalibration(0x40)) return false;
         //
-        // await this.writeRegister(0x01, 0x02);
+        // await this.writeRegister(SYSTEM_SEQUENCE_CONFIG, 0x02);
         // if(!await this.performCalibration(0x00)) return false;
         //
         // //Restore previous config
-        // await this.writeRegister(0x01, 0xE8);
+        // await this.writeRegister(SYSTEM_SEQUENCE_CONFIG, 0xE8);
 
-        let config = await this.readRegister(0x01);
-        await this.writeRegister(0x01, 0x02);
-        await this.performCalibration(0x0);
-        await this.writeRegister(0x01, config);
+        let config = await this.readRegister(register.SYSTEM_SEQUENCE_CONFIG);
+        await this.writeRegister(register.SYSTEM_SEQUENCE_CONFIG, 0x02);
+        await this.performCalibration(0x00);
+        await this.writeRegister(register.SYSTEM_SEQUENCE_CONFIG, config);
 
         console.log("Starting continuous");
         await this.startContinuous(0);
@@ -389,7 +397,11 @@ export class DistanceSensor {
     }
 
     private async setSignalRateLimit(mcps: number): Promise<void> {
-        await this.writeShort(0x44, (mcps * (1<<7)));
+        await this.writeShort(register.FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT, (mcps * (1<<7)));
+    }
+
+    private async getSignalRateLimit(): Promise<number> {
+        return (await this.readShort(register.FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT)) / (1 << 7);
     }
 
     // Get reference SPAD (single photon avalanche diode) count and type
@@ -409,17 +421,20 @@ export class DistanceSensor {
         await this.writeRegister(0x94, 0x6b);
         await this.writeRegister(0x83, 0x00);
 
-        // reference has a timeout mechanism, but it doesn't seem to be necessary
+        //wait for the device to be ready
+        while(await this.readRegister(0x83) == 0);
 
         await this.writeRegister(0x83, 0x01);
         let tmp = await this.readRegister(0x92);
 
         this.spadCount = tmp & 0x7f;
         this.spadTypeIsAperture = ((tmp >> 7) & 0x01) != 0;
+        console.log(`Spad Count is ${this.spadCount}. Is Aperture? ${this.spadTypeIsAperture}`);
 
         await this.writeRegister(0x81, 0x00);
         await this.writeRegister(0xff, 0x06);
-        await this.writeRegister(0x83, await this.readRegister(0x83) & ~0x04);
+        let value = await this.readRegister(0x83);
+        await this.writeRegister(0x83, value & 0xfb);
         await this.writeRegister(0xff, 0x01);
         await this.writeRegister(0x00, 0x01);
 
