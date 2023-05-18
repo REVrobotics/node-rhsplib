@@ -13,7 +13,7 @@ We have several packages currently:
 2. `expansion-hub`: High-level interaction with a REV expansion hub.
 3. `sample`: Command line app useful for testing and showing features.
 
-## building and other tasks
+## Building and other tasks
 
 To build the app, run `lerna run build`.
 If you have other tasks you wish to create, define 
