@@ -203,11 +203,10 @@ export class DistanceSensor {
         await this.writeRegister(0x01, 0x01);
         if (!(await this.performCalibration(0x40))) return false;
 
+        let config = await this.readRegister(0x01);
         await this.writeRegister(0x01, 0x02);
-        if (!(await this.performCalibration(0x00))) return false;
-
-        //Restore previous config
-        await this.writeRegister(0x01, 0xe8);
+        await this.performCalibration(0x0);
+        await this.writeRegister(0x01, config);
 
         console.log("Starting continuous");
         await this.startContinuous(0);
@@ -229,6 +228,9 @@ export class DistanceSensor {
             }
 
             await this.writeInt(0x04, periodMs);
+            await this.writeRegister(0x00, 0x04);
+        } else {
+            await this.writeRegister(0x00, 0x02);
         }
     }
 
