@@ -22,7 +22,7 @@ them in the module's package.json like normal, and run
 module that has a task with that name.
 
 Tasks in the top-level package.json can be run with 
-npm run like normal.
+`npm run` like normal.
 
 ## Making a release
 
