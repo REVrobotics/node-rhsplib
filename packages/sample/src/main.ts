@@ -1,7 +1,7 @@
 import {Command} from "commander";
 import {
-    createLEDPattern,
-    createLEDPatternStep,
+    createLedPattern,
+    createLedPatternStep,
     ExpansionHub,
     getConnectedExpansionHubs,
     RevHub
@@ -39,15 +39,15 @@ if(options.list) {
 if(options.led) {
     const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
     const steps = [
-        createLEDPatternStep(1, 0, 255, 0), //green
-        createLEDPatternStep(1, 255, 0, 0), //red
-        createLEDPatternStep(1, 0, 0, 255), //blue
-        createLEDPatternStep(1, 255, 0, 255), //magenta
-        createLEDPatternStep(1, 255, 255, 0), //yellow
+        createLedPatternStep(1, 0, 255, 0), //green
+        createLedPatternStep(1, 255, 0, 0), //red
+        createLedPatternStep(1, 0, 0, 255), //blue
+        createLedPatternStep(1, 255, 0, 255), //magenta
+        createLedPatternStep(1, 255, 255, 0), //yellow
     ]
     await hubs[0].sendKeepAlive();
-    const pattern = createLEDPattern(steps);
-    await hubs[0].setModuleLEDPattern(pattern);
+    const pattern = createLedPattern(steps);
+    await hubs[0].setModuleLedPattern(pattern);
 
     setInterval(async () => {
         await hubs[0].sendKeepAlive();
