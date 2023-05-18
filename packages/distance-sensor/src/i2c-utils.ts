@@ -32,8 +32,7 @@ export async function writeRegisterMultipleBytes(
     register: number,
     values: number[]
 ): Promise<void> {
-    await hub.writeI2CSingleByte(channel, address, register);
-    await hub.writeI2CMultipleBytes(channel, address, values);
+    await hub.writeI2CMultipleBytes(channel, address, [register, ...values]);
 }
 
 export async function writeRegister(
@@ -93,9 +92,9 @@ function shortToByteArray(value: number) {
 function intToByteArray(value: number): number[] {
     const byteArray = [0, 0, 0, 0];
 
-    byteArray[0] = (value & 0xFF000000) >> 24;
-    byteArray[1] = (value & 0xFF0000) >> 16;
-    byteArray[2] = (value & 0xFF00) >> 8;
+    byteArray[0] = (value >> 24) & 0xFF;
+    byteArray[1] = (value >> 16) & 0xFF;
+    byteArray[2] = (value >> 8) & 0xFF;
     byteArray[3] = value & 0xFF;
 
     return byteArray;
