@@ -2,7 +2,7 @@
 
 This project enables Node.js applications to control devices that speak the REV Hub Serial Protocol (such as the REV Robotics Expansion Hub).
 
-## package structure
+## Package structure
 
 This project uses [lerna](https://lerna.js.org) for
 multi-package builds.
