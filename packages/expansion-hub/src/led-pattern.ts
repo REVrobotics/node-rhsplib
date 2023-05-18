@@ -3,13 +3,34 @@ import {LEDPattern} from "@rev-robotics/rhsplib";
 /**
  * Create the value representing an LED step.
  *
- * @param t time in seconds
- * @param r red value (0 to 255)
- * @param g green value (0 to 255)
- * @param b blue value (0 to 255)
+ * @param step
  */
-export function createLedPatternStep(t: number, r: number, g: number, b: number): number {
-    return (r & 0xFF) << 24 | (g & 0xFF) << 16 | (b & 0xFF) << 8 | (t*10 & 0xFF);
+function createLedPatternStep(step: LedPatternStep): number {
+    return (step.r & 0xFF) << 24 | (step.g & 0xFF) << 16 | (step.b & 0xFF) << 8 | (step.t*10 & 0xFF);
+}
+
+/**
+ * Represents a step in an LED pattern
+ */
+export class LedPatternStep {
+    r: number;
+    g: number;
+    b: number;
+    t: number;
+
+    /**
+     *
+     * @param r red component [0, 255]
+     * @param g green component [0, 255]
+     * @param b blue component [0, 255]
+     * @param t time in seconds
+     */
+    constructor(t: number, r: number, g: number, b: number) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.t = t;
+    }
 }
 
 /**
@@ -17,7 +38,7 @@ export function createLedPatternStep(t: number, r: number, g: number, b: number)
  *
  * @param ledSteps list of led steps created using {@link createLedPatternStep}
  */
-export function createLedPattern(ledSteps: number[]): LEDPattern {
+export function createLedPattern(ledSteps: LedPatternStep[]): LEDPattern {
     return {
         rgbtPatternStep0: getOrZero(ledSteps, 0),
         rgbtPatternStep1: getOrZero(ledSteps, 1),
@@ -38,7 +59,7 @@ export function createLedPattern(ledSteps: number[]): LEDPattern {
     };
 }
 
-function getOrZero(arr: number[], index: number) {
-    if(index < arr.length) return arr[index];
+function getOrZero(arr: LedPatternStep[], index: number): number {
+    if(index < arr.length) return createLedPatternStep(arr[index]);
     return 0;
 }

@@ -1,9 +1,8 @@
 import {Command} from "commander";
 import {
     createLedPattern,
-    createLedPatternStep,
     ExpansionHub,
-    getConnectedExpansionHubs,
+    getConnectedExpansionHubs, LedPatternStep,
     RevHub
 } from "@rev-robotics/expansion-hub";
 
@@ -39,11 +38,11 @@ if(options.list) {
 if(options.led) {
     const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
     const steps = [
-        createLedPatternStep(1, 0, 255, 0), //green
-        createLedPatternStep(1, 255, 0, 0), //red
-        createLedPatternStep(1, 0, 0, 255), //blue
-        createLedPatternStep(1, 255, 0, 255), //magenta
-        createLedPatternStep(1, 255, 255, 0), //yellow
+        new LedPatternStep(1, 0, 255, 0), //green
+        new LedPatternStep(1, 255, 0, 0), //red
+        new LedPatternStep(1, 0, 0, 255), //blue
+        new LedPatternStep(1, 255, 0, 255), //magenta
+        new LedPatternStep(1, 255, 255, 0), //yellow
     ]
     await hubs[0].sendKeepAlive();
     const pattern = createLedPattern(steps);
