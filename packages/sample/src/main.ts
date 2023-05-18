@@ -1,5 +1,5 @@
 import {Command} from "commander";
-import {ExpansionHub, getConnectedExpansionHubs} from "@rev-robotics/expansion-hub";
+import {ExpansionHub, openConnectedExpansionHubs} from "@rev-robotics/expansion-hub";
 import {RevHub} from "@rev-robotics/expansion-hub";
 
 const program = new Command();
@@ -14,7 +14,7 @@ console.log("Starting...");
 
 if(options.list) {
     console.log("Starting to search Serial Ports")
-    const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
+    const hubs: ExpansionHub[] = await openConnectedExpansionHubs();
     hubs.forEach(async (hub) => {
         hub.on("error", (e: any) => {
             console.log(`Got error:`);
