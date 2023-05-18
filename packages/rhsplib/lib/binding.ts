@@ -170,7 +170,7 @@ export declare class RevHub {
 
   // Device Control
   getBulkInputData(): Promise<BulkInputData>;
-  getADC(): Promise<number>;
+  getADC(channel: number, rawMode: number): Promise<number>;
   setPhoneChargeControl(chargeEnable: boolean): Promise<void>;
   getPhoneChargeControl(): Promise<boolean>;
   injectDataLogHint(hintText: string): Promise<void>;

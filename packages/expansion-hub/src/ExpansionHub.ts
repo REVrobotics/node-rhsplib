@@ -38,7 +38,7 @@ export interface ExpansionHub extends RevHub {
 
     // Device Control
     getBulkInputData(): Promise<BulkInputData>;
-    getADC(): Promise<number>;
+    getADC(channel: number, rawMode: boolean): Promise<number>;
     setPhoneChargeControl(chargeEnable: boolean): Promise<void>;
     getPhoneChargeControl(): Promise<boolean>;
     injectDataLogHint(hintText: string): Promise<void>;

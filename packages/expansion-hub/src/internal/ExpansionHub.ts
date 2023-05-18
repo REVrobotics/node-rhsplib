@@ -78,8 +78,8 @@ export class ExpansionHubInternal implements ExpansionHub {
         this.nativeRevHub.setResponseTimeoutMs(timeout);
     }
 
-    getADC(): Promise<number> {
-        return this.nativeRevHub.getADC();
+    getADC(channel: number, rawMode: boolean): Promise<number> {
+        return this.nativeRevHub.getADC(channel, rawMode ? 1 : 0);
     }
 
     getBulkInputData(): Promise<BulkInputData> {

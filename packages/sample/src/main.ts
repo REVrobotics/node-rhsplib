@@ -6,6 +6,7 @@ const program = new Command();
 
 program.version('1.0.0')
     .option('-l --list', 'List connected devices')
+    .option('-a --analog', 'Run the analog demo')
     .parse(process.argv);
 
 const options = program.opts();
@@ -28,6 +29,16 @@ if(options.list) {
             hub.close();
         })
     }, 2000);
+}
+
+if(options.analog) {
+    const hubs = await getConnectedExpansionHubs();
+
+    while(true) {
+        let value = await hubs[0].getADC(0, false);
+        let value2 = await hubs[0].getADC(2, false);
+        console.log(`ADC: ${value.toString().padStart(4)}   ${value2.toString().padStart(4)}`);
+    }
 }
 
 async function toString(hub: RevHub): Promise<string> {
