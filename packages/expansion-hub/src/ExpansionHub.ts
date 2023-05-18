@@ -1,19 +1,19 @@
 import {
     BulkInputData,
     DebugGroup,
-    DIODirection,
+    DioDirection,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
-    LEDPattern,
+    LedPattern,
     ModuleInterface,
     ModuleStatus,
-    PIDCoefficients,
-    RGB,
+    PidCoefficients,
+    Rgb,
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rhsplib";
-import { ParentRevHub, RevHub } from "./RevHub";
+import { ParentRevHub, RevHub } from "@rev-robotics/rev-hub-core";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
 
@@ -36,9 +36,9 @@ export interface ExpansionHub extends RevHub {
     setNewModuleAddress(newModuleAddress: number): Promise<void>;
     queryInterface(interfaceName: string): Promise<ModuleInterface>;
     setModuleLedColor(red: number, green: number, blue: number): Promise<void>;
-    getModuleLedColor(): Promise<RGB>;
-    setModuleLedPattern(ledPattern: LEDPattern): Promise<void>;
-    getModuleLedPattern(): Promise<LEDPattern>;
+    getModuleLedColor(): Promise<Rgb>;
+    setModuleLedPattern(ledPattern: LedPattern): Promise<void>;
+    getModuleLedPattern(): Promise<LedPattern>;
     setDebugLogLevel(
         debugGroup: DebugGroup,
         verbosityLevel: VerbosityLevel,
@@ -59,9 +59,22 @@ export interface ExpansionHub extends RevHub {
     // DIO
     setDigitalSingleOutput(digitalChannel: number, value?: boolean): Promise<void>;
     setDigitalAllOutputs(bitPackedField: number): Promise<void>;
-    setDigitalDirection(digitalChannel: number, direction: DIODirection): Promise<void>;
-    getDigitalDirection(digitalChannel: number): Promise<DIODirection>;
-    getDigitalSingleInput(digitalChannel: number): Promise<boolean>;
+
+    /**
+     * Set a digital pin as input or output.
+     * @param dioPin
+     * @param direction
+     */
+    setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void>;
+    getDigitalDirection(dioPin: number): Promise<DioDirection>;
+
+    /**
+     * Read the state of a given digital pin.
+     * Throws an error if the pin is not configured for input
+     *
+     * @param dioPin
+     */
+    getDigitalSingleInput(dioPin: number): Promise<boolean>;
     getDigitalAllInputs(): Promise<number>;
 
     // I2C
@@ -129,12 +142,12 @@ export interface ExpansionHub extends RevHub {
     setMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
-        pid: PIDCoefficients,
+        pid: PidCoefficients,
     ): Promise<void>;
     getMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
-    ): Promise<PIDCoefficients>;
+    ): Promise<PidCoefficients>;
 
     // Servo
     setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void>;
