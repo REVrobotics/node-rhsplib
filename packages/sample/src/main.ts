@@ -3,7 +3,8 @@ import {
     ExpansionHub,
     getConnectedExpansionHubs,
     MotorNotFullyConfiguredError,
-    NackError
+    NackError,
+    RevHub
 } from "@rev-robotics/expansion-hub";
 
 const program = new Command();
@@ -21,17 +22,23 @@ if(options.list) {
     console.log("Starting to search Serial Ports")
     const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
     hubs.forEach(async (hub) => {
-        hub.on("error", (e) => {
+        hub.on("error", (e: any) => {
             console.log(`Got error:`);
             console.log(e);
         });
         console.log(await toString(hub));
     });
+
+    setTimeout(() => {
+        hubs.forEach(async (hub) => {
+            hub.close();
+        })
+    }, 2000);
 }
 
 if(options.error) {
+    let hubs = await getConnectedExpansionHubs();
     try {
-        let hubs = await getConnectedExpansionHubs();
         //Motor Mode intentionally wrong to get error
         await hubs[0].setMotorChannelMode(2, 1, false);
         await hubs[0].setMotorConstantPower(2, 0);
@@ -47,8 +54,22 @@ if(options.error) {
         }
         console.log(`Is error a motor command error? ${e instanceof MotorNotFullyConfiguredError}`);
     }
+
+    hubs[0].close();
 }
 
-async function toString(hub: ExpansionHub): Promise<string> {
-    return `RevHub: ${hub.getDestAddress()}`;
+async function toString(hub: RevHub): Promise<string> {
+    let result = `RevHub: ${hub.moduleAddress}\n`;
+
+    if(hub.isExpansionHub()) {
+        console.log(`Is open? ${hub.isOpen}`)
+    }
+
+    if(hub.isParent()) {
+        for(const child of hub.children) {
+            result += `\tRevHub: ${child.moduleAddress}\n`;
+        }
+    }
+
+    return result;
 }

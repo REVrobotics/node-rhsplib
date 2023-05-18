@@ -1,8 +1,8 @@
 import { SerialPort } from "serialport";
 import {ExpansionHub} from "./ExpansionHub";
-import {openParentRevHub} from "./open-rev-hub";
+import {openExpansionHubAndAllChildren} from "./open-rev-hub";
 
-async function getPossibleExpansionHubSerialNumbers(): Promise<string[]> {
+export async function getPossibleExpansionHubSerialNumbers(): Promise<string[]> {
     const results: string[] = [];
     const serialPorts = await SerialPort.list();
     for (let i = 0; i < serialPorts.length; i++) {
@@ -21,12 +21,12 @@ async function getPossibleExpansionHubSerialNumbers(): Promise<string[]> {
  * and child hubs are available via {@link ExpansionHub#children}.
  */
 export async function getConnectedExpansionHubs(): Promise<ExpansionHub[]> {
-    let addresses = await getPossibleExpansionHubSerialNumbers();
+    let serialNumbers = await getPossibleExpansionHubSerialNumbers();
 
     let hubs: ExpansionHub[] = [];
 
-    for(let address of addresses) {
-        let hub = await openParentRevHub(address);
+    for(let serialNumber of serialNumbers) {
+        let hub = await openExpansionHubAndAllChildren(serialNumber);
         hubs.push(hub);
     }
 

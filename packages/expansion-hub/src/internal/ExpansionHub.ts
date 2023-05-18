@@ -4,33 +4,81 @@ import {
     DIODirection,
     I2CReadStatus,
     I2CSpeedCode, I2CWriteStatus, LEDPattern, ModuleInterface, ModuleStatus, PIDCoefficients,
-    RevHub as NativeRevHub, RGB,
-    Serial, VerbosityLevel, Version
+    RevHub as NativeRevHub, RGB, Serial,
+    Serial as SerialPort, VerbosityLevel, Version
 } from "@rev-robotics/rhsplib"
-import {nackCodeToError} from "../errors/nack-code-to-error";
-import {RevHubType} from "../RevHubType";
-import {ParameterOutOfRangeError} from "../errors/ParameterOutOfRangeError";
 import {EventEmitter} from "events";
-import {RevHub} from "../RevHub";
+import {RevHubType} from "../RevHubType";
+import {ParentRevHub, RevHub} from "../RevHub";
+import {closeSerialPort} from "../open-rev-hub";
+import {ParameterOutOfRangeError} from "../errors/ParameterOutOfRangeError";
+import {nackCodeToError} from "../errors/nack-code-to-error";
 
 export class ExpansionHubInternal implements ExpansionHub {
-    constructor() {
+    constructor(isParent: true, serial: SerialPort, serialNumber: string);
+    constructor(isParent: false, serial: SerialPort);
+    constructor(isParent: boolean, serialPort: SerialPort, serialNumber?: string) {
         this.nativeRevHub = new NativeRevHub();
+        this.hubIsParent = isParent;
+        this.serialNumber = serialNumber;
+        this.serialPort = serialPort;
     }
 
+    hubIsParent: boolean;
+    serialPort: SerialPort;
+    serialNumber: string | undefined;
     nativeRevHub: NativeRevHub;
-    keepAliveTimer: NodeJS.Timer | undefined = undefined;
-    children: Map<number, ExpansionHub> = new Map();
+    moduleAddress!: number
+    private mutableChildren: RevHub[] = [];
+
+    get children(): ReadonlyArray<RevHub> {
+        return this.mutableChildren
+    }
+
+    keepAliveTimer?: NodeJS.Timer;
+
     type = RevHubType.ExpansionHub;
     private emitter = new EventEmitter();
 
+    isParent(): this is ParentRevHub {
+        return this.hubIsParent;
+    }
+
+    isExpansionHub(): this is ExpansionHub {
+        return true;
+    }
+
     close(): void {
+        //Closing a parent closes the serial port and all children
+        if(this.isParent()) {
+            if(this.serialPort) closeSerialPort(this.serialPort);
+            this.children.forEach((child) => {
+                if(child.isExpansionHub()) {
+                    child.close();
+                }
+            })
+        }
+
         clearInterval(this.keepAliveTimer);
         this.keepAliveTimer = undefined;
     }
 
-    open(serialPort: Serial, destAddress: number): Promise<void> {
-        return this.convertErrorPromise(() => { return this.nativeRevHub.open(serialPort, destAddress) });
+    open(destAddress: number): Promise<void> {
+        return this.convertErrorPromise(() => {
+            return this.nativeRevHub.open(this.serialPort, destAddress)
+        });
+    }
+
+    get isOpen(): boolean {
+        return this.convertErrorSync(() => { return this.nativeRevHub.isOpened(); });
+    }
+
+    get responseTimeoutMs(): number {
+        return this.convertErrorSync(() => { return this.nativeRevHub.getResponseTimeoutMs(); });
+    }
+
+    set responseTimeoutMs(timeout: number) {
+        this.convertErrorSync(() => { this.nativeRevHub.setResponseTimeoutMs(timeout); });
     }
 
     getADC(): Promise<number> {
@@ -141,10 +189,6 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.convertErrorPromise(() => { return this.nativeRevHub.getPhoneChargeControl() });
     }
 
-    getResponseTimeoutMs(): number {
-        return this.convertErrorSync(() => { return this.nativeRevHub.getResponseTimeoutMs() });
-    }
-
     getServoConfiguration(servoChannel: number): Promise<number> {
         return this.convertErrorPromise(() => { return this.nativeRevHub.getServoConfiguration(servoChannel) });
     }
@@ -159,10 +203,6 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     injectDataLogHint(hintText: string): Promise<void> {
         return this.convertErrorPromise(() => { return this.nativeRevHub.injectDataLogHint(hintText) });
-    }
-
-    isOpened(): boolean {
-        return this.convertErrorSync(() => { return this.nativeRevHub.isOpened() });
     }
 
     queryInterface(interfaceName: string): Promise<ModuleInterface> {
@@ -201,16 +241,8 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.convertErrorPromise(() => { return this.nativeRevHub.sendReadCommand(packetTypeID, payload) });
     }
 
-    sendReadCommandInternal(packetTypeID: number, payload: number[]): Promise<void> {
-        return this.convertErrorPromise(() => { return this.nativeRevHub.sendReadCommandInternal(packetTypeID, payload) });
-    }
-
     sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
         return this.convertErrorPromise(() => { return this.nativeRevHub.sendWriteCommand(packetTypeID, payload) });
-    }
-
-    sendWriteCommandInternal(packetTypeID: number, payload: number[]): Promise<void> {
-        return this.convertErrorPromise(() => { return this.nativeRevHub.sendWriteCommandInternal(packetTypeID, payload) });
     }
 
     setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<void> {
@@ -278,27 +310,12 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     setNewModuleAddress(newModuleAddress: number): Promise<void> {
+        this.moduleAddress = newModuleAddress;
         return this.convertErrorPromise(() => { return this.nativeRevHub.setNewModuleAddress(newModuleAddress) });
-    }
-
-    setPWMConfiguration(pwmChannel: number, framePeriod: number): Promise<void> {
-        return this.convertErrorPromise(() => { return this.nativeRevHub.setPWMConfiguration(pwmChannel, framePeriod) });
-    }
-
-    setPWMEnable(pwmChannel: number, enable: boolean): Promise<void> {
-        return this.convertErrorPromise(() => { return this.nativeRevHub.setPWMEnable(pwmChannel, enable) });
-    }
-
-    setPWMPulseWidth(pwmChannel: number, pulseWidth: number): Promise<void> {
-        return this.convertErrorPromise(() => { return this.nativeRevHub.setPWMPulseWidth(pwmChannel, pulseWidth) });
     }
 
     setPhoneChargeControl(chargeEnable: boolean): Promise<void> {
         return this.convertErrorPromise(() => { return this.nativeRevHub.setPhoneChargeControl(chargeEnable) });
-    }
-
-    setResponseTimeoutMs(responseTimeoutMs: number): void {
-        this.nativeRevHub.setResponseTimeoutMs(responseTimeoutMs);
     }
 
     setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void> {
@@ -353,6 +370,20 @@ export class ExpansionHubInternal implements ExpansionHub {
                 throw e;
             }
         }
+    }
+
+    addChild(hub: RevHub): void {
+        this.mutableChildren.push(hub);
+    }
+
+    async addChildByAddress(moduleAddress: number): Promise<RevHub> {
+        let childHub = new ExpansionHubInternal(false, this.serialPort);
+        await childHub.open(moduleAddress);
+        await childHub.queryInterface("DEKA");
+
+        this.addChild(childHub);
+
+        return childHub;
     }
 
     /**
