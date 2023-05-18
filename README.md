@@ -9,9 +9,9 @@ multi-package builds.
 
 We have several packages currently:
 
-1. rhsplib: Raw interaction with RHSPLib.
-2. expansion-hub: High-level interaction with a REV expansion hub.
-3. sample: Command line app useful for testing and showing features.
+1. `rhsplib`: Raw interaction with RHSPLib.
+2. `expansion-hub`: High-level interaction with a REV expansion hub.
+3. `sample`: Command line app useful for testing and showing features.
 
 ## building and other tasks
 
