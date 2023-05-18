@@ -1,8 +1,14 @@
-import {ExpansionHub, ParentExpansionHub} from "./ExpansionHub";
-import {Serial as SerialPort, SerialParity, SerialFlowControl, RevHub as NativeRevHub, RevHub} from "@rev-robotics/rhsplib";
-import {SerialPort as SerialLister} from "serialport"
-import {ExpansionHubInternal} from "./internal/ExpansionHub";
-import {startKeepAlive} from "./start-keep-alive";
+import { ExpansionHub, ParentExpansionHub } from "./ExpansionHub";
+import {
+    Serial as SerialPort,
+    SerialParity,
+    SerialFlowControl,
+    RevHub as NativeRevHub,
+    RevHub,
+} from "@rev-robotics/rhsplib";
+import { SerialPort as SerialLister } from "serialport";
+import { ExpansionHubInternal } from "./internal/ExpansionHub";
+import { startKeepAlive } from "./start-keep-alive";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
@@ -20,11 +26,13 @@ const openSerialMap = new Map<string, SerialPort>();
  * @param moduleAddress The module address of the parent (if this is not provided, it will take upwards of a second to
  * find the address of the parent hub).
  */
-export async function openParentExpansionHub(serialNumber: string, moduleAddress?: number):
-    Promise<ParentExpansionHub> {
+export async function openParentExpansionHub(
+    serialNumber: string,
+    moduleAddress?: number,
+): Promise<ParentExpansionHub> {
     let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
 
-    if(openSerialMap.get(serialPortPath) == undefined) {
+    if (openSerialMap.get(serialPortPath) == undefined) {
         openSerialMap.set(serialPortPath, await openSerialPort(serialPortPath));
     }
 
@@ -32,7 +40,7 @@ export async function openParentExpansionHub(serialNumber: string, moduleAddress
 
     let parentHub = new ExpansionHubInternal(true, serialPort, serialNumber);
 
-    if(moduleAddress === undefined) {
+    if (moduleAddress === undefined) {
         let addresses = await RevHub.discoverRevHubs(serialPort);
         moduleAddress = addresses.parentAddress;
     }
@@ -41,10 +49,12 @@ export async function openParentExpansionHub(serialNumber: string, moduleAddress
     await parentHub.queryInterface("DEKA");
     startKeepAlive(parentHub, 1000);
 
-    if(parentHub.isParent()) {
+    if (parentHub.isParent()) {
         return parentHub;
     } else {
-        throw new Error(`Hub at ${serialNumber} with moduleAddress ${moduleAddress} is not a parent`);
+        throw new Error(
+            `Hub at ${serialNumber} with moduleAddress ${moduleAddress} is not a parent`,
+        );
     }
 }
 
@@ -54,10 +64,12 @@ export async function openParentExpansionHub(serialNumber: string, moduleAddress
  *
  * @param serialNumber the serial number of the REV hub (should start with DQ)
  */
-export async function openExpansionHubAndAllChildren(serialNumber: string): Promise<ParentExpansionHub> {
+export async function openExpansionHubAndAllChildren(
+    serialNumber: string,
+): Promise<ParentExpansionHub> {
     let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
 
-    if(openSerialMap.get(serialPortPath) == undefined) {
+    if (openSerialMap.get(serialPortPath) == undefined) {
         openSerialMap.set(serialPortPath, await openSerialPort(serialPortPath));
     }
 
@@ -65,13 +77,15 @@ export async function openExpansionHubAndAllChildren(serialNumber: string): Prom
 
     let discoveredModules = await NativeRevHub.discoverRevHubs(serialPort);
     let parentAddress = discoveredModules.parentAddress;
-    let parentHub =
-        await openParentExpansionHub(serialNumber, parentAddress) as ParentExpansionHub & ExpansionHubInternal;
+    let parentHub = (await openParentExpansionHub(
+        serialNumber,
+        parentAddress,
+    )) as ParentExpansionHub & ExpansionHubInternal;
 
-    for(let address of discoveredModules.childAddresses) {
+    for (let address of discoveredModules.childAddresses) {
         let hub = await parentHub.addChildByAddress(address);
-        if(hub.isExpansionHub()) {
-            startKeepAlive(hub as ExpansionHubInternal, 1000)
+        if (hub.isExpansionHub()) {
+            startKeepAlive(hub as ExpansionHubInternal, 1000);
         }
     }
 
@@ -84,9 +98,7 @@ export async function openExpansionHubAndAllChildren(serialNumber: string): Prom
  * @throws Error if the {@link serialNumber} is not found
  * @param serialNumber the serial number of the REV hub
  */
-async function getSerialPortPathForExHubSerial(
-    serialNumber: string,
-): Promise<string> {
+async function getSerialPortPathForExHubSerial(serialNumber: string): Promise<string> {
     const serialPorts = await SerialLister.list();
     for (let i = 0; i < serialPorts.length; i++) {
         const portInfo = serialPorts[i];
@@ -104,8 +116,8 @@ async function getSerialPortPathForExHubSerial(
  * @param serialPort the Serial port to close
  */
 export function closeSerialPort(serialPort: SerialPort) {
-    for(let [path, port] of openSerialMap.entries()) {
-        if(port === serialPort) {
+    for (let [path, port] of openSerialMap.entries()) {
+        if (port === serialPort) {
             openSerialMap.delete(path);
         }
     }
@@ -114,11 +126,13 @@ export function closeSerialPort(serialPort: SerialPort) {
 
 async function openSerialPort(serialPortPath: string): Promise<SerialPort> {
     let serial = new SerialPort();
-    await serial.open(serialPortPath,
+    await serial.open(
+        serialPortPath,
         460800,
         8,
         SerialParity.None,
         1,
-        SerialFlowControl.None);
+        SerialFlowControl.None,
+    );
     return serial;
 }

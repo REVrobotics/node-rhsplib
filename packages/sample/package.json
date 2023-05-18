@@ -1,16 +1,16 @@
 {
-  "name": "sample",
-  "descripton": "sample for testing Rev Hub code",
-  "version": "0.1.0",
-  "main": "dist/main.js",
-  "private": true,
-  "type": "module",
-  "dependencies": {
-    "@rev-robotics/expansion-hub": "*",
-    "commander": "^10.0.1"
-  },
-  "scripts": {
-    "build": "tsc",
-    "list": "node dist/main.js -l"
-  }
+    "name": "sample",
+    "descripton": "sample for testing Rev Hub code",
+    "version": "0.1.0",
+    "main": "dist/main.js",
+    "private": true,
+    "type": "module",
+    "dependencies": {
+        "@rev-robotics/expansion-hub": "*",
+        "commander": "^10.0.1"
+    },
+    "scripts": {
+        "build": "tsc",
+        "list": "node dist/main.js -l"
+    }
 }
