@@ -52,10 +52,13 @@ export async function writeShort(
     register: number,
     value: number,
 ) {
-    await hub.writeI2CMultipleBytes(channel, address, [
+    await writeRegisterMultipleBytes(
+        hub,
+        channel,
+        address,
         register,
-        ...shortToByteArray(value),
-    ]);
+        shortToByteArray(value),
+    );
 }
 
 export async function readShort(
@@ -64,11 +67,7 @@ export async function readShort(
     address: number,
     register: number,
 ) {
-    await hub.writeI2CSingleByte(channel, address, register);
-
-    await hub.readI2CMultipleBytes(channel, address, 2);
-
-    let bytes = (await hub.getI2CReadStatus(channel)).bytes;
+    let bytes = await readRegisterMultipleBytes(hub, channel, address, register, 2);
 
     return (bytes[0] << 8) | bytes[1];
 }
@@ -89,7 +88,7 @@ export async function writeInt(
 function shortToByteArray(value: number) {
     const byteArray = [0, 0];
 
-    byteArray[0] = (value & 0xff00) >> 1;
+    byteArray[0] = (value >> 8) & 0xff;
     byteArray[1] = value & 0xff;
 
     return byteArray;

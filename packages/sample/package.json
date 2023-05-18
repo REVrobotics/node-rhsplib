@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "name": "rev-hub-cli",
     "descripton": "sample for testing Rev Hub code",
     "version": "1.0.0",
@@ -33,3 +34,22 @@
         "distance": "node dist/main.js distance 0"
     }
 }
+=======
+  "name": "sample",
+  "descripton": "sample for testing Rev Hub code",
+  "version": "0.1.0",
+  "main": "dist/main.js",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@rev-robotics/expansion-hub": "*",
+    "@rev-robotics/distance-sensor": "*",
+    "commander": "^10.0.1"
+  },
+  "scripts": {
+    "build": "tsc",
+    "distance": "node dist/main.js -d 0",
+    "list": "node dist/main.js -l"
+  }
+}
+>>>>>>> a8e1e4f (Get distance sensor working)
