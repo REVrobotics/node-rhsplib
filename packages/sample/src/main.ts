@@ -57,13 +57,22 @@ if(options.error) {
 
     hubs[0].close();
 
-    let serialNumbers = await getPossibleExpansionHubSerialNumbers();
-
     try {
-        let hub = await openParentExpansionHub(serialNumbers[0], 12);
+        let serialNumbers = await getPossibleExpansionHubSerialNumbers();
+        await openParentExpansionHub(serialNumbers[0], 12);
         console.log("Did not get error opening hub ith wrong address");
     } catch(e) {
-        console.log("Got error opening hub with invalid address");
+        console.log("Got error opening parent hub with invalid address");
+        console.log(e);
+    }
+
+    try {
+        let hubs = await getConnectedExpansionHubs();
+        if(hubs[0].isParent()) {
+            hubs[0].addChildByAddress(12);
+        }
+    } catch(e: any) {
+        console.log("Got error opening child hub with invalid address");
         console.log(e);
     }
 }

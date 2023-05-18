@@ -13,6 +13,7 @@ import {ParentRevHub, RevHub} from "../RevHub";
 import {closeSerialPort} from "../open-rev-hub";
 import {ParameterOutOfRangeError} from "../errors/ParameterOutOfRangeError";
 import {nackCodeToError} from "../errors/nack-code-to-error";
+import {NoExpansionHubWithAddressError} from "../errors/NoExpansionHubWithAddressError";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -378,8 +379,13 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {
         let childHub = new ExpansionHubInternal(false, this.serialPort);
-        await childHub.open(moduleAddress);
-        await childHub.queryInterface("DEKA");
+
+        try {
+            await childHub.open(moduleAddress);
+            await childHub.queryInterface("DEKA");
+        } catch(e: any) {
+            if(e.errorCode == -2) throw new NoExpansionHubWithAddressError(moduleAddress);
+        }
 
         this.addChild(childHub);
 

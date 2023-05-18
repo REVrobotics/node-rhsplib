@@ -3,6 +3,7 @@ import {Serial as SerialPort, SerialParity, SerialFlowControl, RevHub as NativeR
 import {SerialPort as SerialLister} from "serialport"
 import {ExpansionHubInternal} from "./internal/ExpansionHub";
 import {startKeepAlive} from "./start-keep-alive";
+import {NoExpansionHubWithAddressError} from "./errors/NoExpansionHubWithAddressError";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
@@ -41,7 +42,7 @@ export async function openParentExpansionHub(serialNumber: string, moduleAddress
         await parentHub.open(moduleAddress);
         await parentHub.queryInterface("DEKA");
     } catch(e: any) {
-        if(e.errorCode == -2) throw new Error(`Unable to open hub with address ${moduleAddress}`);
+        if(e.errorCode == -2) throw new NoExpansionHubWithAddressError(moduleAddress);
     }
     startKeepAlive(parentHub, 1000);
 
