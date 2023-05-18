@@ -69,8 +69,9 @@ if(options.error) {
     try {
         let hubs = await getConnectedExpansionHubs();
         if(hubs[0].isParent()) {
-            hubs[0].addChildByAddress(12);
+            await hubs[0].addChildByAddress(15);
         }
+        hubs[0].close();
     } catch(e: any) {
         console.log("Got error opening child hub with invalid address");
         console.log(e);
