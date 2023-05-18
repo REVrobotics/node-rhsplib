@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "distance": "node dist/main.js -d 1",
+    "distance": "node dist/main.js -d 0",
     "list": "node dist/main.js -l"
   }
 }

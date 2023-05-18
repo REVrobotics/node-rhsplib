@@ -8,6 +8,7 @@ import {
 } from "./i2c-utils";
 
 import * as register from './registers';
+import {SYSTEM_SEQUENCE_CONFIG} from "./registers";
 
 export class DistanceSensor {
     constructor(hub: ExpansionHub, channel: number) {
@@ -22,17 +23,31 @@ export class DistanceSensor {
     private spadTypeIsAperture = false;
     private stopValue = 0;
 
+    async close() {
+        await this.writeRegister(register.SYS_RANGE_START, 0x01); // VL53L0X_REG_SYSRANGE_MODE_SINGLESHOT
+
+        await this.writeRegister(0xFF, 0x01);
+        await this.writeRegister(0x00, 0x00);
+        await this.writeRegister(0x91, 0x00);
+        await this.writeRegister(0x00, 0x01);
+        await this.writeRegister(0xFF, 0x00);
+    }
+
     async is2mDistanceSensor(): Promise<boolean> {
-        if ((await this.readRegister(0xc0)) != 0xee) return false;
-        if ((await this.readRegister(0xc1)) != 0xaa) return false;
-        if ((await this.readRegister(0xc2)) != 0x10) return false;
-        if ((await this.readRegister(0x61)) != 0x00) return false;
-        else return true;
+        try {
+            if ((await this.readRegister(0xc0)) != 0xee) return false;
+            if ((await this.readRegister(0xc1)) != 0xaa) return false;
+            if ((await this.readRegister(0xc2)) != 0x10) return false;
+            if ((await this.readRegister(0x61)) != 0x00) return false;
+            else return true;
+        } catch { //if there's an I2C error, we don't have a working sensor.
+            return false;
+        }
     }
 
     async getDistanceMillimeters(): Promise<number> {
         try {
-            let range = await this.readShort(register.RESULT_RANGE_STATUS  + 10);
+            let range = await this.readShort(register.RESULT_RANGE_STATUS + 10);
             await this.writeRegister(register.SYSTEM_INTERRUPT_CLEAR, 0x01);
 
             return range;
@@ -190,34 +205,29 @@ export class DistanceSensor {
 
         await this.writeMultipleBytes(register.GLOBAL_CONFIG_SPAD_ENABLES_REF_0, refSpadMap);
 
-        await this.loadTuningSettings()
+        await this.loadTuningSettings();
 
         await this.writeRegister(register.SYSTEM_INTERRUPT_CONFIG_GPIO, 0x04);
         await this.writeRegister(register.GPIO_HV_MUX_ACTIVE_HIGH,
             (await this.readRegister(register.GPIO_HV_MUX_ACTIVE_HIGH)) & ~0x10); //active low
         await this.writeRegister(register.SYSTEM_INTERRUPT_CLEAR, 0x01);
 
-        let measurementTimingBudget = await this.getMeasurementTimingBudget();
-        console.log(`Timing budget: ${measurementTimingBudget}`);
+        //let measurementTimingBudget = await this.getMeasurementTimingBudget();
+        //console.log(`Timing budget: ${measurementTimingBudget}`);
 
         await this.writeRegister(register.SYSTEM_SEQUENCE_CONFIG, 0xE8);
 
         //set measurement timing budget
-        await this.setMeasurementTimingBudget(measurementTimingBudget);
+        //await this.setMeasurementTimingBudget(measurementTimingBudget);
 
-        // await this.writeRegister(SYSTEM_SEQUENCE_CONFIG, 0x01);
-        // if(!await this.performCalibration(0x40)) return false;
-        //
-        // await this.writeRegister(SYSTEM_SEQUENCE_CONFIG, 0x02);
-        // if(!await this.performCalibration(0x00)) return false;
-        //
-        // //Restore previous config
-        // await this.writeRegister(SYSTEM_SEQUENCE_CONFIG, 0xE8);
+        await this.writeRegister(register.SYSTEM_SEQUENCE_CONFIG, 0x01);
+        if(!await this.performCalibration(0x40)) return false;
 
-        let config = await this.readRegister(register.SYSTEM_SEQUENCE_CONFIG);
         await this.writeRegister(register.SYSTEM_SEQUENCE_CONFIG, 0x02);
-        await this.performCalibration(0x00);
-        await this.writeRegister(register.SYSTEM_SEQUENCE_CONFIG, config);
+        if(!await this.performCalibration(0x00)) return false;
+
+        //Restore previous config
+        await this.writeRegister(register.SYSTEM_SEQUENCE_CONFIG, 0xE8);
 
         console.log("Starting continuous");
         await this.startContinuous(0);
@@ -239,17 +249,19 @@ export class DistanceSensor {
             }
 
             await this.writeInt(0x04, periodMs);
-            await this.writeRegister(0x00, 0x04);
+            await this.writeRegister(register.SYS_RANGE_START, 0x04);
         } else {
-            await this.writeRegister(0x00, 0x02);
+            await this.writeRegister(register.SYS_RANGE_START, 0x02);
         }
     }
 
     private async performCalibration(input: number): Promise<boolean> {
-        await this.writeRegister(0x00, 0x01 | input);
+        await this.writeRegister(register.SYS_RANGE_START, 0x01 | input);
+
+        //while ((await this.readRegister(register.RESULT_INTERRUPT_STATUS) & 0x07) == 0);
 
         await this.writeRegister(0x0B, 0x01);
-        await this.writeRegister(0x00, 0x00);
+        await this.writeRegister(register.SYS_RANGE_START, 0x00);
 
         return true;
     }
@@ -261,6 +273,9 @@ export class DistanceSensor {
 
         let enables = await this.getSequenceStepEnables();
         let timeouts = await this.getSequenceStepTimeouts(enables);
+
+        console.log(JSON.stringify(enables));
+        console.log(JSON.stringify(timeouts));
 
         if(enables.tcc) {
             usedBudget += timeouts.msrc_dss_tcc_us + 590;
@@ -290,7 +305,9 @@ export class DistanceSensor {
                 finalTimeoutMclks += timeouts.pre_range_mclks;
             }
 
-            await this.writeShort(0x71, this.encodeTimeout(finalTimeoutMclks));
+            console.log(`Setting measurement budget to ${this.encodeTimeout(finalTimeoutMclks)}`);
+            await this.writeShort(register.FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI,
+                this.encodeTimeout(finalTimeoutMclks));
         }
 
         return true;
@@ -325,19 +342,23 @@ export class DistanceSensor {
 
     private async getSequenceStepTimeouts(enables: SequenceStepEnables): Promise<SequenceStepTimeouts> {
         let result = new SequenceStepTimeouts();
-        result.pre_range_vcsel_period_pclks = this.decodeVcselPeriod(await this.readRegister(0x50));
+        result.pre_range_vcsel_period_pclks = this.decodeVcselPeriod(
+            await this.readRegister(register.PRE_RANGE_CONFIG_VCSEL_PERIOD));
 
-        result.msrc_dss_tcc_mclks = await this.readRegister(0x46);
+        result.msrc_dss_tcc_mclks = await this.readRegister(register.MSRC_CONFIG_TIMEOUT_MACROP) + 1;
         result.msrc_dss_tcc_us = this.timeoutMclksToMicroseconds(result.msrc_dss_tcc_mclks,
             result.pre_range_vcsel_period_pclks);
 
-        result.pre_range_mclks = this.decodeTimeout(await this.readShort(0x51));
+        result.pre_range_mclks = this.decodeTimeout(await this.readShort(
+            register.PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI));
         result.pre_range_us = this.timeoutMclksToMicroseconds(result.pre_range_mclks,
             result.pre_range_vcsel_period_pclks);
 
-        result.final_range_vcsel_period_pclks = this.decodeVcselPeriod(await this.readRegister(0x70));
+        result.final_range_vcsel_period_pclks = this.decodeVcselPeriod(
+            await this.readRegister(register.FINAL_RANGE_CONFIG_VCSEL_PERIOD));
 
-        result.final_range_mclks = this.decodeTimeout(await this.readShort(0x71));
+        result.final_range_mclks = this.decodeTimeout(await this.readShort(
+            register.FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI));
 
         if(enables.pre_range) {
             result.final_range_mclks -= result.pre_range_mclks;
@@ -369,7 +390,7 @@ export class DistanceSensor {
     }
 
     private decodeVcselPeriod(value: number) {
-        return (value +1) << 1;
+        return (value + 1) << 1;
     }
 
     private timeoutMclksToMicroseconds(timeout_period_mclks: number, vcsel_period_pclks: number): number {
@@ -385,13 +406,13 @@ export class DistanceSensor {
     private async getSequenceStepEnables(): Promise<SequenceStepEnables> {
         let result = new SequenceStepEnables();
 
-        let sequenceConfig = await this.readRegister(0x01);
+        let sequenceConfig = await this.readRegister(SYSTEM_SEQUENCE_CONFIG);
 
-        result.tcc = ((sequenceConfig >> 4) & 0x01) != 0;
-        result.dss = ((sequenceConfig >> 3) & 0x01) != 0;
-        result.msrc = ((sequenceConfig >> 2) & 0x01) != 0;
-        result.pre_range = ((sequenceConfig >> 6) & 0x01) != 0;
-        result.final_range = ((sequenceConfig >> 7) & 0x01) != 0;
+        result.tcc = ((sequenceConfig >> 4) & 0x1) != 0;
+        result.dss = ((sequenceConfig >> 3) & 0x1) != 0;
+        result.msrc = ((sequenceConfig >> 2) & 0x1) != 0;
+        result.pre_range = ((sequenceConfig >> 6) & 0x1) != 0;
+        result.final_range = ((sequenceConfig >> 7) & 0x1) != 0;
 
         return result;
     }
@@ -443,15 +464,15 @@ export class DistanceSensor {
     }
 
     private async readRegister(register: number): Promise<number> {
-        return readRegister(this.hub, this.channel, this.address, register);
+        return await readRegister(this.hub, this.channel, this.address, register);
     }
 
     private async readMultipleBytes(register: number, n: number): Promise<number[]> {
-        return readRegisterMultipleBytes(this.hub, this.channel, this.address, register, n);
+        return await readRegisterMultipleBytes(this.hub, this.channel, this.address, register, n);
     }
 
     private async writeMultipleBytes(register: number, values: number[]): Promise<void> {
-        return writeRegisterMultipleBytes(this.hub, this.channel, this.address, register, values);
+        return await writeRegisterMultipleBytes(this.hub, this.channel, this.address, register, values);
     }
 
     private async writeRegister(register: number, value: number) {

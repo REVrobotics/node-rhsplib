@@ -52,7 +52,7 @@ export async function writeShort(
     register: number,
     value: number,
 ) {
-    await hub.writeI2CMultipleBytes(channel, address, [register, ...shortToByteArray(value)]);
+    await writeRegisterMultipleBytes(hub, channel, address, register, shortToByteArray(value));
 }
 
 export async function readShort(
@@ -61,11 +61,7 @@ export async function readShort(
     address: number,
     register: number
 ) {
-    await hub.writeI2CSingleByte(channel, address, register);
-
-    await hub.readI2CMultipleBytes(channel, address, 2);
-
-    let bytes = (await hub.getI2CReadStatus(channel)).bytes
+    let bytes = await readRegisterMultipleBytes(hub, channel, address, register, 2);
 
     return (bytes[0] << 8) | bytes[1];
 }
@@ -83,8 +79,8 @@ export async function writeInt(
 function shortToByteArray(value: number) {
     const byteArray = [0, 0];
 
-    byteArray[0] = (value & 0xFF00) >> 8;
-    byteArray[1] = value & 0xFF;
+    byteArray[0] = (value >> 8) & 0xff;
+    byteArray[1] = value & 0xff;
 
     return byteArray;
 }
@@ -92,10 +88,10 @@ function shortToByteArray(value: number) {
 function intToByteArray(value: number): number[] {
     const byteArray = [0, 0, 0, 0];
 
-    byteArray[0] = (value >> 24) & 0xFF;
-    byteArray[1] = (value >> 16) & 0xFF;
-    byteArray[2] = (value >> 8) & 0xFF;
-    byteArray[3] = value & 0xFF;
+    byteArray[0] = (value >> 24) & 0xff;
+    byteArray[1] = (value >> 16) & 0xff;
+    byteArray[2] = (value >> 8) & 0xff;
+    byteArray[3] = value & 0xff;
 
     return byteArray;
 }
