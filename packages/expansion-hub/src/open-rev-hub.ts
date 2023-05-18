@@ -37,8 +37,12 @@ export async function openParentExpansionHub(serialNumber: string, moduleAddress
         moduleAddress = addresses.parentAddress;
     }
 
-    await parentHub.open(moduleAddress);
-    await parentHub.queryInterface("DEKA");
+    try {
+        await parentHub.open(moduleAddress);
+        await parentHub.queryInterface("DEKA");
+    } catch(e: any) {
+        if(e.errorCode == -2) throw new Error(`Unable to open hub with address ${moduleAddress}`);
+    }
     startKeepAlive(parentHub, 1000);
 
     if(parentHub.isParent()) {

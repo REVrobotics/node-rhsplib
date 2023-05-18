@@ -1,9 +1,9 @@
 import {Command} from "commander";
 import {
     ExpansionHub,
-    getConnectedExpansionHubs,
+    getConnectedExpansionHubs, getPossibleExpansionHubSerialNumbers,
     MotorNotFullyConfiguredError,
-    NackError,
+    NackError, openParentExpansionHub,
     RevHub
 } from "@rev-robotics/expansion-hub";
 
@@ -56,6 +56,16 @@ if(options.error) {
     }
 
     hubs[0].close();
+
+    let serialNumbers = await getPossibleExpansionHubSerialNumbers();
+
+    try {
+        let hub = await openParentExpansionHub(serialNumbers[0], 12);
+        console.log("Did not get error opening hub ith wrong address");
+    } catch(e) {
+        console.log("Got error opening hub with invalid address");
+        console.log(e);
+    }
 }
 
 async function toString(hub: RevHub): Promise<string> {
