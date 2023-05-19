@@ -40,6 +40,7 @@ program
 
 let digitalCommand = program.command("digital");
 
+<<<<<<< HEAD
 digitalCommand
     .command("write <channel> <state>")
     .description("write digital pin. Valid values for <state> are high, low, 0, and 1.")
@@ -52,6 +53,46 @@ digitalCommand
             stateBoolean = false;
         } else {
             program.error("Please provide only one of {high, low, 1, 0}");
+=======
+if(options.list) {
+    console.log("Starting to search Serial Ports")
+    const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
+    hubs.forEach(async (hub) => {
+        hub.on("error", (e: any) => {
+            console.log(`Got error:`);
+            console.log(e);
+        });
+        console.log(await toString(hub));
+    });
+}
+
+if(options.distance) {
+    let channel = Number(options.distance)
+    console.log(`Channel number is ${channel}`);
+
+    let hubs = await getConnectedExpansionHubs();
+    let hub = hubs[0];
+
+    let sensor = new DistanceSensor(hub, channel);
+    await sensor.setup();
+
+    sensor.startMeasuringDistance((distance) => {
+        console.log(`Distance is ${distance}mm`);
+    }, 1000);
+
+    setTimeout(async () => {
+        sensor.stop();
+        hub.close();
+    }, 20000);
+}
+
+async function toString(hub: RevHub): Promise<string> {
+    let result = `RevHub: ${hub.moduleAddress}\n`;
+
+    if(hub.isParent()) {
+        for(const child of hub.getChildren()) {
+            result += `\tRevHub: ${child.moduleAddress}\n`;
+>>>>>>> fb77285 (Abstract away the driver, providing a lighter-weight DistanceSensor class.)
         }
         let digitalState = stateBoolean ? DigitalState.High : DigitalState.Low;
 
