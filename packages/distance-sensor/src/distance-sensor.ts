@@ -47,8 +47,10 @@ export class DistanceSensor {
 
     async getDistanceMillimeters(): Promise<number> {
         try {
-            let range = await this.readShort(register.RESULT_RANGE_STATUS + 10);
-            await this.writeRegister(register.SYSTEM_INTERRUPT_CLEAR, 0x01);
+            let range = await this.readShort(
+                register.RESULT_RANGE_STATUS + 10);
+            await this.writeRegister(
+                register.SYSTEM_INTERRUPT_CLEAR, 0x01);
 
             return range;
         } catch(e) {
@@ -66,8 +68,6 @@ export class DistanceSensor {
         await this.writeRegister(0x00, 0x00);
 
         this.stopValue = await this.readRegister(0x91);
-
-        console.log(`Stop Value: ${this.stopValue}`);
 
         await this.writeRegister(0x00, 0x01);
         await this.writeRegister(0xff, 0x00);
@@ -212,13 +212,15 @@ export class DistanceSensor {
             (await this.readRegister(register.GPIO_HV_MUX_ACTIVE_HIGH)) & ~0x10); //active low
         await this.writeRegister(register.SYSTEM_INTERRUPT_CLEAR, 0x01);
 
-        //let measurementTimingBudget = await this.getMeasurementTimingBudget();
-        //console.log(`Timing budget: ${measurementTimingBudget}`);
+        //Commented this code out because the sensor doesn't correctly output
+        //if we set the timing measurement budget.
+        // let measurementTimingBudget = await this.getMeasurementTimingBudget();
+        // console.log(`Timing budget: ${measurementTimingBudget}`);
 
         await this.writeRegister(register.SYSTEM_SEQUENCE_CONFIG, 0xE8);
 
         //set measurement timing budget
-        //await this.setMeasurementTimingBudget(measurementTimingBudget);
+        // await this.setMeasurementTimingBudget(measurementTimingBudget);
 
         await this.writeRegister(register.SYSTEM_SEQUENCE_CONFIG, 0x01);
         if(!await this.performCalibration(0x40)) return false;
@@ -229,7 +231,6 @@ export class DistanceSensor {
         //Restore previous config
         await this.writeRegister(register.SYSTEM_SEQUENCE_CONFIG, 0xE8);
 
-        console.log("Starting continuous");
         await this.startContinuous(0);
     }
 
@@ -258,8 +259,6 @@ export class DistanceSensor {
     private async performCalibration(input: number): Promise<boolean> {
         await this.writeRegister(register.SYS_RANGE_START, 0x01 | input);
 
-        //while ((await this.readRegister(register.RESULT_INTERRUPT_STATUS) & 0x07) == 0);
-
         await this.writeRegister(0x0B, 0x01);
         await this.writeRegister(register.SYS_RANGE_START, 0x00);
 
@@ -273,9 +272,6 @@ export class DistanceSensor {
 
         let enables = await this.getSequenceStepEnables();
         let timeouts = await this.getSequenceStepTimeouts(enables);
-
-        console.log(JSON.stringify(enables));
-        console.log(JSON.stringify(timeouts));
 
         if(enables.tcc) {
             usedBudget += timeouts.msrc_dss_tcc_us + 590;
@@ -305,7 +301,6 @@ export class DistanceSensor {
                 finalTimeoutMclks += timeouts.pre_range_mclks;
             }
 
-            console.log(`Setting measurement budget to ${this.encodeTimeout(finalTimeoutMclks)}`);
             await this.writeShort(register.FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI,
                 this.encodeTimeout(finalTimeoutMclks));
         }
@@ -450,7 +445,6 @@ export class DistanceSensor {
 
         this.spadCount = tmp & 0x7f;
         this.spadTypeIsAperture = ((tmp >> 7) & 0x01) != 0;
-        console.log(`Spad Count is ${this.spadCount}. Is Aperture? ${this.spadTypeIsAperture}`);
 
         await this.writeRegister(0x81, 0x00);
         await this.writeRegister(0xff, 0x06);
