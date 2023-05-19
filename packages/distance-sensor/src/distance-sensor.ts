@@ -23,6 +23,13 @@ export class DistanceSensor {
     private spadTypeIsAperture = false;
     private stopValue = 0;
 
+    /**
+     * This will zero out the sensor's stored stop variable for as long as
+     * it's powered on. This {@link DistanceSensor} will have cached the stop
+     * value as part of initialization, but no new {@link DistanceSensor}
+     * instances will be able to initialize until the physical sensor is power
+     * cycled.
+     */
     async close() {
         await this.writeRegister(register.SYS_RANGE_START, 0x01); // VL53L0X_REG_SYSRANGE_MODE_SINGLESHOT
 
