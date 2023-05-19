@@ -34,25 +34,14 @@ if(options.distance) {
     let hub = hubs[0];
 
     let sensor = new DistanceSensor(hub, channel);
+    await sensor.setup();
 
-    console.log("Checking sensor type");
-
-    if(!(await sensor.is2mDistanceSensor())) {
-        console.log("Sensor is not a valid distance sensor!");
-    }
-
-    console.log("Initializing sensor");
-
-    await sensor.initialize();
-
-    let timer = setInterval(async () => {
-        let distance = await sensor.getDistanceMillimeters();
-
+    sensor.startMeasuringDistance((distance) => {
         console.log(`Distance is ${distance}mm`);
     }, 1000);
 
     setTimeout(async () => {
-        clearInterval(timer);
+        sensor.stop();
         hub.close();
     }, 20000);
 }
