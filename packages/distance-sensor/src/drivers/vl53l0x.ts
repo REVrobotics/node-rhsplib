@@ -9,7 +9,7 @@ import {
     writeShort
 } from "../i2c-utils";
 
-export class VL53L0X {
+export class VL53L0X implements DistanceSensorDriver {
     constructor(hub: ExpansionHub, channel: number) {
         this.hub = hub;
         this.channel = channel;

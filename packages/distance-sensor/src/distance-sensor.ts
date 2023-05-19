@@ -6,7 +6,7 @@ export class DistanceSensor {
         this.device = new VL53L0X(hub, channel);
     }
 
-    private readonly device: VL53L0X
+    private readonly device: DistanceSensorDriver
     private timer?: NodeJS.Timer
 
     async setup() {
