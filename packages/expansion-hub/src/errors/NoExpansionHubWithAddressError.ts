@@ -1,11 +1,16 @@
-import {setPrototypeOf} from "./NackError";
+import { setPrototypeOf } from "./NackError";
 
 export class NoExpansionHubWithAddressError extends Error {
     moduleAddress: number;
-    constructor(moduleAddress: number) {
-        super(`Unable to open hub with address ${moduleAddress}}`);
+    serialNumber: string;
+    constructor(serialNumber: string, moduleAddress: number) {
+        super(
+            `Unable to open hub with address ${moduleAddress} connected ` +
+                `via parent hub with serial number ${serialNumber}`,
+        );
         setPrototypeOf(this, NoExpansionHubWithAddressError.prototype);
 
         this.moduleAddress = moduleAddress;
+        this.serialNumber = serialNumber;
     }
 }

@@ -600,7 +600,10 @@ export class ExpansionHubInternal implements ExpansionHub {
         } catch (e: any) {
             //errorCode = -2 indicates timeout
             if (e.errorCode == -2)
-                throw new NoExpansionHubWithAddressError(moduleAddress);
+                throw new NoExpansionHubWithAddressError(
+                    this.serialNumber!, //Can only call this method on parent, so serialNumber is not undefined.
+                    moduleAddress,
+                );
         }
 
         this.addChild(childHub);
