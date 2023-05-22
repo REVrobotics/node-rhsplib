@@ -8,6 +8,8 @@ program.version('1.0.0')
     .option('-l --list', 'List connected devices')
     .option('-a --analog <port>', 'Read an analog port')
     .option('-c --continuous', 'Specify that sensor readings should be continuous')
+    .option('-b --battery', 'Read the current battery voltage')
+    .option('-v --volt', 'Read the current 5V rail voltage')
     .parse(process.argv);
 
 const options = program.opts();
@@ -30,6 +32,42 @@ if(options.list) {
             hub.close();
         })
     }, 2000);
+}
+
+if(options.battery) {
+    let isContinuous = options.continuous !== undefined;
+    const hubs = await getConnectedExpansionHubs();
+
+    if(isContinuous) {
+        while(true) {
+            let value = await hubs[0].getBatteryVoltage();
+            console.log(`Battery: ${value}`);
+        }
+    } else {
+        let value = await hubs[0].getBatteryVoltage();
+        console.log(`Battery: ${value}`);
+        hubs.forEach((hub) => {
+            hub.close();
+        });
+    }
+}
+
+if(options.volt) {
+    let isContinuous = options.continuous !== undefined;
+    const hubs = await getConnectedExpansionHubs();
+
+    if(isContinuous) {
+        while(true) {
+            let value = await hubs[0].get5VMonitorVoltage();
+            console.log(`Battery: ${value}`);
+        }
+    } else {
+        let value = await hubs[0].get5VMonitorVoltage();
+        console.log(`Battery: ${value}`);
+        hubs.forEach((hub) => {
+            hub.close();
+        });
+    }
 }
 
 if(options.analog) {
