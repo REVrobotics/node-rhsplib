@@ -1,6 +1,10 @@
 import {Command} from "commander";
-import {ExpansionHub, getConnectedExpansionHubs} from "@rev-robotics/expansion-hub";
-import {RevHub} from "@rev-robotics/expansion-hub";
+import {
+    createLedPattern,
+    ExpansionHub,
+    getConnectedExpansionHubs, LedPatternStep,
+    RevHub
+} from "@rev-robotics/expansion-hub";
 
 const program = new Command();
 
@@ -9,6 +13,7 @@ program.version('1.0.0')
     .option('-c --count <counts>', 'Set encoder count. Must also specify --motor')
     .option('-m --motor <index>', 'Set motor index. Must also include --power or --count')
     .option('-p --power <power>', 'Set motor power. Must also specify --motor')
+    .option('--led', 'Start led pattern')
     .parse(process.argv);
 
 const options = program.opts();
@@ -47,7 +52,7 @@ if(options.count) {
 }
 
 if(options.power) {
-    if(!options.motor) {
+    if (!options.motor) {
         program.error("Please provide a motor index using --motor");
     }
     let index: number = Number(options.motor);
@@ -59,6 +64,24 @@ if(options.power) {
     await hub.setMotorChannelMode(index, 0, true);
     await hub.setMotorConstantPower(index, power);
     await hub.setMotorChannelEnable(index, true);
+}
+
+if(options.led) {
+    const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
+    const steps = [
+        new LedPatternStep(1, 0, 255, 0), //green
+        new LedPatternStep(1, 255, 0, 0), //red
+        new LedPatternStep(1, 0, 0, 255), //blue
+        new LedPatternStep(1, 255, 0, 255), //magenta
+        new LedPatternStep(1, 255, 255, 0), //yellow
+    ]
+    await hubs[0].sendKeepAlive();
+    const pattern = createLedPattern(steps);
+    await hubs[0].setModuleLedPattern(pattern);
+
+    setInterval(async () => {
+        await hubs[0].sendKeepAlive();
+    }, 1000);
 }
 
 async function toString(hub: RevHub): Promise<string> {

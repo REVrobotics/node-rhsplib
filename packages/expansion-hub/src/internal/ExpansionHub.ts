@@ -123,11 +123,11 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.getInterfacePacketID(interfaceName, functionNumber);
     }
 
-    getModuleLEDColor(): Promise<RGB> {
+    getModuleLedColor(): Promise<RGB> {
         return this.nativeRevHub.getModuleLEDColor();
     }
 
-    getModuleLEDPattern(): Promise<LEDPattern> {
+    getModuleLedPattern(): Promise<LEDPattern> {
         return this.nativeRevHub.getModuleLEDPattern();
     }
 
@@ -271,11 +271,11 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.setI2CChannelConfiguration(i2cChannel, speedCode);
     }
 
-    setModuleLEDColor(red: number, green: number, blue: number): Promise<void> {
+    setModuleLedColor(red: number, green: number, blue: number): Promise<void> {
         return this.nativeRevHub.setModuleLEDColor(red, green, blue);
     }
 
-    setModuleLEDPattern(ledPattern: LEDPattern): Promise<void> {
+    setModuleLedPattern(ledPattern: LEDPattern): Promise<void> {
         return this.nativeRevHub.setModuleLEDPattern(ledPattern);
     }
 
