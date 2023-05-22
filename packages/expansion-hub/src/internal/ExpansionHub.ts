@@ -32,6 +32,7 @@ import { RevHubType } from "@rev-robotics/rev-hub-core";
 import { RhspLibError } from "../errors/RhspLibError.js";
 import { startKeepAlive } from "../start-keep-alive.js";
 import { performance } from "perf_hooks";
+import { MotorMode } from "../MotorMode.js";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -264,7 +265,7 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     getMotorChannelMode(
         motorChannel: number,
-    ): Promise<{ motorMode: number; floatAtZero: boolean }> {
+    ): Promise<{ motorMode: MotorMode; floatAtZero: boolean }> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.getMotorChannelMode(motorChannel);
         });
@@ -284,7 +285,7 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     getMotorPIDCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
     ): Promise<PidCoefficients> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.getMotorPIDCoefficients(motorChannel, motorMode);
@@ -499,7 +500,7 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     setMotorChannelMode(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
         floatAtZero: boolean,
     ): Promise<void> {
         return this.convertErrorPromise(() => {
@@ -522,7 +523,7 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     setMotorPIDCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
         pid: PidCoefficients,
     ): Promise<void> {
         return this.convertErrorPromise(() => {
