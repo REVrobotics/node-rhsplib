@@ -11,7 +11,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "analog": "node dist/main.js -a",
+    "analog": "node dist/main.js -a 1",
     "list": "node dist/main.js -l"
   }
 }

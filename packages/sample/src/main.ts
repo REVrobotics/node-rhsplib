@@ -6,7 +6,7 @@ const program = new Command();
 
 program.version('1.0.0')
     .option('-l --list', 'List connected devices')
-    .option('-a --analog', 'Run the analog demo')
+    .option('-a --analog <port>', 'Read an analog port')
     .parse(process.argv);
 
 const options = program.opts();
@@ -32,12 +32,12 @@ if(options.list) {
 }
 
 if(options.analog) {
+    let port = Number(options.analog);
     const hubs = await getConnectedExpansionHubs();
 
     while(true) {
-        let value = await hubs[0].getADC(0, false);
-        let value2 = await hubs[0].getADC(2, false);
-        console.log(`ADC: ${value.toString().padStart(4)}   ${value2.toString().padStart(4)}`);
+        let value = await hubs[0].getADC(port, false);
+        console.log(`ADC: ${value}`);
     }
 }
 
