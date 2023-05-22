@@ -12,6 +12,7 @@ import {
     openHubWithAddress,
     openParentExpansionHub,
 } from "@rev-robotics/expansion-hub";
+import { runMotorConstantPower, runMotorConstantVelocity } from "./commands/motor.js";
 
 const program = new Command();
 
@@ -34,6 +35,24 @@ program
     )
     .action(async () => {
         await error();
+    });
+
+let motorCommand = program.command("motor");
+
+motorCommand.command("power <channel> <power>").action(async (channel, power) => {
+    console.log(`${channel} ${power}`);
+    let channelNumber = Number(channel);
+    let powerNumber = Number(power);
+    await runMotorConstantPower(channelNumber, powerNumber);
+});
+
+motorCommand
+    .command("velocity <channel> <speed>")
+    .action(async (channel, speed) => {
+        console.log(`${channel} ${speed}`);
+        let channelNumber = Number(channel);
+        let speedNumber = Number(speed);
+        await runMotorConstantVelocity(channelNumber, speedNumber);
     });
 
 program

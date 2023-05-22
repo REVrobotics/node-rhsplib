@@ -161,6 +161,12 @@ export interface ExpansionHub extends RevHub {
     resetMotorEncoder(motorChannel: number): Promise<void>;
     setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void>;
     getMotorConstantPower(motorChannel: number): Promise<number>;
+
+    /**
+     * Set the target velocity for a motor
+     * @param motorChannel the motor
+     * @param velocity_cps velocity in encoder counts per second
+     */
     setMotorTargetVelocity(motorChannel: number, velocity_cps: number): Promise<void>;
     getMotorTargetVelocity(motorChannel: number): Promise<number>;
     setMotorTargetPosition(
