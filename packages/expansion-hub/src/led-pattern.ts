@@ -20,10 +20,10 @@ export class LedPatternStep {
 
     /**
      *
+     * @param t time in seconds
      * @param r red component [0, 255]
      * @param g green component [0, 255]
      * @param b blue component [0, 255]
-     * @param t time in seconds
      */
     constructor(t: number, r: number, g: number, b: number) {
         this.r = r;
