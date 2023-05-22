@@ -61,7 +61,7 @@ program
 program
   .command("battery [continuous]")
   .description(
-    "Read the current battery Voltage. " + "Specify 'true' to run continuously."
+    "Read the current battery Voltage. Specify 'true' to run continuously."
   )
   .action(async (continuous) => {
     let isContinuous = Boolean(continuous);
