@@ -13,7 +13,6 @@ const program = new Command();
 program
     .version("1.0.0")
     .option("-l --list", "List connected devices")
-    .option("-e --error", "error out")
     .option("--led", "Start led pattern");
 
 program

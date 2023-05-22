@@ -12,7 +12,7 @@
     "scripts": {
         "build": "tsc",
         "list": "node dist/main.js -l",
-      "error": "tsc && node dist/main.js -e",
+        "error": "node dist/main.js error",
         "led": "node dist/main.js --led"
     }
 }
