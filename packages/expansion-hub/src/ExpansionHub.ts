@@ -71,7 +71,7 @@ export interface ExpansionHub extends RevHub {
      * Configure a specific motor
      * @param motorChannel
      * @param motorMode 0 for constant power, 1 for constant velocity, 2 for position
-     * @param floatAtZero whether to coast or break when power is set to 0
+     * @param floatAtZero whether to coast when power is set to 0. If this is set to true, the motor will brake at 0 instead.
      */
     setMotorChannelMode(motorChannel: number, motorMode: number, floatAtZero: boolean): Promise<void>;
     getMotorChannelMode(motorChannel: number): Promise<{motorMode: number, floatAtZero: boolean}>
