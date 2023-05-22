@@ -2,7 +2,7 @@ import {NackError, setPrototypeOf} from "./NackError.js";
 
 export class CommandImplementationPendingError extends NackError {
     constructor() {
-        super(253, "Command Implementation Pending");
+        super(253, "This command has not finished being implemented in this firmware version");
         setPrototypeOf(this, CommandImplementationPendingError.prototype);
     }
 }
