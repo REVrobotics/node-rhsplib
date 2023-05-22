@@ -11,6 +11,7 @@ import {closeSerialPort} from "../open-rev-hub";
 import {ParentRevHub, RevHub} from "../RevHub";
 import {EventEmitter} from "events";
 import {RevHubType} from "../RevHubType";
+import { MotorMode } from "../MotorMode";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -146,7 +147,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.getMotorChannelEnable(motorChannel);
     }
 
-    getMotorChannelMode(motorChannel: number): Promise<{ motorMode: number; floatAtZero: boolean }> {
+    getMotorChannelMode(motorChannel: number): Promise<{ motorMode: MotorMode; floatAtZero: boolean }> {
         return this.nativeRevHub.getMotorChannelMode(motorChannel);
     }
 
@@ -158,7 +159,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         return Promise.resolve(0);
     }
 
-    getMotorPIDCoefficients(motorChannel: number, motorMode: number): Promise<PIDCoefficients> {
+    getMotorPIDCoefficients(motorChannel: number, motorMode: MotorMode): Promise<PIDCoefficients> {
         return this.nativeRevHub.getMotorPIDCoefficients(motorChannel, motorMode);
     }
 
@@ -286,7 +287,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.setMotorChannelEnable(motorChannel, enable);
     }
 
-    setMotorChannelMode(motorChannel: number, motorMode: number, floatAtZero: boolean): Promise<void> {
+    setMotorChannelMode(motorChannel: number, motorMode: MotorMode, floatAtZero: boolean): Promise<void> {
         return this.nativeRevHub.setMotorChannelMode(motorChannel, motorMode, floatAtZero);
     }
 
@@ -294,7 +295,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.setMotorConstantPower(motorChannel, powerLevel*32_767);
     }
 
-    setMotorPIDCoefficients(motorChannel: number, motorMode: number, pid: PIDCoefficients): Promise<void> {
+    setMotorPIDCoefficients(motorChannel: number, motorMode: MotorMode, pid: PIDCoefficients): Promise<void> {
         return this.nativeRevHub.setMotorPIDCoefficients(motorChannel, motorMode, pid);
     }
 

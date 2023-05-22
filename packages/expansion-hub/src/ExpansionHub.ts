@@ -8,6 +8,7 @@ import {
     VerbosityLevel, Version
 } from "@rev-robotics/rhsplib";
 import {ParentRevHub, RevHub} from "./RevHub";
+import { MotorMode } from "./MotorMode";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub
 
@@ -70,11 +71,11 @@ export interface ExpansionHub extends RevHub {
     /**
      * Configure a specific motor
      * @param motorChannel
-     * @param motorMode 0 for constant power, 1 for constant velocity, 2 for position
+     * @param motorMode
      * @param floatAtZero whether to coast when power is set to 0. If this is set to true, the motor will brake at 0 instead.
      */
-    setMotorChannelMode(motorChannel: number, motorMode: number, floatAtZero: boolean): Promise<void>;
-    getMotorChannelMode(motorChannel: number): Promise<{motorMode: number, floatAtZero: boolean}>
+    setMotorChannelMode(motorChannel: number, motorMode: MotorMode, floatAtZero: boolean): Promise<void>;
+    getMotorChannelMode(motorChannel: number): Promise<{motorMode: MotorMode, floatAtZero: boolean}>
 
     /**
      * Enable a motor. The motor must be configured before enabling.
@@ -100,8 +101,8 @@ export interface ExpansionHub extends RevHub {
     getMotorTargetPosition(motorChannel: number): Promise<{targetPosition: number, targetTolerance: number}>;
     getMotorAtTarget(motorChannel: number): Promise<boolean>;
     getMotorEncoderPosition(motorChannel: number): Promise<number>;
-    setMotorPIDCoefficients(motorChannel: number, motorMode: number, pid: PIDCoefficients): Promise<void>;
-    getMotorPIDCoefficients(motorChannel: number, motorMode: number): Promise<PIDCoefficients>;
+    setMotorPIDCoefficients(motorChannel: number, motorMode: MotorMode, pid: PIDCoefficients): Promise<void>;
+    getMotorPIDCoefficients(motorChannel: number, motorMode: MotorMode): Promise<PIDCoefficients>;
 
     // Servo
     setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void>;
