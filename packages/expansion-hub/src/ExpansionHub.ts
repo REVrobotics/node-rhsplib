@@ -54,6 +54,8 @@ export interface ExpansionHub extends RevHub {
     getADC(channel: number, rawMode: boolean): Promise<number>;
 
     /**
+     * For SystemType.GPIO, the result is the total current running through
+     * the ground of the GPIO sub-system.
      *
      * @param systemType the type of system to get current for. Defaults to BATTERY, which is the whole device's current.
      * @param rawMode true for raw counts, false for mA
