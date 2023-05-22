@@ -1,13 +1,20 @@
 import {
     BulkInputData,
-    DebugGroup, DIODirection, I2CReadStatus, I2CSpeedCode, I2CWriteStatus,
+    DebugGroup,
+    DIODirection,
+    I2CReadStatus,
+    I2CSpeedCode,
+    I2CWriteStatus,
     LEDPattern,
     ModuleInterface,
-    ModuleStatus, PIDCoefficients,
+    ModuleStatus,
+    PIDCoefficients,
     RGB,
-    VerbosityLevel, Version
+    VerbosityLevel,
+    Version
 } from "@rev-robotics/rhsplib";
-import {ParentRevHub, RevHub} from "./RevHub";
+import { ParentRevHub, RevHub } from "./RevHub";
+import { SystemType } from "./SystemType";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub
 
@@ -45,6 +52,37 @@ export interface ExpansionHub extends RevHub {
      * @param rawMode true for raw counts, false for mV
      */
     getADC(channel: number, rawMode: boolean): Promise<number>;
+
+    /**
+     *
+     * @param systemType the type of system to get current for. Defaults to BATTERY, which is the whole device's current.
+     * @param rawMode true for raw counts, false for mA
+     */
+    getSystemCurrent(systemType?: SystemType, rawMode?: boolean): Promise<number>;
+
+    /**
+     * Get the current draw of a given motor.
+     *
+     * @param motorChannel
+     * @param rawMode true for raw counts, false for mA
+     */
+    getMotorCurrent(motorChannel: number, rawMode: boolean): Promise<number>
+
+    /**
+     * get the battery's voltage (mV)
+     */
+    getBatteryVoltage(): Promise<number>
+
+    /**
+     * Check the 5V line's voltage (mV)
+     */
+    get5VMonitorVoltage(): Promise<number>
+
+    /**
+     * Get the device's current temperature in degrees Celsius
+     */
+    getTemperature(): Promise<number>
+
     setPhoneChargeControl(chargeEnable: boolean): Promise<void>;
     getPhoneChargeControl(): Promise<boolean>;
     injectDataLogHint(hintText: string): Promise<void>;

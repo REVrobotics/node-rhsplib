@@ -1,16 +1,26 @@
-import {ExpansionHub} from "../ExpansionHub";
+import { ExpansionHub } from "../ExpansionHub";
 import {
-    BulkInputData, DebugGroup,
+    BulkInputData,
+    DebugGroup,
     DIODirection,
     I2CReadStatus,
-    I2CSpeedCode, I2CWriteStatus, LEDPattern, ModuleInterface, ModuleStatus, PIDCoefficients,
-    RevHub as NativeRevHub, RGB,
-    Serial as SerialPort, VerbosityLevel, Version
-} from "@rev-robotics/rhsplib"
-import {closeSerialPort} from "../open-rev-hub";
-import {ParentRevHub, RevHub} from "../RevHub";
-import {EventEmitter} from "events";
-import {RevHubType} from "../RevHubType";
+    I2CSpeedCode,
+    I2CWriteStatus,
+    LEDPattern,
+    ModuleInterface,
+    ModuleStatus,
+    PIDCoefficients,
+    RevHub as NativeRevHub,
+    RGB,
+    Serial as SerialPort,
+    VerbosityLevel,
+    Version
+} from "@rev-robotics/rhsplib";
+import { closeSerialPort } from "../open-rev-hub";
+import { ParentRevHub, RevHub } from "../RevHub";
+import { EventEmitter } from "events";
+import { RevHubType } from "../RevHubType";
+import { SystemType } from "../SystemType";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -80,6 +90,35 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     getADC(channel: number, rawMode: boolean): Promise<number> {
         return this.nativeRevHub.getADC(channel, rawMode ? 1 : 0);
+    }
+
+    async getSystemCurrent(systemType: SystemType = SystemType.Battery, rawMode: boolean = true): Promise<number> {
+        switch(systemType) {
+            case SystemType.I2C: return await this.nativeRevHub.getADC(5, rawMode ? 1 : 0);
+            case SystemType.Gpio: return await this.nativeRevHub.getADC(4, rawMode ? 1 : 0);
+            case SystemType.Servo: return await this.nativeRevHub.getADC(6, rawMode ? 1 : 0);
+            case SystemType.Battery: return await this.nativeRevHub.getADC(7, rawMode ? 1 : 0);
+        }
+        return -1;
+    }
+
+    async getMotorCurrent(motorChannel: number, rawMode: boolean): Promise<number> {
+        if(motorChannel > 11 || motorChannel < 8) {
+            throw new Error(`Motor Channel ${motorChannel} is out of range`);
+        }
+        return await this.nativeRevHub.getADC(motorChannel - 8, rawMode ? 1 : 0);
+    }
+
+    async getBatteryVoltage(): Promise<number> {
+        return await this.nativeRevHub.getADC(13, 0);
+    }
+
+    async get5VMonitorVoltage(): Promise<number> {
+        return await this.nativeRevHub.getADC(12, 0);
+    }
+
+    async getTemperature(): Promise<number> {
+        return (await this.nativeRevHub.getADC(14, 0))*10;
     }
 
     getBulkInputData(): Promise<BulkInputData> {
