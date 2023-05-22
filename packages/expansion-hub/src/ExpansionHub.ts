@@ -29,10 +29,10 @@ export interface ExpansionHub extends RevHub {
     sendFailSafe(): Promise<void>;
     setNewModuleAddress(newModuleAddress: number): Promise<void>;
     queryInterface(interfaceName: string): Promise<ModuleInterface>;
-    setModuleLEDColor(red: number, green: number, blue: number): Promise<void>;
-    getModuleLEDColor(): Promise<RGB>;
-    setModuleLEDPattern(ledPattern: LEDPattern): Promise<void>;
-    getModuleLEDPattern(): Promise<LEDPattern>;
+    setModuleLedColor(red: number, green: number, blue: number): Promise<void>;
+    getModuleLedColor(): Promise<RGB>;
+    setModuleLedPattern(ledPattern: LEDPattern): Promise<void>;
+    getModuleLedPattern(): Promise<LEDPattern>;
     setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<void>;
     getInterfacePacketID(interfaceName: string, functionNumber: number): Promise<number>;
 
