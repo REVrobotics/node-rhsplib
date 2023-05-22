@@ -6,21 +6,32 @@ import {
     LedPatternStep,
     RevHub,
 } from "@rev-robotics/expansion-hub";
-import { runMotorConstantPower } from "./commands/motor";
+import { runMotorConstantPower, runMotorConstantVelocity } from "./commands/motor.js";
 
 const program = new Command();
 
 program
     .version("1.0.0")
     .option("-l --list", "List connected devices")
-    .option("--led", "Start led pattern")
-    .parse(process.argv);
+    .option("--led", "Start led pattern");
 
 let motorCommand = program.command("motor");
 
 motorCommand.command("power <channel> <power>").action(async (channel, power) => {
-    await runMotorConstantPower(channel, power);
+    console.log(`${channel} ${power}`);
+    let channelNumber = Number(channel);
+    let powerNumber = Number(power);
+    await runMotorConstantPower(channelNumber, powerNumber);
 });
+
+motorCommand.command("velocity <channel> <speed>").action(async (channel, speed) => {
+    console.log(`${channel} ${speed}`);
+    let channelNumber = Number(channel);
+    let speedNumber = Number(speed);
+    await runMotorConstantVelocity(channelNumber, speedNumber);
+});
+
+program.parse(process.argv);
 
 const options = program.opts();
 
