@@ -38,6 +38,12 @@ export interface ExpansionHub extends RevHub {
 
     // Device Control
     getBulkInputData(): Promise<BulkInputData>;
+
+    /**
+     * Get the ADC reading of a given channel.
+     * @param channel
+     * @param rawMode true for raw counts, false for mV
+     */
     getADC(channel: number, rawMode: boolean): Promise<number>;
     setPhoneChargeControl(chargeEnable: boolean): Promise<void>;
     getPhoneChargeControl(): Promise<boolean>;
