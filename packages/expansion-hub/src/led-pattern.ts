@@ -1,4 +1,4 @@
-import {LEDPattern} from "@rev-robotics/rhsplib";
+import { LEDPattern } from "@rev-robotics/rhsplib";
 
 /**
  * Create the value representing an LED step.
@@ -6,7 +6,12 @@ import {LEDPattern} from "@rev-robotics/rhsplib";
  * @param step
  */
 function createLedPatternStep(step: LedPatternStep): number {
-    return (step.r & 0xFF) << 24 | (step.g & 0xFF) << 16 | (step.b & 0xFF) << 8 | (step.t*10 & 0xFF);
+    return (
+        ((step.r & 0xff) << 24) |
+        ((step.g & 0xff) << 16) |
+        ((step.b & 0xff) << 8) |
+        ((step.t * 10) & 0xff)
+    );
 }
 
 /**
@@ -55,11 +60,11 @@ export function createLedPattern(ledSteps: LedPatternStep[]): LEDPattern {
         rgbtPatternStep12: getOrZero(ledSteps, 12),
         rgbtPatternStep13: getOrZero(ledSteps, 13),
         rgbtPatternStep14: getOrZero(ledSteps, 14),
-        rgbtPatternStep15: getOrZero(ledSteps, 15)
+        rgbtPatternStep15: getOrZero(ledSteps, 15),
     };
 }
 
 function getOrZero(arr: LedPatternStep[], index: number): number {
-    if(index < arr.length) return createLedPatternStep(arr[index]);
+    if (index < arr.length) return createLedPatternStep(arr[index]);
     return 0;
 }
