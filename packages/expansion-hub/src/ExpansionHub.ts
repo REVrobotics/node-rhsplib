@@ -59,11 +59,6 @@ export interface ExpansionHub extends RevHub {
     // DIO
     setDigitalSingleOutput(digitalChannel: number, value?: boolean): Promise<void>;
     setDigitalAllOutputs(bitPackedField: number): Promise<void>;
-<<<<<<< HEAD
-    setDigitalDirection(digitalChannel: number, direction: DIODirection): Promise<void>;
-    getDigitalDirection(digitalChannel: number): Promise<DIODirection>;
-    getDigitalSingleInput(digitalChannel: number): Promise<boolean>;
-=======
 
     /**
      * Set a digital pin as input or output.
@@ -80,7 +75,10 @@ export interface ExpansionHub extends RevHub {
      * @param dioPin
      */
     getDigitalSingleInput(dioPin: number): Promise<boolean>;
->>>>>>> 254ad218fe77ac347abf9fa893f8dd5e7ce5f114
+
+    /**
+     * Read all digital inputs as a bit-packed number.
+     */
     getDigitalAllInputs(): Promise<number>;
 
     // I2C
