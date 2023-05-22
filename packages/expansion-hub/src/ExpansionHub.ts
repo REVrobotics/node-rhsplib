@@ -75,6 +75,10 @@ export interface ExpansionHub extends RevHub {
      * @param dioPin
      */
     getDigitalSingleInput(dioPin: number): Promise<boolean>;
+
+    /**
+     * Read all digital inputs as a bit-packed number.
+     */
     getDigitalAllInputs(): Promise<number>;
 
     // I2C
