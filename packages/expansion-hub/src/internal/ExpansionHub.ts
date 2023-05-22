@@ -95,7 +95,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     async getSystemCurrent(systemType: SystemType = SystemType.Battery, rawMode: boolean = true): Promise<number> {
         switch(systemType) {
             case SystemType.I2C: return await this.nativeRevHub.getADC(5, rawMode ? 1 : 0);
-            case SystemType.Gpio: return await this.nativeRevHub.getADC(4, rawMode ? 1 : 0);
+            case SystemType.DigitalIO: return await this.nativeRevHub.getADC(4, rawMode ? 1 : 0);
             case SystemType.Servo: return await this.nativeRevHub.getADC(6, rawMode ? 1 : 0);
             case SystemType.Battery: return await this.nativeRevHub.getADC(7, rawMode ? 1 : 0);
         }

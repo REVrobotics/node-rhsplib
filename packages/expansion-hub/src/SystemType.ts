@@ -1,6 +1,6 @@
 
 export enum SystemType {
-    Gpio,
+    DigitalIO,
     I2C,
     Servo,
     Battery
