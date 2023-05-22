@@ -7,6 +7,7 @@ const program = new Command();
 program.version('1.0.0')
     .option('-l --list', 'List connected devices')
     .option('-a --analog <port>', 'Read an analog port')
+    .option('-c --continuous', 'Specify that sensor readings should be continuous')
     .parse(process.argv);
 
 const options = program.opts();
@@ -32,12 +33,21 @@ if(options.list) {
 }
 
 if(options.analog) {
+    let isContinuous = options.continuous !== undefined;
     let port = Number(options.analog);
     const hubs = await getConnectedExpansionHubs();
 
-    while(true) {
+    if(isContinuous) {
+        while(true) {
+            let value = await hubs[0].getADC(port, false);
+            console.log(`ADC: ${value}`);
+        }
+    } else {
         let value = await hubs[0].getADC(port, false);
         console.log(`ADC: ${value}`);
+        hubs.forEach((hub) => {
+           hub.close();
+        });
     }
 }
 
