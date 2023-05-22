@@ -1,26 +1,40 @@
-import {Command} from "commander";
+import { Command } from "commander";
 import {
+    createLedPattern,
     ExpansionHub,
-    getConnectedExpansionHubs, getPossibleExpansionHubSerialNumbers,
-    MotorNotFullyConfiguredError,
-    NackError, openParentExpansionHub,
-    RevHub
+    openConnectedExpansionHubs,
+    LedPatternStep,
+    RevHub,
 } from "@rev-robotics/expansion-hub";
+import { error } from "./commands/error.js";
 
 const program = new Command();
 
-program.version('1.0.0')
-    .option('-l --list', 'List connected devices')
-    .option('-e --error', 'error out')
-    .parse(process.argv);
+program
+    .version("1.0.0")
+    .option("-l --list", "List connected devices")
+    .option("-e --error", "error out")
+    .option("--led", "Start led pattern");
+
+program
+    .command("error")
+    .description(
+        "Intentionally causes a few errors to happen and " +
+            "prints information about the errors.",
+    )
+    .action(async () => {
+        await error();
+    });
+
+program.parse(process.argv);
 
 const options = program.opts();
 
 console.log("Starting...");
 
-if(options.list) {
-    console.log("Starting to search Serial Ports")
-    const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
+if (options.list) {
+    console.log("Starting to search Serial Ports");
+    const hubs: ExpansionHub[] = await openConnectedExpansionHubs();
     hubs.forEach(async (hub) => {
         hub.on("error", (e: any) => {
             console.log(`Got error:`);
@@ -32,61 +46,33 @@ if(options.list) {
     setTimeout(() => {
         hubs.forEach(async (hub) => {
             hub.close();
-        })
+        });
     }, 2000);
 }
 
-if(options.error) {
-    let hubs = await getConnectedExpansionHubs();
-    try {
-        //Motor Mode intentionally wrong to get error
-        await hubs[0].setMotorChannelMode(2, 1, false);
-        await hubs[0].setMotorConstantPower(2, 0);
-        await hubs[0].setMotorChannelEnable(2, true);
-        console.log("Expected error, but got none")
-    } catch(e: any) {
-        console.log(e.message);
-        console.log(`Error is:\n\t${e}`);
-
-        console.log(`Is error a nack? ${e instanceof NackError}`);
-        if(e instanceof NackError) {
-            console.log(`Code is ${e.nackCode}`);
-        }
-        console.log(`Is error a motor command error? ${e instanceof MotorNotFullyConfiguredError}`);
-    }
-
-    hubs[0].close();
-
-    try {
-        let serialNumbers = await getPossibleExpansionHubSerialNumbers();
-        await openParentExpansionHub(serialNumbers[0], 12);
-        console.log("Did not get error opening hub ith wrong address");
-    } catch(e) {
-        console.log("Got error opening parent hub with invalid address");
-        console.log(e);
-    }
-
-    try {
-        let hubs = await getConnectedExpansionHubs();
-        if(hubs[0].isParent()) {
-            await hubs[0].addChildByAddress(15);
-        }
-        hubs[0].close();
-    } catch(e: any) {
-        console.log("Got error opening child hub with invalid address");
-        console.log(e);
-    }
+if (options.led) {
+    const hubs: ExpansionHub[] = await openConnectedExpansionHubs();
+    const steps = [
+        new LedPatternStep(1, 0, 255, 0), //green
+        new LedPatternStep(1, 255, 0, 0), //red
+        new LedPatternStep(1, 0, 0, 255), //blue
+        new LedPatternStep(1, 255, 0, 255), //magenta
+        new LedPatternStep(1, 255, 255, 0), //yellow
+    ];
+    await hubs[0].sendKeepAlive();
+    const pattern = createLedPattern(steps);
+    await hubs[0].setModuleLedPattern(pattern);
 }
 
 async function toString(hub: RevHub): Promise<string> {
     let result = `RevHub: ${hub.moduleAddress}\n`;
 
-    if(hub.isExpansionHub()) {
-        console.log(`Is open? ${hub.isOpen}`)
+    if (hub.isExpansionHub()) {
+        console.log(`Is open? ${hub.isOpen}`);
     }
 
-    if(hub.isParent()) {
-        for(const child of hub.children) {
+    if (hub.isParent()) {
+        for (const child of hub.children) {
             result += `\tRevHub: ${child.moduleAddress}\n`;
         }
     }

@@ -1,8 +1,8 @@
-import {RevHubType} from "./RevHubType";
-import {ExpansionHub} from "./ExpansionHub";
+import { RevHubType } from "./RevHubType";
+import { ExpansionHub } from "./ExpansionHub";
 
 export interface RevHub {
-    readonly moduleAddress: number
+    readonly moduleAddress: number;
     type: RevHubType;
 
     isParent(): this is ParentRevHub;
@@ -14,12 +14,12 @@ export interface RevHub {
      * @param eventName
      * @param listener
      */
-    on(eventName: "error", listener: (error: Error) => void): RevHub
+    on(eventName: "error", listener: (error: Error) => void): RevHub;
 }
 
 export interface ParentRevHub extends RevHub {
     readonly children: ReadonlyArray<RevHub>;
-    readonly serialNumber: string
+    readonly serialNumber: string;
 
     addChild(hub: RevHub): void;
     addChildByAddress(moduleAddress: number): Promise<RevHub>;
