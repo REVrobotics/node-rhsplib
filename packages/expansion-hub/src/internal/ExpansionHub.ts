@@ -118,7 +118,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     async getTemperature(): Promise<number> {
-        return (await this.nativeRevHub.getADC(14, 0))*10;
+        return (await this.nativeRevHub.getADC(14, 0))/10;
     }
 
     getBulkInputData(): Promise<BulkInputData> {

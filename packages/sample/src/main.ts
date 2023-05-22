@@ -10,6 +10,7 @@ program.version('1.0.0')
     .option('-c --continuous', 'Specify that sensor readings should be continuous')
     .option('-b --battery', 'Read the current battery voltage')
     .option('-v --volt', 'Read the current 5V rail voltage')
+    .option('-t --temperature', 'Read the current temperature')
     .parse(process.argv);
 
 const options = program.opts();
@@ -32,6 +33,24 @@ if(options.list) {
             hub.close();
         })
     }, 2000);
+}
+
+if(options.temperature) {
+    let isContinuous = options.continuous !== undefined;
+    const hubs = await getConnectedExpansionHubs();
+
+    if(isContinuous) {
+        while(true) {
+            let value = await hubs[0].getTemperature();
+            console.log(`Temperature: ${value} C`);
+        }
+    } else {
+        let value = await hubs[0].getTemperature();
+        console.log(`Temperature: ${value} C`);
+        hubs.forEach((hub) => {
+            hub.close();
+        });
+    }
 }
 
 if(options.battery) {
@@ -59,11 +78,11 @@ if(options.volt) {
     if(isContinuous) {
         while(true) {
             let value = await hubs[0].get5VMonitorVoltage();
-            console.log(`Battery: ${value}`);
+            console.log(`5V rail: ${value} mV`);
         }
     } else {
         let value = await hubs[0].get5VMonitorVoltage();
-        console.log(`Battery: ${value}`);
+        console.log(`5V rail: ${value} mV`);
         hubs.forEach((hub) => {
             hub.close();
         });

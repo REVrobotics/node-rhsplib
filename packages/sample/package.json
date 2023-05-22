@@ -14,6 +14,7 @@
     "analog": "node dist/main.js -a 0",
     "battery": "node dist/main.js -b -c",
     "voltage": "node dist/main.js -v -c",
+    "temperature": "node dist/main.js -t -c",
     "list": "node dist/main.js -l"
   }
 }
