@@ -1,4 +1,4 @@
-import {ExpansionHubInternal} from "./internal/ExpansionHub";
+import { ExpansionHubInternal } from "./internal/ExpansionHub";
 
 /**
  * Starts a keep alive task for a given hub.
@@ -6,7 +6,7 @@ import {ExpansionHubInternal} from "./internal/ExpansionHub";
  * @param intervalMs interval in ms between each keep alive
  */
 export function startKeepAlive(hub: ExpansionHubInternal, intervalMs: number) {
-    if(hub.keepAliveTimer) {
+    if (hub.keepAliveTimer) {
         //stop existing keep alive timer, so we can start a new one.
         clearInterval(hub.keepAliveTimer);
     }

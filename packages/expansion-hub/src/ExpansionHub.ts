@@ -1,19 +1,25 @@
 import {
     BulkInputData,
-    DebugGroup, DIODirection, I2CReadStatus, I2CSpeedCode, I2CWriteStatus,
+    DebugGroup,
+    DIODirection,
+    I2CReadStatus,
+    I2CSpeedCode,
+    I2CWriteStatus,
     LEDPattern,
     ModuleInterface,
-    ModuleStatus, PIDCoefficients,
+    ModuleStatus,
+    PIDCoefficients,
     RGB,
-    VerbosityLevel, Version
+    VerbosityLevel,
+    Version,
 } from "@rev-robotics/rhsplib";
-import {ParentRevHub, RevHub} from "./RevHub";
+import { ParentRevHub, RevHub } from "./RevHub";
 import { MotorMode } from "./MotorMode";
 
-export type ParentExpansionHub = ParentRevHub & ExpansionHub
+export type ParentExpansionHub = ParentRevHub & ExpansionHub;
 
 export interface ExpansionHub extends RevHub {
-    readonly isOpen: boolean
+    readonly isOpen: boolean;
     responseTimeoutMs: number;
 
     /**
@@ -34,7 +40,10 @@ export interface ExpansionHub extends RevHub {
     getModuleLedColor(): Promise<RGB>;
     setModuleLedPattern(ledPattern: LEDPattern): Promise<void>;
     getModuleLedPattern(): Promise<LEDPattern>;
-    setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<void>;
+    setDebugLogLevel(
+        debugGroup: DebugGroup,
+        verbosityLevel: VerbosityLevel,
+    ): Promise<void>;
     getInterfacePacketID(interfaceName: string, functionNumber: number): Promise<number>;
 
     // Device Control
@@ -57,14 +66,34 @@ export interface ExpansionHub extends RevHub {
     getDigitalAllInputs(): Promise<number>;
 
     // I2C
-    setI2CChannelConfiguration(i2cChannel: number, speedCode: I2CSpeedCode): Promise<void>;
+    setI2CChannelConfiguration(
+        i2cChannel: number,
+        speedCode: I2CSpeedCode,
+    ): Promise<void>;
     getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode>;
-    writeI2CSingleByte(i2cChannel: number, slaveAddress: number, byte: number): Promise<void>;
-    writeI2CMultipleBytes(i2cChannel: number, slaveAddress: number, bytes: number[]): Promise<void>;
+    writeI2CSingleByte(
+        i2cChannel: number,
+        slaveAddress: number,
+        byte: number,
+    ): Promise<void>;
+    writeI2CMultipleBytes(
+        i2cChannel: number,
+        slaveAddress: number,
+        bytes: number[],
+    ): Promise<void>;
     getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus>;
     readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void>;
-    readI2CMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number): Promise<void>;
-    writeI2CReadMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number, startAddress: number): Promise<void>;
+    readI2CMultipleBytes(
+        i2cChannel: number,
+        slaveAddress: number,
+        numBytesToRead: number,
+    ): Promise<void>;
+    writeI2CReadMultipleBytes(
+        i2cChannel: number,
+        slaveAddress: number,
+        numBytesToRead: number,
+        startAddress: number,
+    ): Promise<void>;
     getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus>;
 
     // Motor
@@ -74,17 +103,27 @@ export interface ExpansionHub extends RevHub {
      * @param motorMode
      * @param floatAtZero whether to coast when power is set to 0. If this is set to true, the motor will brake at 0 instead.
      */
-    setMotorChannelMode(motorChannel: number, motorMode: MotorMode, floatAtZero: boolean): Promise<void>;
-    getMotorChannelMode(motorChannel: number): Promise<{motorMode: MotorMode, floatAtZero: boolean}>
+    setMotorChannelMode(
+        motorChannel: number,
+        motorMode: MotorMode,
+        floatAtZero: boolean,
+    ): Promise<void>;
+    getMotorChannelMode(
+        motorChannel: number,
+    ): Promise<{ motorMode: MotorMode; floatAtZero: boolean }>;
 
     /**
      * Enable a motor. The motor must be configured before enabling.
      * @param motorChannel
      * @param enable
      */
+
     setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void>;
     getMotorChannelEnable(motorChannel: number): Promise<boolean>;
-    setMotorChannelCurrentAlertLevel(motorChannel: number, currentLimit_mA: number): Promise<void>;
+    setMotorChannelCurrentAlertLevel(
+        motorChannel: number,
+        currentLimit_mA: number,
+    ): Promise<void>;
     getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<number>;
     resetMotorEncoder(motorChannel: number): Promise<void>;
 
@@ -97,12 +136,25 @@ export interface ExpansionHub extends RevHub {
     getMotorConstantPower(motorChannel: number): Promise<number>;
     setMotorTargetVelocity(motorChannel: number, velocity_cps: number): Promise<void>;
     getMotorTargetVelocity(motorChannel: number): Promise<number>;
-    setMotorTargetPosition(motorChannel: number, targetPosition_counts: number, targetTolerance_counts: number): Promise<void>;
-    getMotorTargetPosition(motorChannel: number): Promise<{targetPosition: number, targetTolerance: number}>;
+    setMotorTargetPosition(
+        motorChannel: number,
+        targetPosition_counts: number,
+        targetTolerance_counts: number,
+    ): Promise<void>;
+    getMotorTargetPosition(
+        motorChannel: number,
+    ): Promise<{ targetPosition: number; targetTolerance: number }>;
     getMotorAtTarget(motorChannel: number): Promise<boolean>;
     getMotorEncoderPosition(motorChannel: number): Promise<number>;
-    setMotorPIDCoefficients(motorChannel: number, motorMode: MotorMode, pid: PIDCoefficients): Promise<void>;
-    getMotorPIDCoefficients(motorChannel: number, motorMode: MotorMode): Promise<PIDCoefficients>;
+    setMotorPIDCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        pid: PIDCoefficients,
+    ): Promise<void>;
+    getMotorPIDCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+    ): Promise<PIDCoefficients>;
 
     // Servo
     setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void>;
