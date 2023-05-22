@@ -6,14 +6,36 @@ import {
     LedPatternStep,
     RevHub,
 } from "@rev-robotics/expansion-hub";
+import { digitalRead, digitalWrite } from "./commands/digital.js";
 
 const program = new Command();
 
 program
     .version("1.0.0")
     .option("-l --list", "List connected devices")
-    .option("--led", "Start led pattern")
-    .parse(process.argv);
+    .option("--led", "Start led pattern");
+
+let digitalCommand = program.command("digital");
+
+digitalCommand
+    .command("write <channel> <state>")
+    .description("write digital pin")
+    .action(async (channel, state) => {
+        let channelNumber = Number(channel);
+        let stateValue = state == "high";
+
+        await digitalWrite(channelNumber, stateValue);
+    });
+
+digitalCommand
+    .command("read <channel>")
+    .description("read digital pin")
+    .action(async (channel) => {
+        let channelNumber = Number(channel);
+        await digitalRead(channelNumber);
+    });
+
+program.parse(process.argv);
 
 const options = program.opts();
 

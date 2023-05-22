@@ -57,11 +57,11 @@ export interface ExpansionHub extends RevHub {
     getFTDIResetControl(): Promise<boolean>;
 
     // DIO
-    setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void>;
+    setDigitalSingleOutput(digitalChannel: number, value?: boolean): Promise<void>;
     setDigitalAllOutputs(bitPackedField: number): Promise<void>;
-    setDigitalDirection(dioPin: number, direction: DIODirection): Promise<void>;
-    getDigitalDirection(dioPin: number): Promise<DIODirection>;
-    getDigitalSingleInput(dioPin: number): Promise<boolean>;
+    setDigitalDirection(digitalChannel: number, direction: DIODirection): Promise<void>;
+    getDigitalDirection(digitalChannel: number): Promise<DIODirection>;
+    getDigitalSingleInput(digitalChannel: number): Promise<boolean>;
     getDigitalAllInputs(): Promise<number>;
 
     // I2C

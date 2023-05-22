@@ -103,12 +103,12 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.getDigitalAllInputs();
     }
 
-    getDigitalDirection(dioPin: number): Promise<DIODirection> {
-        return this.nativeRevHub.getDigitalDirection(dioPin);
+    getDigitalDirection(digitalChannel: number): Promise<DIODirection> {
+        return this.nativeRevHub.getDigitalDirection(digitalChannel);
     }
 
-    getDigitalSingleInput(dioPin: number): Promise<boolean> {
-        return this.nativeRevHub.getDigitalSingleInput(dioPin);
+    getDigitalSingleInput(digitalChannel: number): Promise<boolean> {
+        return this.nativeRevHub.getDigitalSingleInput(digitalChannel);
     }
 
     getFTDIResetControl(): Promise<boolean> {
@@ -281,12 +281,12 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.setDigitalAllOutputs(bitPackedField);
     }
 
-    setDigitalDirection(dioPin: number, direction: DIODirection): Promise<void> {
-        return this.nativeRevHub.setDigitalDirection(dioPin, direction);
+    setDigitalDirection(digitalChannel: number, direction: DIODirection): Promise<void> {
+        return this.nativeRevHub.setDigitalDirection(digitalChannel, direction);
     }
 
-    setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void> {
-        return this.nativeRevHub.setDigitalSingleOutput(dioPin, value);
+    setDigitalSingleOutput(digitalChannel: number, value?: boolean): Promise<void> {
+        return this.nativeRevHub.setDigitalSingleOutput(digitalChannel, value);
     }
 
     setFTDIResetControl(ftdiResetControl: boolean): Promise<void> {
