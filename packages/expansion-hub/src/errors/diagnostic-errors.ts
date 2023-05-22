@@ -1,8 +1,11 @@
-import {NackError, setPrototypeOf} from "./NackError.js";
+import { NackError, setPrototypeOf } from "./NackError.js";
 
 export class CommandImplementationPendingError extends NackError {
     constructor() {
-        super(253, "This command has not finished being implemented in this firmware version");
+        super(
+            253,
+            "This command has not finished being implemented in this firmware version",
+        );
         setPrototypeOf(this, CommandImplementationPendingError.prototype);
     }
 }
@@ -14,9 +17,9 @@ export class CommandRoutingError extends NackError {
     }
 }
 
-export class PacketTypeIDUnknownError extends NackError {
+export class CommandNotSupportedError extends NackError {
     constructor() {
-        super(255, "Unknown Packet Type ID");
-        setPrototypeOf(this, PacketTypeIDUnknownError.prototype);
+        super(255, "Command is not supported. Unknown Packet Type ID");
+        setPrototypeOf(this, CommandNotSupportedError.prototype);
     }
 }
