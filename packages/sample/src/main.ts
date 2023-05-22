@@ -71,10 +71,6 @@ if (options.led) {
     await hubs[0].sendKeepAlive();
     const pattern = createLedPattern(steps);
     await hubs[0].setModuleLedPattern(pattern);
-
-    setInterval(async () => {
-        await hubs[0].sendKeepAlive();
-    }, 1000);
 }
 
 async function toString(hub: RevHub): Promise<string> {
