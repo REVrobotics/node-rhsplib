@@ -12,10 +12,10 @@
     "scripts": {
         "build": "tsc",
         "list": "node dist/main.js -l",
-        "analog": "node dist/main.js -a 0",
-        "battery": "node dist/main.js -b -c",
-        "voltage": "node dist/main.js -v -c",
-        "temperature": "node dist/main.js -t -c",
+        "analog": "node dist/main.js analog 0",
+        "battery": "node dist/main.js battery true",
+        "voltage": "node dist/main.js voltage true",
+        "temperature": "node dist/main.js temperature true",
         "led": "node dist/main.js --led"
     }
 }
