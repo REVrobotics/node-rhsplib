@@ -34,6 +34,9 @@ if(options.list) {
 }
 
 if(options.count) {
+    if(!options.motor) {
+        program.error("Please provide a motor index using --motor");
+    }
     let index = Number(options.motor);
     let counts = Number(options.count);
 
@@ -46,8 +49,13 @@ if(options.count) {
 }
 
 if(options.power) {
+    if(!options.motor) {
+        program.error("Please provide a motor index using --motor");
+    }
     let index: number = Number(options.motor);
     let power: number = Number(options.power);
+
+    console.log(`motor: ${index}, raw: ${options.motor}`);
 
     const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
     let hub = hubs[0];
