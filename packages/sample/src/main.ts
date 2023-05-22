@@ -6,9 +6,9 @@ const program = new Command();
 
 program.version('1.0.0')
     .option('-l --list', 'List connected devices')
-    .option('-c --count <counts>', 'Set encoder count.')
-    .option('-m --motor <index>', 'Set motor index. Must also include -p or -c')
-    .option('-p --power <power>', 'Set motor power')
+    .option('-c --count <counts>', 'Set encoder count. Must also specify --motor')
+    .option('-m --motor <index>', 'Set motor index. Must also include --power or --count')
+    .option('-p --power <power>', 'Set motor power. Must also specify --motor')
     .parse(process.argv);
 
 const options = program.opts();
@@ -34,7 +34,7 @@ if(options.list) {
 }
 
 if(options.count) {
-    let index = (options.motor) ? Number(options.motor) : 1;
+    let index = Number(options.motor);
     let counts = Number(options.count);
 
     const hubs = await getConnectedExpansionHubs();
@@ -46,7 +46,7 @@ if(options.count) {
 }
 
 if(options.power) {
-    let index: number = (options.motor) ? Number(options.motor) : 1;
+    let index: number = Number(options.motor);
     let power: number = Number(options.power);
 
     const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
