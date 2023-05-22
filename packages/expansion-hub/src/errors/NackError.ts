@@ -25,7 +25,7 @@ export const {
 
 export class NackError extends RevHubError {
     nackCode: number;
-    constructor(nackCode: number, message: string = "Nack Error") {
+    constructor(nackCode: number, message: string = "NACK error") {
         super(message);
 
         this.nackCode = nackCode;

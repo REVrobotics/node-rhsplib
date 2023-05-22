@@ -50,6 +50,7 @@ export async function openParentExpansionHub(
         await parentHub.open(moduleAddress);
         await parentHub.queryInterface("DEKA");
     } catch (e: any) {
+        //errorCode = -2 indicates timeout
         if (e.errorCode == -2) throw new NoExpansionHubWithAddressError(moduleAddress);
     }
     startKeepAlive(parentHub, 1000);
