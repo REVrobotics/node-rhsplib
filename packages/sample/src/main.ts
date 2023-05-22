@@ -19,6 +19,7 @@ import {
     openHubWithAddress,
     openParentExpansionHub,
 } from "@rev-robotics/expansion-hub";
+import { digitalRead, digitalWrite } from "./commands/digital.js";
 
 const program = new Command();
 
@@ -32,6 +33,26 @@ program
         "-a --address <address>",
         "module address. If this is specified, you must also specify a parent address",
     );
+
+let digitalCommand = program.command("digital");
+
+digitalCommand
+    .command("write <channel> <state>")
+    .description("write digital pin")
+    .action(async (channel, state) => {
+        let channelNumber = Number(channel);
+        let stateValue = state == "high";
+
+        await digitalWrite(channelNumber, stateValue);
+    });
+
+digitalCommand
+    .command("read <channel>")
+    .description("read digital pin")
+    .action(async (channel) => {
+        let channelNumber = Number(channel);
+        await digitalRead(channelNumber);
+    });
 
 program
     .command("testErrorHandling")
