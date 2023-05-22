@@ -35,7 +35,6 @@ program
     .action(async () => {
         await error();
     });
-<<<<<<< HEAD
 
 program
     .command("list")
