@@ -39,7 +39,10 @@ export interface ExpansionHub extends RevHub {
     getModuleLedColor(): Promise<RGB>;
     setModuleLedPattern(ledPattern: LEDPattern): Promise<void>;
     getModuleLedPattern(): Promise<LEDPattern>;
-    setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<void>;
+    setDebugLogLevel(
+        debugGroup: DebugGroup,
+        verbosityLevel: VerbosityLevel,
+    ): Promise<void>;
     getInterfacePacketID(interfaceName: string, functionNumber: number): Promise<number>;
 
     // Device Control
