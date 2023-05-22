@@ -13,8 +13,6 @@ program.version('1.0.0')
 
 const options = program.opts();
 
-console.log("Starting...");
-
 if(options.list) {
     console.log("Starting to search Serial Ports")
     const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
@@ -54,8 +52,6 @@ if(options.power) {
     }
     let index: number = Number(options.motor);
     let power: number = Number(options.power);
-
-    console.log(`motor: ${index}, raw: ${options.motor}`);
 
     const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
     let hub = hubs[0];
