@@ -1,20 +1,21 @@
 {
-  "name": "sample",
-  "descripton": "sample for testing Rev Hub code",
-  "version": "0.1.0",
-  "main": "dist/main.js",
-  "private": true,
-  "type": "module",
-  "dependencies": {
-    "@rev-robotics/expansion-hub": "*",
-    "commander": "^10.0.1"
-  },
-  "scripts": {
-    "build": "tsc",
-    "analog": "node dist/main.js -a 0",
-    "battery": "node dist/main.js -b -c",
-    "voltage": "node dist/main.js -v -c",
-    "temperature": "node dist/main.js -t -c",
-    "list": "node dist/main.js -l"
-  }
+    "name": "sample",
+    "descripton": "sample for testing Rev Hub code",
+    "version": "0.1.0",
+    "main": "dist/main.js",
+    "private": true,
+    "type": "module",
+    "dependencies": {
+        "@rev-robotics/expansion-hub": "*",
+        "commander": "^10.0.1"
+    },
+    "scripts": {
+        "build": "tsc",
+        "list": "node dist/main.js -l",
+"analog": "node dist/main.js -a 0",
+"battery": "node dist/main.js -b -c",
+"voltage": "node dist/main.js -v -c",
+"temperature": "node dist/main.js -t -c",
+        "led": "node dist/main.js --led"
+    }
 }

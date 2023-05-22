@@ -11,15 +11,15 @@ import {
     PIDCoefficients,
     RGB,
     VerbosityLevel,
-    Version
+    Version,
 } from "@rev-robotics/rhsplib";
 import { ParentRevHub, RevHub } from "./RevHub";
 import { SystemType } from "./SystemType";
 
-export type ParentExpansionHub = ParentRevHub & ExpansionHub
+export type ParentExpansionHub = ParentRevHub & ExpansionHub;
 
 export interface ExpansionHub extends RevHub {
-    readonly isOpen: boolean
+    readonly isOpen: boolean;
     responseTimeoutMs: number;
 
     /**
@@ -36,11 +36,14 @@ export interface ExpansionHub extends RevHub {
     sendFailSafe(): Promise<void>;
     setNewModuleAddress(newModuleAddress: number): Promise<void>;
     queryInterface(interfaceName: string): Promise<ModuleInterface>;
-    setModuleLEDColor(red: number, green: number, blue: number): Promise<void>;
-    getModuleLEDColor(): Promise<RGB>;
-    setModuleLEDPattern(ledPattern: LEDPattern): Promise<void>;
-    getModuleLEDPattern(): Promise<LEDPattern>;
-    setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<void>;
+    setModuleLedColor(red: number, green: number, blue: number): Promise<void>;
+    getModuleLedColor(): Promise<RGB>;
+    setModuleLedPattern(ledPattern: LEDPattern): Promise<void>;
+    getModuleLedPattern(): Promise<LEDPattern>;
+    setDebugLogLevel(
+        debugGroup: DebugGroup,
+        verbosityLevel: VerbosityLevel,
+    ): Promise<void>;
     getInterfacePacketID(interfaceName: string, functionNumber: number): Promise<number>;
 
     // Device Control
@@ -68,22 +71,22 @@ export interface ExpansionHub extends RevHub {
      * @param motorChannel
      * @param rawMode true for raw counts, false for mA
      */
-    getMotorCurrent(motorChannel: number, rawMode: boolean): Promise<number>
+    getMotorCurrent(motorChannel: number, rawMode: boolean): Promise<number>;
 
     /**
      * get the battery's voltage (mV)
      */
-    getBatteryVoltage(): Promise<number>
+    getBatteryVoltage(): Promise<number>;
 
     /**
      * Check the 5V line's voltage (mV)
      */
-    get5VMonitorVoltage(): Promise<number>
+    get5VMonitorVoltage(): Promise<number>;
 
     /**
      * Get the device's current temperature in degrees Celsius
      */
-    getTemperature(): Promise<number>
+    getTemperature(): Promise<number>;
 
     setPhoneChargeControl(chargeEnable: boolean): Promise<void>;
     getPhoneChargeControl(): Promise<boolean>;
@@ -102,34 +105,76 @@ export interface ExpansionHub extends RevHub {
     getDigitalAllInputs(): Promise<number>;
 
     // I2C
-    setI2CChannelConfiguration(i2cChannel: number, speedCode: I2CSpeedCode): Promise<void>;
+    setI2CChannelConfiguration(
+        i2cChannel: number,
+        speedCode: I2CSpeedCode,
+    ): Promise<void>;
     getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode>;
-    writeI2CSingleByte(i2cChannel: number, slaveAddress: number, byte: number): Promise<void>;
-    writeI2CMultipleBytes(i2cChannel: number, slaveAddress: number, bytes: number[]): Promise<void>;
+    writeI2CSingleByte(
+        i2cChannel: number,
+        slaveAddress: number,
+        byte: number,
+    ): Promise<void>;
+    writeI2CMultipleBytes(
+        i2cChannel: number,
+        slaveAddress: number,
+        bytes: number[],
+    ): Promise<void>;
     getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus>;
     readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void>;
-    readI2CMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number): Promise<void>;
-    writeI2CReadMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number, startAddress: number): Promise<void>;
+    readI2CMultipleBytes(
+        i2cChannel: number,
+        slaveAddress: number,
+        numBytesToRead: number,
+    ): Promise<void>;
+    writeI2CReadMultipleBytes(
+        i2cChannel: number,
+        slaveAddress: number,
+        numBytesToRead: number,
+        startAddress: number,
+    ): Promise<void>;
     getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus>;
 
     // Motor
-    setMotorChannelMode(motorChannel: number, motorMode: number, floatAtZero: boolean): Promise<void>;
-    getMotorChannelMode(motorChannel: number): Promise<{motorMode: number, floatAtZero: boolean}>
+    setMotorChannelMode(
+        motorChannel: number,
+        motorMode: number,
+        floatAtZero: boolean,
+    ): Promise<void>;
+    getMotorChannelMode(
+        motorChannel: number,
+    ): Promise<{ motorMode: number; floatAtZero: boolean }>;
     setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void>;
     getMotorChannelEnable(motorChannel: number): Promise<boolean>;
-    setMotorChannelCurrentAlertLevel(motorChannel: number, currentLimit_mA: number): Promise<void>;
+    setMotorChannelCurrentAlertLevel(
+        motorChannel: number,
+        currentLimit_mA: number,
+    ): Promise<void>;
     getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<number>;
     resetMotorEncoder(motorChannel: number): Promise<void>;
     setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void>;
     getMotorConstantPower(motorChannel: number): Promise<number>;
     setMotorTargetVelocity(motorChannel: number, velocity_cps: number): Promise<void>;
     getMotorTargetVelocity(motorChannel: number): Promise<number>;
-    setMotorTargetPosition(motorChannel: number, targetPosition_counts: number, targetTolerance_counts: number): Promise<void>;
-    getMotorTargetPosition(motorChannel: number): Promise<{targetPosition: number, targetTolerance: number}>;
+    setMotorTargetPosition(
+        motorChannel: number,
+        targetPosition_counts: number,
+        targetTolerance_counts: number,
+    ): Promise<void>;
+    getMotorTargetPosition(
+        motorChannel: number,
+    ): Promise<{ targetPosition: number; targetTolerance: number }>;
     getMotorAtTarget(motorChannel: number): Promise<boolean>;
     getMotorEncoderPosition(motorChannel: number): Promise<number>;
-    setMotorPIDCoefficients(motorChannel: number, motorMode: number, pid: PIDCoefficients): Promise<void>;
-    getMotorPIDCoefficients(motorChannel: number, motorMode: number): Promise<PIDCoefficients>;
+    setMotorPIDCoefficients(
+        motorChannel: number,
+        motorMode: number,
+        pid: PIDCoefficients,
+    ): Promise<void>;
+    getMotorPIDCoefficients(
+        motorChannel: number,
+        motorMode: number,
+    ): Promise<PIDCoefficients>;
 
     // Servo
     setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void>;
