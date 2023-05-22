@@ -9,7 +9,7 @@ export class CommandImplementationPendingError extends NackError {
 
 export class CommandRoutingError extends NackError {
     constructor() {
-        super(254, "Command Routing Error");
+        super(254, "The firmware reported a Command Routing Error");
         setPrototypeOf(this, CommandRoutingError.prototype);
     }
 }
