@@ -2,7 +2,7 @@ import { Command } from "commander";
 import {
     createLedPattern,
     ExpansionHub,
-    getConnectedExpansionHubs,
+    openConnectedExpansionHubs,
     LedPatternStep,
     RevHub,
 } from "@rev-robotics/expansion-hub";
@@ -21,7 +21,7 @@ console.log("Starting...");
 
 if (options.list) {
     console.log("Starting to search Serial Ports");
-    const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
+    const hubs: ExpansionHub[] = await openConnectedExpansionHubs();
     hubs.forEach(async (hub) => {
         hub.on("error", (e: any) => {
             console.log(`Got error:`);
@@ -38,7 +38,7 @@ if (options.list) {
 }
 
 if (options.led) {
-    const hubs: ExpansionHub[] = await getConnectedExpansionHubs();
+    const hubs: ExpansionHub[] = await openConnectedExpansionHubs();
     const steps = [
         new LedPatternStep(1, 0, 255, 0), //green
         new LedPatternStep(1, 255, 0, 0), //red
