@@ -16,15 +16,15 @@ We have several packages currently:
 ## Building and other tasks
 
 To build the app, run `lerna run build`.
-If you have other tasks you wish to create, define 
-them in the module's package.json like normal, and run 
+If you have other tasks you wish to create, define
+them in the module's package.json like normal, and run
 `lerna run mytask`. This will run 'mytask' in every
 module that has a task with that name.
 
-Tasks in the top-level package.json can be run with 
+Tasks in the top-level package.json can be run with
 `npm run` like normal.
 
-## Making a release
+## Making a release (update when we learn more about lerna)
 
 1. Check out the `main` branch
 2. Update `version` field in `package.json`
