@@ -2,18 +2,31 @@ import { Command } from "commander";
 import {
     createLedPattern,
     ExpansionHub,
-    openConnectedExpansionHubs,
     LedPatternStep,
+    openConnectedExpansionHubs,
     RevHub,
 } from "@rev-robotics/expansion-hub";
+import { runServo } from "./commands/servo.js";
 
 const program = new Command();
 
 program
     .version("1.0.0")
     .option("-l --list", "List connected devices")
-    .option("--led", "Start led pattern")
-    .parse(process.argv);
+    .option("--led", "Start led pattern");
+
+program
+    .command("servo <channel> <pulseWidth> [frameWidth]")
+    .description("Run a servo with pulse width and optional frame width")
+    .action(async (channel, pulseWidth, frameWidth) => {
+        let channelValue = Number(channel);
+        let pulseWidthValue = Number(pulseWidth);
+        let frameWidthValue = frameWidth ? Number(frameWidth) : 4000;
+
+        await runServo(channelValue, pulseWidthValue, frameWidthValue);
+    });
+
+program.parse(process.argv);
 
 const options = program.opts();
 
