@@ -1,6 +1,6 @@
 import { RevHub } from "@rev-robotics/expansion-hub";
 
-export async function toString(hub: RevHub): Promise<string> {
+export function hubHierarchyToString(hub: RevHub): string {
     let result = `RevHub: ${hub.moduleAddress}\n`;
 
     if (hub.isExpansionHub()) {

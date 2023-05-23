@@ -1,5 +1,5 @@
 import { ExpansionHub, openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
-import { toString } from "../HubStringify.js";
+import { hubHierarchyToString } from "../HubStringify.js";
 
 export async function list() {
     console.log("Starting to search Serial Ports");
@@ -9,7 +9,7 @@ export async function list() {
             console.log(`Got error:`);
             console.log(e);
         });
-        console.log(await toString(hub));
+        console.log(hubHierarchyToString(hub));
     }
 
     setTimeout(() => {
