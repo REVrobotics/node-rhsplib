@@ -37,6 +37,21 @@ program
         await error();
     });
 
+program
+    .command("list")
+    .description("List all connected expansion hubs")
+    .action(async () => {
+        await list();
+    });
+
+program
+    .command("led")
+    .description("Run LED steps")
+    .action(async () => {
+        let hub = await getExpansionHubOrThrow();
+        await led(hub);
+    });
+
 let motorCommand = program.command("motor");
 
 motorCommand.command("power <channel> <power>").action(async (channel, power) => {
@@ -46,14 +61,12 @@ motorCommand.command("power <channel> <power>").action(async (channel, power) =>
     await runMotorConstantPower(channelNumber, powerNumber);
 });
 
-motorCommand
-    .command("velocity <channel> <speed>")
-    .action(async (channel, speed) => {
-        console.log(`${channel} ${speed}`);
-        let channelNumber = Number(channel);
-        let speedNumber = Number(speed);
-        await runMotorConstantVelocity(channelNumber, speedNumber);
-    });
+motorCommand.command("velocity <channel> <speed>").action(async (channel, speed) => {
+    console.log(`${channel} ${speed}`);
+    let channelNumber = Number(channel);
+    let speedNumber = Number(speed);
+    await runMotorConstantVelocity(channelNumber, speedNumber);
+});
 
 program
     .command("list")
