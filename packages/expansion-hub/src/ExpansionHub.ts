@@ -14,6 +14,7 @@ import {
     Version,
 } from "@rev-robotics/rhsplib";
 import { ParentRevHub, RevHub } from "./RevHub";
+import { DigitalState } from "./digital-state";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
 
@@ -57,7 +58,7 @@ export interface ExpansionHub extends RevHub {
     getFTDIResetControl(): Promise<boolean>;
 
     // DIO
-    setDigitalSingleOutput(digitalChannel: number, value?: boolean): Promise<void>;
+    setDigitalSingleOutput(digitalChannel: number, value: DigitalState): Promise<void>;
     setDigitalAllOutputs(bitPackedField: number): Promise<void>;
 
     /**
@@ -74,7 +75,7 @@ export interface ExpansionHub extends RevHub {
      *
      * @param dioPin
      */
-    getDigitalSingleInput(dioPin: number): Promise<boolean>;
+    getDigitalSingleInput(dioPin: number): Promise<DigitalState>;
 
     /**
      * Read all digital inputs as a bit-packed number.

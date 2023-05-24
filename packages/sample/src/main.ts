@@ -7,6 +7,7 @@ import {
     RevHub,
 } from "@rev-robotics/expansion-hub";
 import { digitalRead, digitalWrite } from "./commands/digital.js";
+import { DigitalState } from "@rev-robotics/expansion-hub/dist/digital-state.js";
 
 const program = new Command();
 
@@ -22,7 +23,7 @@ digitalCommand
     .description("write digital pin")
     .action(async (channel, state) => {
         let channelNumber = Number(channel);
-        let stateValue = state == "high";
+        let stateValue = state == "high" ? DigitalState.High : DigitalState.Low;
 
         await digitalWrite(channelNumber, stateValue);
     });

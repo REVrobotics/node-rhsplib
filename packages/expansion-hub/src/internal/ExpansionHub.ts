@@ -20,6 +20,7 @@ import { closeSerialPort } from "../open-rev-hub";
 import { ParentRevHub, RevHub } from "../RevHub";
 import { EventEmitter } from "events";
 import { RevHubType } from "../RevHubType";
+import { DigitalState } from "../digital-state";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -107,8 +108,10 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.getDigitalDirection(digitalChannel);
     }
 
-    getDigitalSingleInput(digitalChannel: number): Promise<boolean> {
-        return this.nativeRevHub.getDigitalSingleInput(digitalChannel);
+    async getDigitalSingleInput(digitalChannel: number): Promise<DigitalState> {
+        return (await this.nativeRevHub.getDigitalSingleInput(digitalChannel))
+            ? DigitalState.High
+            : DigitalState.Low;
     }
 
     getFTDIResetControl(): Promise<boolean> {
@@ -285,8 +288,8 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.setDigitalDirection(digitalChannel, direction);
     }
 
-    setDigitalSingleOutput(digitalChannel: number, value?: boolean): Promise<void> {
-        return this.nativeRevHub.setDigitalSingleOutput(digitalChannel, value);
+    setDigitalSingleOutput(digitalChannel: number, value: DigitalState): Promise<void> {
+        return this.nativeRevHub.setDigitalSingleOutput(digitalChannel, value.isHigh());
     }
 
     setFTDIResetControl(ftdiResetControl: boolean): Promise<void> {
