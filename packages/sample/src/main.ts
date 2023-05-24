@@ -7,6 +7,20 @@ const program = new Command();
 
 program.version("1.0.0");
 
+program
+    .command("list")
+    .description("List all connected expansion hubs")
+    .action(async () => {
+        await list();
+    });
+
+program
+    .command("led")
+    .description("Run LED steps")
+    .action(async () => {
+        await led();
+    });
+
 let motorCommand = program.command("motor");
 
 motorCommand.command("power <channel> <power>").action(async (channel, power) => {
@@ -22,23 +36,5 @@ motorCommand.command("velocity <channel> <speed>").action(async (channel, speed)
     let speedNumber = Number(speed);
     await runMotorConstantVelocity(channelNumber, speedNumber);
 });
-
-program.parse(process.argv);
-
-console.log("Starting...");
-
-program
-    .command("list")
-    .description("List all connected expansion hubs")
-    .action(async () => {
-        await list();
-    });
-
-program
-    .command("led")
-    .description("Run LED steps")
-    .action(async () => {
-        await led();
-    });
 
 program.parse(process.argv);
