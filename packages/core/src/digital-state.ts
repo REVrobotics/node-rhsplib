@@ -1,6 +1,6 @@
 export class DigitalState {
-    static High = new DigitalState(true);
-    static Low = new DigitalState(false);
+    static readonly High = new DigitalState(true);
+    static readonly Low = new DigitalState(false);
 
     private readonly state: boolean;
     private constructor(state: boolean) {
