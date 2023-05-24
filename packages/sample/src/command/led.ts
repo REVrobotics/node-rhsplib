@@ -5,8 +5,7 @@ import {
     openConnectedExpansionHubs,
 } from "@rev-robotics/expansion-hub";
 
-export async function led() {
-    const hubs: ExpansionHub[] = await openConnectedExpansionHubs();
+export async function led(hubs: ExpansionHub[]) {
     const steps = [
         new LedPatternStep(1, 0, 255, 0), //green
         new LedPatternStep(1, 255, 0, 0), //red
