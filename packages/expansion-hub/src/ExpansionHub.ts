@@ -58,6 +58,11 @@ export interface ExpansionHub extends RevHub {
     getFTDIResetControl(): Promise<boolean>;
 
     // DIO
+    /**
+     * Set the output state of a digital pin.
+     * @param digitalChannel
+     * @param value whether the pin should be High or Low
+     */
     setDigitalSingleOutput(digitalChannel: number, value: DigitalState): Promise<void>;
     setDigitalAllOutputs(bitPackedField: number): Promise<void>;
 
