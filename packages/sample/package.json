@@ -11,9 +11,8 @@
     },
     "scripts": {
         "build": "tsc",
-        "list": "node dist/main.js -l",
         "motor": "node dist/main.js motor power 1 0.60",
-        "motor-position": "node dist/main.js --count 3000",
-        "led": "node dist/main.js --led"
+        "list": "node dist/main.js list",
+        "led": "node dist/main.js led"
     }
 }
