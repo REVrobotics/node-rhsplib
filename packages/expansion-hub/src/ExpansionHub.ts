@@ -63,8 +63,8 @@ export interface ExpansionHub extends RevHub {
      * @param digitalChannel
      * @param value whether the pin should be High or Low
      */
-    setDigitalSingleOutput(digitalChannel: number, value: DigitalState): Promise<void>;
-    setDigitalAllOutputs(bitPackedField: number): Promise<void>;
+    setDigitalOutput(digitalChannel: number, value: DigitalState): Promise<void>;
+    setAllDigitalOutputs(bitPackedField: number): Promise<void>;
 
     /**
      * Set a digital pin as input or output.
@@ -83,12 +83,12 @@ export interface ExpansionHub extends RevHub {
      *
      * @param digitalChannel
      */
-    getDigitalSingleInput(digitalChannel: number): Promise<DigitalState>;
+    getDigitalInput(digitalChannel: number): Promise<DigitalState>;
 
     /**
      * Read all digital inputs as a bit-packed number.
      */
-    getDigitalAllInputs(): Promise<number>;
+    getAllDigitalInputs(): Promise<number>;
 
     // I2C
     setI2CChannelConfiguration(

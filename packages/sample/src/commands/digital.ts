@@ -1,12 +1,12 @@
-import { DIODirection } from "@rev-robotics/rhsplib";
 import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
 import { DigitalState } from "@rev-robotics/expansion-hub/dist/digital-state.js";
+import { DigitalChannelDirection } from "@rev-robotics/expansion-hub/dist/DigitalChannelDirection.js";
 
 export async function digitalRead(channel: number): Promise<void> {
     let hubs = await openConnectedExpansionHubs();
 
-    await hubs[0].setDigitalDirection(channel, DIODirection.Input);
-    let state = await hubs[0].getDigitalSingleInput(channel);
+    await hubs[0].setDigitalDirection(channel, DigitalChannelDirection.Input);
+    let state = await hubs[0].getDigitalInput(channel);
 
     console.log(`${state}`);
 
@@ -18,8 +18,8 @@ export async function digitalRead(channel: number): Promise<void> {
 export async function digitalWrite(channel: number, state: DigitalState): Promise<void> {
     let hubs = await openConnectedExpansionHubs();
 
-    await hubs[0].setDigitalDirection(channel, DIODirection.Input);
-    await hubs[0].setDigitalSingleOutput(channel, state);
+    await hubs[0].setDigitalDirection(channel, DigitalChannelDirection.Input);
+    await hubs[0].setDigitalOutput(channel, state);
 
     for (let hub of hubs) {
         hub.close();

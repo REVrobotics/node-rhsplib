@@ -101,7 +101,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.getDestAddress();
     }
 
-    getDigitalAllInputs(): Promise<number> {
+    getAllDigitalInputs(): Promise<number> {
         return this.nativeRevHub.getDigitalAllInputs();
     }
 
@@ -112,7 +112,7 @@ export class ExpansionHubInternal implements ExpansionHub {
             : DigitalChannelDirection.Output;
     }
 
-    async getDigitalSingleInput(digitalChannel: number): Promise<DigitalState> {
+    async getDigitalInput(digitalChannel: number): Promise<DigitalState> {
         return (await this.nativeRevHub.getDigitalSingleInput(digitalChannel))
             ? DigitalState.High
             : DigitalState.Low;
@@ -284,7 +284,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         this.nativeRevHub.setDestAddress(destAddress);
     }
 
-    setDigitalAllOutputs(bitPackedField: number): Promise<void> {
+    setAllDigitalOutputs(bitPackedField: number): Promise<void> {
         return this.nativeRevHub.setDigitalAllOutputs(bitPackedField);
     }
 
@@ -300,7 +300,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         );
     }
 
-    setDigitalSingleOutput(digitalChannel: number, value: DigitalState): Promise<void> {
+    setDigitalOutput(digitalChannel: number, value: DigitalState): Promise<void> {
         return this.nativeRevHub.setDigitalSingleOutput(digitalChannel, value.isHigh());
     }
 
