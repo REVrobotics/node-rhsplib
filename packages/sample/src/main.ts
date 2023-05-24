@@ -12,7 +12,11 @@ import { list } from "./command/list.js";
 import { led } from "./command/led.js";
 import { runServo } from "./command/servo.js";
 import { openUsbControlHubs } from "./adb-setup.js";
-import { ExpansionHub, ParentExpansionHub } from "@rev-robotics/rev-hub-core";
+import {
+    DigitalState,
+    ExpansionHub,
+    ParentExpansionHub,
+} from "@rev-robotics/rev-hub-core";
 import {
     getPossibleExpansionHubSerialNumbers,
     openConnectedExpansionHubs,
@@ -41,7 +45,7 @@ digitalCommand
     .description("write digital pin")
     .action(async (channel, state) => {
         let channelNumber = Number(channel);
-        let stateValue = state == "high";
+        let stateValue = state == "high" ? DigitalState.High : DigitalState.Low;
 
         await digitalWrite(channelNumber, stateValue);
     });

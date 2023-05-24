@@ -13,6 +13,7 @@ import { I2CWriteStatus } from "./I2CWriteStatus.js";
 import { I2CReadStatus } from "./I2CReadStatus.js";
 import { PidCoefficients } from "./PidCoefficients.js";
 import { MotorMode } from "./MotorMode.js";
+import { DigitalState } from "./digital-state.js";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
 
@@ -105,11 +106,11 @@ export interface ExpansionHub extends RevHub {
     getFTDIResetControl(): Promise<boolean>;
 
     // DIO
-    setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void>;
+    setDigitalSingleOutput(dioPin: number, value: DigitalState): Promise<void>;
     setDigitalAllOutputs(bitPackedField: number): Promise<void>;
     setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void>;
     getDigitalDirection(dioPin: number): Promise<DioDirection>;
-    getDigitalSingleInput(dioPin: number): Promise<boolean>;
+    getDigitalSingleInput(dioPin: number): Promise<DigitalState>;
     getDigitalAllInputs(): Promise<number>;
 
     // I2C

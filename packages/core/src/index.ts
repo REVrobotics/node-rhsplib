@@ -3,6 +3,7 @@ export * from "./ControlHub.js";
 export * from "./RevHub.js";
 export * from "./RevHubType.js";
 export * from "./BulkInputData.js";
+export * from "./digital-state.js";
 export * from "./DebugGroup.js";
 export * from "./DioDirection.js";
 export * from "./DiscoveredAddresses.js";

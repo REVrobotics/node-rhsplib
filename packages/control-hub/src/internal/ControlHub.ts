@@ -5,6 +5,7 @@ import {
     BulkInputData,
     ControlHub,
     DebugGroup,
+    DigitalState,
     DioDirection,
     ExpansionHub,
     I2CReadStatus,
@@ -238,7 +239,7 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.getDigitalDirection(dioPin);
     }
 
-    async getDigitalSingleInput(dioPin: number): Promise<boolean> {
+    async getDigitalSingleInput(dioPin: number): Promise<DigitalState> {
         return this.embedded.getDigitalSingleInput(dioPin);
     }
 
@@ -411,7 +412,7 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.setDigitalDirection(dioPin, direction);
     }
 
-    async setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void> {
+    async setDigitalSingleOutput(dioPin: number, value: DigitalState): Promise<void> {
         return this.embedded.setDigitalSingleOutput(dioPin, value);
     }
 

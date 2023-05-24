@@ -1,6 +1,7 @@
 import {
     BulkInputData,
     DebugGroup,
+    DigitalState,
     DioDirection,
     ExpansionHub,
     I2CReadStatus,
@@ -132,11 +133,13 @@ export class ControlHubConnected implements ParentExpansionHub {
         return isOutput ? DioDirection.Output : DioDirection.Input;
     }
 
-    async getDigitalSingleInput(dioPin: number): Promise<boolean> {
-        return await this.sendCommand("getDigitalInput", {
+    async getDigitalSingleInput(dioPin: number): Promise<DigitalState> {
+        let result: boolean = await this.sendCommand("getDigitalInput", {
             id: this.id,
             digitalChannel: dioPin,
         });
+
+        return result ? DigitalState.High : DigitalState.Low;
     }
 
     async getFTDIResetControl(): Promise<boolean> {
@@ -417,11 +420,11 @@ export class ControlHubConnected implements ParentExpansionHub {
         });
     }
 
-    async setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void> {
+    async setDigitalSingleOutput(dioPin: number, value: DigitalState): Promise<void> {
         await this.sendCommand("readVersionString", {
             id: this.id,
             digitalChannel: dioPin,
-            value: value ?? false,
+            value: value.isHigh(),
         });
     }
 

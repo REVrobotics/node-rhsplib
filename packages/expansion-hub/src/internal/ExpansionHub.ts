@@ -1,4 +1,9 @@
-import { ExpansionHub, ParentRevHub, RevHub } from "@rev-robotics/rev-hub-core";
+import {
+    DigitalState,
+    ExpansionHub,
+    ParentRevHub,
+    RevHub,
+} from "@rev-robotics/rev-hub-core";
 import {
     NativeRevHub,
     Serial as SerialPort,
@@ -190,9 +195,11 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    getDigitalSingleInput(dioPin: number): Promise<boolean> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.getDigitalSingleInput(dioPin);
+    async getDigitalSingleInput(dioPin: number): Promise<DigitalState> {
+        return this.convertErrorPromise(async () => {
+            return (await this.nativeRevHub.getDigitalSingleInput(dioPin))
+                ? DigitalState.High
+                : DigitalState.Low;
         });
     }
 
@@ -446,9 +453,9 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void> {
+    setDigitalSingleOutput(dioPin: number, value: DigitalState): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setDigitalSingleOutput(dioPin, value);
+            return this.nativeRevHub.setDigitalSingleOutput(dioPin, value.isHigh());
         });
     }
 
