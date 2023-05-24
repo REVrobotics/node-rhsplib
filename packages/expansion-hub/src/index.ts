@@ -1,4 +1,5 @@
 export * from "./discovery";
+export * from "./digital-state";
 export * from "./open-rev-hub";
 export * from "./led-pattern";
 export { openParentExpansionHub, openExpansionHubAndAllChildren } from "./open-rev-hub";
