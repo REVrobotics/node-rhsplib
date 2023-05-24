@@ -1,4 +1,5 @@
 import {
+    DigitalChannelDirection,
     DigitalState,
     ExpansionHub,
     ParentRevHub,
@@ -189,15 +190,18 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    getDigitalDirection(dioPin: number): Promise<DioDirection> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.getDigitalDirection(dioPin);
+    getDigitalDirection(digitalChannel: number): Promise<DioDirection> {
+        return this.convertErrorPromise(async () => {
+            return (await this.nativeRevHub.getDigitalDirection(digitalChannel)) ==
+                DioDirection.Input
+                ? DioDirection.Input
+                : DioDirection.Output;
         });
     }
 
-    async getDigitalSingleInput(dioPin: number): Promise<DigitalState> {
+    async getDigitalSingleInput(digitalChannel: number): Promise<DigitalState> {
         return this.convertErrorPromise(async () => {
-            return (await this.nativeRevHub.getDigitalSingleInput(dioPin))
+            return (await this.nativeRevHub.getDigitalSingleInput(digitalChannel))
                 ? DigitalState.High
                 : DigitalState.Low;
         });
@@ -447,15 +451,23 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void> {
+    setDigitalDirection(digitalChannel: number, direction: DioDirection): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setDigitalDirection(dioPin, direction);
+            return this.nativeRevHub.setDigitalDirection(
+                digitalChannel,
+                direction == DioDirection.Input
+                    ? DioDirection.Input
+                    : DioDirection.Output,
+            );
         });
     }
 
-    setDigitalSingleOutput(dioPin: number, value: DigitalState): Promise<void> {
+    setDigitalSingleOutput(digitalChannel: number, value: DigitalState): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setDigitalSingleOutput(dioPin, value.isHigh());
+            return this.nativeRevHub.setDigitalSingleOutput(
+                digitalChannel,
+                value.isHigh(),
+            );
         });
     }
 
