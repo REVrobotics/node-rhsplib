@@ -118,7 +118,7 @@ export class ControlHubConnected implements ParentExpansionHub {
         });
     }
 
-    async getDigitalAllInputs(): Promise<number> {
+    async getAllDigitalInputs(): Promise<number> {
         return await this.sendCommand("getAllDigitalInputs", {
             id: this.id,
         });
@@ -133,7 +133,7 @@ export class ControlHubConnected implements ParentExpansionHub {
         return isOutput ? DioDirection.Output : DioDirection.Input;
     }
 
-    async getDigitalSingleInput(dioPin: number): Promise<DigitalState> {
+    async getDigitalInput(dioPin: number): Promise<DigitalState> {
         let result: boolean = await this.sendCommand("getDigitalInput", {
             id: this.id,
             digitalChannel: dioPin,
@@ -405,7 +405,7 @@ export class ControlHubConnected implements ParentExpansionHub {
         });
     }
 
-    async setDigitalAllOutputs(bitPackedField: number): Promise<void> {
+    async setAllDigitalOutputs(bitPackedField: number): Promise<void> {
         await this.sendCommand("readVersionString", {
             id: this.id,
             bitField: bitPackedField,
@@ -420,7 +420,7 @@ export class ControlHubConnected implements ParentExpansionHub {
         });
     }
 
-    async setDigitalSingleOutput(dioPin: number, value: DigitalState): Promise<void> {
+    async setDigitalOutput(dioPin: number, value: DigitalState): Promise<void> {
         await this.sendCommand("readVersionString", {
             id: this.id,
             digitalChannel: dioPin,
