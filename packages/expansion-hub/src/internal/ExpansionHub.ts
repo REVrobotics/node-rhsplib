@@ -21,6 +21,7 @@ import { ParentRevHub, RevHub } from "../RevHub";
 import { EventEmitter } from "events";
 import { RevHubType } from "../RevHubType";
 import { DigitalState } from "../digital-state";
+import { DigitalChannelDirection } from "../DigitalChannelDirection";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -104,8 +105,11 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.getDigitalAllInputs();
     }
 
-    getDigitalDirection(digitalChannel: number): Promise<DIODirection> {
-        return this.nativeRevHub.getDigitalDirection(digitalChannel);
+    async getDigitalDirection(digitalChannel: number): Promise<DigitalChannelDirection> {
+        return (await this.nativeRevHub.getDigitalDirection(digitalChannel)) ==
+            DIODirection.Input
+            ? DigitalChannelDirection.Input
+            : DigitalChannelDirection.Output;
     }
 
     async getDigitalSingleInput(digitalChannel: number): Promise<DigitalState> {
@@ -284,8 +288,16 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.setDigitalAllOutputs(bitPackedField);
     }
 
-    setDigitalDirection(digitalChannel: number, direction: DIODirection): Promise<void> {
-        return this.nativeRevHub.setDigitalDirection(digitalChannel, direction);
+    setDigitalDirection(
+        digitalChannel: number,
+        direction: DigitalChannelDirection,
+    ): Promise<void> {
+        return this.nativeRevHub.setDigitalDirection(
+            digitalChannel,
+            direction == DigitalChannelDirection.Input
+                ? DIODirection.Input
+                : DIODirection.Output,
+        );
     }
 
     setDigitalSingleOutput(digitalChannel: number, value: DigitalState): Promise<void> {

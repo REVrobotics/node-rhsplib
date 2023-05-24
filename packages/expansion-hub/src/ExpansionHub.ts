@@ -1,7 +1,6 @@
 import {
     BulkInputData,
     DebugGroup,
-    DIODirection,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
@@ -15,6 +14,7 @@ import {
 } from "@rev-robotics/rhsplib";
 import { ParentRevHub, RevHub } from "./RevHub";
 import { DigitalState } from "./digital-state";
+import { DigitalChannelDirection } from "./DigitalChannelDirection";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
 
@@ -71,8 +71,11 @@ export interface ExpansionHub extends RevHub {
      * @param digitalChannel
      * @param direction
      */
-    setDigitalDirection(digitalChannel: number, direction: DIODirection): Promise<void>;
-    getDigitalDirection(digitalChannel: number): Promise<DIODirection>;
+    setDigitalDirection(
+        digitalChannel: number,
+        direction: DigitalChannelDirection,
+    ): Promise<void>;
+    getDigitalDirection(digitalChannel: number): Promise<DigitalChannelDirection>;
 
     /**
      * Read the state of a given digital pin.
