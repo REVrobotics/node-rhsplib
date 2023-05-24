@@ -11,8 +11,8 @@
     },
     "scripts": {
         "build": "tsc",
-        "list": "node dist/main.js -l",
         "distance": "node dist/main.js distance 0",
-        "led": "node dist/main.js --led"
+        "list": "node dist/main.js list",
+        "led": "node dist/main.js led"
     }
 }
