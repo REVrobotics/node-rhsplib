@@ -63,19 +63,19 @@ export interface ExpansionHub extends RevHub {
 
     /**
      * Set a digital pin as input or output.
-     * @param dioPin
+     * @param digitalChannel
      * @param direction
      */
-    setDigitalDirection(dioPin: number, direction: DIODirection): Promise<void>;
-    getDigitalDirection(dioPin: number): Promise<DIODirection>;
+    setDigitalDirection(digitalChannel: number, direction: DIODirection): Promise<void>;
+    getDigitalDirection(digitalChannel: number): Promise<DIODirection>;
 
     /**
      * Read the state of a given digital pin.
      * Throws an error if the pin is not configured for input
      *
-     * @param dioPin
+     * @param digitalChannel
      */
-    getDigitalSingleInput(dioPin: number): Promise<DigitalState>;
+    getDigitalSingleInput(digitalChannel: number): Promise<DigitalState>;
 
     /**
      * Read all digital inputs as a bit-packed number.
