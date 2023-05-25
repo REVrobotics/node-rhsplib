@@ -88,8 +88,8 @@ export class ExpansionHubInternal implements ExpansionHub {
         this.nativeRevHub.setResponseTimeoutMs(timeout);
     }
 
-    async getAnalogInput(channel: number) {
-        return this.nativeRevHub.getADC(channel, 0);
+    async getAnalogInput(channel: number): Promise<number> {
+        return await this.nativeRevHub.getADC(channel, 0);
     }
 
     async getSystemCurrent(systemType: SystemType = SystemType.Battery): Promise<number> {
