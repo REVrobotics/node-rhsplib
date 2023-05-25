@@ -73,7 +73,6 @@ export class ControlHub implements ExpansionHub {
 
             return false;
         } catch (e) {
-            console.log(e);
             return false;
         }
     }

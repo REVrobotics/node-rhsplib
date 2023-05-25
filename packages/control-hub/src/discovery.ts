@@ -1,25 +1,21 @@
 import { ControlHub } from "./internal/ControlHub";
 
-export async function openConnectedControlHub(): Promise<
-  ControlHub | undefined
-> {
-  try {
-    return await createControlHub();
-  } catch (e: any) {
-    console.log(e);
-    return undefined;
-  }
+export async function openConnectedControlHub(): Promise<ControlHub | undefined> {
+    try {
+        return await createControlHub();
+    } catch (e: any) {
+        return undefined;
+    }
 }
 
 async function createControlHub(): Promise<ControlHub> {
-  let hub = new ControlHub();
+    let hub = new ControlHub();
 
-  if(!await hub.isConnected()) {
-    console.log("Hub not connected")
-    throw new Error("Hub is not connected via WiFi");
-  }
+    if (!(await hub.isConnected())) {
+        throw new Error("Hub is not connected via WiFi");
+    }
 
-  await hub.open();
+    await hub.open();
 
-  return hub;
+    return hub;
 }
