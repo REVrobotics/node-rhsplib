@@ -6,6 +6,7 @@ export async function list() {
     const controlHub = await openConnectedControlHub();
     if (controlHub) {
         console.log(`Control Hub: ${controlHub.moduleAddress}\n\n`);
+        controlHub.close();
     }
 
     console.log("USB Expansion Hub:");
