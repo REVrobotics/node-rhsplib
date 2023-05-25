@@ -5,11 +5,11 @@ export async function analog(channel: number, continuous: boolean) {
 
     if (continuous) {
         while (true) {
-            let value = await hubs[0].getADC(channel, false);
+            let value = await hubs[0].getAnalogInput(channel);
             console.log(`ADC: ${value} mV`);
         }
     } else {
-        let value = await hubs[0].getADC(channel, false);
+        let value = await hubs[0].getAnalogInput(channel);
         console.log(`ADC: ${value} mV`);
         hubs.forEach((hub) => {
             hub.close();
