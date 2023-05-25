@@ -29,9 +29,17 @@ digitalCommand
     .description("write digital pin")
     .action(async (channel, state) => {
         let channelNumber = Number(channel);
-        let stateValue = state == "high" ? DigitalState.High : DigitalState.Low;
+        let stateBoolean = false;
+        if (state === "high" || state === "1") {
+            stateBoolean = true;
+        } else if (state === "low" || state === "0") {
+            stateBoolean = false;
+        } else {
+            program.error("Please provide only one of {high, low, 1, 0}");
+        }
+        let digitalState = stateBoolean ? DigitalState.High : DigitalState.Low;
 
-        await digitalWrite(channelNumber, stateValue);
+        await digitalWrite(channelNumber, digitalState);
     });
 
 digitalCommand
