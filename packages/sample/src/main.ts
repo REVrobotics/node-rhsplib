@@ -26,7 +26,7 @@ let digitalCommand = program.command("digital");
 
 digitalCommand
     .command("write <channel> <state>")
-    .description("write digital pin")
+    .description("write digital pin. Valid values for <state> are high, low, 0, and 1.")
     .action(async (channel, state) => {
         let channelNumber = Number(channel);
         let stateBoolean = false;
