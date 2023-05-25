@@ -68,7 +68,7 @@ export class ControlHub implements ExpansionHub {
             });
             if (response.data) {
                 let rcVersion: string = response.data.rcVersion;
-                return semver.gt(rcVersion, semver.coerce("8.1")!.version);
+                return semver.gt(rcVersion, semver.coerce("8.2")!.version);
             }
 
             return false;
