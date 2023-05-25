@@ -6,6 +6,7 @@
   "dependencies": {
     "serialport": "^10.5.0",
     "isomorphic-ws": "^5.0.0",
+    "axios":"^1.4.0",
     "@rev-robotics/rhsplib": "*"
   },
   "devDependencies": {
