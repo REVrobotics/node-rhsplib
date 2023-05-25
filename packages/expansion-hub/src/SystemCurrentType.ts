@@ -1,4 +1,4 @@
-export enum SystemType {
+export enum SystemCurrentType {
     DigitalIO,
     I2C,
     Servo,

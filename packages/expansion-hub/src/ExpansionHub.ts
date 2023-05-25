@@ -14,7 +14,7 @@ import {
     Version,
 } from "@rev-robotics/rhsplib";
 import { ParentRevHub, RevHub } from "./RevHub";
-import { SystemType } from "./SystemType";
+import { SystemCurrentType } from "./SystemCurrentType";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
 
@@ -60,9 +60,9 @@ export interface ExpansionHub extends RevHub {
      * For SystemType.DigitalIO, the result is the total current running through
      * the shared ground of the digital channels.
      *
-     * @param systemType the type of system to get current for. Defaults to BATTERY, which is the whole device's current.
+     * @param systemType the type of system to get current for. Defaults to Battery, which is the whole device's current.
      */
-    getSystemCurrent(systemType?: SystemType): Promise<number>;
+    getSystemCurrent(systemType?: SystemCurrentType): Promise<number>;
 
     /**
      * Get the current draw of a given motor.
