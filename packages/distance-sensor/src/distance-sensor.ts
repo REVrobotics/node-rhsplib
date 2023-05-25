@@ -1,4 +1,4 @@
-import {ExpansionHub} from "@rev-robotics/expansion-hub";
+import { ExpansionHub } from "@rev-robotics/expansion-hub";
 import { VL53L0X } from "./drivers/vl53l0x";
 
 export class DistanceSensor {
@@ -6,8 +6,8 @@ export class DistanceSensor {
         this.device = new VL53L0X(hub, channel);
     }
 
-    private readonly device: DistanceSensorDriver
-    private timer?: NodeJS.Timer
+    private readonly device: DistanceSensorDriver;
+    private timer?: NodeJS.Timer;
 
     async setup() {
         await this.device.setup();
@@ -17,8 +17,12 @@ export class DistanceSensor {
         return await this.device.getDistanceMillimeters();
     }
 
-    startMeasuringDistance(onDistanceRecorded: (_: number) => void,
-                           interval: number) {
+    /**
+     * Begin recording distance continuously.
+     * @param onDistanceRecorded callback for when a distance is measured in mm.
+     * @param interval interval at which to start measurement.
+     */
+    startMeasuringDistance(onDistanceRecorded: (_: number) => void, interval: number) {
         this.stop();
         this.timer = setInterval(async () => {
             let distance = await this.getDistanceMillimeters();
@@ -27,7 +31,7 @@ export class DistanceSensor {
     }
 
     stop() {
-        if(this.timer) {
+        if (this.timer) {
             clearInterval(this.timer);
         }
     }

@@ -23,10 +23,12 @@ program
 
 program
     .command("distance <channel>")
+    .option("--continuous", "run continuously")
     .description("Read distance from a REV 2m distance sensor")
-    .action(async (channel): Promise<void> => {
+    .action(async (channel, options): Promise<void> => {
+        let isContinuous = options.continuous !== undefined;
         let channelNumber = Number(channel);
-        await distance(channelNumber);
+        await distance(channelNumber, isContinuous);
     });
 
 program.parse(process.argv);
