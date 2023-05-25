@@ -88,32 +88,29 @@ export class ExpansionHubInternal implements ExpansionHub {
         this.nativeRevHub.setResponseTimeoutMs(timeout);
     }
 
-    getADC(channel: number, rawMode: boolean): Promise<number> {
-        return this.nativeRevHub.getADC(channel, rawMode ? 1 : 0);
+    async getAnalogVoltage(channel: number) {
+        return this.nativeRevHub.getADC(channel, 0);
     }
 
-    async getSystemCurrent(
-        systemType: SystemType = SystemType.Battery,
-        rawMode: boolean = true,
-    ): Promise<number> {
+    async getSystemCurrent(systemType: SystemType = SystemType.Battery): Promise<number> {
         switch (systemType) {
             case SystemType.I2C:
-                return await this.nativeRevHub.getADC(5, rawMode ? 1 : 0);
+                return await this.nativeRevHub.getADC(5, 0);
             case SystemType.DigitalIO:
-                return await this.nativeRevHub.getADC(4, rawMode ? 1 : 0);
+                return await this.nativeRevHub.getADC(4, 0);
             case SystemType.Servo:
-                return await this.nativeRevHub.getADC(6, rawMode ? 1 : 0);
+                return await this.nativeRevHub.getADC(6, 0);
             case SystemType.Battery:
-                return await this.nativeRevHub.getADC(7, rawMode ? 1 : 0);
+                return await this.nativeRevHub.getADC(7, 0);
         }
         return -1;
     }
 
-    async getMotorCurrent(motorChannel: number, rawMode: boolean): Promise<number> {
+    async getMotorCurrent(motorChannel: number): Promise<number> {
         if (motorChannel > 11 || motorChannel < 8) {
             throw new Error(`Motor Channel ${motorChannel} is out of range`);
         }
-        return await this.nativeRevHub.getADC(motorChannel - 8, rawMode ? 1 : 0);
+        return await this.nativeRevHub.getADC(motorChannel - 8, 0);
     }
 
     async getBatteryVoltage(): Promise<number> {

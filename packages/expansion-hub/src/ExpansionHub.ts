@@ -50,28 +50,26 @@ export interface ExpansionHub extends RevHub {
     getBulkInputData(): Promise<BulkInputData>;
 
     /**
-     * Get the ADC reading of a given channel.
+     * Read the value of an analog channel in mV.
+     *
      * @param channel
-     * @param rawMode true for raw counts, false for mV
      */
-    getADC(channel: number, rawMode: boolean): Promise<number>;
+    getAnalogVoltage(channel: number): Promise<number>;
 
     /**
      * For SystemType.DigitalIO, the result is the total current running through
      * the ground of the digital GPIO sub-system.
      *
      * @param systemType the type of system to get current for. Defaults to BATTERY, which is the whole device's current.
-     * @param rawMode true for raw counts, false for mA
      */
-    getSystemCurrent(systemType?: SystemType, rawMode?: boolean): Promise<number>;
+    getSystemCurrent(systemType?: SystemType): Promise<number>;
 
     /**
      * Get the current draw of a given motor.
      *
      * @param motorChannel
-     * @param rawMode true for raw counts, false for mA
      */
-    getMotorCurrent(motorChannel: number, rawMode: boolean): Promise<number>;
+    getMotorCurrent(motorChannel: number): Promise<number>;
 
     /**
      * get the battery's voltage (mV)
