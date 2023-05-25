@@ -64,6 +64,12 @@ export interface ExpansionHub extends RevHub {
      * @param value whether the pin should be High or Low
      */
     setDigitalOutput(digitalChannel: number, value: DigitalState): Promise<void>;
+
+    /**
+     * Set the output state of all digital pins.
+     *
+     * @param bitPackedField a bit-field indicating the output states
+     */
     setAllDigitalOutputs(bitPackedField: number): Promise<void>;
 
     /**
