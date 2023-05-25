@@ -7,7 +7,11 @@
     "type": "module",
     "dependencies": {
         "@rev-robotics/expansion-hub": "*",
+        "ws": "8.13.0",
         "commander": "^10.0.1"
+    },
+    "devDependencies": {
+        "@types/ws": "^8.5.4"
     },
     "scripts": {
         "build": "tsc",

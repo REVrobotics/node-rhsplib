@@ -1,8 +1,14 @@
 import { ExpansionHub, openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
 import { hubHierarchyToString } from "../HubStringify.js";
+import { openConnectedControlHub } from "@rev-robotics/control-hub";
 
 export async function list() {
-    console.log("Starting to search Serial Ports");
+    const controlHub = await openConnectedControlHub();
+    if (controlHub) {
+        console.log(`Control Hub: ${controlHub.moduleAddress}\n\n`);
+    }
+
+    console.log("USB Expansion Hub:");
     const hubs: ExpansionHub[] = await openConnectedExpansionHubs();
     for (const hub of hubs) {
         hub.on("error", (e: any) => {
@@ -11,10 +17,7 @@ export async function list() {
         });
         console.log(hubHierarchyToString(hub));
     }
-
-    setTimeout(() => {
-        hubs.forEach(async (hub) => {
-            hub.close();
-        });
-    }, 2000);
+    hubs.forEach((hub) => {
+        hub.close();
+    });
 }
