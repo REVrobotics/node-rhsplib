@@ -109,3 +109,4 @@ typings/
 
 #Webstorm config
 .idea/
+!.idea/prettier.xml

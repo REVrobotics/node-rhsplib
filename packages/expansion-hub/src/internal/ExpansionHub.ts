@@ -1,16 +1,25 @@
-import {ExpansionHub} from "../ExpansionHub";
+import { ExpansionHub } from "../ExpansionHub";
 import {
-    BulkInputData, DebugGroup,
+    BulkInputData,
+    DebugGroup,
     DIODirection,
     I2CReadStatus,
-    I2CSpeedCode, I2CWriteStatus, LEDPattern, ModuleInterface, ModuleStatus, PIDCoefficients,
-    RevHub as NativeRevHub, RGB,
-    Serial as SerialPort, VerbosityLevel, Version
-} from "@rev-robotics/rhsplib"
-import {closeSerialPort} from "../open-rev-hub";
-import {ParentRevHub, RevHub} from "../RevHub";
-import {EventEmitter} from "events";
-import {RevHubType} from "../RevHubType";
+    I2CSpeedCode,
+    I2CWriteStatus,
+    LEDPattern,
+    ModuleInterface,
+    ModuleStatus,
+    PIDCoefficients,
+    RevHub as NativeRevHub,
+    RGB,
+    Serial as SerialPort,
+    VerbosityLevel,
+    Version,
+} from "@rev-robotics/rhsplib";
+import { closeSerialPort } from "../open-rev-hub";
+import { ParentRevHub, RevHub } from "../RevHub";
+import { EventEmitter } from "events";
+import { RevHubType } from "../RevHubType";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -26,11 +35,11 @@ export class ExpansionHubInternal implements ExpansionHub {
     serialPort: SerialPort;
     serialNumber: string | undefined;
     nativeRevHub: NativeRevHub;
-    moduleAddress!: number
+    moduleAddress!: number;
     private mutableChildren: RevHub[] = [];
 
     get children(): ReadonlyArray<RevHub> {
-        return this.mutableChildren
+        return this.mutableChildren;
     }
 
     keepAliveTimer?: NodeJS.Timer;
@@ -48,13 +57,13 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     close(): void {
         //Closing a parent closes the serial port and all children
-        if(this.isParent()) {
-            if(this.serialPort) closeSerialPort(this.serialPort);
+        if (this.isParent()) {
+            if (this.serialPort) closeSerialPort(this.serialPort);
             this.children.forEach((child) => {
-                if(child.isExpansionHub()) {
+                if (child.isExpansionHub()) {
                     child.close();
                 }
-            })
+            });
         }
 
         clearInterval(this.keepAliveTimer);
@@ -122,11 +131,11 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.getInterfacePacketID(interfaceName, functionNumber);
     }
 
-    getModuleLEDColor(): Promise<RGB> {
+    getModuleLedColor(): Promise<RGB> {
         return this.nativeRevHub.getModuleLEDColor();
     }
 
-    getModuleLEDPattern(): Promise<LEDPattern> {
+    getModuleLedPattern(): Promise<LEDPattern> {
         return this.nativeRevHub.getModuleLEDPattern();
     }
 
@@ -146,7 +155,9 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.getMotorChannelEnable(motorChannel);
     }
 
-    getMotorChannelMode(motorChannel: number): Promise<{ motorMode: number; floatAtZero: boolean }> {
+    getMotorChannelMode(
+        motorChannel: number,
+    ): Promise<{ motorMode: number; floatAtZero: boolean }> {
         return this.nativeRevHub.getMotorChannelMode(motorChannel);
     }
 
@@ -158,11 +169,16 @@ export class ExpansionHubInternal implements ExpansionHub {
         return Promise.resolve(0);
     }
 
-    getMotorPIDCoefficients(motorChannel: number, motorMode: number): Promise<PIDCoefficients> {
+    getMotorPIDCoefficients(
+        motorChannel: number,
+        motorMode: number,
+    ): Promise<PIDCoefficients> {
         return this.nativeRevHub.getMotorPIDCoefficients(motorChannel, motorMode);
     }
 
-    getMotorTargetPosition(motorChannel: number): Promise<{ targetPosition: number; targetTolerance: number }> {
+    getMotorTargetPosition(
+        motorChannel: number,
+    ): Promise<{ targetPosition: number; targetTolerance: number }> {
         return this.nativeRevHub.getMotorTargetPosition(motorChannel);
     }
 
@@ -206,8 +222,16 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.queryInterface(interfaceName);
     }
 
-    readI2CMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number): Promise<void> {
-        return this.nativeRevHub.readI2CMultipleBytes(i2cChannel, slaveAddress, numBytesToRead);
+    readI2CMultipleBytes(
+        i2cChannel: number,
+        slaveAddress: number,
+        numBytesToRead: number,
+    ): Promise<void> {
+        return this.nativeRevHub.readI2CMultipleBytes(
+            i2cChannel,
+            slaveAddress,
+            numBytesToRead,
+        );
     }
 
     readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void> {
@@ -242,7 +266,10 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.sendWriteCommand(packetTypeID, payload);
     }
 
-    setDebugLogLevel(debugGroup: DebugGroup, verbosityLevel: VerbosityLevel): Promise<void> {
+    setDebugLogLevel(
+        debugGroup: DebugGroup,
+        verbosityLevel: VerbosityLevel,
+    ): Promise<void> {
         return this.nativeRevHub.setDebugLogLevel(debugGroup, verbosityLevel);
     }
 
@@ -266,40 +293,69 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.setFTDIResetControl(ftdiResetControl);
     }
 
-    setI2CChannelConfiguration(i2cChannel: number, speedCode: I2CSpeedCode): Promise<void> {
+    setI2CChannelConfiguration(
+        i2cChannel: number,
+        speedCode: I2CSpeedCode,
+    ): Promise<void> {
         return this.nativeRevHub.setI2CChannelConfiguration(i2cChannel, speedCode);
     }
 
-    setModuleLEDColor(red: number, green: number, blue: number): Promise<void> {
+    setModuleLedColor(red: number, green: number, blue: number): Promise<void> {
         return this.nativeRevHub.setModuleLEDColor(red, green, blue);
     }
 
-    setModuleLEDPattern(ledPattern: LEDPattern): Promise<void> {
+    setModuleLedPattern(ledPattern: LEDPattern): Promise<void> {
         return this.nativeRevHub.setModuleLEDPattern(ledPattern);
     }
 
-    setMotorChannelCurrentAlertLevel(motorChannel: number, currentLimit_mA: number): Promise<void> {
-        return this.nativeRevHub.setMotorChannelCurrentAlertLevel(motorChannel, currentLimit_mA);
+    setMotorChannelCurrentAlertLevel(
+        motorChannel: number,
+        currentLimit_mA: number,
+    ): Promise<void> {
+        return this.nativeRevHub.setMotorChannelCurrentAlertLevel(
+            motorChannel,
+            currentLimit_mA,
+        );
     }
 
     setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void> {
         return this.nativeRevHub.setMotorChannelEnable(motorChannel, enable);
     }
 
-    setMotorChannelMode(motorChannel: number, motorMode: number, floatAtZero: boolean): Promise<void> {
-        return this.nativeRevHub.setMotorChannelMode(motorChannel, motorMode, floatAtZero);
+    setMotorChannelMode(
+        motorChannel: number,
+        motorMode: number,
+        floatAtZero: boolean,
+    ): Promise<void> {
+        return this.nativeRevHub.setMotorChannelMode(
+            motorChannel,
+            motorMode,
+            floatAtZero,
+        );
     }
 
     setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
         return this.nativeRevHub.setMotorConstantPower(motorChannel, powerLevel);
     }
 
-    setMotorPIDCoefficients(motorChannel: number, motorMode: number, pid: PIDCoefficients): Promise<void> {
+    setMotorPIDCoefficients(
+        motorChannel: number,
+        motorMode: number,
+        pid: PIDCoefficients,
+    ): Promise<void> {
         return this.nativeRevHub.setMotorPIDCoefficients(motorChannel, motorMode, pid);
     }
 
-    setMotorTargetPosition(motorChannel: number, targetPosition_counts: number, targetTolerance_counts: number): Promise<void> {
-        return this.nativeRevHub.setMotorTargetPosition(motorChannel, targetPosition_counts, targetTolerance_counts);
+    setMotorTargetPosition(
+        motorChannel: number,
+        targetPosition_counts: number,
+        targetTolerance_counts: number,
+    ): Promise<void> {
+        return this.nativeRevHub.setMotorTargetPosition(
+            motorChannel,
+            targetPosition_counts,
+            targetTolerance_counts,
+        );
     }
 
     setMotorTargetVelocity(motorChannel: number, velocity_cps: number): Promise<void> {
@@ -339,15 +395,33 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.setServoPulseWidth(servoChannel, pulseWidth);
     }
 
-    writeI2CMultipleBytes(i2cChannel: number, slaveAddress: number, bytes: number[]): Promise<void> {
+    writeI2CMultipleBytes(
+        i2cChannel: number,
+        slaveAddress: number,
+        bytes: number[],
+    ): Promise<void> {
         return this.nativeRevHub.writeI2CMultipleBytes(i2cChannel, slaveAddress, bytes);
     }
 
-    writeI2CReadMultipleBytes(i2cChannel: number, slaveAddress: number, numBytesToRead: number, startAddress: number): Promise<void> {
-        return this.nativeRevHub.writeI2CReadMultipleBytes(i2cChannel, slaveAddress, numBytesToRead, startAddress);
+    writeI2CReadMultipleBytes(
+        i2cChannel: number,
+        slaveAddress: number,
+        numBytesToRead: number,
+        startAddress: number,
+    ): Promise<void> {
+        return this.nativeRevHub.writeI2CReadMultipleBytes(
+            i2cChannel,
+            slaveAddress,
+            numBytesToRead,
+            startAddress,
+        );
     }
 
-    writeI2CSingleByte(i2cChannel: number, slaveAddress: number, byte: number): Promise<void> {
+    writeI2CSingleByte(
+        i2cChannel: number,
+        slaveAddress: number,
+        byte: number,
+    ): Promise<void> {
         return this.nativeRevHub.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
     }
 
