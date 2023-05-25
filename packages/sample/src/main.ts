@@ -22,43 +22,53 @@ program
     });
 
 program
-    .command("analog <port> [continuous]")
+    .option("--continuous", "Run continuously")
+    .command("analog <port>")
     .description(
-        "Read the analog value of the given port. Specify 'true' as the " +
-            "second argument to run continuously.",
+        "Read the analog value of the given port. Specify" +
+            "--continuous to run continuously.",
     )
-    .action(async (port, continuous) => {
-        let isContinuous = Boolean(continuous);
+    .action(async (port) => {
+        let options = program.opts();
+        let isContinuous = options.continuous !== undefined;
         let portNumber = Number(port);
         await analog(portNumber, isContinuous);
     });
 
 program
-    .command("temperature [continuous]")
+    .option("--continuous", "Run continuously")
+    .command("temperature")
     .description(
         "Read the current temperature in Celsius. " +
-            "Specify 'true' to run continuously.",
+            "Specify --continuous to run continuously",
     )
     .action(async (continuous) => {
-        let isContinuous = Boolean(continuous);
+        let options = program.opts();
+        let isContinuous = options.continuous !== undefined;
         await temperature(isContinuous);
     });
 
 program
-    .command("voltage [continuous]")
+    .option("--continuous", "Run continuously")
+    .command("voltage")
     .description(
-        "Read the current 5V rail voltage. " + "Specify 'true' to run continuously.",
+        "Read the current 5V rail voltage. Specify --continuous to run continuously",
     )
     .action(async (continuous) => {
-        let isContinuous = Boolean(continuous);
+        let options = program.opts();
+        let isContinuous = options.continuous !== undefined;
         await voltageRail(isContinuous);
     });
 
 program
-    .command("battery [continuous]")
-    .description("Read the current battery Voltage. Specify 'true' to run continuously.")
+    .option("--continuous", "Run continuously")
+    .command("battery")
+    .description(
+        "Read the current battery Voltage. Specify --continuous to run continuously",
+    )
     .action(async (continuous) => {
-        let isContinuous = Boolean(continuous);
+        let options = program.opts();
+        let isContinuous = options.continuous !== undefined;
         await battery(isContinuous);
     });
 
