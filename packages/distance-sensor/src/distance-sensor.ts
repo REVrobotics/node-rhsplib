@@ -9,10 +9,16 @@ export class DistanceSensor {
     private readonly device: DistanceSensorDriver;
     private timer?: NodeJS.Timer;
 
+    /**
+     * Initializes the device
+     */
     async setup() {
         await this.device.setup();
     }
 
+    /**
+     * Measure the current distance in millimeters.
+     */
     async getDistanceMillimeters(): Promise<number> {
         return await this.device.getDistanceMillimeters();
     }
@@ -30,6 +36,9 @@ export class DistanceSensor {
         }, interval);
     }
 
+    /**
+     * Stops calling the measurement callback if one is defined.
+     */
     stop() {
         if (this.timer) {
             clearInterval(this.timer);
