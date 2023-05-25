@@ -19,14 +19,33 @@ import {
   VerbosityLevel,
   Version,
 } from "@rev-robotics/rhsplib";
+import axios from "axios";
 
 export class ControlHub implements ExpansionHub {
   readonly isOpen: boolean = true;
   readonly moduleAddress: number = 0;
   responseTimeoutMs: number = 0;
   type: RevHubType = RevHubType.ControlHub;
+  webSocketConnection?: WebSocket;
 
-  async open() {}
+  async open() {
+    this.webSocketConnection = new WebSocket("ws://192.168.43.1:8081");
+  }
+
+  async isConnected(): Promise<boolean> {
+    try {
+      let response = await axios.get("http://192.168.43.1:8080/js/rcInfo.json");
+      if(response.data) {
+        let rcInfo = JSON.parse(response.data);
+        console.log(rcInfo);
+        return rcInfo.webSocketApiVersion == "1";
+      }
+
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
 
   close(): void {}
 
