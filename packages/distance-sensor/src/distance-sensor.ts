@@ -35,7 +35,10 @@ export class DistanceSensor {
      * @param onDistanceRecorded callback for when a distance is measured in mm.
      * @param interval interval at which to start measurement.
      */
-    startMeasuringDistance(onDistanceRecorded: (_: number) => void, interval: number) {
+    startMeasuringDistance(
+        onDistanceRecorded: (millimeters: number) => void,
+        interval: number,
+    ) {
         if (!this.isInitialized) {
             throw new Error(
                 "Distance Sensor is not initialized. Please call setup() first.",
