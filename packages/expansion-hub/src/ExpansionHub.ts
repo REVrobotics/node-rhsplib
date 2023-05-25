@@ -58,7 +58,7 @@ export interface ExpansionHub extends RevHub {
 
     /**
      * For SystemType.DigitalIO, the result is the total current running through
-     * the ground of the digital GPIO sub-system.
+     * the shared ground of the digital channels.
      *
      * @param systemType the type of system to get current for. Defaults to BATTERY, which is the whole device's current.
      */
