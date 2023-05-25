@@ -16,6 +16,7 @@ import {
     Version,
 } from "@rev-robotics/rhsplib";
 import axios from "axios";
+import semver from "semver";
 import WebSocket from "isomorphic-ws";
 
 export class ControlHub implements ExpansionHub {
@@ -66,8 +67,8 @@ export class ControlHub implements ExpansionHub {
                 timeout: 1000,
             });
             if (response.data) {
-                return true;
-                //return response.data.webSocketApiVersion === "1";
+                let rcVersion: string = response.data.rcVersion;
+                return semver.gt(rcVersion, semver.coerce("8.1")!.version);
             }
 
             return false;
@@ -77,7 +78,9 @@ export class ControlHub implements ExpansionHub {
         }
     }
 
-    close(): void {}
+    close(): void {
+        this.webSocketConnection.close();
+    }
 
     getADC(): Promise<number> {
         return Promise.resolve(0);

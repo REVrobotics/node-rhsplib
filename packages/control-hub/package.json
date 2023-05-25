@@ -6,11 +6,13 @@
   "dependencies": {
     "serialport": "^10.5.0",
     "isomorphic-ws": "^5.0.0",
-    "axios":"^1.4.0",
+    "axios": "^1.4.0",
+    "semver": "^7.5.1",
     "@rev-robotics/rhsplib": "*"
   },
   "devDependencies": {
     "@types/node": "^16.18.18",
+    "@types/semver": "^7.5.0",
     "typescript": "^5.0.2"
   },
   "scripts": {
