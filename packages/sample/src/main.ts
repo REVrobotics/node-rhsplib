@@ -60,10 +60,13 @@ digitalCommand
 
 digitalCommand
     .command("read <channel>")
+    .option("--continuous", "run continuously")
     .description("read digital pin")
-    .action(async (channel) => {
+    .action(async (channel, options) => {
+        let isContinuous = options.continuous !== undefined;
         let channelNumber = Number(channel);
-        await digitalRead(channelNumber);
+
+        await digitalRead(channelNumber, isContinuous);
     });
 
 program
