@@ -8,18 +8,25 @@ export class DistanceSensor {
 
     private readonly device: DistanceSensorDriver;
     private timer?: NodeJS.Timer;
+    private isInitialized = false;
 
     /**
      * Initializes the device
      */
     async setup() {
         await this.device.setup();
+        this.isInitialized = true;
     }
 
     /**
      * Measure the current distance in millimeters.
      */
     async getDistanceMillimeters(): Promise<number> {
+        if (!this.isInitialized) {
+            throw new Error(
+                "Distance Sensor is not initialized. Please call setup() first.",
+            );
+        }
         return await this.device.getDistanceMillimeters();
     }
 
@@ -29,6 +36,11 @@ export class DistanceSensor {
      * @param interval interval at which to start measurement.
      */
     startMeasuringDistance(onDistanceRecorded: (_: number) => void, interval: number) {
+        if (!this.isInitialized) {
+            throw new Error(
+                "Distance Sensor is not initialized. Please call setup() first.",
+            );
+        }
         this.stop();
         this.timer = setInterval(async () => {
             let distance = await this.getDistanceMillimeters();
