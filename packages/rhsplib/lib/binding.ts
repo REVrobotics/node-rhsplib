@@ -1,8 +1,15 @@
 import * as path from "path";
+import { createRequire } from "module";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const require = createRequire(import.meta.url);
 const addon = require("node-gyp-build")(path.join(__dirname, ".."));
 
-module.exports.Serial = addon.Serial;
-module.exports.RevHub = addon.RevHub;
+export let NativeSerial = addon.Serial;
+export let NativeRevHub = addon.RevHub;
 
 export enum SerialParity {
     None = 0,
