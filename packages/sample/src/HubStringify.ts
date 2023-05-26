@@ -9,7 +9,7 @@ export function hubHierarchyToString(hub: RevHub): string {
 
     if (hub.isParent()) {
         for (const child of hub.children) {
-            result += `\tRevHub: ${child.moduleAddress}\n`;
+            result += `\tUSB Expansion Hub: ${child.moduleAddress}\n`;
         }
     }
 

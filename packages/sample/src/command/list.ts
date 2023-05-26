@@ -15,7 +15,6 @@ export async function list() {
         controlHub.close();
     }
 
-    console.log("USB Expansion Hub:");
     const hubs: ExpansionHub[] = await openConnectedExpansionHubs();
     for (const hub of hubs) {
         hub.on("error", (e: any) => {
