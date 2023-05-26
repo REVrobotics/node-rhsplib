@@ -37,8 +37,8 @@ export class ControlHub implements ExpansionHub {
         (response: any | undefined, error: any | undefined) => void
     >();
 
-    async open(): Promise<void> {
-        this.webSocketConnection = new WebSocket("ws://192.168.43.1:8081");
+    async open(ip: string = "192.168.43.1", port: string = "8081"): Promise<void> {
+        this.webSocketConnection = new WebSocket(`ws://${ip}:${port}`);
 
         this.webSocketConnection.on("message", (data) => {
             let rawMessage = JSON.parse(data.toString());
@@ -80,15 +80,6 @@ export class ControlHub implements ExpansionHub {
         } catch (e) {
             return false;
         }
-    }
-
-    async isUsbConnected(): Promise<boolean> {
-        let adbClient = adb.createClient();
-        let devices = await adbClient.listDevicesWithPaths();
-        let controlHubs = devices.filter((device) => {
-            return this.isControlHub(device.path);
-        });
-        return false;
     }
 
     private isControlHub(path: string): boolean {

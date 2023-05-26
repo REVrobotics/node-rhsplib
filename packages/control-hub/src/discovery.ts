@@ -12,37 +12,30 @@ export async function openConnectedControlHub(): Promise<ControlHub | undefined>
 
 export async function openUsbControlHubs(): Promise<ControlHub[]> {
     let adbClient = Adb.createClient();
+    let controlHubs: ControlHub[] = [];
 
     let devices = await adbClient.listDevices();
-    let controlHubs = devices.filter(async (device) => {
+    for (const device of devices) {
         let deviceClient = device.getClient();
         let isHub = await isControlHub(deviceClient);
-        console.log(`Is hub? ${isHub}`);
         if (isHub) {
-            console.log("configuring tcp");
-            await configureHubTcp(deviceClient);
+            let port = await configureHubTcp(deviceClient);
+
+            let hub = new ControlHub();
+            await hub.open("127.0.0.1", (port + 1).toString());
+            controlHubs.push(hub);
         }
-        return isHub;
-    });
-
-    console.log(`Found ${controlHubs.length} Control hubs`);
-
-    let result: ControlHub[] = [];
-
-    for (const device of controlHubs) {
-        let hub = new ControlHub();
-        console.log("Opening hub");
-        await hub.open();
-        result.push(hub);
     }
-    return result;
+
+    return controlHubs;
 }
 
-async function configureHubTcp(deviceClient: DeviceClient) {
+async function configureHubTcp(deviceClient: DeviceClient): Promise<number> {
     let port = await findAdjacentPorts();
-    console.log(`Found port ${port}`);
     await deviceClient.forward(`tcp:${port}`, `tcp:8080`);
     await deviceClient.forward(`tcp:${port + 1}`, `tcp:8081`);
+
+    return port;
 }
 
 async function isControlHub(deviceClient: DeviceClient): Promise<boolean> {
@@ -70,12 +63,10 @@ async function createWiFiControlHub(): Promise<ControlHub> {
  * @param host
  */
 export async function findAdjacentPorts(host: string = "127.0.0.1"): Promise<number> {
-    console.log("Finding ports");
     try {
         //const getPort = (await import("get-port")).default;
         let port = await getPort({ host: host });
         let adjacent = await getPort({ host: host, port: port + 1 });
-        console.log("Tried to get ports");
         if (adjacent === port + 1) return port;
         else {
             return await findAdjacentPorts(host);

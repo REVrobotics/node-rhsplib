@@ -1,7 +1,7 @@
 import { RevHub } from "@rev-robotics/expansion-hub";
 
 export function hubHierarchyToString(hub: RevHub): string {
-    let result = `RevHub: ${hub.moduleAddress}\n`;
+    let result = `USB Expansion Hub: ${hub.moduleAddress}\n`;
 
     if (hub.isExpansionHub()) {
         console.log(`Is open? ${hub.isOpen}`);
@@ -9,7 +9,7 @@ export function hubHierarchyToString(hub: RevHub): string {
 
     if (hub.isParent()) {
         for (const child of hub.children) {
-            result += `\tRevHub: ${child.moduleAddress}\n`;
+            result += `\tUSB Expansion Hub: ${child.moduleAddress}\n`;
         }
     }
 
