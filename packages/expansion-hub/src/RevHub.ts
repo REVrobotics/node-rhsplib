@@ -1,5 +1,5 @@
-import { RevHubType } from "./RevHubType";
-import { ExpansionHub } from "./ExpansionHub";
+import { RevHubType } from "./RevHubType.js";
+import { ExpansionHub } from "./ExpansionHub.js";
 
 export interface RevHub {
     readonly moduleAddress: number;

@@ -13,8 +13,8 @@ import {
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rhsplib";
-import { ParentRevHub, RevHub } from "./RevHub";
-import { MotorMode } from "./MotorMode";
+import { MotorMode } from "./MotorMode.js";
+import { ParentRevHub, RevHub } from "./RevHub.js";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
 
