@@ -22,6 +22,7 @@ import {
 import axios from "axios";
 import semver from "semver";
 import WebSocket from "isomorphic-ws";
+import adb from "@u4/adbkit";
 
 export class ControlHub implements ExpansionHub {
     readonly isOpen: boolean = true;
@@ -65,7 +66,7 @@ export class ControlHub implements ExpansionHub {
         });
     }
 
-    async isConnected(): Promise<boolean> {
+    async isWiFiConnected(): Promise<boolean> {
         try {
             let response = await axios.get("http://192.168.43.1:8080/js/rcInfo.json", {
                 timeout: 1000,
@@ -79,6 +80,19 @@ export class ControlHub implements ExpansionHub {
         } catch (e) {
             return false;
         }
+    }
+
+    async isUsbConnected(): Promise<boolean> {
+        let adbClient = adb.createClient();
+        let devices = await adbClient.listDevicesWithPaths();
+        let controlHubs = devices.filter((device) => {
+            return this.isControlHub(device.path);
+        });
+        return false;
+    }
+
+    private isControlHub(path: string): boolean {
+        return path.includes("_box") && path.includes("msm8916_64");
     }
 
     close(): void {

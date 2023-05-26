@@ -1,4 +1,4 @@
 export enum RevHubType {
-  ExpansionHub,
-  ControlHub,
+    ExpansionHub,
+    ControlHub,
 }

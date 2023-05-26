@@ -11,6 +11,10 @@
     "semver": "^7.5.1",
     "@rev-robotics/rhsplib": "*"
   },
+  "peerDependencies": {
+    "@u4/adbkit": ">= 4.1.19",
+    "get-port": "^6.1.2"
+  },
   "devDependencies": {
     "@types/node": "^16.18.18",
     "@types/semver": "^7.5.0",
