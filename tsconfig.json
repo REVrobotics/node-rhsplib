@@ -4,7 +4,8 @@
       "module": "es2022",
       "moduleResolution": "nodenext",
       "strict": true,
-      "target": "es2015",
+      "lib": ["es2021"],
+      "target": "es2021",
       "types": [
         "node"
       ],
