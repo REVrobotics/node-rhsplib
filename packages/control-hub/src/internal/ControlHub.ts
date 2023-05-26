@@ -1,5 +1,9 @@
-import { ExpansionHub, ParentRevHub, RevHub } from "@rev-robotics/expansion-hub";
-import { RevHubType } from "@rev-robotics/expansion-hub/dist/RevHubType";
+import {
+    ExpansionHub,
+    ParentRevHub,
+    RevHub,
+    RevHubType,
+} from "@rev-robotics/expansion-hub";
 import {
     BulkInputData,
     DebugGroup,

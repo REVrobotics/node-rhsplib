@@ -1,4 +1,4 @@
-import { ExpansionHubInternal } from "./internal/ExpansionHub";
+import { ExpansionHubInternal } from "./internal/ExpansionHub.js";
 
 /**
  * Starts a keep alive task for a given hub.

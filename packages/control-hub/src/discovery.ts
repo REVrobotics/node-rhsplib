@@ -1,4 +1,4 @@
-import { ControlHub } from "./internal/ControlHub";
+import { ControlHub } from "./internal/ControlHub.js";
 
 export async function openConnectedControlHub(): Promise<ControlHub | undefined> {
     try {
