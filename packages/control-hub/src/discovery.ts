@@ -1,6 +1,7 @@
-import { ControlHub } from "./internal/ControlHub.js";
+import { ControlHubInternal } from "./internal/ControlHub.js";
 import { Adb, DeviceClient } from "@u4/adbkit";
 import getPort from "get-port";
+import { ControlHub } from "./ControlHub.js";
 
 export async function openConnectedControlHub(): Promise<ControlHub | undefined> {
     try {
@@ -20,8 +21,9 @@ export async function openUsbControlHubs(): Promise<ControlHub[]> {
         let isHub = await isControlHub(deviceClient);
         if (isHub) {
             let port = await configureHubTcp(deviceClient);
+            let serialNumber = device.id;
 
-            let hub = new ControlHub();
+            let hub = new ControlHubInternal(serialNumber);
             await hub.open("127.0.0.1", (port + 1).toString());
             controlHubs.push(hub);
         }
@@ -47,7 +49,7 @@ async function isControlHub(deviceClient: DeviceClient): Promise<boolean> {
 }
 
 async function createWiFiControlHub(): Promise<ControlHub> {
-    let hub = new ControlHub();
+    let hub = new ControlHubInternal();
 
     if (!(await hub.isWiFiConnected())) {
         throw new Error("Hub is not connected via WiFi");

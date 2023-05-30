@@ -17,19 +17,29 @@ import {
 import axios from "axios";
 import semver from "semver";
 import WebSocket from "isomorphic-ws";
+import { ControlHub, ParentControlHub } from "../ControlHub.js";
 
-export class ControlHub implements ExpansionHub {
+export class ControlHubInternal implements ControlHub {
     readonly isOpen: boolean = true;
     moduleAddress: number = 0;
     responseTimeoutMs: number = 0;
     type: RevHubType = RevHubType.ControlHub;
     webSocketConnection!: WebSocket;
+    private readonly serialNumber?: string;
 
     keyGenerator = 0;
     currentActiveCommands = new Map<
         any,
         (response: any | undefined, error: any | undefined) => void
     >();
+
+    constructor(serialNumber?: string) {
+        this.serialNumber = serialNumber;
+    }
+
+    isParent(): this is ParentControlHub {
+        return this.serialNumber !== undefined;
+    }
 
     async open(ip: string = "192.168.43.1", port: string = "8081"): Promise<void> {
         this.webSocketConnection = new WebSocket(`ws://${ip}:${port}`);
@@ -200,10 +210,6 @@ export class ControlHub implements ExpansionHub {
     }
 
     isExpansionHub(): this is ExpansionHub {
-        throw new Error("not implemented");
-    }
-
-    isParent(): this is ParentRevHub {
         throw new Error("not implemented");
     }
 
