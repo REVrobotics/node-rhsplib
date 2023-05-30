@@ -25,7 +25,8 @@ export class ControlHubInternal implements ControlHub {
     responseTimeoutMs: number = 0;
     type: RevHubType = RevHubType.ControlHub;
     webSocketConnection!: WebSocket;
-    private readonly serialNumber?: string;
+    readonly serialNumber: string;
+    readonly children: ReadonlyArray<RevHub> = [];
 
     keyGenerator = 0;
     currentActiveCommands = new Map<
@@ -33,11 +34,11 @@ export class ControlHubInternal implements ControlHub {
         (response: any | undefined, error: any | undefined) => void
     >();
 
-    constructor(serialNumber?: string) {
+    constructor(serialNumber: string) {
         this.serialNumber = serialNumber;
     }
 
-    isParent(): this is ParentControlHub {
+    isParent(): this is ParentRevHub {
         return this.serialNumber !== undefined;
     }
 
@@ -411,5 +412,13 @@ export class ControlHubInternal implements ControlHub {
                 }
             });
         });
+    }
+
+    addChild(hub: RevHub): void {
+        throw new Error("not implemented");
+    }
+
+    addChildByAddress(moduleAddress: number): Promise<RevHub> {
+        throw new Error("not implemented");
     }
 }

@@ -49,7 +49,7 @@ async function isControlHub(deviceClient: DeviceClient): Promise<boolean> {
 }
 
 async function createWiFiControlHub(): Promise<ControlHub> {
-    let hub = new ControlHubInternal();
+    let hub = new ControlHubInternal("Placeholder");
 
     if (!(await hub.isWiFiConnected())) {
         throw new Error("Hub is not connected via WiFi");
