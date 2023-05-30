@@ -1,4 +1,4 @@
-import { ExpansionHub } from "../ExpansionHub";
+import { ExpansionHub } from "../ExpansionHub.js";
 import {
     BulkInputData,
     DebugGroup,
@@ -10,17 +10,17 @@ import {
     ModuleInterface,
     ModuleStatus,
     PIDCoefficients,
-    RevHub as NativeRevHub,
+    NativeRevHub,
     RGB,
     Serial as SerialPort,
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rhsplib";
-import { closeSerialPort } from "../open-rev-hub";
-import { ParentRevHub, RevHub } from "../RevHub";
+import { closeSerialPort } from "../open-rev-hub.js";
+import { ParentRevHub, RevHub } from "../RevHub.js";
 import { EventEmitter } from "events";
-import { RevHubType } from "../RevHubType";
-import { SystemCurrentType } from "../SystemCurrentType";
+import { SystemCurrentType } from "../SystemCurrentType.js";
+import { RevHubType } from "../RevHubType.js";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -35,7 +35,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     hubIsParent: boolean;
     serialPort: SerialPort;
     serialNumber: string | undefined;
-    nativeRevHub: NativeRevHub;
+    nativeRevHub: typeof NativeRevHub;
     moduleAddress!: number;
     private mutableChildren: RevHub[] = [];
 
