@@ -9,7 +9,7 @@ import {
     ModuleInterface,
     ModuleStatus,
     PidCoefficients,
-    RGB,
+    Rgb,
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rhsplib";
@@ -36,7 +36,7 @@ export interface ExpansionHub extends RevHub {
     setNewModuleAddress(newModuleAddress: number): Promise<void>;
     queryInterface(interfaceName: string): Promise<ModuleInterface>;
     setModuleLedColor(red: number, green: number, blue: number): Promise<void>;
-    getModuleLedColor(): Promise<RGB>;
+    getModuleLedColor(): Promise<Rgb>;
     setModuleLedPattern(ledPattern: LedPattern): Promise<void>;
     getModuleLedPattern(): Promise<LedPattern>;
     setDebugLogLevel(

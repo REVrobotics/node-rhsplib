@@ -11,7 +11,7 @@ import {
     ModuleStatus,
     PidCoefficients,
     NativeRevHub,
-    RGB,
+    Rgb,
     Serial as SerialPort,
     VerbosityLevel,
     Version,
@@ -131,7 +131,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.getInterfacePacketID(interfaceName, functionNumber);
     }
 
-    getModuleLedColor(): Promise<RGB> {
+    getModuleLedColor(): Promise<Rgb> {
         return this.nativeRevHub.getModuleLEDColor();
     }
 

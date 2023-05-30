@@ -66,7 +66,7 @@ export interface ModuleInterface {
     numberIDValues: number;
 }
 
-export interface RGB {
+export interface Rgb {
     red: number;
     green: number;
     blue: number;
@@ -175,7 +175,7 @@ export declare class RevHub {
     setNewModuleAddress(newModuleAddress: number): Promise<void>;
     queryInterface(interfaceName: string): Promise<ModuleInterface>;
     setModuleLEDColor(red: number, green: number, blue: number): Promise<void>;
-    getModuleLEDColor(): Promise<RGB>;
+    getModuleLEDColor(): Promise<Rgb>;
     setModuleLEDPattern(ledPattern: LedPattern): Promise<void>;
     getModuleLEDPattern(): Promise<LedPattern>;
     setDebugLogLevel(
