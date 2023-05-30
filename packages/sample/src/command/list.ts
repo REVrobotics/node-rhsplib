@@ -2,7 +2,6 @@ import { ExpansionHub, openConnectedExpansionHubs } from "@rev-robotics/expansio
 import { hubHierarchyToString } from "../HubStringify.js";
 
 export async function list() {
-    console.log("Starting to search Serial Ports");
     const hubs: ExpansionHub[] = await openConnectedExpansionHubs();
     for (const hub of hubs) {
         hub.on("error", (e: any) => {

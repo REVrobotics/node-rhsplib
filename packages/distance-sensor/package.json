@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Library for using the REV Robotics 2m distance sensor",
   "main": "dist/index.js",
+  "type": "module",
   "dependencies": {
     "serialport": "^10.5.0",
     "@rev-robotics/expansion-hub": "*"

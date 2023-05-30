@@ -1,5 +1,6 @@
 import { ExpansionHub } from "@rev-robotics/expansion-hub";
-import { VL53L0X } from "./drivers/vl53l0x";
+import { VL53L0X } from "./drivers/vl53l0x.js";
+import { DistanceSensorDriver } from "./drivers/DistanceSensorDriver.js";
 
 export class DistanceSensor {
     constructor(hub: ExpansionHub, channel: number) {
