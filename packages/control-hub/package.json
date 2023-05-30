@@ -10,7 +10,7 @@
     "@rev-robotics/rev-hub-core": "*"
   },
   "peerDependencies": {
-    "get-port": "^6.1.2"
+    "get-port": "6.x"
   },
   "devDependencies": {
     "@types/node": "^16.18.18",
