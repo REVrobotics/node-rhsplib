@@ -2,14 +2,14 @@ import { ExpansionHub } from "../ExpansionHub.js";
 import {
     BulkInputData,
     DebugGroup,
-    DIODirection,
+    DioDirection,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
-    LEDPattern,
+    LedPattern,
     ModuleInterface,
     ModuleStatus,
-    PIDCoefficients,
+    PidCoefficients,
     NativeRevHub,
     RGB,
     Serial as SerialPort,
@@ -103,7 +103,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.getDigitalAllInputs();
     }
 
-    getDigitalDirection(dioPin: number): Promise<DIODirection> {
+    getDigitalDirection(dioPin: number): Promise<DioDirection> {
         return this.nativeRevHub.getDigitalDirection(dioPin);
     }
 
@@ -135,7 +135,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.getModuleLEDColor();
     }
 
-    getModuleLedPattern(): Promise<LEDPattern> {
+    getModuleLedPattern(): Promise<LedPattern> {
         return this.nativeRevHub.getModuleLEDPattern();
     }
 
@@ -172,7 +172,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     getMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
-    ): Promise<PIDCoefficients> {
+    ): Promise<PidCoefficients> {
         return this.nativeRevHub.getMotorPIDCoefficients(motorChannel, motorMode);
     }
 
@@ -281,7 +281,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.setDigitalAllOutputs(bitPackedField);
     }
 
-    setDigitalDirection(dioPin: number, direction: DIODirection): Promise<void> {
+    setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void> {
         return this.nativeRevHub.setDigitalDirection(dioPin, direction);
     }
 
@@ -304,7 +304,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.setModuleLEDColor(red, green, blue);
     }
 
-    setModuleLedPattern(ledPattern: LEDPattern): Promise<void> {
+    setModuleLedPattern(ledPattern: LedPattern): Promise<void> {
         return this.nativeRevHub.setModuleLEDPattern(ledPattern);
     }
 
@@ -341,7 +341,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     setMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
-        pid: PIDCoefficients,
+        pid: PidCoefficients,
     ): Promise<void> {
         return this.nativeRevHub.setMotorPIDCoefficients(motorChannel, motorMode, pid);
     }

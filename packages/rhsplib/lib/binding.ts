@@ -45,7 +45,7 @@ export enum VerbosityLevel {
     Level3,
 }
 
-export enum DIODirection {
+export enum DioDirection {
     Input,
     Output,
 }
@@ -72,7 +72,7 @@ export interface RGB {
     blue: number;
 }
 
-export interface LEDPattern {
+export interface LedPattern {
     rgbtPatternStep0: number;
     rgbtPatternStep1: number;
     rgbtPatternStep2: number;
@@ -135,7 +135,7 @@ export interface I2CReadStatus {
     bytes: number[];
 }
 
-export interface PIDCoefficients {
+export interface PidCoefficients {
     P: number;
     I: number;
     D: number;
@@ -176,8 +176,8 @@ export declare class RevHub {
     queryInterface(interfaceName: string): Promise<ModuleInterface>;
     setModuleLEDColor(red: number, green: number, blue: number): Promise<void>;
     getModuleLEDColor(): Promise<RGB>;
-    setModuleLEDPattern(ledPattern: LEDPattern): Promise<void>;
-    getModuleLEDPattern(): Promise<LEDPattern>;
+    setModuleLEDPattern(ledPattern: LedPattern): Promise<void>;
+    getModuleLEDPattern(): Promise<LedPattern>;
     setDebugLogLevel(
         debugGroup: DebugGroup,
         verbosityLevel: VerbosityLevel,
@@ -199,8 +199,8 @@ export declare class RevHub {
     // DIO
     setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void>;
     setDigitalAllOutputs(bitPackedField: number): Promise<void>;
-    setDigitalDirection(dioPin: number, direction: DIODirection): Promise<void>;
-    getDigitalDirection(dioPin: number): Promise<DIODirection>;
+    setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void>;
+    getDigitalDirection(dioPin: number): Promise<DioDirection>;
     getDigitalSingleInput(dioPin: number): Promise<boolean>;
     getDigitalAllInputs(): Promise<number>;
 
@@ -269,12 +269,12 @@ export declare class RevHub {
     setMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
-        pid: PIDCoefficients,
+        pid: PidCoefficients,
     ): Promise<void>;
     getMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
-    ): Promise<PIDCoefficients>;
+    ): Promise<PidCoefficients>;
 
     // PWM
     setPWMConfiguration(pwmChannel: number, framePeriod: number): Promise<void>;
