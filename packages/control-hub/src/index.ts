@@ -1,2 +1,2 @@
 
-export { openConnectedControlHub, openUsbControlHubs } from "./discovery.js";
+export { openConnectedControlHub } from "./discovery.js";
