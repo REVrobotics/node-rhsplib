@@ -5,7 +5,11 @@ import { openConnectedControlHub, openUsbControlHubs } from "@rev-robotics/contr
 export async function list() {
     let usbControlHubs = await openUsbControlHubs();
     for (const hub of usbControlHubs) {
-        console.log(`USB Control Hub: ${hub.moduleAddress}\n\n`);
+        if (hub.isParent()) {
+            console.log(`USB Control Hub: ${hub.serialNumber} ${hub.moduleAddress}\n\n`);
+        } else {
+            console.log(`\tUSB Control Hub: ${hub.moduleAddress}\n\n`);
+        }
         hub.close();
     }
 
