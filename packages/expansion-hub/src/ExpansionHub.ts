@@ -131,6 +131,12 @@ export interface ExpansionHub extends RevHub {
      * @param motorChannel
      */
     getMotorChannelEnable(motorChannel: number): Promise<boolean>;
+
+    /**
+     * Set the current level in mA that will trigger the current alert for a given motor channel
+     * @param motorChannel
+     * @param currentLimit_mA Current level in mA that will trigger the current alert
+     */
     setMotorChannelCurrentAlertLevel(
         motorChannel: number,
         currentLimit_mA: number,
@@ -141,6 +147,11 @@ export interface ExpansionHub extends RevHub {
      * @param motorChannel
      */
     getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<number>;
+
+    /**
+     * Reset motor position to 0 counts
+     * @param motorChannel
+     */
     resetMotorEncoder(motorChannel: number): Promise<void>;
 
     /**
@@ -168,10 +179,17 @@ export interface ExpansionHub extends RevHub {
      * @param motorChannel
      */
     getMotorTargetVelocity(motorChannel: number): Promise<number>;
+
+    /**
+     * Set the target position for a motor
+     * @param motorChannel
+     * @param targetPositionCounts
+     * @param targetToleranceCounts how far the position can be from the target and still considered 'at target'
+     */
     setMotorTargetPosition(
         motorChannel: number,
-        targetPosition_counts: number,
-        targetTolerance_counts: number,
+        targetPositionCounts: number,
+        targetToleranceCounts: number,
     ): Promise<void>;
 
     /**
