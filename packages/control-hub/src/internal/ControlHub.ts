@@ -16,7 +16,6 @@ import {
 import axios from "axios";
 import semver from "semver";
 import WebSocket from "isomorphic-ws";
-import adb from "@u4/adbkit";
 import {
     ControlHub,
     ExpansionHub,
