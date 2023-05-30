@@ -12,9 +12,9 @@ import {
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rhsplib";
-import { ParentRevHub, RevHub } from "./RevHub";
-import { DigitalState } from "./digital-state";
-import { DigitalChannelDirection } from "./DigitalChannelDirection";
+import { DigitalState } from "./digital-state.js";
+import { DigitalChannelDirection } from "./DigitalChannelDirection.js";
+import { ParentRevHub, RevHub } from "./RevHub.js";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
 
