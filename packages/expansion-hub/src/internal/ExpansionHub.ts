@@ -1,4 +1,4 @@
-import { ExpansionHub } from "../ExpansionHub.js";
+import { ExpansionHub, ParentRevHub, RevHub } from "@rev-robotics/rev-hub-core";
 import {
     BulkInputData,
     DebugGroup,
@@ -17,9 +17,8 @@ import {
     Version,
 } from "@rev-robotics/rhsplib";
 import { closeSerialPort } from "../open-rev-hub.js";
-import { ParentRevHub, RevHub } from "../RevHub.js";
 import { EventEmitter } from "events";
-import { RevHubType } from "../RevHubType.js";
+import { RevHubType } from "@rev-robotics/rev-hub-core";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -44,7 +43,7 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     keepAliveTimer?: NodeJS.Timer;
 
-    type = RevHubType.ExpansionHub;
+    type: RevHubType = RevHubType.ExpansionHub;
     private emitter = new EventEmitter();
 
     isParent(): this is ParentRevHub {

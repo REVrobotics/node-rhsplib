@@ -6,6 +6,7 @@
     "type": "module",
     "dependencies": {
         "serialport": "^10.5.0",
+        "@rev-robotics/rev-hub-core": "*",
         "@rev-robotics/rhsplib": "*"
     },
     "devDependencies": {

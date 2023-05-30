@@ -1,7 +1,7 @@
 import { ControlHubInternal } from "./internal/ControlHub.js";
 import { Adb, DeviceClient } from "@u4/adbkit";
 import getPort from "get-port";
-import { ControlHub } from "./ControlHub.js";
+import { ControlHub } from "@rev-robotics/rev-hub-core";
 
 export async function openConnectedControlHub(): Promise<ControlHub | undefined> {
     try {

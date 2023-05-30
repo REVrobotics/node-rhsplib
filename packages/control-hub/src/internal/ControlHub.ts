@@ -1,10 +1,4 @@
 import {
-    ExpansionHub,
-    ParentRevHub,
-    RevHub,
-    RevHubType,
-} from "@rev-robotics/expansion-hub";
-import {
     BulkInputData,
     DebugGroup,
     DIODirection,
@@ -23,7 +17,13 @@ import axios from "axios";
 import semver from "semver";
 import WebSocket from "isomorphic-ws";
 import adb from "@u4/adbkit";
-import { ControlHub } from "../ControlHub.js";
+import {
+    ControlHub,
+    ExpansionHub,
+    ParentRevHub,
+    RevHub,
+    RevHubType,
+} from "@rev-robotics/rev-hub-core";
 
 export class ControlHubInternal implements ControlHub {
     readonly isOpen: boolean = true;

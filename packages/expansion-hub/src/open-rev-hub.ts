@@ -1,4 +1,4 @@
-import { ExpansionHub, ParentExpansionHub } from "./ExpansionHub.js";
+import { ExpansionHub, ParentExpansionHub } from "@rev-robotics/rev-hub-core";
 import {
     SerialParity,
     SerialFlowControl,
