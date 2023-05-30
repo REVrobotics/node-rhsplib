@@ -15,7 +15,7 @@ export interface RevHub {
      * @param listener
      */
     on(eventName: "error", listener: (error: Error) => void): RevHub;
-    close(): any;
+    close(): void;
 }
 
 export interface ParentRevHub extends RevHub {

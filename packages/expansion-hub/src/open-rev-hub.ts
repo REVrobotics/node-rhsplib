@@ -13,7 +13,6 @@ import {
     InvalidSerialArguments,
     NoExpansionHubWithAddressError,
     ParentExpansionHub,
-    RevHub,
     SerialConfigurationError,
     SerialIoError,
     SerialParity,

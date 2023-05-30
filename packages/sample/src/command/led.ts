@@ -1,8 +1,8 @@
 import {
     createLedPattern,
-    ExpansionHub,
     LedPatternStep,
-} from "@rev-robotics/rev-hub-core";
+} from "@rev-robotics/expansion-hub";
+import { ExpansionHub } from "@rev-robotics/rev-hub-core";
 
 export async function ledPattern(hub: ExpansionHub, args: string[]) {
     function parse(step: string): LedPatternStep {

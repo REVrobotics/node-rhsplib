@@ -1,8 +1,7 @@
-import { ExpansionHub, ParentRevHub, RevHub, RevHubType } from "@rev-robotics/expansion-hub";
 import {
     BulkInputData,
     DebugGroup,
-    DioDirection,
+    DigitalChannelDirection,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
@@ -17,7 +16,13 @@ import {
 import axios from "axios";
 import semver from "semver";
 import WebSocket from "isomorphic-ws";
-import { ControlHub, ParentControlHub } from "../ControlHub.js";
+import {
+    ControlHub,
+    ExpansionHub,
+    ParentRevHub,
+    RevHub,
+    RevHubType,
+} from "@rev-robotics/rev-hub-core";
 
 export class ControlHubInternal implements ControlHub {
     readonly isOpen: boolean = true;
@@ -107,7 +112,7 @@ export class ControlHubInternal implements ControlHub {
         throw new Error("not implemented");
     }
 
-    async getDigitalDirection(dioPin: number): Promise<DioDirection> {
+    async getDigitalDirection(dioPin: number): Promise<DigitalChannelDirection> {
         throw new Error("not implemented");
     }
 
@@ -273,7 +278,7 @@ export class ControlHubInternal implements ControlHub {
         throw new Error("not implemented");
     }
 
-    setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void> {
+    setDigitalDirection(dioPin: number, direction: DigitalChannelDirection): Promise<void> {
         throw new Error("not implemented");
     }
 
