@@ -108,6 +108,12 @@ export interface ExpansionHub extends RevHub {
         motorMode: MotorMode,
         floatAtZero: boolean,
     ): Promise<void>;
+
+    /**
+     *
+     * Get the configuration for a specific motor
+     * @param motorChannel
+     */
     getMotorChannelMode(
         motorChannel: number,
     ): Promise<{ motorMode: MotorMode; floatAtZero: boolean }>;
@@ -119,11 +125,21 @@ export interface ExpansionHub extends RevHub {
      */
 
     setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void>;
+
+    /**
+     * Check whether a motor channel is currently enabled
+     * @param motorChannel
+     */
     getMotorChannelEnable(motorChannel: number): Promise<boolean>;
     setMotorChannelCurrentAlertLevel(
         motorChannel: number,
         currentLimit_mA: number,
     ): Promise<void>;
+
+    /**
+     * Get the present current alert (mA)
+     * @param motorChannel
+     */
     getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<number>;
     resetMotorEncoder(motorChannel: number): Promise<void>;
 
@@ -133,6 +149,11 @@ export interface ExpansionHub extends RevHub {
      * @param powerLevel power in range [-1,1]
      */
     setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void>;
+
+    /**
+     * Get the current constant power setting for a motor
+     * @param motorChannel
+     */
     getMotorConstantPower(motorChannel: number): Promise<number>;
 
     /**
@@ -141,22 +162,55 @@ export interface ExpansionHub extends RevHub {
      * @param velocity_cps velocity in encoder counts per second
      */
     setMotorTargetVelocity(motorChannel: number, velocity_cps: number): Promise<void>;
+
+    /**
+     * Get the current target velocity for a motor
+     * @param motorChannel
+     */
     getMotorTargetVelocity(motorChannel: number): Promise<number>;
     setMotorTargetPosition(
         motorChannel: number,
         targetPosition_counts: number,
         targetTolerance_counts: number,
     ): Promise<void>;
+
+    /**
+     * Get the current target position for a motor
+     * @param motorChannel
+     */
     getMotorTargetPosition(
         motorChannel: number,
     ): Promise<{ targetPosition: number; targetTolerance: number }>;
+
+    /**
+     * Check if a motor has reached its target
+     * @param motorChannel
+     */
     getMotorAtTarget(motorChannel: number): Promise<boolean>;
+
+    /**
+     * Get the current encoder counts for a motor
+     * @param motorChannel
+     */
     getMotorEncoderPosition(motorChannel: number): Promise<number>;
+
+    /**
+     * Set the current PID coefficients for a motor
+     * @param motorChannel
+     * @param motorMode
+     * @param pid
+     */
     setMotorPIDCoefficients(
         motorChannel: number,
         motorMode: MotorMode,
         pid: PIDCoefficients,
     ): Promise<void>;
+
+    /**
+     * Get the current PID coefficients for a motor
+     * @param motorChannel
+     * @param motorMode
+     */
     getMotorPIDCoefficients(
         motorChannel: number,
         motorMode: MotorMode,
