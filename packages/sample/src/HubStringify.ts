@@ -8,6 +8,7 @@ export function hubHierarchyToString(hub: RevHub): string {
     let result = `RevHub ${serialNumberText}: ${hub.moduleAddress}\n`;
 
     if (hub.isParent()) {
+        result = `USB Expansion Hub: ${hub.serialNumber} ${hub.moduleAddress}\n`;
         for (const child of hub.children) {
             result += `\tUSB Expansion Hub: ${child.moduleAddress}\n`;
         }
