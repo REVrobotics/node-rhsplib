@@ -11,8 +11,8 @@
     },
     "scripts": {
         "build": "tsc",
-        "list": "node dist/main.js -l",
         "error": "node dist/main.js error",
-        "led": "node dist/main.js --led"
+        "list": "node dist/main.js list",
+        "led": "node dist/main.js led"
     }
 }

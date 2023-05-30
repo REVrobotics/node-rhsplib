@@ -1,4 +1,4 @@
-import { setPrototypeOf } from "./NackError";
+import { setPrototypeOf } from "./NackError.js";
 
 export class NoExpansionHubWithAddressError extends Error {
     moduleAddress: number;

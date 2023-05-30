@@ -8,7 +8,7 @@ import {
 import {
     BatteryTooLowToRunServoError,
     ServoNotFullyConfiguredError,
-} from "./servo-errors";
+} from "./servo-errors.js";
 import {
     I2cMasterBusyError,
     I2cNoResultsPendingError,

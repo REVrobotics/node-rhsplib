@@ -1,5 +1,5 @@
-import {NackError, setPrototypeOf} from "./NackError";
-import {BatteryTooLowError} from "./BatteryTooLowError";
+import { NackError, setPrototypeOf } from "./NackError.js";
+import { BatteryTooLowError } from "./BatteryTooLowError.js";
 
 export class MotorNotFullyConfiguredError extends NackError {
     constructor() {

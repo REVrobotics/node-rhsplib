@@ -1,4 +1,4 @@
-import { RevHubError } from "./RevHubError";
+import { RevHubError } from "./RevHubError.js";
 
 //Taken from https://github.com/apollographql/invariant-packages/blob/779f525d6b475653050cb17976753de287e30f91/packages/ts-invariant/src/invariant.ts#L2-L7
 /*
