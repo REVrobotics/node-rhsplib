@@ -4,5 +4,5 @@
 
 #### Changed
 
-- Convert from commonjs to es modules
+- Convert from commonjs to ES modules
 - Rename classes with better capitalization
