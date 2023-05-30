@@ -1,24 +1,22 @@
-import { ExpansionHub, ParentRevHub, RevHub } from "@rev-robotics/expansion-hub";
-import { RevHubType } from "@rev-robotics/expansion-hub/dist/RevHubType";
+import { ExpansionHub, ParentRevHub, RevHub, RevHubType } from "@rev-robotics/expansion-hub";
 import {
     BulkInputData,
     DebugGroup,
-    DIODirection,
+    DioDirection,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
-    LEDPattern,
+    LedPattern,
     ModuleInterface,
     ModuleStatus,
-    PIDCoefficients,
-    RGB,
+    PidCoefficients,
+    Rgb,
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rhsplib";
 import axios from "axios";
 import semver from "semver";
 import WebSocket from "isomorphic-ws";
-import adb from "@u4/adbkit";
 
 export class ControlHub implements ExpansionHub {
     readonly isOpen: boolean = true;
@@ -98,7 +96,7 @@ export class ControlHub implements ExpansionHub {
         throw new Error("not implemented");
     }
 
-    async getDigitalDirection(dioPin: number): Promise<DIODirection> {
+    async getDigitalDirection(dioPin: number): Promise<DioDirection> {
         throw new Error("not implemented");
     }
 
@@ -126,11 +124,11 @@ export class ControlHub implements ExpansionHub {
         return Promise.resolve(0);
     }
 
-    getModuleLedColor(): Promise<RGB> {
+    getModuleLedColor(): Promise<Rgb> {
         throw new Error("not implemented");
     }
 
-    getModuleLedPattern(): Promise<LEDPattern> {
+    getModuleLedPattern(): Promise<LedPattern> {
         throw new Error("not implemented");
     }
 
@@ -167,7 +165,7 @@ export class ControlHub implements ExpansionHub {
     getMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
-    ): Promise<PIDCoefficients> {
+    ): Promise<PidCoefficients> {
         throw new Error("not implemented");
     }
 
@@ -268,7 +266,7 @@ export class ControlHub implements ExpansionHub {
         throw new Error("not implemented");
     }
 
-    setDigitalDirection(dioPin: number, direction: DIODirection): Promise<void> {
+    setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void> {
         throw new Error("not implemented");
     }
 
@@ -291,7 +289,7 @@ export class ControlHub implements ExpansionHub {
         throw new Error("not implemented");
     }
 
-    setModuleLedPattern(ledPattern: LEDPattern): Promise<void> {
+    setModuleLedPattern(ledPattern: LedPattern): Promise<void> {
         throw new Error("not implemented");
     }
 
@@ -321,7 +319,7 @@ export class ControlHub implements ExpansionHub {
     setMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
-        pid: PIDCoefficients,
+        pid: PidCoefficients,
     ): Promise<void> {
         throw new Error("not implemented");
     }

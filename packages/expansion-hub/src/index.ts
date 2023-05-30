@@ -47,4 +47,8 @@ export {
     BatteryTooLowToRunServoError,
     TimeoutError,
     UnrecognizedNackError,
+    RevHubType,
+    RevHub,
+    ParentRevHub,
+    ExpansionHub,
 } from "@rev-robotics/rev-hub-core";
