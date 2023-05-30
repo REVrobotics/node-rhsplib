@@ -2,6 +2,24 @@
 
 This project enables Node.js applications to control devices that speak the REV Hub Serial Protocol (such as the REV Robotics Expansion Hub).
 
+## Control Hub dependencies
+
+The Control Hub package has two optional dependencies.
+
+### ws
+
+If you are using node.js and wish to communicate
+with a Control Hub via WiFi, you will need to add
+a dependency on [ws](https://www.npmjs.com/package/ws).
+
+### adbkit
+
+If you wish to communicate with a Control Hub over
+USB, you will need to set up port forwarding. This
+requires a dependency on [adbkit](https://www.npmjs.com/package/adbkit).
+See [adbkit setup](packages/sample/src/adb-setup.ts)
+for an example of setting up port forwarding.
+
 ## Package structure
 
 This project uses [lerna](https://lerna.js.org) for
