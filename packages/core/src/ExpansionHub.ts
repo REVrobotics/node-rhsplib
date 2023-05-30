@@ -170,7 +170,7 @@ export interface ExpansionHub extends RevHub {
     ): Promise<void>;
 
     /**
-     * Get the present current alert (mA)
+     * Get the current level in mA that will trigger the current alert for a given motor channel
      * @param motorChannel
      */
     getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<number>;
