@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import {
+    resetEncoder,
     runEncoder,
     runMotorConstantPower,
     runMotorConstantVelocity,
@@ -29,10 +30,15 @@ let motorCommand = program.command("motor");
 
 motorCommand
     .command("encoder <channel>")
+    .option("-r --reset", "reset the encoder count")
     .description("Get the current encoder position of a motor")
-    .action(async (channel) => {
+    .action(async (channel, options) => {
         let channelNumber = Number(channel);
-        await runEncoder(channelNumber);
+        if (options.reset) {
+            await resetEncoder(channelNumber);
+        } else {
+            await runEncoder(channelNumber);
+        }
     });
 
 motorCommand.command("power <channel> <power>").action(async (channel, power) => {
