@@ -65,34 +65,92 @@ export interface ExpansionHub extends RevHub {
     getDigitalAllInputs(): Promise<number>;
 
     // I2C
+    /**
+     * Configure the speed for a I2C channel
+     * @param i2cChannel
+     * @param speedCode
+     */
     setI2CChannelConfiguration(
         i2cChannel: number,
         speedCode: I2CSpeedCode,
     ): Promise<void>;
+
+    /**
+     * Get the speed for a I2C channel
+     * @param i2cChannel
+     */
     getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode>;
+
+    /**
+     * Write a single byte over I2C
+     * @param i2cChannel
+     * @param slaveAddress the address of the target device
+     * @param byte the byte to send
+     */
     writeI2CSingleByte(
         i2cChannel: number,
         slaveAddress: number,
         byte: number,
     ): Promise<void>;
+
+    /**
+     * Write several bytes over I2C
+     * @param i2cChannel
+     * @param slaveAddress the address of the target device
+     * @param bytes the data to send
+     */
     writeI2CMultipleBytes(
         i2cChannel: number,
         slaveAddress: number,
         bytes: number[],
     ): Promise<void>;
+
+    /**
+     * Get the status of a write operation.
+     * @param i2cChannel
+     */
     getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus>;
+
+    /**
+     * Read a single byte from a target device. Use {@link getI2CReadStatus} to
+     * get the actual byte.
+     * @param i2cChannel
+     * @param slaveAddress the address of the target device
+     */
     readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void>;
+
+    /**
+     * Read multiple bytes from a target device. Use {@link getI2CReadStatus} to
+     * get the actual data.
+     * @param i2cChannel
+     * @param slaveAddress the address of the target device
+     * @param numBytesToRead the size of the payload to read
+     */
     readI2CMultipleBytes(
         i2cChannel: number,
         slaveAddress: number,
         numBytesToRead: number,
     ): Promise<void>;
+
+    /**
+     * Send a write command to a given target requesting data at a given address.
+     * @param i2cChannel
+     * @param slaveAddress the address of the target device
+     * @param numBytesToRead size of data to read
+     * @param startAddress a byte to send at the start of the payload, typically a register address.
+     */
     writeI2CReadMultipleBytes(
         i2cChannel: number,
         slaveAddress: number,
         numBytesToRead: number,
         startAddress: number,
     ): Promise<void>;
+
+    /**
+     * Get the read status, indicating whether a read was successful and how
+     * much data was read.
+     * @param i2cChannel
+     */
     getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus>;
 
     // Motor
