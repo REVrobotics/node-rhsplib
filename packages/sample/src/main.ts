@@ -14,6 +14,7 @@ program.version("1.0.0");
 
 program
     .option("-s --serial <serial>", "serial number")
+    .option("-p --parent <address>", "parent address")
     .option("-a --address <address>", "module address");
 
 program
@@ -38,6 +39,7 @@ async function getExpansionHubs(): Promise<ExpansionHub[]> {
     let options = program.opts();
     let serialNumber = options.serial;
     let moduleAddress = options.address ? Number(options.address) : undefined;
+    let parentAddress = options.parent ? Number(options.parent) : undefined;
     if (serialNumber) {
         let parentHub = await openParentExpansionHub(serialNumber, moduleAddress);
         if (!moduleAddress || moduleAddress == parentHub.moduleAddress) {
@@ -50,7 +52,9 @@ async function getExpansionHubs(): Promise<ExpansionHub[]> {
         }
     } else if (moduleAddress) {
         //module address specified, but no serial number
-        let hub = await openHubWithAddress(moduleAddress, moduleAddress);
+        //if the user specifies a parent address, use that, else use module address as parent address.
+        let parentHubAddress = parentAddress ? parentAddress : moduleAddress;
+        let hub = await openHubWithAddress(parentHubAddress, moduleAddress);
         if (hub.isExpansionHub()) {
             return [hub];
         } else {
