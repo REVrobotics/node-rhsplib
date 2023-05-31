@@ -8,6 +8,7 @@ export function hubHierarchyToString(hub: RevHub): string {
     }
 
     if (hub.isParent()) {
+        console.log(hub.serialNumber);
         for (const child of hub.children) {
             result += `\tRevHub: ${child.moduleAddress}\n`;
         }

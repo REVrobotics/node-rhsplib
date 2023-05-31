@@ -4,11 +4,12 @@ import {
     SerialParity,
     SerialFlowControl,
     RevHub as NativeRevHub,
-    RevHub,
 } from "@rev-robotics/rhsplib";
 import { SerialPort as SerialLister } from "serialport";
 import { ExpansionHubInternal } from "./internal/ExpansionHub";
 import { startKeepAlive } from "./start-keep-alive";
+import { getPossibleExpansionHubSerialNumbers } from "./discovery";
+import { RevHub } from "./RevHub";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
@@ -16,6 +17,35 @@ import { startKeepAlive } from "./start-keep-alive";
  * the map upon closing.
  */
 const openSerialMap = new Map<string, SerialPort>();
+
+/**
+ * Opens the hub with the given module address if there is only one parent hub.
+ * @throws if there are multiple parent hubs.
+ *
+ * @param parentAddress the parent to open
+ * @param moduleAddress the exact hub to open
+ */
+export async function openHubWithAddress(
+    parentAddress: number,
+    moduleAddress: number = parentAddress,
+): Promise<RevHub> {
+    let serialNumbers = await getPossibleExpansionHubSerialNumbers();
+
+    if (serialNumbers.length > 1) {
+        //there are multiple hubs connected. We can't distinguish without a serial number
+        throw new Error(
+            `There are ${serialNumbers.length} parent hubs. Please specify a serialNumber`,
+        );
+    }
+
+    let parentHub = await openParentExpansionHub(serialNumbers[0], parentAddress);
+
+    if (parentAddress == moduleAddress) {
+        return parentHub;
+    }
+
+    return await parentHub.addChildByAddress(moduleAddress);
+}
 
 /**
  * Opens a parent Expansion Hub. Does not open any child hubs.
@@ -41,7 +71,7 @@ export async function openParentExpansionHub(
     let parentHub = new ExpansionHubInternal(true, serialPort, serialNumber);
 
     if (moduleAddress === undefined) {
-        let addresses = await RevHub.discoverRevHubs(serialPort);
+        let addresses = await NativeRevHub.discoverRevHubs(serialPort);
         moduleAddress = addresses.parentAddress;
     }
 
