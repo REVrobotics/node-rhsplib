@@ -4,7 +4,7 @@ import {
     runEncoder,
     runMotorConstantPower,
     runMotorConstantVelocity,
-} from "./commands/motor.js";
+} from "./command/motor.js";
 import { list } from "./command/list.js";
 import { led } from "./command/led.js";
 
