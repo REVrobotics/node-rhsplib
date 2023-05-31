@@ -12,7 +12,17 @@ export async function led(hubs: ExpansionHub[]) {
         new LedPatternStep(1, 255, 0, 255), //magenta
         new LedPatternStep(1, 255, 255, 0), //yellow
     ];
-    await hubs[0].sendKeepAlive();
     const pattern = createLedPattern(steps);
-    await hubs[0].setModuleLedPattern(pattern);
+
+    for (let hub of hubs) {
+        await hub.setModuleLedPattern(pattern);
+
+        if (hub.isParent()) {
+            for (let child of hub.children) {
+                if (child.isExpansionHub()) {
+                    await child.setModuleLedPattern(pattern);
+                }
+            }
+        }
+    }
 }
