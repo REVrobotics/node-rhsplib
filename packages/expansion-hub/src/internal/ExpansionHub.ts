@@ -564,18 +564,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         try {
             return await block();
         } catch (e: any) {
-            if (e.errorCode == -5) {
-                throw new SerialError(this.serialNumber ?? "no serial number provided");
-            }
-            if (e.errorCode >= -55 && e.errorCode <= -50) {
-                let index = -(e.errorCode + 50);
-                throw new ParameterOutOfRangeError(index);
-            }
-            if (e.nackCode !== undefined) {
-                throw nackCodeToError(e.nackCode);
-            } else {
-                throw e;
-            }
+            throw this.createError(e);
         }
     }
 
@@ -583,18 +572,22 @@ export class ExpansionHubInternal implements ExpansionHub {
         try {
             return block();
         } catch (e: any) {
-            if (e.errorCode == -5) {
-                throw new SerialError(this.serialNumber ?? "no serial number provided");
-            }
-            if (e.errorCode >= -55 && e.errorCode <= -50) {
-                let index = -(e.errorCode + 50);
-                throw new ParameterOutOfRangeError(index);
-            }
-            if (e.nackCode !== undefined) {
-                throw nackCodeToError(e.nackCode);
-            } else {
-                throw e;
-            }
+            throw this.createError(e);
+        }
+    }
+
+    private createError(e: any): any {
+        if (e.errorCode == -5) {
+            return new SerialError(this.serialNumber ?? "no serial number provided");
+        }
+        if (e.errorCode >= -55 && e.errorCode <= -50) {
+            let index = -(e.errorCode + 50);
+            return new ParameterOutOfRangeError(index);
+        }
+        if (e.nackCode !== undefined) {
+            return nackCodeToError(e.nackCode);
+        } else {
+            return e;
         }
     }
 
