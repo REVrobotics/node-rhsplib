@@ -6,6 +6,7 @@
     "license": "BSD-3-Clause",
     "main": "dist/binding.js",
     "types": "dist/binding.d.ts",
+    "type": "module",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/REVrobotics/node-rhsplib.git"
