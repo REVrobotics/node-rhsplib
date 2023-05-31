@@ -565,7 +565,7 @@ export class ExpansionHubInternal implements ExpansionHub {
             return await block();
         } catch (e: any) {
             if (e.errorCode == -5) {
-                throw new SerialError();
+                throw new SerialError(this.serialNumber ?? "no serial number provided");
             }
             if (e.errorCode >= -55 && e.errorCode <= -50) {
                 let index = -(e.errorCode + 50);
@@ -584,7 +584,7 @@ export class ExpansionHubInternal implements ExpansionHub {
             return block();
         } catch (e: any) {
             if (e.errorCode == -5) {
-                throw new SerialError();
+                throw new SerialError(this.serialNumber ?? "no serial number provided");
             }
             if (e.errorCode >= -55 && e.errorCode <= -50) {
                 let index = -(e.errorCode + 50);
