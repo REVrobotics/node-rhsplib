@@ -23,6 +23,7 @@ import { RevHubType } from "../RevHubType.js";
 import { nackCodeToError } from "../errors/nack-code-to-error.js";
 import { ParameterOutOfRangeError } from "../errors/ParameterOutOfRangeError.js";
 import { NoExpansionHubWithAddressError } from "../errors/NoExpansionHubWithAddressError.js";
+import { SerialError } from "../errors/SerialError.js";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -563,6 +564,13 @@ export class ExpansionHubInternal implements ExpansionHub {
         try {
             return await block();
         } catch (e: any) {
+            if (e.errorCode == -5) {
+                throw new SerialError();
+            }
+            if (e.errorCode >= -55 && e.errorCode <= -50) {
+                let index = -(e.errorCode + 50);
+                throw new ParameterOutOfRangeError(index);
+            }
             if (e.nackCode !== undefined) {
                 throw nackCodeToError(e.nackCode);
             } else {
@@ -575,6 +583,9 @@ export class ExpansionHubInternal implements ExpansionHub {
         try {
             return block();
         } catch (e: any) {
+            if (e.errorCode == -5) {
+                throw new SerialError();
+            }
             if (e.errorCode >= -55 && e.errorCode <= -50) {
                 let index = -(e.errorCode + 50);
                 throw new ParameterOutOfRangeError(index);
