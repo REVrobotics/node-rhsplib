@@ -1,5 +1,9 @@
 import { Command } from "commander";
-import { runMotorConstantPower, runMotorConstantVelocity } from "./commands/motor.js";
+import {
+    runEncoder,
+    runMotorConstantPower,
+    runMotorConstantVelocity,
+} from "./commands/motor.js";
 import { list } from "./command/list.js";
 import { led } from "./command/led.js";
 
@@ -22,6 +26,14 @@ program
     });
 
 let motorCommand = program.command("motor");
+
+motorCommand
+    .command("encoder <channel>")
+    .description("Get the current encoder position of a motor")
+    .action(async (channel) => {
+        let channelNumber = Number(channel);
+        await runEncoder(channelNumber);
+    });
 
 motorCommand.command("power <channel> <power>").action(async (channel, power) => {
     console.log(`${channel} ${power}`);

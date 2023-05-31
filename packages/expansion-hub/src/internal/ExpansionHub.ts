@@ -166,8 +166,8 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.getMotorConstantPower(motorChannel);
     }
 
-    getMotorEncoderPosition(motorChannel: number): Promise<number> {
-        return Promise.resolve(0);
+    async getMotorEncoderPosition(motorChannel: number): Promise<number> {
+        return await this.nativeRevHub.getMotorEncoderPosition(motorChannel);
     }
 
     getMotorPIDCoefficients(
