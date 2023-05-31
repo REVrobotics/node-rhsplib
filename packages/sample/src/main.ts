@@ -31,13 +31,15 @@ let motorCommand = program.command("motor");
 motorCommand
     .command("encoder <channel>")
     .option("-r --reset", "reset the encoder count")
+    .option("--continuous", "run continuously")
     .description("Get the current encoder position of a motor")
     .action(async (channel, options) => {
         let channelNumber = Number(channel);
         if (options.reset) {
             await resetEncoder(channelNumber);
         } else {
-            await runEncoder(channelNumber);
+            let isContinuous = options.continuous !== undefined;
+            await runEncoder(channelNumber, isContinuous);
         }
     });
 
