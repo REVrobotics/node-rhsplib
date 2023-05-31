@@ -1,5 +1,5 @@
 import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
-import { MotorMode } from "@rev-robotics/expansion-hub/dist/MotorMode.js";
+import { MotorMode } from "@rev-robotics/rev-hub-core";
 
 export async function runMotorConstantPower(channel: number, power: number) {
     const hubs = await openConnectedExpansionHubs();

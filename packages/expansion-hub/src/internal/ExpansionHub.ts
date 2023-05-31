@@ -28,11 +28,10 @@ import {
 } from "@rev-robotics/rev-hub-core";
 import { closeSerialPort } from "../open-rev-hub.js";
 import { EventEmitter } from "events";
-import { RevHubType } from "@rev-robotics/rev-hub-core";
+import { RevHubType, MotorMode } from "@rev-robotics/rev-hub-core";
 import { RhspLibError } from "../errors/RhspLibError.js";
 import { startKeepAlive } from "../start-keep-alive.js";
 import { performance } from "perf_hooks";
-import { MotorMode } from "../MotorMode.js";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);

@@ -14,6 +14,7 @@ export * from "./ModuleInterface.js";
 export * from "./ModuleStatus.js";
 export * from "./PidCoefficients.js";
 export * from "./Rgb.js";
+export * from "./MotorMode.js";
 export * from "./SerialFlowControl.js";
 export * from "./SerialParity.js";
 export * from "./VerbosityLevel.js";
