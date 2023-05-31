@@ -560,7 +560,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    async convertErrorPromise<T>(block: () => Promise<T>): Promise<T> {
+    private async convertErrorPromise<T>(block: () => Promise<T>): Promise<T> {
         try {
             return await block();
         } catch (e: any) {
@@ -568,7 +568,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         }
     }
 
-    convertErrorSync<T>(block: () => T): T {
+    private convertErrorSync<T>(block: () => T): T {
         try {
             return block();
         } catch (e: any) {
