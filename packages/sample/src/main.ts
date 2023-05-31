@@ -1,11 +1,4 @@
 import { Command } from "commander";
-import {
-    createLedPattern,
-    ExpansionHub,
-    openConnectedExpansionHubs,
-    LedPatternStep,
-    RevHub,
-} from "@rev-robotics/expansion-hub";
 import { error } from "./command/error.js";
 import { list } from "./command/list.js";
 import { led } from "./command/led.js";
