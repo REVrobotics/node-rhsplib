@@ -5,8 +5,8 @@
     "main": "dist/index.js",
     "type": "module",
     "dependencies": {
-        "serialport": "^10.5.0",
-        "@rev-robotics/rhsplib": "*"
+        "@rev-robotics/rhsplib": "^1.0.6",
+        "serialport": "^10.5.0"
     },
     "devDependencies": {
         "@types/node": "^16.18.18",
