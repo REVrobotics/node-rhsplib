@@ -27,3 +27,11 @@ export async function runEncoder(channel: number) {
     console.log(`Encoder count is ${encoder}`);
     hub.close();
 }
+
+export async function resetEncoder(channel: number) {
+    const hubs = await openConnectedExpansionHubs();
+    let hub = hubs[0];
+
+    await hub.resetMotorEncoder(channel);
+    hub.close();
+}
