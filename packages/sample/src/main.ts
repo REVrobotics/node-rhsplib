@@ -1,6 +1,11 @@
 import { Command } from "commander";
 import { analog, battery, temperature, voltageRail } from "./command/analog.js";
 import { error } from "./command/error.js";
+import {
+    runEncoder,
+    runMotorConstantPower,
+    runMotorConstantVelocity,
+} from "./commands/motor.js";
 import { list } from "./command/list.js";
 import { led } from "./command/led.js";
 import { runServo } from "./command/servo.js";
@@ -12,7 +17,6 @@ import {
     openHubWithAddress,
     openParentExpansionHub,
 } from "@rev-robotics/expansion-hub";
-import { runMotorConstantPower, runMotorConstantVelocity } from "./commands/motor.js";
 
 const program = new Command();
 
@@ -53,6 +57,14 @@ program
     });
 
 let motorCommand = program.command("motor");
+
+motorCommand
+    .command("encoder <channel>")
+    .description("Get the current encoder position of a motor")
+    .action(async (channel) => {
+        let channelNumber = Number(channel);
+        await runEncoder(channelNumber);
+    });
 
 motorCommand.command("power <channel> <power>").action(async (channel, power) => {
     console.log(`${channel} ${power}`);

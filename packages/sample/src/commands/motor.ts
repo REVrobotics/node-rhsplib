@@ -18,3 +18,12 @@ export async function runMotorConstantVelocity(channel: number, velocity: number
     await hub.setMotorTargetVelocity(channel, velocity);
     await hub.setMotorChannelEnable(channel, true);
 }
+
+export async function runEncoder(channel: number) {
+    const hubs = await openConnectedExpansionHubs();
+    let hub = hubs[0];
+
+    let encoder = await hub.getMotorEncoderPosition(channel);
+    console.log(`Encoder count is ${encoder}`);
+    hub.close();
+}
