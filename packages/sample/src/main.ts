@@ -6,7 +6,7 @@ import {
     LedPatternStep,
     RevHub,
 } from "@rev-robotics/expansion-hub";
-import { error } from "./commands/error.js";
+import { error } from "./command/error.js";
 import { list } from "./command/list.js";
 import { led } from "./command/led.js";
 
