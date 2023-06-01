@@ -22,52 +22,48 @@ program
     });
 
 program
-    .option("--continuous", "Run continuously")
     .command("analog <port>")
+    .option("--continuous", "Run continuously")
     .description(
         "Read the analog value of the given port. Specify" +
             "--continuous to run continuously.",
     )
-    .action(async (port) => {
-        let options = program.opts();
+    .action(async (port, options) => {
         let isContinuous = options.continuous !== undefined;
         let portNumber = Number(port);
         await analog(portNumber, isContinuous);
     });
 
 program
-    .option("--continuous", "Run continuously")
     .command("temperature")
+    .option("--continuous", "Run continuously")
     .description(
         "Read the current temperature in Celsius. " +
             "Specify --continuous to run continuously",
     )
-    .action(async () => {
-        let options = program.opts();
+    .action(async (options) => {
         let isContinuous = options.continuous !== undefined;
         await temperature(isContinuous);
     });
 
 program
-    .option("--continuous", "Run continuously")
     .command("voltage")
+    .option("--continuous", "Run continuously")
     .description(
         "Read the current 5V rail voltage. Specify --continuous to run continuously",
     )
-    .action(async () => {
-        let options = program.opts();
+    .action(async (options) => {
         let isContinuous = options.continuous !== undefined;
         await voltageRail(isContinuous);
     });
 
 program
-    .option("--continuous", "Run continuously")
     .command("battery")
+    .option("--continuous", "Run continuously")
     .description(
         "Read the current battery Voltage. Specify --continuous to run continuously",
     )
-    .action(async () => {
-        let options = program.opts();
+    .action(async (options) => {
         let isContinuous = options.continuous !== undefined;
         await battery(isContinuous);
     });
