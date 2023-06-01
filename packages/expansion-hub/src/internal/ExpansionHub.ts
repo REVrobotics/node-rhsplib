@@ -25,6 +25,7 @@ import { ParameterOutOfRangeError } from "../errors/ParameterOutOfRangeError.js"
 import { NoExpansionHubWithAddressError } from "../errors/NoExpansionHubWithAddressError.js";
 import { SerialError } from "../errors/SerialError.js";
 import { TimeoutError } from "../errors/TimeoutError.js";
+import { SERIAL_ERROR, TIMEOUT } from "../errors/error-codes.js";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -578,10 +579,10 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     private createError(e: any): any {
-        if (e.errorCode == -2) {
+        if (e.errorCode == TIMEOUT) {
             return new TimeoutError();
         }
-        if (e.errorCode == -5) {
+        if (e.errorCode == SERIAL_ERROR) {
             return new SerialError(this.serialNumber ?? "no serial number provided");
         }
         if (e.errorCode >= -55 && e.errorCode <= -50) {
