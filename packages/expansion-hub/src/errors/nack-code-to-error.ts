@@ -42,14 +42,14 @@ export function nackCodeToError(nackCode: number): NackError {
         nackCode >= NackCode.DIGITAL_CHANNEL_NOT_CONFIGURED_FOR_OUTPUT_START &&
         nackCode <= NackCode.DIGITAL_CHANNEL_NOT_CONFIGURED_FOR_OUTPUT_END
     )
-        return new DigitalChannelNotConfiguredForOutputError(nackCode - 10);
+        return new DigitalChannelNotConfiguredForOutputError(nackCode);
     if (nackCode == NackCode.NO_DIGITAL_CHANNELS_CONFIGURED_FOR_OUTPUT)
         return new NoDigitalChannelsConfiguredForOutputError();
     if (
         nackCode >= NackCode.DIGITAL_CHANNEL_NOT_CONFIGURED_FOR_INPUT_START &&
         nackCode <= NackCode.DIGITAL_CHANNEL_NOT_CONFIGURED_FOR_INPUT_END
     )
-        return new DigitalChannelNotConfiguredForInputError(nackCode - 20);
+        return new DigitalChannelNotConfiguredForInputError(nackCode);
     if (nackCode == NackCode.NO_DIGITAL_CHANNELS_CONFIGURED_FOR_INPUT)
         return new NoDigitalChannelsConfiguredForInputError();
     if (nackCode == NackCode.SERVO_NOT_FULLY_CONFIGURED)

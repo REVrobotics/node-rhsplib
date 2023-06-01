@@ -1,14 +1,18 @@
 import { NackError, setPrototypeOf } from "./NackError.js";
+import { NackCode } from "./nack-codes.js";
 
 export class DigitalChannelNotConfiguredForOutputError extends NackError {
     digitalChannel: number;
-    constructor(digitalChannel: number) {
+    constructor(nackCode: number) {
         super(
-            digitalChannel + 10,
-            `digital channel ${digitalChannel} not configured for output`,
+            nackCode,
+            `digital channel ${
+                nackCode - NackCode.DIGITAL_CHANNEL_NOT_CONFIGURED_FOR_OUTPUT_START
+            } not configured for output`,
         );
 
-        this.digitalChannel = digitalChannel;
+        this.digitalChannel =
+            nackCode - NackCode.DIGITAL_CHANNEL_NOT_CONFIGURED_FOR_OUTPUT_START;
         setPrototypeOf(this, DigitalChannelNotConfiguredForOutputError.prototype);
     }
 }
@@ -22,20 +26,26 @@ export class NoDigitalChannelsConfiguredForOutputError extends NackError {
 
 export class DigitalChannelNotConfiguredForInputError extends NackError {
     digitalChannel: number;
-    constructor(digitalChannel: number) {
+    constructor(nackCode: number) {
         super(
-            digitalChannel + 20,
-            `digital channel ${digitalChannel} not configured for input`,
+            nackCode,
+            `digital channel ${
+                nackCode - NackCode.DIGITAL_CHANNEL_NOT_CONFIGURED_FOR_INPUT_START
+            } not configured for input`,
         );
 
-        this.digitalChannel = digitalChannel;
+        this.digitalChannel =
+            nackCode - NackCode.DIGITAL_CHANNEL_NOT_CONFIGURED_FOR_INPUT_START;
         setPrototypeOf(this, DigitalChannelNotConfiguredForInputError.prototype);
     }
 }
 
 export class NoDigitalChannelsConfiguredForInputError extends NackError {
     constructor() {
-        super(28, "No digital channels configured for input");
+        super(
+            NackCode.NO_DIGITAL_CHANNELS_CONFIGURED_FOR_INPUT,
+            "No digital channels configured for input",
+        );
         setPrototypeOf(this, NoDigitalChannelsConfiguredForInputError.prototype);
     }
 }

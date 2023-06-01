@@ -6,10 +6,10 @@ export class ParameterOutOfRangeError extends NackError {
      */
     parameterIndex: number;
 
-    constructor(parameterIndex: number) {
-        super(parameterIndex, `Parameter ${parameterIndex} is out of range`);
+    constructor(nackCode: number) {
+        super(nackCode, `Parameter ${nackCode} is out of range`);
 
-        this.parameterIndex = parameterIndex;
+        this.parameterIndex = nackCode;
         setPrototypeOf(this, ParameterOutOfRangeError.prototype);
     }
 }

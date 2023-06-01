@@ -1,16 +1,20 @@
 import { NackError, setPrototypeOf } from "./NackError.js";
 import { BatteryTooLowError } from "./BatteryTooLowError.js";
+import { NackCode } from "./nack-codes.js";
 
 export class ServoNotFullyConfiguredError extends NackError {
     constructor() {
-        super(30, "Servo is not fully configured");
+        super(NackCode.SERVO_NOT_FULLY_CONFIGURED, "Servo is not fully configured");
         setPrototypeOf(this, ServoNotFullyConfiguredError.prototype);
     }
 }
 
 export class BatteryTooLowToRunServoError extends BatteryTooLowError {
     constructor() {
-        super(31, "Battery is too low to run servos");
+        super(
+            NackCode.BATTERY_VOLTAG_TOO_LOW_TO_RUN_SERVO,
+            "Battery is too low to run servos",
+        );
         setPrototypeOf(this, BatteryTooLowToRunServoError.prototype);
     }
 }
