@@ -23,7 +23,7 @@ export function setPrototypeOf(obj: any, proto: any) {
 
 export class NackError extends RevHubError {
     nackCode: number;
-    constructor(nackCode: number, message: string = "NACK error") {
+    constructor(nackCode: number, message: string) {
         super(message);
 
         this.nackCode = nackCode;
