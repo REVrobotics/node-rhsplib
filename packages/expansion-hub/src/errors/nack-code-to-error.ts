@@ -1,10 +1,10 @@
 import { ParameterOutOfRangeError } from "./ParameterOutOfRangeError.js";
 import {
-    GpioNotConfiguredForInputError,
-    GpioNotConfiguredForOutputError,
-    NoGpioPinsConfiguredForInputError,
-    NoGpioPinsConfiguredForOutputError,
-} from "./gpio-errors.js";
+    DigitalChannelNotConfiguredForInputError,
+    DigitalChannelNotConfiguredForOutputError,
+    NoDigitalChannelsConfiguredForInputError,
+    NoDigitalChannelsConfiguredForOutputError,
+} from "./digital-channel-errors.js";
 import {
     BatteryTooLowToRunServoError,
     ServoNotFullyConfiguredError,
@@ -33,11 +33,12 @@ import { NackError } from "./NackError.js";
 
 export function nackCodeToError(nackCode: number): NackError {
     if (nackCode >= 0 && nackCode <= 10) return new ParameterOutOfRangeError(nackCode);
-    if (nackCode < 18) return new GpioNotConfiguredForOutputError(nackCode - 10);
-    if (nackCode == 18) return new NoGpioPinsConfiguredForOutputError();
+    if (nackCode < 18)
+        return new DigitalChannelNotConfiguredForOutputError(nackCode - 10);
+    if (nackCode == 18) return new NoDigitalChannelsConfiguredForOutputError();
     if (nackCode >= 20 && nackCode < 28)
-        return new GpioNotConfiguredForInputError(nackCode - 20);
-    if (nackCode == 28) return new NoGpioPinsConfiguredForInputError();
+        return new DigitalChannelNotConfiguredForInputError(nackCode - 20);
+    if (nackCode == 28) return new NoDigitalChannelsConfiguredForInputError();
     if (nackCode == 30) return new ServoNotFullyConfiguredError();
     if (nackCode == 31) return new BatteryTooLowToRunServoError();
     if (nackCode == 40) return new I2cMasterBusyError();

@@ -4,7 +4,7 @@ export * from "./errors/i2c-errors.js";
 export * from "./errors/ParameterOutOfRangeError.js";
 export * from "./errors/diagnostic-errors.js";
 export * from "./errors/BatteryTooLowError.js";
-export * from "./errors/gpio-errors.js";
+export * from "./errors/digital-channel-errors.js";
 export * from "./errors/motor-errors.js";
 export * from "./errors/servo-errors.js";
 export * from "./errors/nack-code-to-error.js";
