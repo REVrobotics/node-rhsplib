@@ -24,6 +24,7 @@ import { nackCodeToError } from "../errors/nack-code-to-error.js";
 import { ParameterOutOfRangeError } from "../errors/ParameterOutOfRangeError.js";
 import { NoExpansionHubWithAddressError } from "../errors/NoExpansionHubWithAddressError.js";
 import { SerialError } from "../errors/SerialError.js";
+import { TimeoutError } from "../errors/TimeoutError.js";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -577,6 +578,9 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     private createError(e: any): any {
+        if (e.errorCode == -2) {
+            return new TimeoutError();
+        }
         if (e.errorCode == -5) {
             return new SerialError(this.serialNumber ?? "no serial number provided");
         }
@@ -603,7 +607,7 @@ export class ExpansionHubInternal implements ExpansionHub {
             await childHub.queryInterface("DEKA");
         } catch (e: any) {
             //errorCode = -2 indicates timeout
-            if (e.errorCode == -2)
+            if (e instanceof TimeoutError)
                 throw new NoExpansionHubWithAddressError(
                     this.serialNumber!, //Can only call this method on parent, so serialNumber is not undefined.
                     moduleAddress,

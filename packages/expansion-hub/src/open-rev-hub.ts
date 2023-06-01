@@ -10,6 +10,7 @@ import { SerialPort as SerialLister } from "serialport";
 import { NoExpansionHubWithAddressError } from "./errors/NoExpansionHubWithAddressError.js";
 import { ExpansionHubInternal } from "./internal/ExpansionHub.js";
 import { startKeepAlive } from "./start-keep-alive.js";
+import { TimeoutError } from "./errors/TimeoutError.js";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
@@ -53,7 +54,7 @@ export async function openParentExpansionHub(
         await parentHub.queryInterface("DEKA");
     } catch (e: any) {
         //errorCode = -2 indicates timeout
-        if (e.errorCode == -2)
+        if (e instanceof TimeoutError)
             throw new NoExpansionHubWithAddressError(serialNumber, moduleAddress);
     }
     startKeepAlive(parentHub, 1000);
