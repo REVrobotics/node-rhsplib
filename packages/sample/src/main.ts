@@ -42,7 +42,7 @@ program
         "Read the current temperature in Celsius. " +
             "Specify --continuous to run continuously",
     )
-    .action(async (continuous) => {
+    .action(async () => {
         let options = program.opts();
         let isContinuous = options.continuous !== undefined;
         await temperature(isContinuous);
@@ -54,7 +54,7 @@ program
     .description(
         "Read the current 5V rail voltage. Specify --continuous to run continuously",
     )
-    .action(async (continuous) => {
+    .action(async () => {
         let options = program.opts();
         let isContinuous = options.continuous !== undefined;
         await voltageRail(isContinuous);
@@ -66,7 +66,7 @@ program
     .description(
         "Read the current battery Voltage. Specify --continuous to run continuously",
     )
-    .action(async (continuous) => {
+    .action(async () => {
         let options = program.opts();
         let isContinuous = options.continuous !== undefined;
         await battery(isContinuous);
