@@ -607,7 +607,6 @@ export class ExpansionHubInternal implements ExpansionHub {
             await childHub.open(moduleAddress);
             await childHub.queryInterface("DEKA");
         } catch (e: any) {
-            //errorCode = -2 indicates timeout
             if (e instanceof TimeoutError)
                 throw new NoExpansionHubWithAddressError(
                     this.serialNumber!, //Can only call this method on parent, so serialNumber is not undefined.
