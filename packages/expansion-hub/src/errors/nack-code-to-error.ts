@@ -28,7 +28,7 @@ import {
     CommandRoutingError,
     CommandNotSupportedError,
 } from "./diagnostic-errors.js";
-import { UnknownNackError } from "./UnknownNackError.js";
+import { UnrecognizedNackError } from "./UnrecognizedNackError.js";
 import { NackError } from "./NackError.js";
 
 export function nackCodeToError(nackCode: number): NackError {
@@ -53,5 +53,5 @@ export function nackCodeToError(nackCode: number): NackError {
     if (nackCode == 253) return new CommandImplementationPendingError();
     if (nackCode == 254) return new CommandRoutingError();
     if (nackCode == 255) return new CommandNotSupportedError();
-    return new UnknownNackError(nackCode);
+    return new UnrecognizedNackError(nackCode);
 }

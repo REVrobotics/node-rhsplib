@@ -1,5 +1,5 @@
 export * from "./errors/NackError.js";
-export * from "./errors/UnknownNackError.js";
+export * from "./errors/UnrecognizedNackError.js";
 export * from "./errors/i2c-errors.js";
 export * from "./errors/ParameterOutOfRangeError.js";
 export * from "./errors/diagnostic-errors.js";
