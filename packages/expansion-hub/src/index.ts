@@ -8,6 +8,7 @@ export * from "./errors/digital-channel-errors.js";
 export * from "./errors/motor-errors.js";
 export * from "./errors/servo-errors.js";
 export * from "./errors/nack-code-to-error.js";
+export * from "./errors/nack-codes.js";
 export * from "./discovery.js";
 export * from "./open-rev-hub.js";
 export * from "./led-pattern.js";
