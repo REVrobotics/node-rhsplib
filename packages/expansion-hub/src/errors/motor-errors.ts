@@ -3,7 +3,7 @@ import { BatteryTooLowError } from "./BatteryTooLowError.js";
 
 export class MotorNotFullyConfiguredError extends NackError {
     constructor() {
-        super(50);
+        super(50, "Motor is not fully configured");
         setPrototypeOf(this, MotorNotFullyConfiguredError.prototype);
     }
 }

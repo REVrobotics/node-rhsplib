@@ -3,7 +3,7 @@ import { BatteryTooLowError } from "./BatteryTooLowError.js";
 
 export class ServoNotFullyConfiguredError extends NackError {
     constructor() {
-        super(30);
+        super(30, "Servo is not fully configured");
         setPrototypeOf(this, ServoNotFullyConfiguredError.prototype);
     }
 }
