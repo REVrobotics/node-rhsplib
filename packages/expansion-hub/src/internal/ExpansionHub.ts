@@ -300,21 +300,21 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     readI2CMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         numBytesToRead: number,
     ): Promise<void> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.readI2CMultipleBytes(
                 i2cChannel,
-                slaveAddress,
+                targetAddress,
                 numBytesToRead,
             );
         });
     }
 
-    readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void> {
+    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.readI2CSingleByte(i2cChannel, slaveAddress);
+            return this.nativeRevHub.readI2CSingleByte(i2cChannel, targetAddress);
         });
     }
 
@@ -523,13 +523,13 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     writeI2CMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         bytes: number[],
     ): Promise<void> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.writeI2CMultipleBytes(
                 i2cChannel,
-                slaveAddress,
+                targetAddress,
                 bytes,
             );
         });
@@ -537,14 +537,14 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     writeI2CReadMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         numBytesToRead: number,
         startAddress: number,
     ): Promise<void> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.writeI2CReadMultipleBytes(
                 i2cChannel,
-                slaveAddress,
+                targetAddress,
                 numBytesToRead,
                 startAddress,
             );
@@ -553,11 +553,11 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     writeI2CSingleByte(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         byte: number,
     ): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
+            return this.nativeRevHub.writeI2CSingleByte(i2cChannel, targetAddress, byte);
         });
     }
 

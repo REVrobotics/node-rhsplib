@@ -10,7 +10,7 @@ import {
     ServoNotFullyConfiguredError,
 } from "./servo-errors.js";
 import {
-    I2cMasterBusyError,
+    I2cControllerBusyError,
     I2cNoResultsPendingError,
     I2cOperationInProgressError,
     I2cQueryMismatchError,
@@ -41,7 +41,7 @@ export function nackCodeToError(nackCode: number): NackError {
     if (nackCode == 28) return new NoDigitalChannelsConfiguredForInputError();
     if (nackCode == 30) return new ServoNotFullyConfiguredError();
     if (nackCode == 31) return new BatteryTooLowToRunServoError();
-    if (nackCode == 40) return new I2cMasterBusyError();
+    if (nackCode == 40) return new I2cControllerBusyError();
     if (nackCode == 41) return new I2cOperationInProgressError();
     if (nackCode == 42) return new I2cNoResultsPendingError();
     if (nackCode == 43) return new I2cQueryMismatchError();

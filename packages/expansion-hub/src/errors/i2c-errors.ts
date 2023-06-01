@@ -1,9 +1,9 @@
-import {NackError, setPrototypeOf} from "./NackError.js";
+import { NackError, setPrototypeOf } from "./NackError.js";
 
-export class I2cMasterBusyError extends NackError {
+export class I2cControllerBusyError extends NackError {
     constructor() {
         super(40, "I2C Controller busy");
-        setPrototypeOf(this, I2cMasterBusyError.prototype);
+        setPrototypeOf(this, I2cControllerBusyError.prototype);
     }
 }
 

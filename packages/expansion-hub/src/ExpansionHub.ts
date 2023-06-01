@@ -72,24 +72,24 @@ export interface ExpansionHub extends RevHub {
     getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode>;
     writeI2CSingleByte(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         byte: number,
     ): Promise<void>;
     writeI2CMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         bytes: number[],
     ): Promise<void>;
     getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus>;
-    readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void>;
+    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<void>;
     readI2CMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         numBytesToRead: number,
     ): Promise<void>;
     writeI2CReadMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         numBytesToRead: number,
         startAddress: number,
     ): Promise<void>;
