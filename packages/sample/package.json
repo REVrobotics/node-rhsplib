@@ -11,7 +11,7 @@
     },
     "scripts": {
         "build": "tsc",
-        "error": "node dist/main.js error",
+        "error": "node dist/main.js testErrorHandling",
         "list": "node dist/main.js list",
         "led": "node dist/main.js led"
     }

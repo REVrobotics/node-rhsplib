@@ -8,7 +8,7 @@ const program = new Command();
 program.version("1.0.0");
 
 program
-    .command("error")
+    .command("testErrorHandling")
     .description(
         "Intentionally causes a few errors to happen and " +
             "prints information about the errors.",
