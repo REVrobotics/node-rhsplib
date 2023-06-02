@@ -34,7 +34,7 @@ export async function error() {
     try {
         let serialNumbers = await getPossibleExpansionHubSerialNumbers();
         await openParentExpansionHub(serialNumbers[0], 12);
-        console.log("Did not get error opening hub ith wrong address");
+        console.log("Did not get error opening hub with wrong address");
     } catch (e) {
         console.log("Got error opening parent hub with invalid address");
         console.log(e);
