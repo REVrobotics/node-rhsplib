@@ -54,7 +54,7 @@ export function nackCodeToError(nackCode: number): NackError {
         return new NoDigitalChannelsConfiguredForInputError();
     if (nackCode == NackCode.SERVO_NOT_FULLY_CONFIGURED)
         return new ServoNotFullyConfiguredError();
-    if (nackCode == NackCode.BATTERY_VOLTAG_TOO_LOW_TO_RUN_SERVO)
+    if (nackCode == NackCode.BATTERY_VOLTAGE_TOO_LOW_TO_RUN_SERVO)
         return new BatteryTooLowToRunServoError();
     if (nackCode == NackCode.I2C_CONTROLLER_BUSY) return new I2cControllerBusyError();
     if (nackCode == NackCode.I2C_OPERATION_IN_PROGRESS)

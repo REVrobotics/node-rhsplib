@@ -12,7 +12,7 @@ export class ServoNotFullyConfiguredError extends NackError {
 export class BatteryTooLowToRunServoError extends BatteryTooLowError {
     constructor() {
         super(
-            NackCode.BATTERY_VOLTAG_TOO_LOW_TO_RUN_SERVO,
+            NackCode.BATTERY_VOLTAGE_TOO_LOW_TO_RUN_SERVO,
             "Battery is too low to run servos",
         );
         setPrototypeOf(this, BatteryTooLowToRunServoError.prototype);

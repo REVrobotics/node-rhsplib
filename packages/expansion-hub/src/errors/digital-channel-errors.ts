@@ -19,7 +19,10 @@ export class DigitalChannelNotConfiguredForOutputError extends NackError {
 
 export class NoDigitalChannelsConfiguredForOutputError extends NackError {
     constructor() {
-        super(18, "No digital channels configured for output");
+        super(
+            NackCode.NO_DIGITAL_CHANNELS_CONFIGURED_FOR_OUTPUT,
+            "No digital channels configured for output",
+        );
         setPrototypeOf(this, NoDigitalChannelsConfiguredForOutputError.prototype);
     }
 }
