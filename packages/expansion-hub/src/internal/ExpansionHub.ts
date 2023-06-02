@@ -25,7 +25,7 @@ import { ParameterOutOfRangeError } from "../errors/ParameterOutOfRangeError.js"
 import { NoExpansionHubWithAddressError } from "../errors/NoExpansionHubWithAddressError.js";
 import { SerialError } from "../errors/SerialError.js";
 import { TimeoutError } from "../errors/TimeoutError.js";
-import { RhspLibErrorCode } from "../errors/error-codes.js";
+import { RhspLibErrorCode } from "@rev-robotics/rev-hub-core";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);

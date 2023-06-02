@@ -30,7 +30,7 @@ import {
 } from "./diagnostic-errors.js";
 import { UnrecognizedNackError } from "./UnrecognizedNackError.js";
 import { NackError } from "./NackError.js";
-import { NackCode } from "./nack-codes.js";
+import { NackCode } from "@rev-robotics/rev-hub-core";
 
 export function nackCodeToError(nackCode: number): NackError {
     if (

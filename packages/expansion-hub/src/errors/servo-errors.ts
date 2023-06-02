@@ -1,6 +1,6 @@
 import { NackError, setPrototypeOf } from "./NackError.js";
 import { BatteryTooLowError } from "./BatteryTooLowError.js";
-import { NackCode } from "./nack-codes.js";
+import { NackCode } from "@rev-robotics/rev-hub-core";
 
 export class ServoNotFullyConfiguredError extends NackError {
     constructor() {
