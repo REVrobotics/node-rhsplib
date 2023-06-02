@@ -585,8 +585,11 @@ export class ExpansionHubInternal implements ExpansionHub {
         if (e.errorCode == RhspLibErrorCode.SERIAL_ERROR) {
             return new SerialError(this.serialNumber ?? "no serial number provided");
         }
-        if (e.errorCode >= -55 && e.errorCode <= -50) {
-            let index = -(e.errorCode + 50);
+        if (
+            e.errorCode >= RhspLibErrorCode.ARG_OUT_OF_RANGE_END &&
+            e.errorCode <= RhspLibErrorCode.ARG_OUT_OF_RANGE_START
+        ) {
+            let index = -e.errorCode + RhspLibErrorCode.ARG_OUT_OF_RANGE_START;
             return new ParameterOutOfRangeError(index);
         }
         if (e.nackCode !== undefined) {
