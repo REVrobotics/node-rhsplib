@@ -25,7 +25,7 @@ import { ParameterOutOfRangeError } from "../errors/ParameterOutOfRangeError.js"
 import { NoExpansionHubWithAddressError } from "../errors/NoExpansionHubWithAddressError.js";
 import { SerialError } from "../errors/SerialError.js";
 import { TimeoutError } from "../errors/TimeoutError.js";
-import { RhspLibErrorCode } from "@rev-robotics/rev-hub-core";
+import { RhspLibErrorCode } from "@rev-robotics/rhsplib";
 import { RhspLibError } from "../errors/RhspLibError.js";
 import { CommandNotSupportedError } from "../errors/diagnostic-errors.js";
 

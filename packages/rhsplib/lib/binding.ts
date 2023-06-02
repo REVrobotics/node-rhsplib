@@ -8,6 +8,8 @@ const __dirname = dirname(__filename);
 const require = createRequire(import.meta.url);
 const addon = require("node-gyp-build")(path.join(__dirname, ".."));
 
+export * from "./error-codes.js";
+
 export let NativeSerial = addon.Serial;
 export let NativeRevHub = addon.RevHub;
 
