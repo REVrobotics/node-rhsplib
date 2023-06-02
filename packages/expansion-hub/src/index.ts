@@ -1,4 +1,4 @@
-export * from "./errors/NackError.js";
+export { NackError } from "./errors/NackError.js";
 export * from "./errors/UnrecognizedNackError.js";
 export * from "./errors/i2c-errors.js";
 export * from "./errors/ParameterOutOfRangeError.js";
@@ -11,7 +11,6 @@ export * from "./errors/nack-code-to-error.js";
 export * from "./errors/NoExpansionHubWithAddressError.js";
 export * from "./errors/RevHubError.js";
 export * from "./errors/RhspLibError.js";
-export * from "./errors/serial-errors.js";
 export * from "./errors/GeneralSerialError.js";
 export * from "./errors/TimeoutError.js";
 export * from "./discovery.js";

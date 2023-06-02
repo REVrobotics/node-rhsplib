@@ -27,6 +27,7 @@ const require = createRequire(import.meta.url);
 const addon = require("node-gyp-build")(path.join(__dirname, ".."));
 
 export * from "./error-codes.js";
+export * from "./serial-errors.js";
 export {
     BulkInputData,
     DebugGroup,

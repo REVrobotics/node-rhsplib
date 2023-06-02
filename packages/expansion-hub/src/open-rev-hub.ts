@@ -1,5 +1,5 @@
 import { ExpansionHub, ParentExpansionHub } from "./ExpansionHub.js";
-import { NativeRevHub, NativeSerial } from "@rev-robotics/rhsplib";
+import { NativeRevHub, NativeSerial, SerialError } from "@rev-robotics/rhsplib";
 import { SerialPort as SerialLister } from "serialport";
 import { NoExpansionHubWithAddressError } from "./errors/NoExpansionHubWithAddressError.js";
 import { ExpansionHubInternal } from "./internal/ExpansionHub.js";
@@ -8,7 +8,6 @@ import { TimeoutError } from "./errors/TimeoutError.js";
 import {
     InvalidSerialArguments,
     SerialConfigurationError,
-    SerialError,
     SerialIoError,
     UnableToOpenSerialError,
 } from "./errors/serial-errors.js";

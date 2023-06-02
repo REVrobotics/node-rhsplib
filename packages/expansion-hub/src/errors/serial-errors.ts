@@ -1,13 +1,5 @@
 import { setPrototypeOf } from "./NackError.js";
 
-export enum SerialError {
-    GENERAL_ERROR = -101,
-    UNABLE_TO_OPEN = -102,
-    INVALID_ARGS = -103,
-    CONFIGURATION_ERROR = -104,
-    IO_ERROR = -105,
-}
-
 export class UnableToOpenSerialError extends Error {
     constructor(serialPort: string) {
         super(`Unable to open serial port ${serialPort}`);
