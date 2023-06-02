@@ -50,7 +50,6 @@ export async function openParentExpansionHub(
         let addresses: DiscoveredAddresses = await NativeRevHub.discoverRevHubs(
             serialPort,
         );
-        console.log(`Discovered ${addresses.parentAddress} ${addresses}`);
         moduleAddress = addresses.parentAddress;
     }
 
@@ -97,7 +96,6 @@ export async function openExpansionHubAndAllChildren(
     )) as ParentExpansionHub & ExpansionHubInternal;
 
     for (let address of discoveredModules.childAddresses) {
-        console.log(`Adding child with address ${address}`);
         let hub = await parentHub.addChildByAddress(address);
         if (hub.isExpansionHub()) {
             startKeepAlive(hub as ExpansionHubInternal, 1000);
