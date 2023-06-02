@@ -19,7 +19,7 @@ import {
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rev-hub-core";
-import { SerialParity } from "@rev-robotics/rev-hub-core/dist/SerialParity.js";
+import { SerialParity } from "@rev-robotics/rev-hub-core";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

@@ -22,7 +22,7 @@ import { RevHubType } from "../RevHubType.js";
 import { nackCodeToError } from "../errors/nack-code-to-error.js";
 import { ParameterOutOfRangeError } from "../errors/ParameterOutOfRangeError.js";
 import { NoExpansionHubWithAddressError } from "../errors/NoExpansionHubWithAddressError.js";
-import { SerialError } from "../errors/SerialError.js";
+import { GeneralSerialError } from "../errors/GeneralSerialError.js";
 import { TimeoutError } from "../errors/TimeoutError.js";
 import { RhspLibErrorCode } from "@rev-robotics/rhsplib";
 import { RhspLibError } from "../errors/RhspLibError.js";
@@ -594,7 +594,9 @@ export class ExpansionHubInternal implements ExpansionHub {
         } else if (e.errorCode == RhspLibErrorCode.TIMEOUT) {
             return new TimeoutError();
         } else if (e.errorCode == RhspLibErrorCode.SERIAL_ERROR) {
-            return new SerialError(this.serialNumber ?? "no serial number provided");
+            return new GeneralSerialError(
+                this.serialNumber ?? "no serial number provided",
+            );
         } else if (
             e.errorCode >= RhspLibErrorCode.ARG_OUT_OF_RANGE_END &&
             e.errorCode <= RhspLibErrorCode.ARG_OUT_OF_RANGE_START

@@ -12,9 +12,9 @@ import {
     SerialIoError,
     UnableToOpenSerialError,
 } from "./errors/serial-errors.js";
-import { SerialError as GeneralSerialError } from "./errors/SerialError.js";
+import { GeneralSerialError as GeneralSerialError } from "./errors/GeneralSerialError.js";
 import { DiscoveredAddresses, SerialFlowControl } from "@rev-robotics/rev-hub-core";
-import { SerialParity } from "@rev-robotics/rev-hub-core/dist/SerialParity.js";
+import { SerialParity } from "@rev-robotics/rev-hub-core";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
