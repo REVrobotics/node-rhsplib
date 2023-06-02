@@ -27,6 +27,23 @@ const require = createRequire(import.meta.url);
 const addon = require("node-gyp-build")(path.join(__dirname, ".."));
 
 export * from "./error-codes.js";
+export {
+    BulkInputData,
+    DebugGroup,
+    DioDirection,
+    DiscoveredAddresses,
+    I2CReadStatus,
+    I2CSpeedCode,
+    I2CWriteStatus,
+    LedPattern,
+    ModuleInterface,
+    ModuleStatus,
+    PidCoefficients,
+    Rgb,
+    SerialFlowControl,
+    VerbosityLevel,
+    Version,
+} from "@rev-robotics/rev-hub-core";
 
 export let NativeSerial = addon.Serial;
 export let NativeRevHub = addon.RevHub;
