@@ -1,21 +1,20 @@
 import { ExpansionHub } from "../ExpansionHub.js";
+import { NativeRevHub, Serial as SerialPort } from "@rev-robotics/rhsplib";
 import {
     BulkInputData,
     DebugGroup,
-    DIODirection,
+    DioDirection,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
-    LEDPattern,
+    LedPattern,
     ModuleInterface,
     ModuleStatus,
-    PIDCoefficients,
-    NativeRevHub,
-    RGB,
-    Serial as SerialPort,
+    PidCoefficients,
+    Rgb,
     VerbosityLevel,
     Version,
-} from "@rev-robotics/rhsplib";
+} from "@rev-robotics/rev-hub-core";
 import { closeSerialPort } from "../open-rev-hub.js";
 import { ParentRevHub, RevHub } from "../RevHub.js";
 import { EventEmitter } from "events";
@@ -79,6 +78,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     open(destAddress: number): Promise<void> {
+        this.moduleAddress = destAddress;
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.open(this.serialPort, destAddress);
         });
@@ -126,7 +126,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    getDigitalDirection(dioPin: number): Promise<DIODirection> {
+    getDigitalDirection(dioPin: number): Promise<DioDirection> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.getDigitalDirection(dioPin);
         });
@@ -168,13 +168,13 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    getModuleLedColor(): Promise<RGB> {
+    getModuleLedColor(): Promise<Rgb> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.getModuleLEDColor();
         });
     }
 
-    getModuleLedPattern(): Promise<LEDPattern> {
+    getModuleLedPattern(): Promise<LedPattern> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.getModuleLEDPattern();
         });
@@ -227,7 +227,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     getMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
-    ): Promise<PIDCoefficients> {
+    ): Promise<PidCoefficients> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.getMotorPIDCoefficients(motorChannel, motorMode);
         });
@@ -382,7 +382,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    setDigitalDirection(dioPin: number, direction: DIODirection): Promise<void> {
+    setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.setDigitalDirection(dioPin, direction);
         });
@@ -415,7 +415,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    setModuleLedPattern(ledPattern: LEDPattern): Promise<void> {
+    setModuleLedPattern(ledPattern: LedPattern): Promise<void> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.setModuleLEDPattern(ledPattern);
         });
@@ -462,7 +462,7 @@ export class ExpansionHubInternal implements ExpansionHub {
     setMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
-        pid: PIDCoefficients,
+        pid: PidCoefficients,
     ): Promise<void> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.setMotorPIDCoefficients(

@@ -2,6 +2,24 @@ import * as path from "path";
 import { createRequire } from "module";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import {
+    BulkInputData,
+    DebugGroup,
+    DioDirection,
+    DiscoveredAddresses,
+    I2CReadStatus,
+    I2CSpeedCode,
+    I2CWriteStatus,
+    LedPattern,
+    ModuleInterface,
+    ModuleStatus,
+    PidCoefficients,
+    Rgb,
+    SerialFlowControl,
+    VerbosityLevel,
+    Version,
+} from "@rev-robotics/rev-hub-core";
+import { SerialParity } from "@rev-robotics/rev-hub-core/dist/SerialParity.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -12,136 +30,6 @@ export * from "./error-codes.js";
 
 export let NativeSerial = addon.Serial;
 export let NativeRevHub = addon.RevHub;
-
-export enum SerialParity {
-    None = 0,
-    Odd,
-    Even,
-}
-
-export enum SerialFlowControl {
-    None = 0,
-    Hardware,
-    Software,
-}
-
-export enum DebugGroup {
-    Main = 1,
-    TransmitterToHost,
-    ReceiverFromHost,
-    ADC,
-    PWMAndServo,
-    ModuleLED,
-    DigitalIO,
-    I2C,
-    Motor0,
-    Motor1,
-    Motor2,
-    Motor3,
-}
-
-export enum VerbosityLevel {
-    Off = 0,
-    Level1,
-    Level2,
-    Level3,
-}
-
-export enum DIODirection {
-    Input,
-    Output,
-}
-
-export enum I2CSpeedCode {
-    SpeedCode100_Kbps,
-    SpeedCode400_Kbps,
-}
-
-export interface ModuleStatus {
-    statusWord: number;
-    motorAlerts: number;
-}
-
-export interface ModuleInterface {
-    name: string;
-    firstPacketID: number;
-    numberIDValues: number;
-}
-
-export interface RGB {
-    red: number;
-    green: number;
-    blue: number;
-}
-
-export interface LEDPattern {
-    rgbtPatternStep0: number;
-    rgbtPatternStep1: number;
-    rgbtPatternStep2: number;
-    rgbtPatternStep3: number;
-    rgbtPatternStep4: number;
-    rgbtPatternStep5: number;
-    rgbtPatternStep6: number;
-    rgbtPatternStep7: number;
-    rgbtPatternStep8: number;
-    rgbtPatternStep9: number;
-    rgbtPatternStep10: number;
-    rgbtPatternStep11: number;
-    rgbtPatternStep12: number;
-    rgbtPatternStep13: number;
-    rgbtPatternStep14: number;
-    rgbtPatternStep15: number;
-}
-
-export interface DiscoveredAddresses {
-    parentAddress: number;
-    childAddresses: number[];
-    numberOfChildModules: number;
-}
-
-export interface BulkInputData {
-    digitalInputs: number;
-    motor0position_enc: number;
-    motor1position_enc: number;
-    motor2position_enc: number;
-    motor3position_enc: number;
-    motorStatus: number;
-    motor0velocity_cps: number;
-    motor1velocity_cps: number;
-    motor2velocity_cps: number;
-    motor3velocity_cps: number;
-    analog0_mV: number;
-    analog1_mV: number;
-    analog2_mV: number;
-    analog3_mV: number;
-    attentionRequired: number;
-}
-
-export interface Version {
-    engineeringRevision: number;
-    minorVersion: number;
-    majorVersion: number;
-    minorHwRevision: number;
-    majorHwRevision: number;
-    hwType: number;
-}
-
-export interface I2CWriteStatus {
-    i2cTransactionStatus: number;
-    numBytesWritten: number;
-}
-
-export interface I2CReadStatus {
-    i2cTransactionStatus: number;
-    numBytesRead: number;
-    bytes: number[];
-}
-
-export interface PIDCoefficients {
-    P: number;
-    I: number;
-    D: number;
-}
 
 export declare class Serial {
     constructor();
@@ -177,9 +65,9 @@ export declare class RevHub {
     setNewModuleAddress(newModuleAddress: number): Promise<void>;
     queryInterface(interfaceName: string): Promise<ModuleInterface>;
     setModuleLEDColor(red: number, green: number, blue: number): Promise<void>;
-    getModuleLEDColor(): Promise<RGB>;
-    setModuleLEDPattern(ledPattern: LEDPattern): Promise<void>;
-    getModuleLEDPattern(): Promise<LEDPattern>;
+    getModuleLEDColor(): Promise<Rgb>;
+    setModuleLEDPattern(ledPattern: LedPattern): Promise<void>;
+    getModuleLEDPattern(): Promise<LedPattern>;
     setDebugLogLevel(
         debugGroup: DebugGroup,
         verbosityLevel: VerbosityLevel,
@@ -201,8 +89,8 @@ export declare class RevHub {
     // DIO
     setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void>;
     setDigitalAllOutputs(bitPackedField: number): Promise<void>;
-    setDigitalDirection(dioPin: number, direction: DIODirection): Promise<void>;
-    getDigitalDirection(dioPin: number): Promise<DIODirection>;
+    setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void>;
+    getDigitalDirection(dioPin: number): Promise<DioDirection>;
     getDigitalSingleInput(dioPin: number): Promise<boolean>;
     getDigitalAllInputs(): Promise<number>;
 
@@ -271,12 +159,12 @@ export declare class RevHub {
     setMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
-        pid: PIDCoefficients,
+        pid: PidCoefficients,
     ): Promise<void>;
     getMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
-    ): Promise<PIDCoefficients>;
+    ): Promise<PidCoefficients>;
 
     // PWM
     setPWMConfiguration(pwmChannel: number, framePeriod: number): Promise<void>;

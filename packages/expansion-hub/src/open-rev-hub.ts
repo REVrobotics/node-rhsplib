@@ -1,11 +1,5 @@
 import { ExpansionHub, ParentExpansionHub } from "./ExpansionHub.js";
-import {
-    SerialParity,
-    SerialFlowControl,
-    NativeRevHub,
-    NativeSerial,
-    DiscoveredAddresses,
-} from "@rev-robotics/rhsplib";
+import { NativeRevHub, NativeSerial } from "@rev-robotics/rhsplib";
 import { SerialPort as SerialLister } from "serialport";
 import { NoExpansionHubWithAddressError } from "./errors/NoExpansionHubWithAddressError.js";
 import { ExpansionHubInternal } from "./internal/ExpansionHub.js";
@@ -19,6 +13,8 @@ import {
     UnableToOpenSerialError,
 } from "./errors/serial-errors.js";
 import { SerialError as GeneralSerialError } from "./errors/SerialError.js";
+import { DiscoveredAddresses, SerialFlowControl } from "@rev-robotics/rev-hub-core";
+import { SerialParity } from "@rev-robotics/rev-hub-core/dist/SerialParity.js";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
@@ -54,6 +50,7 @@ export async function openParentExpansionHub(
         let addresses: DiscoveredAddresses = await NativeRevHub.discoverRevHubs(
             serialPort,
         );
+        console.log(`Discovered ${addresses.parentAddress} ${addresses}`);
         moduleAddress = addresses.parentAddress;
     }
 
@@ -100,6 +97,7 @@ export async function openExpansionHubAndAllChildren(
     )) as ParentExpansionHub & ExpansionHubInternal;
 
     for (let address of discoveredModules.childAddresses) {
+        console.log(`Adding child with address ${address}`);
         let hub = await parentHub.addChildByAddress(address);
         if (hub.isExpansionHub()) {
             startKeepAlive(hub as ExpansionHubInternal, 1000);

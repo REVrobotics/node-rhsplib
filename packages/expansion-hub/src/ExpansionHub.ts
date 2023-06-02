@@ -1,18 +1,18 @@
 import {
     BulkInputData,
     DebugGroup,
-    DIODirection,
+    DioDirection,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
-    LEDPattern,
+    LedPattern,
     ModuleInterface,
     ModuleStatus,
-    PIDCoefficients,
-    RGB,
+    PidCoefficients,
+    Rgb,
     VerbosityLevel,
     Version,
-} from "@rev-robotics/rhsplib";
+} from "@rev-robotics/rev-hub-core";
 import { ParentRevHub, RevHub } from "./RevHub.js";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
@@ -36,9 +36,9 @@ export interface ExpansionHub extends RevHub {
     setNewModuleAddress(newModuleAddress: number): Promise<void>;
     queryInterface(interfaceName: string): Promise<ModuleInterface>;
     setModuleLedColor(red: number, green: number, blue: number): Promise<void>;
-    getModuleLedColor(): Promise<RGB>;
-    setModuleLedPattern(ledPattern: LEDPattern): Promise<void>;
-    getModuleLedPattern(): Promise<LEDPattern>;
+    getModuleLedColor(): Promise<Rgb>;
+    setModuleLedPattern(ledPattern: LedPattern): Promise<void>;
+    getModuleLedPattern(): Promise<LedPattern>;
     setDebugLogLevel(
         debugGroup: DebugGroup,
         verbosityLevel: VerbosityLevel,
@@ -59,8 +59,8 @@ export interface ExpansionHub extends RevHub {
     // DIO
     setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void>;
     setDigitalAllOutputs(bitPackedField: number): Promise<void>;
-    setDigitalDirection(dioPin: number, direction: DIODirection): Promise<void>;
-    getDigitalDirection(dioPin: number): Promise<DIODirection>;
+    setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void>;
+    getDigitalDirection(dioPin: number): Promise<DioDirection>;
     getDigitalSingleInput(dioPin: number): Promise<boolean>;
     getDigitalAllInputs(): Promise<number>;
 
@@ -129,12 +129,12 @@ export interface ExpansionHub extends RevHub {
     setMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
-        pid: PIDCoefficients,
+        pid: PidCoefficients,
     ): Promise<void>;
     getMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
-    ): Promise<PIDCoefficients>;
+    ): Promise<PidCoefficients>;
 
     // Servo
     setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void>;
