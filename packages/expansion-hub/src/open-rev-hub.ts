@@ -11,6 +11,14 @@ import { NoExpansionHubWithAddressError } from "./errors/NoExpansionHubWithAddre
 import { ExpansionHubInternal } from "./internal/ExpansionHub.js";
 import { startKeepAlive } from "./start-keep-alive.js";
 import { TimeoutError } from "./errors/TimeoutError.js";
+import {
+    InvalidSerialArguments,
+    SerialConfigurationError,
+    SerialError,
+    SerialIoError,
+    UnableToOpenSerialError,
+} from "./errors/serial-errors.js";
+import { SerialError as GeneralSerialError } from "./errors/SerialError.js";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
@@ -135,13 +143,28 @@ export function closeSerialPort(serialPort: typeof NativeSerial) {
 
 async function openSerialPort(serialPortPath: string): Promise<typeof NativeSerial> {
     let serial = new NativeSerial();
-    await serial.open(
-        serialPortPath,
-        460800,
-        8,
-        SerialParity.None,
-        1,
-        SerialFlowControl.None,
-    );
+    try {
+        await serial.open(
+            serialPortPath,
+            460800,
+            8,
+            SerialParity.None,
+            1,
+            SerialFlowControl.None,
+        );
+    } catch (e: any) {
+        let code = e.errorCode;
+        if (code == SerialError.INVALID_ARGS) {
+            throw new InvalidSerialArguments(serialPortPath);
+        } else if (code == SerialError.UNABLE_TO_OPEN) {
+            throw new UnableToOpenSerialError(serialPortPath);
+        } else if (code == SerialError.CONFIGURATION_ERROR) {
+            throw new SerialConfigurationError(serialPortPath);
+        } else if (code == SerialError.IO_ERROR) {
+            throw new SerialIoError(serialPortPath);
+        } else if (code == SerialError.GENERAL_ERROR) {
+            throw new GeneralSerialError(serialPortPath);
+        }
+    }
     return serial;
 }
