@@ -12,7 +12,7 @@ export class MotorCommandNotValidError extends NackError {
     constructor() {
         super(
             NackCode.COMMAND_NOT_VALID_FOR_SELECTED_MOTOR_MODE,
-            "Motor command is not valid",
+            "The motor is not in the correct mode for this command",
         );
         setPrototypeOf(this, MotorCommandNotValidError.prototype);
     }
