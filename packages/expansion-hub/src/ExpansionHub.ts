@@ -152,7 +152,7 @@ export interface ExpansionHub extends RevHub {
 
     /**
      * Set the width of a pulse. For most servos, this is a range centered on
-     * 1500ms, but the minimum and maximum can vary by servo model.
+     * 1500us, but the minimum and maximum can vary by servo model.
      * @param servoChannel
      * @param pulseWidth the pulse width in milliseconds
      */
