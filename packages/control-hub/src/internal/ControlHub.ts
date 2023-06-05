@@ -108,27 +108,55 @@ export class ControlHubInternal implements ControlHub {
     }
 
     async getBulkInputData(): Promise<BulkInputData> {
+        let result = await this.sendCommand("getBulkInputData", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+        });
         throw new Error("not implemented");
     }
 
-    getDigitalAllInputs(): Promise<number> {
-        throw new Error("not implemented");
+    async getDigitalAllInputs(): Promise<number> {
+        return await this.sendCommand("getAllDigitalInputs", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+        });
     }
 
     async getDigitalDirection(dioPin: number): Promise<DIODirection> {
-        throw new Error("not implemented");
+        let isOutput = await this.sendCommand("getDigitalDirection", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            channel: dioPin,
+        });
+
+        return isOutput ? DIODirection.Output : DIODirection.Input;
     }
 
-    getDigitalSingleInput(dioPin: number): Promise<boolean> {
-        throw new Error("not implemented");
+    async getDigitalSingleInput(dioPin: number): Promise<boolean> {
+        return await this.sendCommand("getDigitalInput", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            channel: dioPin,
+        });
     }
 
-    getFTDIResetControl(): Promise<boolean> {
-        throw new Error("not implemented");
+    async getFTDIResetControl(): Promise<boolean> {
+        return await this.sendCommand("getFtdiResetControl", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+        });
     }
 
-    getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode> {
-        throw new Error("not implemented");
+    async getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode> {
+        let speedCode = await this.sendCommand("getI2CChannelConfiguration", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            channel: i2cChannel,
+        });
+
+        return speedCode == 1
+            ? I2CSpeedCode.SpeedCode400_Kbps
+            : I2CSpeedCode.SpeedCode100_Kbps;
     }
 
     getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus> {
@@ -139,95 +167,198 @@ export class ControlHubInternal implements ControlHub {
         throw new Error("not implemented");
     }
 
-    getInterfacePacketID(interfaceName: string, functionNumber: number): Promise<number> {
-        return Promise.resolve(0);
+    async getInterfacePacketID(
+        interfaceName: string,
+        functionNumber: number,
+    ): Promise<number> {
+        return await this.sendCommand("getInterfacePacketId", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            interfaceName: interfaceName,
+            functionNumber: functionNumber,
+        });
     }
 
-    getModuleLedColor(): Promise<RGB> {
-        throw new Error("not implemented");
+    async getModuleLedColor(): Promise<RGB> {
+        let result: { r: number; g: number; b: number } = await this.sendCommand(
+            "getLedColor",
+            {
+                serialNumber: this.serialNumber,
+                moduleAddress: this.moduleAddress,
+            },
+        );
+
+        return {
+            red: result.r,
+            green: result.g,
+            blue: result.b,
+        };
     }
 
     getModuleLedPattern(): Promise<LEDPattern> {
         throw new Error("not implemented");
     }
 
-    getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus> {
-        throw new Error("not implemented");
+    async getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus> {
+        return await this.sendCommand("getModuleStatus", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+        });
     }
 
-    getMotorAtTarget(motorChannel: number): Promise<boolean> {
-        return Promise.resolve(false);
+    async getMotorAtTarget(motorChannel: number): Promise<boolean> {
+        return await this.sendCommand("getIsMotorAtTarget", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+        });
     }
 
-    getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<number> {
-        return Promise.resolve(0);
+    async getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<number> {
+        return await this.sendCommand("getMotorAlertLevel", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            motorChannel: motorChannel,
+        });
     }
 
-    getMotorChannelEnable(motorChannel: number): Promise<boolean> {
-        return Promise.resolve(false);
+    async getMotorChannelEnable(motorChannel: number): Promise<boolean> {
+        return await this.sendCommand("getMotorChannelEnable", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            motorChannel: motorChannel,
+        });
     }
 
-    getMotorChannelMode(
+    async getMotorChannelMode(
         motorChannel: number,
     ): Promise<{ motorMode: number; floatAtZero: boolean }> {
-        return Promise.resolve({ floatAtZero: false, motorMode: 0 });
+        return await this.sendCommand("getMotorMode", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            motorChannel: motorChannel,
+        });
     }
 
-    getMotorConstantPower(motorChannel: number): Promise<number> {
-        return Promise.resolve(0);
+    async getMotorConstantPower(motorChannel: number): Promise<number> {
+        return await this.sendCommand("getMotorConstantPower", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            motorChannel: motorChannel,
+        });
     }
 
-    getMotorEncoderPosition(motorChannel: number): Promise<number> {
-        return Promise.resolve(0);
+    async getMotorEncoderPosition(motorChannel: number): Promise<number> {
+        return await this.sendCommand("getMotorEncoderPosition", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            motorChannel: motorChannel,
+        });
     }
 
-    getMotorPIDCoefficients(
+    async getMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
     ): Promise<PIDCoefficients> {
-        throw new Error("not implemented");
+        let result: { p: number; i: number; d: number } = await this.sendCommand(
+            "getMotorPidCoefficients",
+            {
+                serialNumber: this.serialNumber,
+                moduleAddress: this.moduleAddress,
+                motorChannel: motorChannel,
+            },
+        );
+
+        return {
+            P: result.p,
+            I: result.i,
+            D: result.d,
+        };
     }
 
-    getMotorTargetPosition(
+    async getMotorTargetPosition(
         motorChannel: number,
     ): Promise<{ targetPosition: number; targetTolerance: number }> {
-        return Promise.resolve({ targetPosition: 0, targetTolerance: 0 });
+        let result: { targetPositionCounts: number; targetToleranceCounts: number } =
+            await this.sendCommand("getMotorTargetPosition", {
+                serialNumber: this.serialNumber,
+                moduleAddress: this.moduleAddress,
+                motorChannel: motorChannel,
+            });
+
+        return {
+            targetPosition: result.targetPositionCounts,
+            targetTolerance: result.targetToleranceCounts,
+        };
     }
 
-    getMotorTargetVelocity(motorChannel: number): Promise<number> {
-        return Promise.resolve(0);
+    async getMotorTargetVelocity(motorChannel: number): Promise<number> {
+        return await this.sendCommand("getMotorTargetVelocity", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            motorChannel: motorChannel,
+        });
     }
 
-    getPhoneChargeControl(): Promise<boolean> {
-        return Promise.resolve(false);
+    async getPhoneChargeControl(): Promise<boolean> {
+        return await this.sendCommand("getPhoneChargeControl", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+        });
     }
 
-    getServoConfiguration(servoChannel: number): Promise<number> {
-        return Promise.resolve(0);
+    async getServoConfiguration(servoChannel: number): Promise<number> {
+        return await this.sendCommand("getServoConfiguration", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            servoChannel: servoChannel,
+        });
     }
 
-    getServoEnable(servoChannel: number): Promise<boolean> {
-        return Promise.resolve(false);
+    async getServoEnable(servoChannel: number): Promise<boolean> {
+        return await this.sendCommand("getServoEnable", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            servoChannel: servoChannel,
+        });
     }
 
-    getServoPulseWidth(servoChannel: number): Promise<number> {
-        return Promise.resolve(0);
+    async getServoPulseWidth(servoChannel: number): Promise<number> {
+        return await this.sendCommand("getServoPulseWidth", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            servoChannel: servoChannel,
+        });
     }
 
-    injectDataLogHint(hintText: string): Promise<void> {
-        throw new Error("not implemented");
+    async injectDataLogHint(hintText: string): Promise<void> {
+        await this.sendCommand("injectDebugLogHint", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            hint: hintText,
+        });
     }
 
     isExpansionHub(): this is ExpansionHub {
-        throw new Error("not implemented");
+        return true;
     }
 
     on(eventName: "error", listener: (error: Error) => void): RevHub {
         throw new Error("not implemented");
     }
 
-    queryInterface(interfaceName: string): Promise<ModuleInterface> {
-        throw new Error("not implemented");
+    async queryInterface(interfaceName: string): Promise<ModuleInterface> {
+        let result: { name: string; firstPacketId: number; numberIds: number } =
+            await this.sendCommand("queryInterface", {
+                serialNumber: this.serialNumber,
+                moduleAddress: this.moduleAddress,
+                interfaceName: interfaceName,
+            });
+
+        return {
+            name: result.name,
+            firstPacketID: result.firstPacketId,
+            numberIDValues: result.numberIds,
+        };
     }
 
     readI2CMultipleBytes(
@@ -242,27 +373,37 @@ export class ControlHubInternal implements ControlHub {
         throw new Error("not implemented");
     }
 
-    readVersion(): Promise<Version> {
+    async readVersion(): Promise<Version> {
+        let versionString = await this.readVersionString();
+        //ToDo(landry) parse version string
         throw new Error("not implemented");
     }
 
-    readVersionString(): Promise<string> {
-        return Promise.resolve("");
+    async readVersionString(): Promise<string> {
+        return await this.sendCommand("readVersionString", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+        });
     }
 
-    resetMotorEncoder(motorChannel: number): Promise<void> {
-        throw new Error("not implemented");
+    async resetMotorEncoder(motorChannel: number): Promise<void> {
+        await this.sendCommand("resetMotorEncoder", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            motorChannel: motorChannel,
+        });
     }
 
-    sendFailSafe(): Promise<void> {
-        throw new Error("not implemented");
+    async sendFailSafe(): Promise<void> {
+        await this.sendCommand("readVersionString", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+        });
     }
 
-    sendKeepAlive(): Promise<void> {
-        throw new Error("not implemented");
-    }
+    async sendKeepAlive(): Promise<void> {}
 
-    sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
+    async sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
         return Promise.resolve([]);
     }
 
@@ -270,105 +411,226 @@ export class ControlHubInternal implements ControlHub {
         return Promise.resolve([]);
     }
 
-    setDebugLogLevel(
+    async setDebugLogLevel(
         debugGroup: DebugGroup,
         verbosityLevel: VerbosityLevel,
     ): Promise<void> {
-        throw new Error("not implemented");
+        await this.sendCommand("readVersionString", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            debugGroup: debugGroup,
+            verbosityLevel: verbosityLevel,
+        });
     }
 
-    setDigitalAllOutputs(bitPackedField: number): Promise<void> {
-        throw new Error("not implemented");
+    async setDigitalAllOutputs(bitPackedField: number): Promise<void> {
+        await this.sendCommand("readVersionString", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            bitField: bitPackedField,
+        });
     }
 
-    setDigitalDirection(dioPin: number, direction: DIODirection): Promise<void> {
-        throw new Error("not implemented");
+    async setDigitalDirection(dioPin: number, direction: DIODirection): Promise<void> {
+        await this.sendCommand("readVersionString", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            pin: dioPin,
+            isOutput: direction == DIODirection.Output,
+        });
     }
 
-    setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void> {
-        throw new Error("not implemented");
+    async setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void> {
+        await this.sendCommand("readVersionString", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            pin: dioPin,
+            value: value ?? false,
+        });
     }
 
-    setFTDIResetControl(ftdiResetControl: boolean): Promise<void> {
-        throw new Error("not implemented");
+    async setFTDIResetControl(ftdiResetControl: boolean): Promise<void> {
+        await this.sendCommand("setFtdiResetControl", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+        });
     }
 
-    setI2CChannelConfiguration(
+    async setI2CChannelConfiguration(
         i2cChannel: number,
         speedCode: I2CSpeedCode,
     ): Promise<void> {
-        throw new Error("not implemented");
+        await this.sendCommand("setI2CChannelConfiguration", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            i2cChannel: i2cChannel,
+            speedCode: speedCode,
+        });
     }
 
-    setModuleLedColor(red: number, green: number, blue: number): Promise<void> {
-        throw new Error("not implemented");
+    async setModuleLedColor(red: number, green: number, blue: number): Promise<void> {
+        await this.sendCommand("setLedColor", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            r: red,
+            g: green,
+            b: blue,
+        });
     }
 
-    setModuleLedPattern(ledPattern: LEDPattern): Promise<void> {
-        throw new Error("not implemented");
+    async setModuleLedPattern(ledPattern: LEDPattern): Promise<void> {
+        await this.sendCommand("setLedColor", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            rgbtPatternStep0: ledPattern.rgbtPatternStep0,
+            rgbtPatternStep1: ledPattern.rgbtPatternStep1,
+            rgbtPatternStep2: ledPattern.rgbtPatternStep2,
+            rgbtPatternStep3: ledPattern.rgbtPatternStep3,
+            rgbtPatternStep4: ledPattern.rgbtPatternStep4,
+            rgbtPatternStep5: ledPattern.rgbtPatternStep5,
+            rgbtPatternStep6: ledPattern.rgbtPatternStep6,
+            rgbtPatternStep7: ledPattern.rgbtPatternStep7,
+            rgbtPatternStep8: ledPattern.rgbtPatternStep8,
+            rgbtPatternStep9: ledPattern.rgbtPatternStep9,
+            rgbtPatternStep10: ledPattern.rgbtPatternStep10,
+            rgbtPatternStep11: ledPattern.rgbtPatternStep11,
+            rgbtPatternStep12: ledPattern.rgbtPatternStep12,
+            rgbtPatternStep13: ledPattern.rgbtPatternStep13,
+            rgbtPatternStep14: ledPattern.rgbtPatternStep14,
+            rgbtPatternStep15: ledPattern.rgbtPatternStep15,
+        });
     }
 
-    setMotorChannelCurrentAlertLevel(
+    async setMotorChannelCurrentAlertLevel(
         motorChannel: number,
         currentLimit_mA: number,
     ): Promise<void> {
-        throw new Error("not implemented");
+        await this.sendCommand("setMotorAlertLevel", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            motorChannel: motorChannel,
+            currentLimit_mA: currentLimit_mA,
+        });
     }
 
-    setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void> {
-        throw new Error("not implemented");
+    async setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void> {
+        await this.sendCommand("setMotorEnabled", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            motorChannel: motorChannel,
+            enable: enable,
+        });
     }
 
-    setMotorChannelMode(
+    async setMotorChannelMode(
         motorChannel: number,
         motorMode: number,
         floatAtZero: boolean,
     ): Promise<void> {
-        throw new Error("not implemented");
+        await this.sendCommand("setMotorChannelMode", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            motorChannel: motorChannel,
+            motorMode: motorMode,
+            floatAtZero: floatAtZero,
+        });
     }
 
-    setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
-        throw new Error("not implemented");
+    async setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
+        await this.sendCommand("setMotorConstantPower", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            motorChannel: motorChannel,
+            motorPower: powerLevel,
+        });
     }
 
-    setMotorPIDCoefficients(
+    async setMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
         pid: PIDCoefficients,
     ): Promise<void> {
-        throw new Error("not implemented");
+        await this.sendCommand("setMotorPidCoefficients", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            motorChannel: motorChannel,
+            motorMode: motorMode,
+            p: pid.P,
+            i: pid.I,
+            d: pid.D,
+        });
     }
 
-    setMotorTargetPosition(
+    async setMotorTargetPosition(
         motorChannel: number,
         targetPosition_counts: number,
         targetTolerance_counts: number,
     ): Promise<void> {
-        throw new Error("not implemented");
+        await this.sendCommand("setMotorTargetPosition", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            motorChannel: motorChannel,
+            targetPositionCounts: targetPosition_counts,
+            targetToleranceCounts: targetTolerance_counts,
+        });
     }
 
-    setMotorTargetVelocity(motorChannel: number, velocity_cps: number): Promise<void> {
-        throw new Error("not implemented");
+    async setMotorTargetVelocity(
+        motorChannel: number,
+        velocity_cps: number,
+    ): Promise<void> {
+        await this.sendCommand("setMotorTargetVelocity", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            motorChannel: motorChannel,
+            velocityCps: velocity_cps,
+        });
     }
 
-    setNewModuleAddress(newModuleAddress: number): Promise<void> {
-        throw new Error("not implemented");
+    async setNewModuleAddress(newModuleAddress: number): Promise<void> {
+        await this.sendCommand("setNewModuleAddress", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            address: newModuleAddress,
+        });
     }
 
-    setPhoneChargeControl(chargeEnable: boolean): Promise<void> {
-        throw new Error("not implemented");
+    async setPhoneChargeControl(chargeEnable: boolean): Promise<void> {
+        await this.sendCommand("setPhoneChargeControl", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            enabled: chargeEnable,
+        });
     }
 
-    setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void> {
-        throw new Error("not implemented");
+    async setServoConfiguration(
+        servoChannel: number,
+        framePeriod: number,
+    ): Promise<void> {
+        await this.sendCommand("setServoConfiguration", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            servoChannel: servoChannel,
+            framePeriod: framePeriod,
+        });
     }
 
-    setServoEnable(servoChannel: number, enable: boolean): Promise<void> {
-        throw new Error("not implemented");
+    async setServoEnable(servoChannel: number, enable: boolean): Promise<void> {
+        await this.sendCommand("setServoEnable", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            servoChannel: servoChannel,
+            enabled: enable,
+        });
     }
 
-    setServoPulseWidth(servoChannel: number, pulseWidth: number): Promise<void> {
-        throw new Error("not implemented");
+    async setServoPulseWidth(servoChannel: number, pulseWidth: number): Promise<void> {
+        await this.sendCommand("setServoPulseWidth", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            servoChannel: servoChannel,
+            pulseWidth: pulseWidth,
+        });
     }
 
     writeI2CMultipleBytes(
