@@ -70,7 +70,10 @@ export class ControlHubInternal implements ControlHub {
 
         return new Promise((resolve, reject) => {
             this.webSocketConnection.on("open", async () => {
-                this.moduleAddress = await this.sendCommand("getModuleAddress", {});
+                this.moduleAddress = await this.sendCommand("getModuleAddress", {
+                    serialNumber: "Embedded",
+                    moduleAddress: 173,
+                });
                 resolve();
             });
         });
