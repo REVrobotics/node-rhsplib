@@ -1,4 +1,4 @@
-import { setPrototypeOf } from "./NackError.js";
+import { setPrototypeOf } from "./nack-errors/NackError.js";
 
 export class UnableToOpenSerialError extends Error {
     constructor(serialPort: string) {

@@ -1,5 +1,9 @@
 import { ExpansionHub } from "../ExpansionHub.js";
-import { NativeRevHub, Serial as SerialPort } from "@rev-robotics/rhsplib";
+import {
+    NativeRevHub,
+    Serial as SerialPort,
+    RhspLibErrorCode,
+} from "@rev-robotics/rhsplib";
 import {
     BulkInputData,
     DebugGroup,
@@ -14,19 +18,18 @@ import {
     Rgb,
     VerbosityLevel,
     Version,
+    TimeoutError,
+    nackCodeToError,
+    NoExpansionHubWithAddressError,
+    ParameterOutOfRangeError,
+    GeneralSerialError,
+    CommandNotSupportedError,
 } from "@rev-robotics/rev-hub-core";
 import { closeSerialPort } from "../open-rev-hub.js";
 import { ParentRevHub, RevHub } from "../RevHub.js";
 import { EventEmitter } from "events";
 import { RevHubType } from "../RevHubType.js";
-import { nackCodeToError } from "../errors/nack-code-to-error.js";
-import { ParameterOutOfRangeError } from "../errors/ParameterOutOfRangeError.js";
-import { NoExpansionHubWithAddressError } from "../errors/NoExpansionHubWithAddressError.js";
-import { GeneralSerialError } from "../errors/GeneralSerialError.js";
-import { TimeoutError } from "../errors/TimeoutError.js";
-import { RhspLibErrorCode } from "@rev-robotics/rhsplib";
 import { RhspLibError } from "../errors/RhspLibError.js";
-import { CommandNotSupportedError } from "../errors/diagnostic-errors.js";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);

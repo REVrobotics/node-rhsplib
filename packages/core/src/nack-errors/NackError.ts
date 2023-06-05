@@ -1,5 +1,3 @@
-import { RevHubError } from "./RevHubError.js";
-
 //Taken from https://github.com/apollographql/invariant-packages/blob/779f525d6b475653050cb17976753de287e30f91/packages/ts-invariant/src/invariant.ts#L2-L7
 /*
 Copyright (c) 2019 Apollo GraphQL
@@ -16,6 +14,8 @@ furnished to do so, subject to the following conditions:
 Modified to use Object.setPrototypeOf instead of __proto__ and to be a global
 function
  */
+import { RevHubError } from "../RevHubError.js";
+
 export function setPrototypeOf(obj: any, proto: any) {
     Object.setPrototypeOf(obj, proto);
     return obj;

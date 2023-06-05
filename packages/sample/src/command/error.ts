@@ -1,10 +1,10 @@
 import {
     getPossibleExpansionHubSerialNumbers,
-    MotorNotFullyConfiguredError,
     NackError,
     openConnectedExpansionHubs,
     openParentExpansionHub,
 } from "@rev-robotics/expansion-hub";
+import { MotorNotFullyConfiguredError } from "@rev-robotics/rev-hub-core";
 
 export async function error() {
     let hubs = await openConnectedExpansionHubs();

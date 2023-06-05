@@ -6,10 +6,6 @@ import {
     NoDigitalChannelsConfiguredForOutputError,
 } from "./digital-channel-errors.js";
 import {
-    BatteryTooLowToRunServoError,
-    ServoNotFullyConfiguredError,
-} from "./servo-errors.js";
-import {
     I2cControllerBusyError,
     I2cNoResultsPendingError,
     I2cOperationInProgressError,
@@ -30,7 +26,11 @@ import {
 } from "./diagnostic-errors.js";
 import { UnrecognizedNackError } from "./UnrecognizedNackError.js";
 import { NackError } from "./NackError.js";
-import { NackCode } from "@rev-robotics/rev-hub-core";
+import { NackCode } from "./nack-codes.js";
+import {
+    BatteryTooLowToRunServoError,
+    ServoNotFullyConfiguredError,
+} from "./servo-errors.js";
 
 export function nackCodeToError(nackCode: number): NackError {
     if (

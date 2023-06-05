@@ -1,6 +1,7 @@
 import { NackError, setPrototypeOf } from "./NackError.js";
 import { BatteryTooLowError } from "./BatteryTooLowError.js";
-import { NackCode } from "@rev-robotics/rev-hub-core";
+import { NackCode } from "./nack-codes.js";
+
 export class MotorNotFullyConfiguredError extends NackError {
     constructor() {
         super(NackCode.MOTOR_NOT_FULLY_CONFIGURED, "Motor is not fully configured");
