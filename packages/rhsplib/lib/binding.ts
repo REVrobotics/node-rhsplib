@@ -44,6 +44,7 @@ export {
     SerialFlowControl,
     VerbosityLevel,
     Version,
+    NackCode,
 } from "@rev-robotics/rev-hub-core";
 
 export let NativeSerial = addon.Serial;
