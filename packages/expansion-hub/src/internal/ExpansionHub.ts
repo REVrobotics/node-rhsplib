@@ -119,7 +119,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         return await this.nativeRevHub.getADC(13, 0);
     }
 
-    async get5VMonitorVoltage(): Promise<number> {
+    async get5VBusVoltage(): Promise<number> {
         return await this.nativeRevHub.getADC(12, 0);
     }
 

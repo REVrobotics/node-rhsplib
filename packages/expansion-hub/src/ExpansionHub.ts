@@ -79,7 +79,7 @@ export interface ExpansionHub extends RevHub {
     /**
      * Check the 5V line's voltage (mV)
      */
-    get5VMonitorVoltage(): Promise<number>;
+    get5VBusVoltage(): Promise<number>;
 
     /**
      * Get the device's current temperature in degrees Celsius

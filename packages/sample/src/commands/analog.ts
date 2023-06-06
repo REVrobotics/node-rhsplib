@@ -56,11 +56,11 @@ export async function voltageRail(continuous: boolean) {
 
     if (continuous) {
         while (true) {
-            let value = await hubs[0].get5VMonitorVoltage();
+            let value = await hubs[0].get5VBusVoltage();
             console.log(`5V rail: ${value} mV`);
         }
     } else {
-        let value = await hubs[0].get5VMonitorVoltage();
+        let value = await hubs[0].get5VBusVoltage();
         console.log(`5V rail: ${value} mV`);
         hubs.forEach((hub) => {
             hub.close();
