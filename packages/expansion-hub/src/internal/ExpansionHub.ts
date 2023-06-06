@@ -383,8 +383,8 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.setPhoneChargeControl(chargeEnable);
     }
 
-    setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void> {
-        return this.nativeRevHub.setServoConfiguration(servoChannel, framePeriod);
+    setServoConfiguration(servoChannel: number, framePeriod_us: number): Promise<void> {
+        return this.nativeRevHub.setServoConfiguration(servoChannel, framePeriod_us);
     }
 
     setServoEnable(servoChannel: number, enable: boolean): Promise<void> {
