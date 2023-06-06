@@ -391,8 +391,8 @@ export class ExpansionHubInternal implements ExpansionHub {
         return this.nativeRevHub.setServoEnable(servoChannel, enable);
     }
 
-    setServoPulseWidth(servoChannel: number, pulseWidth: number): Promise<void> {
-        return this.nativeRevHub.setServoPulseWidth(servoChannel, pulseWidth);
+    setServoPulseWidth(servoChannel: number, pulseWidth_us: number): Promise<void> {
+        return this.nativeRevHub.setServoPulseWidth(servoChannel, pulseWidth_us);
     }
 
     writeI2CMultipleBytes(

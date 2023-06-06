@@ -154,9 +154,9 @@ export interface ExpansionHub extends RevHub {
      * Set the width of the pulses that are being sent. For most servos, this is a range centered on
      * 1500us, but the minimum and maximum can vary by servo model.
      * @param servoChannel
-     * @param pulseWidth the pulse width in milliseconds
+     * @param pulseWidth_us the pulse width in microseconds
      */
-    setServoPulseWidth(servoChannel: number, pulseWidth: number): Promise<void>;
+    setServoPulseWidth(servoChannel: number, pulseWidth_us: number): Promise<void>;
 
     /**
      * Get the current pulse width for the given servo
