@@ -1,6 +1,6 @@
 {
     "name": "@rev-robotics/rhsplib",
-    "version": "1.0.5",
+    "version": "2.0.1-2.0.0-alpha.0.0",
     "author": "REV Robotics",
     "description": "Node addon for RHSPlib",
     "license": "BSD-3-Clause",

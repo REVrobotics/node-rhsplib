@@ -1,12 +1,12 @@
 {
     "name": "@rev-robotics/expansion-hub",
-    "version": "0.1.0",
+    "version": "1.0.1-1.0.0-alpha.0.0",
     "description": "High level library for REV expansion hub",
     "main": "dist/index.js",
     "type": "module",
     "dependencies": {
-        "serialport": "^10.5.0",
-        "@rev-robotics/rhsplib": "*"
+        "@rev-robotics/rhsplib": "^2.0.1-2.0.0-alpha.0.0",
+        "serialport": "^10.5.0"
     },
     "devDependencies": {
         "@types/node": "^16.18.18",
