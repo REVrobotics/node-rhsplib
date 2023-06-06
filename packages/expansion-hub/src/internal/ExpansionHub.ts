@@ -3,6 +3,7 @@ import {
     NativeRevHub,
     Serial as SerialPort,
     RhspLibErrorCode,
+    NackCode,
 } from "@rev-robotics/rhsplib";
 import {
     BulkInputData,
@@ -137,7 +138,7 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     async getMotorCurrent(motorChannel: number): Promise<number> {
         if (motorChannel > 3 || motorChannel < 0) {
-            throw new Error(`Motor Channel ${motorChannel} is out of range`);
+            throw new ParameterOutOfRangeError(NackCode.PARAMETER_OUT_OF_RANGE_START + 1);
         }
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.getADC(motorChannel + 8, 0);
