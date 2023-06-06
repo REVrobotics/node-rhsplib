@@ -145,7 +145,7 @@ export interface ExpansionHub extends RevHub {
     setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void>;
 
     /**
-     * Get the interval between pulses (framePeriod) for a given servo
+     * Get the interval between pulses (frame period) for a given servo
      * @param servoChannel
      */
     getServoConfiguration(servoChannel: number): Promise<number>;
