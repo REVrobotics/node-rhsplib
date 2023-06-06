@@ -109,10 +109,10 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     async getMotorCurrent(motorChannel: number): Promise<number> {
-        if (motorChannel > 11 || motorChannel < 8) {
+        if (motorChannel > 3 || motorChannel < 0) {
             throw new Error(`Motor Channel ${motorChannel} is out of range`);
         }
-        return await this.nativeRevHub.getADC(motorChannel - 8, 0);
+        return await this.nativeRevHub.getADC(motorChannel + 8, 0);
     }
 
     async getBatteryVoltage(): Promise<number> {
