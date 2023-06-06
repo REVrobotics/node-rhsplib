@@ -27,7 +27,6 @@ export {
     SerialFlowControl,
     VerbosityLevel,
     Version,
-    NackCode,
     BatteryTooLowError,
     CommandImplementationPendingError,
     CommandRoutingError,
