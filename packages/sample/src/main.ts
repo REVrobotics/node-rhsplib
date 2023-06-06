@@ -1,4 +1,5 @@
 import { Command } from "commander";
+import { runServo } from "./command/servo.js";
 import { error } from "./command/error.js";
 import { list } from "./command/list.js";
 import { led } from "./command/led.js";
@@ -29,6 +30,17 @@ program
     .description("Run LED steps")
     .action(async () => {
         await led();
+    });
+
+program
+    .command("servo <channel> <pulseWidth> [frameWidth]")
+    .description("Run a servo with pulse width and optional frame width")
+    .action(async (channel, pulseWidth, frameWidth) => {
+        let channelValue = Number(channel);
+        let pulseWidthValue = Number(pulseWidth);
+        let frameWidthValue = frameWidth ? Number(frameWidth) : 4000;
+
+        await runServo(channelValue, pulseWidthValue, frameWidthValue);
     });
 
 program.parse(process.argv);
