@@ -563,9 +563,9 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void> {
+    setServoConfiguration(servoChannel: number, framePeriod_us: number): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setServoConfiguration(servoChannel, framePeriod);
+            return this.nativeRevHub.setServoConfiguration(servoChannel, framePeriod_us);
         });
     }
 
@@ -575,9 +575,9 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    setServoPulseWidth(servoChannel: number, pulseWidth: number): Promise<void> {
+    setServoPulseWidth(servoChannel: number, pulseWidth_us: number): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setServoPulseWidth(servoChannel, pulseWidth);
+            return this.nativeRevHub.setServoPulseWidth(servoChannel, pulseWidth_us);
         });
     }
 

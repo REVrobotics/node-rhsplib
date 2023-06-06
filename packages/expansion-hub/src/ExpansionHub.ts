@@ -186,10 +186,43 @@ export interface ExpansionHub extends RevHub {
     ): Promise<PidCoefficients>;
 
     // Servo
-    setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void>;
+    /**
+     * Set the interval between pulses (framePeriod_us) for a given servo
+     * @param servoChannel
+     * @param framePeriod_us time between the rising edge of each pulse in microseconds
+     */
+    setServoConfiguration(servoChannel: number, framePeriod_us: number): Promise<void>;
+
+    /**
+     * Get the interval between pulses (frame period) for a given servo
+     * @param servoChannel
+     */
     getServoConfiguration(servoChannel: number): Promise<number>;
-    setServoPulseWidth(servoChannel: number, pulseWidth: number): Promise<void>;
+
+    /**
+     * Set the width of the pulses that are being sent. For most servos, this is a range centered on
+     * 1500us, but the minimum and maximum can vary by servo model.
+     * @param servoChannel
+     * @param pulseWidth_us the pulse width in microseconds
+     */
+    setServoPulseWidth(servoChannel: number, pulseWidth_us: number): Promise<void>;
+
+    /**
+     * Get the current pulse width for the given servo
+     * @param servoChannel
+     */
     getServoPulseWidth(servoChannel: number): Promise<number>;
+
+    /**
+     * Set whether the given servo is enabled
+     * @param servoChannel
+     * @param enable whether the servo should be enabled or disabled
+     */
     setServoEnable(servoChannel: number, enable: boolean): Promise<void>;
+
+    /**
+     * Get whether a given servo is currently enabled.
+     * @param servoChannel
+     */
     getServoEnable(servoChannel: number): Promise<boolean>;
 }
