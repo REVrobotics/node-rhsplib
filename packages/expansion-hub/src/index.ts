@@ -8,4 +8,3 @@ export {
 export * from "./ExpansionHub.js";
 export * from "./RevHub.js";
 export * from "./RevHubType.js";
-export * from "./SystemCurrentType.js";

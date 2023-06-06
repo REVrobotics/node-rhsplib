@@ -13,7 +13,6 @@ import {
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rhsplib";
-import { SystemCurrentType } from "./SystemCurrentType.js";
 import { ParentRevHub, RevHub } from "./RevHub.js";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
@@ -57,12 +56,24 @@ export interface ExpansionHub extends RevHub {
     getAnalogInput(channel: number): Promise<number>;
 
     /**
-     * For SystemType.DigitalIO, the result is the total current running through
-     * the shared ground of the digital channels.
-     *
-     * @param systemType the type of system to get current for. Defaults to Battery, which is the whole device's current.
+     * Read the total current through the digital IO bus in mA
      */
-    getSystemCurrent(systemType?: SystemCurrentType): Promise<number>;
+    getDigitalBusVoltage(): Promise<number>;
+
+    /**
+     * Read the total current through the I2C bus in mA
+     */
+    getI2CCurrent(): Promise<number>;
+
+    /**
+     * Read the total current through the servos in mA
+     */
+    getServoCurrent(): Promise<number>;
+
+    /**
+     * Read the total current through the battery in mA
+     */
+    getBatteryCurrent(): Promise<number>;
 
     /**
      * Get the current draw of a given motor.

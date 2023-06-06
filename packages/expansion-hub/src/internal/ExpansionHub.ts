@@ -19,7 +19,6 @@ import {
 import { closeSerialPort } from "../open-rev-hub.js";
 import { ParentRevHub, RevHub } from "../RevHub.js";
 import { EventEmitter } from "events";
-import { SystemCurrentType } from "../SystemCurrentType.js";
 import { RevHubType } from "../RevHubType.js";
 
 export class ExpansionHubInternal implements ExpansionHub {
@@ -92,20 +91,20 @@ export class ExpansionHubInternal implements ExpansionHub {
         return await this.nativeRevHub.getADC(channel, 0);
     }
 
-    async getSystemCurrent(
-        systemType: SystemCurrentType = SystemCurrentType.Battery,
-    ): Promise<number> {
-        switch (systemType) {
-            case SystemCurrentType.I2C:
-                return await this.nativeRevHub.getADC(5, 0);
-            case SystemCurrentType.DigitalIO:
-                return await this.nativeRevHub.getADC(4, 0);
-            case SystemCurrentType.Servo:
-                return await this.nativeRevHub.getADC(6, 0);
-            case SystemCurrentType.Battery:
-                return await this.nativeRevHub.getADC(7, 0);
-        }
-        return -1;
+    async getI2CCurrent(): Promise<number> {
+        return await this.nativeRevHub.getADC(5, 0);
+    }
+
+    async getDigitalBusVoltage(): Promise<number> {
+        return await this.nativeRevHub.getADC(4, 0);
+    }
+
+    async getServoCurrent(): Promise<number> {
+        return await this.nativeRevHub.getADC(6, 0);
+    }
+
+    async getBatteryCurrent(): Promise<number> {
+        return await this.nativeRevHub.getADC(7, 0);
     }
 
     async getMotorCurrent(motorChannel: number): Promise<number> {
