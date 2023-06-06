@@ -1,14 +1,26 @@
 import { ExpansionHub, ParentExpansionHub } from "./ExpansionHub.js";
 import {
-    SerialParity,
-    SerialFlowControl,
+    DiscoveredAddresses,
     NativeRevHub,
     NativeSerial,
-    DiscoveredAddresses,
+    SerialError,
+    SerialFlowControl,
 } from "@rev-robotics/rhsplib";
 import { SerialPort as SerialLister } from "serialport";
 import { ExpansionHubInternal } from "./internal/ExpansionHub.js";
 import { startKeepAlive } from "./start-keep-alive.js";
+import {
+    GeneralSerialError,
+    NoExpansionHubWithAddressError,
+    SerialParity,
+    TimeoutError,
+} from "@rev-robotics/rev-hub-core";
+import {
+    InvalidSerialArguments,
+    SerialConfigurationError,
+    SerialIoError,
+    UnableToOpenSerialError,
+} from "@rev-robotics/rev-hub-core/dist/serial-errors.js";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
@@ -47,8 +59,13 @@ export async function openParentExpansionHub(
         moduleAddress = addresses.parentAddress;
     }
 
-    await parentHub.open(moduleAddress);
-    await parentHub.queryInterface("DEKA");
+    try {
+        await parentHub.open(moduleAddress);
+        await parentHub.queryInterface("DEKA");
+    } catch (e: any) {
+        if (e instanceof TimeoutError)
+            throw new NoExpansionHubWithAddressError(serialNumber, moduleAddress);
+    }
     startKeepAlive(parentHub, 1000);
 
     if (parentHub.isParent()) {
@@ -128,13 +145,28 @@ export function closeSerialPort(serialPort: typeof NativeSerial) {
 
 async function openSerialPort(serialPortPath: string): Promise<typeof NativeSerial> {
     let serial = new NativeSerial();
-    await serial.open(
-        serialPortPath,
-        460800,
-        8,
-        SerialParity.None,
-        1,
-        SerialFlowControl.None,
-    );
+    try {
+        await serial.open(
+            serialPortPath,
+            460800,
+            8,
+            SerialParity.None,
+            1,
+            SerialFlowControl.None,
+        );
+    } catch (e: any) {
+        let code = e.errorCode;
+        if (code == SerialError.INVALID_ARGS) {
+            throw new InvalidSerialArguments(serialPortPath);
+        } else if (code == SerialError.UNABLE_TO_OPEN) {
+            throw new UnableToOpenSerialError(serialPortPath);
+        } else if (code == SerialError.CONFIGURATION_ERROR) {
+            throw new SerialConfigurationError(serialPortPath);
+        } else if (code == SerialError.IO_ERROR) {
+            throw new SerialIoError(serialPortPath);
+        } else if (code == SerialError.GENERAL_ERROR) {
+            throw new GeneralSerialError(serialPortPath);
+        }
+    }
     return serial;
 }

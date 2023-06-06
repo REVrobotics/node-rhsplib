@@ -1,4 +1,4 @@
-import { LEDPattern } from "@rev-robotics/rhsplib";
+import { LedPattern } from "@rev-robotics/rev-hub-core";
 
 /**
  * Create the value representing an LED step.
@@ -43,7 +43,7 @@ export class LedPatternStep {
  *
  * @param ledSteps list of led steps created using {@link createLedPatternStep}
  */
-export function createLedPattern(ledSteps: LedPatternStep[]): LEDPattern {
+export function createLedPattern(ledSteps: LedPatternStep[]): LedPattern {
     return {
         rgbtPatternStep0: getOrZero(ledSteps, 0),
         rgbtPatternStep1: getOrZero(ledSteps, 1),

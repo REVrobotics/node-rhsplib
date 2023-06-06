@@ -1,11 +1,22 @@
 import { Command } from "commander";
-import { analog, battery, temperature, voltageRail } from "./commands/analog.js";
+import { analog, battery, temperature, voltageRail } from "./command/analog.js";
+import { error } from "./command/error.js";
 import { list } from "./command/list.js";
 import { led } from "./command/led.js";
 
 const program = new Command();
 
 program.version("1.0.0");
+
+program
+    .command("testErrorHandling")
+    .description(
+        "Intentionally causes a few errors to happen and " +
+            "prints information about the errors.",
+    )
+    .action(async () => {
+        await error();
+    });
 
 program
     .command("list")
