@@ -19,7 +19,10 @@ program.version("1.0.0");
 program
     .option("-s --serial <serial>", "serial number")
     .option("-p --parent <address>", "parent address")
-    .option("-a --address <address>", "module address");
+    .option(
+        "-a --address <address>",
+        "module address. If this is specified, you must also specify a parent address",
+    );
 
 program
     .command("testErrorHandling")
