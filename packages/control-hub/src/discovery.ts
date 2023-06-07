@@ -1,5 +1,5 @@
 import { ControlHubInternal } from "./internal/ControlHub.js";
-import { ControlHub } from "@rev-robotics/rev-hub-core";
+import { ControlHub, ExpansionHub } from "@rev-robotics/rev-hub-core";
 
 export async function openConnectedControlHub(): Promise<ControlHub | undefined> {
     try {

@@ -152,18 +152,47 @@ export interface ExpansionHub extends RevHub {
         bytes: number[],
     ): Promise<void>;
     getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus>;
-    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<void>;
+
+    /**
+     * Read a single byte from a target device. Use {@link getI2CReadStatus} to
+     * get the actual byte.
+     * @param i2cChannel
+     * @param targetAddress the address of the target device
+     */
+    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<number>;
+
+    /**
+     * Read multiple bytes from a target device. Use {@link getI2CReadStatus} to
+     * get the actual data.
+     * @param i2cChannel
+     * @param targetAddress the address of the target device
+     * @param numBytesToRead the size of the payload to read
+     */
     readI2CMultipleBytes(
         i2cChannel: number,
         targetAddress: number,
         numBytesToRead: number,
-    ): Promise<void>;
-    writeI2CReadMultipleBytes(
+    ): Promise<number[]>;
+
+    /**
+     * Send a write command to a given target requesting data at a given register.
+     * @param i2cChannel
+     * @param targetAddress the address of the target device
+     * @param numBytesToRead size of data to read
+     * @param register a byte to send at the start of the payload, typically a register address.
+     */
+    readI2CRegister(
         i2cChannel: number,
         targetAddress: number,
         numBytesToRead: number,
-        startAddress: number,
-    ): Promise<void>;
+        register: number,
+    ): Promise<number[]>;
+
+    /**
+     * Get the read status, indicating whether a read was successful and how
+     * much data was read.
+     * @param i2cChannel
+     */
     getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus>;
 
     // Motor

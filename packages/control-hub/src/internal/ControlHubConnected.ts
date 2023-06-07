@@ -347,15 +347,24 @@ export class ControlHubConnected implements ParentExpansionHub {
         };
     }
 
-    readI2CMultipleBytes(
+    readI2CRegister(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         numBytesToRead: number,
-    ): Promise<void> {
+        register: number,
+    ): Promise<number[]> {
         throw new Error("not implemented");
     }
 
-    readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void> {
+    readI2CMultipleBytes(
+        i2cChannel: number,
+        targetAddress: number,
+        numBytesToRead: number,
+    ): Promise<number[]> {
+        throw new Error("not implemented");
+    }
+
+    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<number> {
         throw new Error("not implemented");
     }
 
@@ -598,7 +607,7 @@ export class ControlHubConnected implements ParentExpansionHub {
 
     writeI2CMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         bytes: number[],
     ): Promise<void> {
         throw new Error("not implemented");
@@ -606,7 +615,7 @@ export class ControlHubConnected implements ParentExpansionHub {
 
     writeI2CReadMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         numBytesToRead: number,
         startAddress: number,
     ): Promise<void> {
@@ -615,7 +624,7 @@ export class ControlHubConnected implements ParentExpansionHub {
 
     writeI2CSingleByte(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         byte: number,
     ): Promise<void> {
         throw new Error("not implemented");

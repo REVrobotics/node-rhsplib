@@ -353,11 +353,25 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.queryInterface(interfaceName);
     }
 
+    readI2CRegister(
+        i2cChannel: number,
+        targetAddress: number,
+        numBytesToRead: number,
+        register: number,
+    ): Promise<number[]> {
+        return this.embedded.readI2CRegister(
+            i2cChannel,
+            targetAddress,
+            numBytesToRead,
+            register,
+        );
+    }
+
     readI2CMultipleBytes(
         i2cChannel: number,
         slaveAddress: number,
         numBytesToRead: number,
-    ): Promise<void> {
+    ): Promise<number[]> {
         return this.embedded.readI2CMultipleBytes(
             i2cChannel,
             slaveAddress,
@@ -365,7 +379,7 @@ export class ControlHubInternal implements ControlHub {
         );
     }
 
-    readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void> {
+    readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<number> {
         return this.embedded.readI2CSingleByte(i2cChannel, slaveAddress);
     }
 

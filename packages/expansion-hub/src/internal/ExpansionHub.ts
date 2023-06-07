@@ -31,6 +31,7 @@ import {
     ParameterOutOfRangeError,
     GeneralSerialError,
     CommandNotSupportedError,
+    I2cOperationInProgressError,
 } from "@rev-robotics/rev-hub-core";
 import { closeSerialPort } from "../open-rev-hub.js";
 import { EventEmitter } from "events";
@@ -374,19 +375,43 @@ export class ExpansionHubInternal implements ExpansionHub {
         i2cChannel: number,
         targetAddress: number,
         numBytesToRead: number,
-    ): Promise<void> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.readI2CMultipleBytes(
+    ): Promise<number[]> {
+        return this.convertErrorPromise(async () => {
+            await this.nativeRevHub.readI2CMultipleBytes(
                 i2cChannel,
                 targetAddress,
                 numBytesToRead,
             );
+            while (true) {
+                try {
+                    let status: I2CReadStatus = await this.nativeRevHub.getI2CReadStatus(
+                        i2cChannel,
+                    );
+                    return status.bytes;
+                } catch (e) {
+                    if (e! instanceof I2cOperationInProgressError) {
+                        throw e;
+                    }
+                }
+            }
         });
     }
 
-    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<void> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.readI2CSingleByte(i2cChannel, targetAddress);
+    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<number> {
+        return this.convertErrorPromise(async () => {
+            await this.nativeRevHub.readI2CSingleByte(i2cChannel, targetAddress);
+            while (true) {
+                try {
+                    let status: I2CReadStatus = await this.nativeRevHub.getI2CReadStatus(
+                        i2cChannel,
+                    );
+                    return status.bytes[0];
+                } catch (e) {
+                    if (e! instanceof I2cOperationInProgressError) {
+                        throw e;
+                    }
+                }
+            }
         });
     }
 
@@ -618,19 +643,31 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    writeI2CReadMultipleBytes(
+    readI2CRegister(
         i2cChannel: number,
         targetAddress: number,
         numBytesToRead: number,
-        startAddress: number,
-    ): Promise<void> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.writeI2CReadMultipleBytes(
+        register: number,
+    ): Promise<number[]> {
+        return this.convertErrorPromise(async () => {
+            await this.nativeRevHub.writeI2CReadMultipleBytes(
                 i2cChannel,
                 targetAddress,
                 numBytesToRead,
-                startAddress,
+                register,
             );
+            while (true) {
+                try {
+                    let status: I2CReadStatus = await this.nativeRevHub.getI2CReadStatus(
+                        i2cChannel,
+                    );
+                    return status.bytes;
+                } catch (e) {
+                    if (e! instanceof I2cOperationInProgressError) {
+                        throw e;
+                    }
+                }
+            }
         });
     }
 

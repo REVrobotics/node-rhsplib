@@ -6,10 +6,7 @@ export async function readRegister(
     address: number,
     register: number,
 ): Promise<number> {
-    await hub.writeI2CSingleByte(channel, address, register);
-    await hub.readI2CSingleByte(channel, address);
-
-    return (await hub.getI2CReadStatus(channel)).bytes[0];
+    return (await hub.readI2CRegister(channel, address, 1, register))[0];
 }
 
 export async function readRegisterMultipleBytes(
@@ -19,10 +16,7 @@ export async function readRegisterMultipleBytes(
     register: number,
     n: number,
 ): Promise<number[]> {
-    await hub.writeI2CSingleByte(channel, address, register);
-    await hub.readI2CMultipleBytes(channel, address, n);
-
-    return (await hub.getI2CReadStatus(channel)).bytes;
+    return await hub.readI2CRegister(channel, address, n, register);
 }
 
 export async function writeRegisterMultipleBytes(
