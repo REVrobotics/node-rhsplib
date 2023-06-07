@@ -29,6 +29,7 @@ export async function runMotorConstantVelocity(channel: number, velocity: number
 
 export async function runMotorToPosition(
     channel: number,
+    velocity: number,
     position: number,
     tolerance: number,
 ) {
@@ -36,6 +37,7 @@ export async function runMotorToPosition(
     let hub = hubs[0];
 
     await hub.setMotorChannelMode(channel, MotorMode.REGULATED_POSITION, true);
+    await hub.setMotorTargetVelocity(channel, velocity);
     await hub.setMotorTargetPosition(channel, position, tolerance);
     await hub.setMotorChannelEnable(channel, true);
     process.on("SIGINT", () => {

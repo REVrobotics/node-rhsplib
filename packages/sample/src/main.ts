@@ -72,13 +72,19 @@ motorCommand.command("velocity <channel> <speed>").action(async (channel, speed)
 });
 
 motorCommand
-    .command("position <channel> <position> <tolerance>")
-    .action(async (channel, position, tolerance) => {
+    .command("position <channel> <velocity> <position> <tolerance>")
+    .action(async (channel, velocity, position, tolerance) => {
         console.log(`${channel} ${position} ${tolerance}`);
         let channelNumber = Number(channel);
         let positionNumber = Number(position);
         let toleranceNumber = Number(tolerance);
-        await runMotorToPosition(channelNumber, positionNumber, toleranceNumber);
+        let velocityNumber = Number(velocity);
+        await runMotorToPosition(
+            channelNumber,
+            velocityNumber,
+            positionNumber,
+            toleranceNumber,
+        );
     });
 
 program
