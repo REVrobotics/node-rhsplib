@@ -27,6 +27,23 @@ export async function runMotorConstantVelocity(channel: number, velocity: number
     });
 }
 
+export async function runMotorToPosition(
+    channel: number,
+    position: number,
+    tolerance: number,
+) {
+    const hubs = await openConnectedExpansionHubs();
+    let hub = hubs[0];
+
+    await hub.setMotorChannelMode(channel, MotorMode.REGULATED_POSITION, true);
+    await hub.setMotorTargetPosition(channel, position, tolerance);
+    await hub.setMotorChannelEnable(channel, true);
+    process.on("SIGINT", () => {
+        hub.setMotorChannelEnable(channel, false);
+        process.exit();
+    });
+}
+
 export async function runEncoder(channel: number, continuous: boolean) {
     const hubs = await openConnectedExpansionHubs();
     let hub = hubs[0];

@@ -4,6 +4,7 @@ import {
     runEncoder,
     runMotorConstantPower,
     runMotorConstantVelocity,
+    runMotorToPosition,
 } from "./command/motor.js";
 import { analog, battery, temperature, voltageRail } from "./command/analog.js";
 import { error } from "./command/error.js";
@@ -69,6 +70,16 @@ motorCommand.command("velocity <channel> <speed>").action(async (channel, speed)
     let speedNumber = Number(speed);
     await runMotorConstantVelocity(channelNumber, speedNumber);
 });
+
+motorCommand
+    .command("position <channel> <position> <tolerance>")
+    .action(async (channel, position, tolerance) => {
+        console.log(`${channel} ${position} ${tolerance}`);
+        let channelNumber = Number(channel);
+        let positionNumber = Number(position);
+        let toleranceNumber = Number(tolerance);
+        await runMotorToPosition(channelNumber, positionNumber, toleranceNumber);
+    });
 
 program
     .command("analog <port>")
