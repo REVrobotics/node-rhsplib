@@ -3,6 +3,12 @@ import { VL53L0X } from "./drivers/vl53l0x.js";
 import { DistanceSensorDriver } from "./drivers/DistanceSensorDriver.js";
 
 export class DistanceSensor {
+    /**
+     *
+     * @param hub the ExpansionHub or ControlHub that this sensor is physically
+     * connected to.
+     * @param channel the I2C channel this sensor is plugged into.
+     */
     constructor(hub: ExpansionHub, channel: number) {
         this.device = new VL53L0X(hub, channel);
     }
