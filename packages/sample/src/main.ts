@@ -112,8 +112,9 @@ async function getExpansionHubs(): Promise<ExpansionHub[]> {
     let moduleAddress = options.address ? Number(options.address) : undefined;
     let parentAddress = options.parent ? Number(options.parent) : undefined;
     if (serialNumber) {
-        let parentHub = await openParentExpansionHub(serialNumber, moduleAddress);
-        if (!moduleAddress || moduleAddress == parentHub.moduleAddress) {
+        console.log(`Opening ${serialNumber} ${parentAddress} ${moduleAddress}`);
+        let parentHub = await openParentExpansionHub(serialNumber, parentAddress);
+        if (moduleAddress === undefined || moduleAddress == parentHub.moduleAddress) {
             return [parentHub];
         } else {
             let childHub = await parentHub.addChildByAddress(moduleAddress);
@@ -121,11 +122,12 @@ async function getExpansionHubs(): Promise<ExpansionHub[]> {
                 return [childHub];
             }
         }
-    } else if (moduleAddress) {
+    } else if (parentAddress !== undefined) {
         //module address specified, but no serial number
-        //if the user specifies a parent address, use that, else use module address as parent address.
-        let parentHubAddress = parentAddress ? parentAddress : moduleAddress;
-        let hub = await openHubWithAddress(parentHubAddress, moduleAddress);
+        //if the user specifies a module address, use that, else use parent address as module address.
+        let realModuleAddress =
+            moduleAddress !== undefined ? moduleAddress : parentAddress;
+        let hub = await openHubWithAddress(parentAddress, realModuleAddress);
         if (hub.isExpansionHub()) {
             return [hub];
         } else {
