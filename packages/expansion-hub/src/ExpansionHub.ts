@@ -133,7 +133,7 @@ export interface ExpansionHub extends RevHub {
     ): Promise<void>;
 
     /**
-     * Send a write command to a given target requesting data at a given address.
+     * Send a write command to a given target requesting data at a given register.
      * @param i2cChannel
      * @param slaveAddress the address of the target device
      * @param numBytesToRead size of data to read
