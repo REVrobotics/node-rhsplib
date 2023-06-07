@@ -217,7 +217,7 @@ export interface ExpansionHub extends RevHub {
 
     /**
      * Set the target velocity for a motor. Assumes the current motor
-     * mode is 'target velocity'
+     * mode is 'target velocity' or 'position target'
      * @param motorChannel the motor
      * @param velocity_cps velocity in encoder counts per second
      */
@@ -232,7 +232,7 @@ export interface ExpansionHub extends RevHub {
 
     /**
      * Set the target position for a motor. Assumes the motor mode is
-     * 'position target'
+     * 'position target' and a velocity has been set using setMotorTargetVelocity.
      * @param motorChannel
      * @param targetPositionCounts target position in encoder counts
      * @param targetToleranceCounts how far the position can be from the target
