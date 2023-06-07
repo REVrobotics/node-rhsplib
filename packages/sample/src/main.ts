@@ -8,9 +8,9 @@ import {
     openConnectedExpansionHubs,
     openHubWithAddress,
     openParentExpansionHub,
+    ParentExpansionHub,
 } from "@rev-robotics/expansion-hub";
 import { runServo } from "./command/servo.js";
-import { NativeRevHub } from "@rev-robotics/rhsplib";
 
 const program = new Command();
 
@@ -35,7 +35,7 @@ program
     .command("list")
     .description("List all connected expansion hubs")
     .action(async () => {
-        let hubs = await getExpansionHubs();
+        let hubs = await openConnectedExpansionHubs();
         await list(hubs);
     });
 
@@ -43,8 +43,8 @@ program
     .command("led")
     .description("Run LED steps")
     .action(async () => {
-        let hubs = await getExpansionHubs();
-        await led(hubs);
+        let hub = await getExpansionHubOrThrow();
+        await led(hub);
     });
 
 program
@@ -55,9 +55,10 @@ program
             "--continuous to run continuously.",
     )
     .action(async (port, options) => {
+        let hub = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
         let portNumber = Number(port);
-        await analog(portNumber, isContinuous);
+        await analog(hub, portNumber, isContinuous);
     });
 
 program
@@ -68,8 +69,9 @@ program
             "Specify --continuous to run continuously",
     )
     .action(async (options) => {
+        let hub = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
-        await temperature(isContinuous);
+        await temperature(hub, isContinuous);
     });
 
 program
@@ -79,8 +81,9 @@ program
         "Read the current 5V rail voltage. Specify --continuous to run continuously",
     )
     .action(async (options) => {
+        let hub = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
-        await voltageRail(isContinuous);
+        await voltageRail(hub, isContinuous);
     });
 
 program
@@ -90,8 +93,9 @@ program
         "Read the current battery Voltage. Specify --continuous to run continuously",
     )
     .action(async (options) => {
+        let hub = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
-        await battery(isContinuous);
+        await battery(hub, isContinuous);
     });
 
 program
@@ -102,28 +106,26 @@ program
         let pulseWidthValue = Number(pulseWidth);
         let frameWidthValue = frameWidth ? Number(frameWidth) : 4000;
 
-        let hubs = await getExpansionHubs();
+        let hub = await getExpansionHubOrThrow();
 
-        await runServo(hubs, channelValue, pulseWidthValue, frameWidthValue);
+        await runServo(hub, channelValue, pulseWidthValue, frameWidthValue);
     });
 
 program.parse(process.argv);
 
-async function getExpansionHubs(): Promise<ExpansionHub[]> {
+async function getExpansionHubOrThrow(): Promise<ExpansionHub> {
     let options = program.opts();
     let serialNumber = options.serial;
     let moduleAddress = options.address ? Number(options.address) : undefined;
     let parentAddress = options.parent ? Number(options.parent) : undefined;
-    console.log(`options: ${serialNumber} ${moduleAddress} ${parentAddress}`);
     if (serialNumber) {
-        console.log(`Opening ${serialNumber} ${parentAddress} ${moduleAddress}`);
         let parentHub = await openParentExpansionHub(serialNumber, parentAddress);
         if (moduleAddress === undefined || moduleAddress == parentHub.moduleAddress) {
-            return [parentHub];
+            return parentHub;
         } else {
             let childHub = await parentHub.addChildByAddress(moduleAddress);
             if (childHub.isExpansionHub()) {
-                return [childHub];
+                return childHub;
             }
         }
     } else if (parentAddress !== undefined) {
@@ -133,11 +135,21 @@ async function getExpansionHubs(): Promise<ExpansionHub[]> {
             moduleAddress !== undefined ? moduleAddress : parentAddress;
         let hub = await openHubWithAddress(parentAddress, realModuleAddress);
         if (hub.isExpansionHub()) {
-            return [hub];
+            return hub;
         } else {
             program.error(`No expansion hub found with module address ${moduleAddress}`);
         }
     }
 
-    return await openConnectedExpansionHubs();
+    let connectedHubs: ParentExpansionHub[] = await openConnectedExpansionHubs();
+    if (connectedHubs.length == 0) {
+        throw new Error("No hubs are connected");
+    }
+    if (connectedHubs.length > 1 || connectedHubs[0].children.length > 0) {
+        throw new Error(
+            "Multiple hubs connected. You must specify a serialNumber and/or address.",
+        );
+    }
+
+    return connectedHubs[0];
 }
