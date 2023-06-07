@@ -3,6 +3,7 @@ import {
     NativeRevHub,
     Serial as SerialPort,
     RhspLibErrorCode,
+    NackCode,
 } from "@rev-robotics/rhsplib";
 import {
     BulkInputData,
@@ -105,10 +106,63 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    getADC(): Promise<number> {
+    async getAnalogInput(channel: number): Promise<number> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.getADC();
+            return this.nativeRevHub.getADC(channel, 0);
         });
+    }
+
+    async getI2CCurrent(): Promise<number> {
+        return this.convertErrorPromise(() => {
+            return this.nativeRevHub.getADC(5, 0);
+        });
+    }
+
+    async getDigitalBusVoltage(): Promise<number> {
+        return this.convertErrorPromise(() => {
+            return this.nativeRevHub.getADC(4, 0);
+        });
+    }
+
+    async getServoCurrent(): Promise<number> {
+        return this.convertErrorPromise(() => {
+            return this.nativeRevHub.getADC(6, 0);
+        });
+    }
+
+    async getBatteryCurrent(): Promise<number> {
+        return this.convertErrorPromise(() => {
+            return this.nativeRevHub.getADC(7, 0);
+        });
+    }
+
+    async getMotorCurrent(motorChannel: number): Promise<number> {
+        if (motorChannel > 3 || motorChannel < 0) {
+            throw new ParameterOutOfRangeError(NackCode.PARAMETER_OUT_OF_RANGE_START + 1);
+        }
+        return this.convertErrorPromise(() => {
+            return this.nativeRevHub.getADC(motorChannel + 8, 0);
+        });
+    }
+
+    async getBatteryVoltage(): Promise<number> {
+        return this.convertErrorPromise(() => {
+            return this.nativeRevHub.getADC(13, 0);
+        });
+    }
+
+    async get5VBusVoltage(): Promise<number> {
+        return this.convertErrorPromise(() => {
+            return this.nativeRevHub.getADC(12, 0);
+        });
+    }
+
+    async getTemperature(): Promise<number> {
+        let deciCelsius: number = await this.convertErrorPromise(() => {
+            return this.nativeRevHub.getADC(14, 0);
+        });
+
+        return deciCelsius / 10;
     }
 
     getBulkInputData(): Promise<BulkInputData> {

@@ -47,7 +47,56 @@ export interface ExpansionHub extends RevHub {
 
     // Device Control
     getBulkInputData(): Promise<BulkInputData>;
-    getADC(): Promise<number>;
+
+    /**
+     * Read the value of an analog channel in mV.
+     *
+     * @param channel
+     */
+    getAnalogInput(channel: number): Promise<number>;
+
+    /**
+     * Read the total current through the digital IO bus in mA
+     */
+    getDigitalBusVoltage(): Promise<number>;
+
+    /**
+     * Read the total current through the I2C busses in mA
+     */
+    getI2CCurrent(): Promise<number>;
+
+    /**
+     * Read the total current through the servos in mA
+     */
+    getServoCurrent(): Promise<number>;
+
+    /**
+     * Read the total current through the battery in mA
+     */
+    getBatteryCurrent(): Promise<number>;
+
+    /**
+     * Get the current draw of a given motor.
+     *
+     * @param motorChannel
+     */
+    getMotorCurrent(motorChannel: number): Promise<number>;
+
+    /**
+     * get the battery's voltage (mV)
+     */
+    getBatteryVoltage(): Promise<number>;
+
+    /**
+     * Check the 5V line's voltage (mV)
+     */
+    get5VBusVoltage(): Promise<number>;
+
+    /**
+     * Get the device's current temperature in degrees Celsius
+     */
+    getTemperature(): Promise<number>;
+
     setPhoneChargeControl(chargeEnable: boolean): Promise<void>;
     getPhoneChargeControl(): Promise<boolean>;
     injectDataLogHint(hintText: string): Promise<void>;
