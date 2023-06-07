@@ -1,6 +1,6 @@
 {
   "name": "@rev-robotics/control-hub",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "High level library for the REV Robotics Control Hub",
   "main": "dist/index.js",
   "type": "module",

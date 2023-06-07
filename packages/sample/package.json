@@ -7,8 +7,8 @@
     "private": true,
     "type": "module",
     "dependencies": {
-        "@rev-robotics/control-hub": "*",
-        "@rev-robotics/expansion-hub": "*",
+        "@rev-robotics/control-hub": "1.0.0",
+        "@rev-robotics/expansion-hub": "1.0.0",
         "ws": "8.13.0",
         "commander": "^10.0.1",
         "@u4/adbkit": "^4.1.19",
