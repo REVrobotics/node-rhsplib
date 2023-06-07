@@ -1,4 +1,4 @@
-import {ExpansionHub} from "@rev-robotics/expansion-hub";
+import { ExpansionHub } from "@rev-robotics/expansion-hub";
 
 export async function readRegister(
     hub: ExpansionHub,
@@ -6,10 +6,7 @@ export async function readRegister(
     address: number,
     register: number,
 ): Promise<number> {
-    await hub.writeI2CSingleByte(channel, address, register);
-    await hub.readI2CSingleByte(channel, address);
-
-    return (await hub.getI2CReadStatus(channel)).bytes[0];
+    return (await hub.readI2CRegister(channel, address, 1, register))[0];
 }
 
 export async function readRegisterMultipleBytes(
@@ -17,12 +14,9 @@ export async function readRegisterMultipleBytes(
     channel: number,
     address: number,
     register: number,
-    n: number
+    n: number,
 ): Promise<number[]> {
-    await hub.writeI2CSingleByte(channel, address, register);
-    await hub.readI2CMultipleBytes(channel, address, n);
-
-    return (await hub.getI2CReadStatus(channel)).bytes;
+    return await hub.readI2CRegister(channel, address, n, register);
 }
 
 export async function writeRegisterMultipleBytes(
@@ -30,7 +24,7 @@ export async function writeRegisterMultipleBytes(
     channel: number,
     address: number,
     register: number,
-    values: number[]
+    values: number[],
 ): Promise<void> {
     await hub.writeI2CMultipleBytes(channel, address, [register, ...values]);
 }
@@ -52,14 +46,20 @@ export async function writeShort(
     register: number,
     value: number,
 ) {
-    await writeRegisterMultipleBytes(hub, channel, address, register, shortToByteArray(value));
+    await writeRegisterMultipleBytes(
+        hub,
+        channel,
+        address,
+        register,
+        shortToByteArray(value),
+    );
 }
 
 export async function readShort(
     hub: ExpansionHub,
     channel: number,
     address: number,
-    register: number
+    register: number,
 ) {
     let bytes = await readRegisterMultipleBytes(hub, channel, address, register, 2);
 
@@ -73,7 +73,10 @@ export async function writeInt(
     register: number,
     value: number,
 ) {
-    await hub.writeI2CMultipleBytes(channel, address, [register, ...intToByteArray(value)]);
+    await hub.writeI2CMultipleBytes(channel, address, [
+        register,
+        ...intToByteArray(value),
+    ]);
 }
 
 function shortToByteArray(value: number) {

@@ -166,7 +166,7 @@ export interface ExpansionHub extends RevHub {
      * @param i2cChannel
      * @param targetAddress the address of the target device
      */
-    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<void>;
+    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<number>;
 
     /**
      * Read multiple bytes from a target device. Use {@link getI2CReadStatus} to
@@ -179,21 +179,21 @@ export interface ExpansionHub extends RevHub {
         i2cChannel: number,
         targetAddress: number,
         numBytesToRead: number,
-    ): Promise<void>;
+    ): Promise<number[]>;
 
     /**
      * Send a write command to a given target requesting data at a given register.
      * @param i2cChannel
      * @param targetAddress the address of the target device
      * @param numBytesToRead size of data to read
-     * @param startAddress a byte to send at the start of the payload, typically a register address.
+     * @param register a byte to send at the start of the payload, typically a register address.
      */
-    writeI2CReadMultipleBytes(
+    readI2CRegister(
         i2cChannel: number,
         targetAddress: number,
         numBytesToRead: number,
-        startAddress: number,
-    ): Promise<void>;
+        register: number,
+    ): Promise<number[]>;
 
     /**
      * Get the read status, indicating whether a read was successful and how
