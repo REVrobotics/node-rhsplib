@@ -1,6 +1,6 @@
 {
     "name": "@rev-robotics/rhsplib",
-    "version": "1.0.6",
+    "version": "2.0.0",
     "author": "REV Robotics",
     "description": "Node addon for RHSPlib",
     "license": "BSD-3-Clause",
@@ -12,6 +12,7 @@
         "url": "git+https://github.com/REVrobotics/node-rhsplib.git"
     },
     "dependencies": {
+        "@rev-robotics/rev-hub-core": "1.0.0",
         "node-addon-api": "^6.0.0",
         "node-gyp-build": "^4.6.0"
     },
