@@ -1,9 +1,14 @@
-import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
+import { ExpansionHub, openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
 
-export async function runServo(channel: number, pulseWidth: number, framePeriod: number) {
-    const hubs = await openConnectedExpansionHubs();
-
-    await hubs[0].setServoConfiguration(channel, framePeriod);
-    await hubs[0].setServoPulseWidth(channel, pulseWidth);
-    await hubs[0].setServoEnable(channel, true);
+export async function runServo(
+    hubs: ExpansionHub[],
+    channel: number,
+    pulseWidth: number,
+    framePeriod: number,
+) {
+    for (let hub of hubs) {
+        await hub.setServoConfiguration(channel, framePeriod);
+        await hub.setServoPulseWidth(channel, pulseWidth);
+        await hub.setServoEnable(channel, true);
+    }
 }

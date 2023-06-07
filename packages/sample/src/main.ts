@@ -10,6 +10,7 @@ import {
     openParentExpansionHub,
 } from "@rev-robotics/expansion-hub";
 import { runServo } from "./command/servo.js";
+import { NativeRevHub } from "@rev-robotics/rhsplib";
 
 const program = new Command();
 
@@ -101,7 +102,9 @@ program
         let pulseWidthValue = Number(pulseWidth);
         let frameWidthValue = frameWidth ? Number(frameWidth) : 4000;
 
-        await runServo(channelValue, pulseWidthValue, frameWidthValue);
+        let hubs = await getExpansionHubs();
+
+        await runServo(hubs, channelValue, pulseWidthValue, frameWidthValue);
     });
 
 program.parse(process.argv);
@@ -111,6 +114,7 @@ async function getExpansionHubs(): Promise<ExpansionHub[]> {
     let serialNumber = options.serial;
     let moduleAddress = options.address ? Number(options.address) : undefined;
     let parentAddress = options.parent ? Number(options.parent) : undefined;
+    console.log(`options: ${serialNumber} ${moduleAddress} ${parentAddress}`);
     if (serialNumber) {
         console.log(`Opening ${serialNumber} ${parentAddress} ${moduleAddress}`);
         let parentHub = await openParentExpansionHub(serialNumber, parentAddress);

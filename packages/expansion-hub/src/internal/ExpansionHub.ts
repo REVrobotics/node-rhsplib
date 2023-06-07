@@ -31,6 +31,8 @@ import { ParentRevHub, RevHub } from "../RevHub.js";
 import { EventEmitter } from "events";
 import { RevHubType } from "../RevHubType.js";
 import { RhspLibError } from "../errors/RhspLibError.js";
+import { startKeepAlive } from "../start-keep-alive.js";
+import { performance } from "perf_hooks";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -676,13 +678,26 @@ export class ExpansionHubInternal implements ExpansionHub {
 
         try {
             await childHub.open(moduleAddress);
+            let startTime = performance.now();
+            while (true) {
+                try {
+                    if (performance.now() - startTime >= 1000) break;
+                    await childHub.sendKeepAlive();
+                    break;
+                } catch (e) {}
+            }
             await childHub.queryInterface("DEKA");
         } catch (e: any) {
+            console.log(e);
             if (e instanceof TimeoutError)
                 throw new NoExpansionHubWithAddressError(
                     this.serialNumber!, //Can only call this method on parent, so serialNumber is not undefined.
                     moduleAddress,
                 );
+        }
+
+        if (childHub.isExpansionHub()) {
+            startKeepAlive(childHub as ExpansionHubInternal, 1000);
         }
 
         this.addChild(childHub);
