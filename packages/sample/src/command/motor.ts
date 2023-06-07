@@ -8,6 +8,10 @@ export async function runMotorConstantPower(channel: number, power: number) {
     await hub.setMotorChannelMode(channel, MotorMode.CONSTANT_POWER, true);
     await hub.setMotorConstantPower(channel, power);
     await hub.setMotorChannelEnable(channel, true);
+    process.on("SIGINT", () => {
+        hub.setMotorChannelEnable(channel, false);
+        process.exit();
+    });
 }
 
 export async function runMotorConstantVelocity(channel: number, velocity: number) {
@@ -17,6 +21,10 @@ export async function runMotorConstantVelocity(channel: number, velocity: number
     await hub.setMotorChannelMode(channel, MotorMode.CONSTANT_VELOCITY, true);
     await hub.setMotorTargetVelocity(channel, velocity);
     await hub.setMotorChannelEnable(channel, true);
+    process.on("SIGINT", () => {
+        hub.setMotorChannelEnable(channel, false);
+        process.exit();
+    });
 }
 
 export async function runEncoder(channel: number, continuous: boolean) {
