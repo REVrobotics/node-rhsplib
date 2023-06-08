@@ -69,6 +69,8 @@ export class ControlHubInternal implements ControlHub {
             }
         });
 
+        //Todo(landry): determine if we should call close() on webSocketConnection.on("close")
+
         return new Promise((resolve, reject) => {
             this.webSocketConnection.on("open", async () => {
                 console.log("Starting manual control op mode");
