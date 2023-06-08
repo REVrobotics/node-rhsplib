@@ -31,7 +31,6 @@ export class ControlHubInternal implements ControlHub {
     moduleAddress: number = 0;
     responseTimeoutMs: number = 0;
     type: RevHubType = RevHubType.ControlHub;
-    webSocketConnection!: WebSocket;
     readonly serialNumber: string;
     readonly children: ReadonlyArray<RevHub> = [];
 
@@ -40,8 +39,9 @@ export class ControlHubInternal implements ControlHub {
      */
     isConnected = false;
 
-    keyGenerator = 0;
-    currentActiveCommands = new Map<
+    private webSocketConnection!: WebSocket;
+    private keyGenerator = 0;
+    private currentActiveCommands = new Map<
         any,
         (response: any | undefined, error: any | undefined) => void
     >();
