@@ -131,6 +131,11 @@ export interface ExpansionHub extends RevHub {
         digitalChannel: number,
         direction: DigitalChannelDirection,
     ): Promise<void>;
+
+    /**
+     * Get the Input/Output direction of a digital channel
+     * @param digitalChannel
+     */
     getDigitalDirection(digitalChannel: number): Promise<DigitalChannelDirection>;
 
     /**
