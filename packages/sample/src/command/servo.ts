@@ -4,7 +4,10 @@ import { openUsbControlHubs } from "../adb-setup.js";
 export async function runServo(channel: number, pulseWidth: number, framePeriod: number) {
     const hubs = await openUsbControlHubs();
 
-    await hubs[0].setServoConfiguration(channel, framePeriod);
-    await hubs[0].setServoPulseWidth(channel, pulseWidth);
-    await hubs[0].setServoEnable(channel, true);
+    for (let hub of hubs) {
+        await hub.setServoConfiguration(channel, framePeriod);
+        await hub.setServoPulseWidth(channel, pulseWidth);
+        await hub.setServoEnable(channel, true);
+        hub.close();
+    }
 }
