@@ -4,4 +4,5 @@ export async function runServo(hub: ExpansionHub, channel: number, pulseWidth: n
     await hub.setServoConfiguration(channel, framePeriod);
     await hub.setServoPulseWidth(channel, pulseWidth);
     await hub.setServoEnable(channel, true);
+    hub.close();
 }

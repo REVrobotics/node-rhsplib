@@ -33,6 +33,9 @@ export class ControlHubInternal implements ControlHub {
     readonly serialNumber: string;
     readonly children: ReadonlyArray<RevHub> = [];
 
+    private supportedManualControlMajorVersion = 0;
+    private supportedManualControlMinorVersion = 1;
+
     /**
      * Whether the websocket is currently open.
      */
@@ -88,8 +91,17 @@ export class ControlHubInternal implements ControlHub {
         return new Promise((resolve, reject) => {
             this.webSocketConnection.on("open", async () => {
                 this.isConnected = true;
-                let apiVersion: { majorVersion: string; minorVersion: string } =
+                let apiVersion: { majorVersion: number; minorVersion: number } =
                     await this.sendCommand("start", {});
+
+                if (
+                    apiVersion.majorVersion != this.supportedManualControlMajorVersion ||
+                    apiVersion.minorVersion < this.supportedManualControlMinorVersion
+                ) {
+                    throw new Error(
+                        `API Version ${apiVersion.majorVersion}.${apiVersion.minorVersion} is not supported`,
+                    );
+                }
 
                 this.moduleAddress = await this.sendCommand("getModuleAddress", {
                     serialNumber: "Embedded",
