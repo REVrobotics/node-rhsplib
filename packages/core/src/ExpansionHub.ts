@@ -108,9 +108,31 @@ export interface ExpansionHub extends RevHub {
     // DIO
     setDigitalOutput(dioPin: number, value: DigitalState): Promise<void>;
     setAllDigitalOutputs(bitPackedField: number): Promise<void>;
-    setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void>;
-    getDigitalDirection(dioPin: number): Promise<DioDirection>;
-    getDigitalInput(dioPin: number): Promise<DigitalState>;
+
+    /**
+     * Set a digital pin as input or output.
+     * @param digitalChannel
+     * @param direction
+     */
+    setDigitalDirection(digitalChannel: number, direction: DioDirection): Promise<void>;
+
+    /**
+     * Get the Input/Output direction of a digital channel
+     * @param digitalChannel
+     */
+    getDigitalDirection(digitalChannel: number): Promise<DioDirection>;
+
+    /**
+     * Read the state of a given digital pin.
+     * Throws an error if the pin is not configured for input
+     *
+     * @param digitalChannel
+     */
+    getDigitalInput(digitalChannel: number): Promise<DigitalState>;
+
+    /**
+     * Read all digital inputs as a bit-packed number.
+     */
     getAllDigitalInputs(): Promise<number>;
 
     // I2C
