@@ -10,9 +10,6 @@
     "semver": "^7.5.1",
     "@rev-robotics/rev-hub-core": "*"
   },
-  "peerDependencies": {
-    "get-port": "6.x"
-  },
   "devDependencies": {
     "@types/node": "^16.18.18",
     "@types/semver": "^7.5.0",

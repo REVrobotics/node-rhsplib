@@ -4,9 +4,14 @@ import {
     openConnectedExpansionHubs,
 } from "@rev-robotics/expansion-hub";
 import { ExpansionHub } from "@rev-robotics/rev-hub-core";
+import { openUsbControlHubs } from "../adb-setup.js";
 
 export async function led() {
     const hubs: ExpansionHub[] = await openConnectedExpansionHubs();
+    const controlHubs = await openUsbControlHubs();
+    for (let hub of controlHubs) {
+        hubs.push(hub);
+    }
     const steps = [
         new LedPatternStep(1, 0, 255, 0), //green
         new LedPatternStep(1, 255, 0, 0), //red
@@ -14,7 +19,10 @@ export async function led() {
         new LedPatternStep(1, 255, 0, 255), //magenta
         new LedPatternStep(1, 255, 255, 0), //yellow
     ];
-    await hubs[0].sendKeepAlive();
+
     const pattern = createLedPattern(steps);
-    await hubs[0].setModuleLedPattern(pattern);
+
+    for (let hub of hubs) {
+        await hub.setModuleLedPattern(pattern);
+    }
 }

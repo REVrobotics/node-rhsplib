@@ -1,15 +1,15 @@
 import {
     BulkInputData,
     DebugGroup,
-    DIODirection,
+    DioDirection,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
-    LEDPattern,
+    LedPattern,
     ModuleInterface,
     ModuleStatus,
-    PIDCoefficients,
-    RGB,
+    PidCoefficients,
+    Rgb,
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rhsplib";
@@ -103,16 +103,75 @@ export class ControlHubInternal implements ControlHub {
         this.webSocketConnection.close();
     }
 
-    getADC(): Promise<number> {
-        return Promise.resolve(0);
+    async getAnalogInput(channel: number): Promise<number> {
+        return await this.sendCommand("getAnalogInput", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            channel: channel,
+        });
     }
 
-    async getBulkInputData(): Promise<BulkInputData> {
-        let result = await this.sendCommand("getBulkInputData", {
+    async get5VBusVoltage(): Promise<number> {
+        return await this.sendCommand("get5VBusVoltage", {
             serialNumber: this.serialNumber,
             moduleAddress: this.moduleAddress,
         });
-        throw new Error("not implemented");
+    }
+
+    async getBatteryCurrent(): Promise<number> {
+        return await this.sendCommand("getBatteryCurrent", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+        });
+    }
+
+    async getBatteryVoltage(): Promise<number> {
+        return await this.sendCommand("getBatteryVoltage", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+        });
+    }
+
+    async getDigitalBusCurrent(): Promise<number> {
+        return await this.sendCommand("getDigitalBusCurrent", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+        });
+    }
+
+    async getI2CCurrent(): Promise<number> {
+        return await this.sendCommand("getI2CCurrent", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+        });
+    }
+
+    async getMotorCurrent(motorChannel: number): Promise<number> {
+        return await this.sendCommand("getMotorCurrent", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+        });
+    }
+
+    async getServoCurrent(): Promise<number> {
+        return await this.sendCommand("getMotorCurrent", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+        });
+    }
+
+    async getTemperature(): Promise<number> {
+        return await this.sendCommand("getTemperature", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+        });
+    }
+
+    async getBulkInputData(): Promise<BulkInputData> {
+        return await this.sendCommand("getBulkInputData", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+        });
     }
 
     async getDigitalAllInputs(): Promise<number> {
@@ -122,14 +181,14 @@ export class ControlHubInternal implements ControlHub {
         });
     }
 
-    async getDigitalDirection(dioPin: number): Promise<DIODirection> {
+    async getDigitalDirection(dioPin: number): Promise<DioDirection> {
         let isOutput = await this.sendCommand("getDigitalDirection", {
             serialNumber: this.serialNumber,
             moduleAddress: this.moduleAddress,
             channel: dioPin,
         });
 
-        return isOutput ? DIODirection.Output : DIODirection.Input;
+        return isOutput ? DioDirection.Output : DioDirection.Input;
     }
 
     async getDigitalSingleInput(dioPin: number): Promise<boolean> {
@@ -179,7 +238,7 @@ export class ControlHubInternal implements ControlHub {
         });
     }
 
-    async getModuleLedColor(): Promise<RGB> {
+    async getModuleLedColor(): Promise<Rgb> {
         let result: { r: number; g: number; b: number } = await this.sendCommand(
             "getLedColor",
             {
@@ -195,7 +254,7 @@ export class ControlHubInternal implements ControlHub {
         };
     }
 
-    getModuleLedPattern(): Promise<LEDPattern> {
+    getModuleLedPattern(): Promise<LedPattern> {
         throw new Error("not implemented");
     }
 
@@ -258,7 +317,7 @@ export class ControlHubInternal implements ControlHub {
     async getMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
-    ): Promise<PIDCoefficients> {
+    ): Promise<PidCoefficients> {
         let result: { p: number; i: number; d: number } = await this.sendCommand(
             "getMotorPidCoefficients",
             {
@@ -269,9 +328,9 @@ export class ControlHubInternal implements ControlHub {
         );
 
         return {
-            P: result.p,
-            I: result.i,
-            D: result.d,
+            p: result.p,
+            i: result.i,
+            d: result.d,
         };
     }
 
@@ -431,12 +490,12 @@ export class ControlHubInternal implements ControlHub {
         });
     }
 
-    async setDigitalDirection(dioPin: number, direction: DIODirection): Promise<void> {
+    async setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void> {
         await this.sendCommand("readVersionString", {
             serialNumber: this.serialNumber,
             moduleAddress: this.moduleAddress,
             pin: dioPin,
-            isOutput: direction == DIODirection.Output,
+            isOutput: direction == DioDirection.Output,
         });
     }
 
@@ -478,7 +537,7 @@ export class ControlHubInternal implements ControlHub {
         });
     }
 
-    async setModuleLedPattern(ledPattern: LEDPattern): Promise<void> {
+    async setModuleLedPattern(ledPattern: LedPattern): Promise<void> {
         await this.sendCommand("setLedColor", {
             serialNumber: this.serialNumber,
             moduleAddress: this.moduleAddress,
@@ -548,16 +607,16 @@ export class ControlHubInternal implements ControlHub {
     async setMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
-        pid: PIDCoefficients,
+        pid: PidCoefficients,
     ): Promise<void> {
         await this.sendCommand("setMotorPidCoefficients", {
             serialNumber: this.serialNumber,
             moduleAddress: this.moduleAddress,
             motorChannel: motorChannel,
             motorMode: motorMode,
-            p: pid.P,
-            i: pid.I,
-            d: pid.D,
+            p: pid.p,
+            i: pid.i,
+            d: pid.d,
         });
     }
 
