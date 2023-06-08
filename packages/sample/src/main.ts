@@ -84,8 +84,7 @@ program
     .command("list")
     .description("List all connected expansion hubs")
     .action(async () => {
-        let hubs = await openConnectedExpansionHubs();
-        await list(hubs);
+        await list();
     });
 
 program

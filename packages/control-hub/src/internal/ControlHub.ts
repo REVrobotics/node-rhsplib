@@ -3,22 +3,22 @@ import {
     ClosedLoopControlAlgorithm,
     ControlHub,
     DebugGroup,
-    DigitalChannelDirection, ExpansionHub,
+    DigitalChannelDirection, DigitalState, ExpansionHub,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
     LedPattern,
     ModuleInterface,
-    ModuleStatus,
-    PidCoefficients, RevHub,
+    ModuleStatus, MotorMode, ParentRevHub,
+    PidCoefficients, PidfCoefficients, RevHub,
     RevHubType,
     Rgb,
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rev-hub-core";
 import axios from "axios";
-import semver from "semver";
 import WebSocket from "isomorphic-ws";
+import semver = require("semver/preload.js");
 
 export class ControlHubInternal implements ControlHub {
     readonly isOpen: boolean = true;
@@ -49,8 +49,8 @@ export class ControlHubInternal implements ControlHub {
         this.webSocketConnection.on("message", (data) => {
             let rawMessage = JSON.parse(data.toString());
 
-            if (rawMessage.key !== undefined) {
-                let key = rawMessage.key;
+            if (rawMessage.commandKey !== undefined) {
+                let key = rawMessage.commandKey;
                 let callback = this.currentActiveCommands.get(key);
 
                 let response = rawMessage.response
@@ -126,14 +126,6 @@ export class ControlHubInternal implements ControlHub {
         });
 
         return isOutput ? DigitalChannelDirection.Output : DigitalChannelDirection.Input;
-    }
-
-    async getDigitalSingleInput(dioPin: number): Promise<boolean> {
-        return await this.sendCommand("getDigitalInput", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
-            channel: dioPin,
-        });
     }
 
     async getFTDIResetControl(): Promise<boolean> {
@@ -261,6 +253,7 @@ export class ControlHubInternal implements ControlHub {
                 serialNumber: this.serialNumber,
                 moduleAddress: this.moduleAddress,
                 motorChannel: motorChannel,
+                motorMode: motorMode,
             },
         );
 
@@ -687,5 +680,72 @@ export class ControlHubInternal implements ControlHub {
 
     addChildByAddress(moduleAddress: number): Promise<RevHub> {
         throw new Error("not implemented");
+    }
+
+    get5VBusVoltage(): Promise<number> {
+        return Promise.resolve(0);
+    }
+
+    getAllDigitalInputs(): Promise<number> {
+        return Promise.resolve(0);
+    }
+
+    getAnalogInput(channel: number): Promise<number> {
+        return Promise.resolve(0);
+    }
+
+    getBatteryCurrent(): Promise<number> {
+        return Promise.resolve(0);
+    }
+
+    getBatteryVoltage(): Promise<number> {
+        return Promise.resolve(0);
+    }
+
+    getDigitalBusCurrent(): Promise<number> {
+        return Promise.resolve(0);
+    }
+
+    async getDigitalInput(digitalChannel: number): Promise<DigitalState> {
+        return await this.sendCommand("getDigitalInput", {
+            serialNumber: this.serialNumber,
+            moduleAddress: this.moduleAddress,
+            channel: digitalChannel,
+        });
+    }
+
+    getI2CCurrent(): Promise<number> {
+        return Promise.resolve(0);
+    }
+
+    getMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode): Promise<PidfCoefficients | PidCoefficients> {
+        return this.getMotorPIDCoefficients(motorChannel, motorMode);
+    }
+
+    getMotorCurrent(motorChannel: number): Promise<number> {
+        return Promise.resolve(0);
+    }
+
+    getServoCurrent(): Promise<number> {
+        return Promise.resolve(0);
+    }
+
+    getTemperature(): Promise<number> {
+        return Promise.resolve(0);
+    }
+
+    setAllDigitalOutputs(bitPackedField: number): Promise<void> {
+        return Promise.resolve(undefined);
+    }
+
+    setDigitalOutput(digitalChannel: number, value: DigitalState): Promise<void> {
+        return Promise.resolve(undefined);
+    }
+
+    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pid, pid: PidCoefficients): Promise<void>;
+    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pidf, pidf: PidfCoefficients): Promise<void>;
+    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm, pid: PidCoefficients | PidfCoefficients): Promise<void>;
+    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pid | ClosedLoopControlAlgorithm.Pidf | ClosedLoopControlAlgorithm, pid: PidCoefficients | PidfCoefficients): Promise<void> {
+        return Promise.resolve(undefined);
     }
 }
