@@ -89,13 +89,8 @@ export class ControlHubInternal implements ControlHub {
         return new Promise((resolve, reject) => {
             this.webSocketConnection.on("open", async () => {
                 this.isConnected = true;
-                console.log("Starting manual control op mode");
                 let apiVersion: { majorVersion: string; minorVersion: string } =
                     await this.sendCommand("start", {});
-
-                console.log(
-                    `API version is ${apiVersion.majorVersion}.${apiVersion.minorVersion}`,
-                );
 
                 this.moduleAddress = await this.sendCommand("getModuleAddress", {
                     serialNumber: "Embedded",
