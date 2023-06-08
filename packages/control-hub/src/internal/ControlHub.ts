@@ -35,6 +35,11 @@ export class ControlHubInternal implements ControlHub {
     readonly serialNumber: string;
     readonly children: ReadonlyArray<RevHub> = [];
 
+    /**
+     * Whether the websocket is currently open.
+     */
+    isConnected = false;
+
     keyGenerator = 0;
     currentActiveCommands = new Map<
         any,
@@ -70,10 +75,20 @@ export class ControlHubInternal implements ControlHub {
             }
         });
 
-        //Todo(landry): determine if we should call close() on webSocketConnection.on("close")
+        this.webSocketConnection.on("close", () => {
+            console.log(`Connection was closed`);
+            this.isConnected = false;
+        });
+
+        this.webSocketConnection.on("error", (_: WebSocket, err: Error) => {
+            console.log("Websocket error");
+            console.log(err);
+            this.isConnected = false;
+        });
 
         return new Promise((resolve, reject) => {
             this.webSocketConnection.on("open", async () => {
+                this.isConnected = true;
                 console.log("Starting manual control op mode");
                 let apiVersion: { majorVersion: string; minorVersion: string } =
                     await this.sendCommand("start", {});
