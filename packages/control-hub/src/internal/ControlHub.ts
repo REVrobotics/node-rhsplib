@@ -66,6 +66,14 @@ export class ControlHubInternal implements ControlHub {
 
         return new Promise((resolve, reject) => {
             this.webSocketConnection.on("open", async () => {
+                console.log("Starting manual control op mode");
+                let apiVersion: { majorVersion: string; minorVersion: string } =
+                    await this.sendCommand("start", {});
+
+                console.log(
+                    `API version is ${apiVersion.majorVersion}.${apiVersion.minorVersion}`,
+                );
+
                 this.moduleAddress = await this.sendCommand("getModuleAddress", {
                     serialNumber: "Embedded",
                     moduleAddress: 173,
@@ -96,7 +104,9 @@ export class ControlHubInternal implements ControlHub {
     }
 
     close(): void {
-        this.webSocketConnection.close();
+        this.sendCommand("stop", {}).then(() => {
+            this.webSocketConnection.close();
+        });
     }
 
     getADC(): Promise<number> {
@@ -655,10 +665,11 @@ export class ControlHubInternal implements ControlHub {
             commandPayload: JSON.stringify(params),
         };
         let payload = {
-            namespace: "ManualControl",
+            namespace: "MC",
             type: type,
             payload: JSON.stringify(messagePayload),
         };
+
         this.webSocketConnection?.send(JSON.stringify(payload));
 
         return new Promise((resolve, reject) => {
