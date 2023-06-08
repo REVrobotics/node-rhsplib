@@ -53,8 +53,8 @@ export class ControlHubInternal implements ControlHub {
         this.webSocketConnection.on("message", (data) => {
             let rawMessage = JSON.parse(data.toString());
 
-            if (rawMessage.key !== undefined) {
-                let key = rawMessage.key;
+            if (rawMessage.commandKey !== undefined) {
+                let key = rawMessage.commandKey;
                 let callback = this.currentActiveCommands.get(key);
 
                 let response = rawMessage.response

@@ -1,7 +1,8 @@
 import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
+import { openUsbControlHubs } from "../adb-setup.js";
 
 export async function analog(channel: number, continuous: boolean) {
-    const hubs = await openConnectedExpansionHubs();
+    const hubs = await openUsbControlHubs();
 
     if (continuous) {
         while (true) {
@@ -18,7 +19,7 @@ export async function analog(channel: number, continuous: boolean) {
 }
 
 export async function temperature(continuous: boolean) {
-    const hubs = await openConnectedExpansionHubs();
+    const hubs = await openUsbControlHubs();
 
     if (continuous) {
         while (true) {
@@ -35,7 +36,7 @@ export async function temperature(continuous: boolean) {
 }
 
 export async function battery(continuous: boolean) {
-    const hubs = await openConnectedExpansionHubs();
+    const hubs = await openUsbControlHubs();
 
     if (continuous) {
         while (true) {
@@ -52,7 +53,7 @@ export async function battery(continuous: boolean) {
 }
 
 export async function voltageRail(continuous: boolean) {
-    const hubs = await openConnectedExpansionHubs();
+    const hubs = await openUsbControlHubs();
 
     if (continuous) {
         while (true) {
