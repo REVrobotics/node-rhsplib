@@ -22,7 +22,9 @@ import {
     ParentRevHub,
     RevHub,
     RevHubType,
+    TimeoutError,
 } from "@rev-robotics/rev-hub-core";
+import { clearTimeout } from "timers";
 
 export class ControlHubInternal implements ControlHub {
     readonly isOpen: boolean = true;
@@ -727,7 +729,7 @@ export class ControlHubInternal implements ControlHub {
         throw new Error("not implemented");
     }
 
-    async sendCommand<P, R>(type: string, params: P): Promise<R> {
+    async sendCommand<P, R>(type: string, params: P, timeout: number = 1000): Promise<R> {
         let key = 0;
         let messagePayload = {
             key: key,
@@ -741,7 +743,7 @@ export class ControlHubInternal implements ControlHub {
 
         this.webSocketConnection?.send(JSON.stringify(payload));
 
-        return new Promise((resolve, reject) => {
+        let callbackPromise: Promise<R> = new Promise((resolve, reject) => {
             this.currentActiveCommands.set(key, (response, error) => {
                 if (response !== undefined) {
                     resolve(response);
@@ -751,6 +753,17 @@ export class ControlHubInternal implements ControlHub {
                     reject(e);
                 }
             });
+        });
+
+        let timer!: NodeJS.Timer;
+        let timeoutPromise: Promise<R> = new Promise((_, reject) => {
+            timer = setTimeout(() => {
+                reject(new TimeoutError());
+            }, timeout);
+        });
+
+        return await Promise.race([callbackPromise, timeoutPromise]).finally(() => {
+            clearTimeout(timer);
         });
     }
 
