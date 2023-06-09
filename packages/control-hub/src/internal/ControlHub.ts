@@ -34,6 +34,9 @@ export class ControlHubInternal implements ControlHub {
     readonly serialNumber: string;
     readonly children: ReadonlyArray<RevHub> = [];
 
+    private id: string | null;
+    private keyGenerator = 0;
+
     private supportedManualControlMajorVersion = 0;
     private supportedManualControlMinorVersion = 1;
 
@@ -43,14 +46,14 @@ export class ControlHubInternal implements ControlHub {
     isConnected = false;
 
     private webSocketConnection!: WebSocket;
-    private keyGenerator = 0;
     private currentActiveCommands = new Map<
         any,
         (response: any | undefined, error: any | undefined) => void
     >();
 
-    constructor(serialNumber: string) {
+    constructor(serialNumber: string, id: string | null = null) {
         this.serialNumber = serialNumber;
+        this.id = id;
     }
 
     isParent(): this is ParentRevHub {
@@ -142,86 +145,74 @@ export class ControlHubInternal implements ControlHub {
 
     async getAnalogInput(channel: number): Promise<number> {
         return await this.sendCommand("getAnalogInput", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             channel: channel,
         });
     }
 
     async get5VBusVoltage(): Promise<number> {
         return await this.sendCommand("get5VBusVoltage", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
         });
     }
 
     async getBatteryCurrent(): Promise<number> {
         return await this.sendCommand("getBatteryCurrent", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
         });
     }
 
     async getBatteryVoltage(): Promise<number> {
         return await this.sendCommand("getBatteryVoltage", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
         });
     }
 
     async getDigitalBusCurrent(): Promise<number> {
         return await this.sendCommand("getDigitalBusCurrent", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
         });
     }
 
     async getI2CCurrent(): Promise<number> {
         return await this.sendCommand("getI2CCurrent", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
         });
     }
 
     async getMotorCurrent(motorChannel: number): Promise<number> {
         return await this.sendCommand("getMotorCurrent", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
         });
     }
 
     async getServoCurrent(): Promise<number> {
         return await this.sendCommand("getMotorCurrent", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
         });
     }
 
     async getTemperature(): Promise<number> {
         return await this.sendCommand("getTemperature", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
         });
     }
 
     async getBulkInputData(): Promise<BulkInputData> {
         return await this.sendCommand("getBulkInputData", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
         });
     }
 
     async getDigitalAllInputs(): Promise<number> {
         return await this.sendCommand("getAllDigitalInputs", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
         });
     }
 
     async getDigitalDirection(dioPin: number): Promise<DioDirection> {
         let isOutput = await this.sendCommand("getDigitalDirection", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             channel: dioPin,
         });
 
@@ -230,23 +221,20 @@ export class ControlHubInternal implements ControlHub {
 
     async getDigitalSingleInput(dioPin: number): Promise<boolean> {
         return await this.sendCommand("getDigitalInput", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             channel: dioPin,
         });
     }
 
     async getFTDIResetControl(): Promise<boolean> {
         return await this.sendCommand("getFtdiResetControl", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
         });
     }
 
     async getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode> {
         let speedCode = await this.sendCommand("getI2CChannelConfiguration", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             channel: i2cChannel,
         });
 
@@ -268,8 +256,7 @@ export class ControlHubInternal implements ControlHub {
         functionNumber: number,
     ): Promise<number> {
         return await this.sendCommand("getInterfacePacketId", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             interfaceName: interfaceName,
             functionNumber: functionNumber,
         });
@@ -297,30 +284,26 @@ export class ControlHubInternal implements ControlHub {
 
     async getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus> {
         return await this.sendCommand("getModuleStatus", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
         });
     }
 
     async getMotorAtTarget(motorChannel: number): Promise<boolean> {
         return await this.sendCommand("getIsMotorAtTarget", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
         });
     }
 
     async getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<number> {
         return await this.sendCommand("getMotorAlertLevel", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             motorChannel: motorChannel,
         });
     }
 
     async getMotorChannelEnable(motorChannel: number): Promise<boolean> {
         return await this.sendCommand("getMotorChannelEnable", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             motorChannel: motorChannel,
         });
     }
@@ -329,24 +312,21 @@ export class ControlHubInternal implements ControlHub {
         motorChannel: number,
     ): Promise<{ motorMode: number; floatAtZero: boolean }> {
         return await this.sendCommand("getMotorMode", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             motorChannel: motorChannel,
         });
     }
 
     async getMotorConstantPower(motorChannel: number): Promise<number> {
         return await this.sendCommand("getMotorConstantPower", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             motorChannel: motorChannel,
         });
     }
 
     async getMotorEncoderPosition(motorChannel: number): Promise<number> {
         return await this.sendCommand("getMotorEncoderPosition", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             motorChannel: motorChannel,
         });
     }
@@ -389,47 +369,41 @@ export class ControlHubInternal implements ControlHub {
 
     async getMotorTargetVelocity(motorChannel: number): Promise<number> {
         return await this.sendCommand("getMotorTargetVelocity", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             motorChannel: motorChannel,
         });
     }
 
     async getPhoneChargeControl(): Promise<boolean> {
         return await this.sendCommand("getPhoneChargeControl", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
         });
     }
 
     async getServoConfiguration(servoChannel: number): Promise<number> {
         return await this.sendCommand("getServoConfiguration", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             servoChannel: servoChannel,
         });
     }
 
     async getServoEnable(servoChannel: number): Promise<boolean> {
         return await this.sendCommand("getServoEnable", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             servoChannel: servoChannel,
         });
     }
 
     async getServoPulseWidth(servoChannel: number): Promise<number> {
         return await this.sendCommand("getServoPulseWidth", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             servoChannel: servoChannel,
         });
     }
 
     async injectDataLogHint(hintText: string): Promise<void> {
         await this.sendCommand("injectDebugLogHint", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             hint: hintText,
         });
     }
@@ -477,23 +451,20 @@ export class ControlHubInternal implements ControlHub {
 
     async readVersionString(): Promise<string> {
         return await this.sendCommand("readVersionString", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
         });
     }
 
     async resetMotorEncoder(motorChannel: number): Promise<void> {
         await this.sendCommand("resetMotorEncoder", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             motorChannel: motorChannel,
         });
     }
 
     async sendFailSafe(): Promise<void> {
         await this.sendCommand("readVersionString", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
         });
     }
 
@@ -512,8 +483,7 @@ export class ControlHubInternal implements ControlHub {
         verbosityLevel: VerbosityLevel,
     ): Promise<void> {
         await this.sendCommand("readVersionString", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             debugGroup: debugGroup,
             verbosityLevel: verbosityLevel,
         });
@@ -521,16 +491,14 @@ export class ControlHubInternal implements ControlHub {
 
     async setDigitalAllOutputs(bitPackedField: number): Promise<void> {
         await this.sendCommand("readVersionString", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             bitField: bitPackedField,
         });
     }
 
     async setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void> {
         await this.sendCommand("readVersionString", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             pin: dioPin,
             isOutput: direction == DioDirection.Output,
         });
@@ -538,8 +506,7 @@ export class ControlHubInternal implements ControlHub {
 
     async setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void> {
         await this.sendCommand("readVersionString", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             pin: dioPin,
             value: value ?? false,
         });
@@ -547,8 +514,7 @@ export class ControlHubInternal implements ControlHub {
 
     async setFTDIResetControl(ftdiResetControl: boolean): Promise<void> {
         await this.sendCommand("setFtdiResetControl", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
         });
     }
 
@@ -557,8 +523,7 @@ export class ControlHubInternal implements ControlHub {
         speedCode: I2CSpeedCode,
     ): Promise<void> {
         await this.sendCommand("setI2CChannelConfiguration", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             i2cChannel: i2cChannel,
             speedCode: speedCode,
         });
@@ -566,8 +531,7 @@ export class ControlHubInternal implements ControlHub {
 
     async setModuleLedColor(red: number, green: number, blue: number): Promise<void> {
         await this.sendCommand("setLedColor", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             r: red,
             g: green,
             b: blue,
@@ -575,9 +539,8 @@ export class ControlHubInternal implements ControlHub {
     }
 
     async setModuleLedPattern(ledPattern: LedPattern): Promise<void> {
-        await this.sendCommand("setLedColor", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+        await this.sendCommand("setLedPattern", {
+            id: this.id,
             rgbtPatternStep0: ledPattern.rgbtPatternStep0,
             rgbtPatternStep1: ledPattern.rgbtPatternStep1,
             rgbtPatternStep2: ledPattern.rgbtPatternStep2,
@@ -602,8 +565,7 @@ export class ControlHubInternal implements ControlHub {
         currentLimit_mA: number,
     ): Promise<void> {
         await this.sendCommand("setMotorAlertLevel", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             motorChannel: motorChannel,
             currentLimit_mA: currentLimit_mA,
         });
@@ -611,8 +573,7 @@ export class ControlHubInternal implements ControlHub {
 
     async setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void> {
         await this.sendCommand("setMotorEnabled", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             motorChannel: motorChannel,
             enable: enable,
         });
@@ -624,8 +585,7 @@ export class ControlHubInternal implements ControlHub {
         floatAtZero: boolean,
     ): Promise<void> {
         await this.sendCommand("setMotorChannelMode", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             motorChannel: motorChannel,
             motorMode: motorMode,
             floatAtZero: floatAtZero,
@@ -634,8 +594,7 @@ export class ControlHubInternal implements ControlHub {
 
     async setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
         await this.sendCommand("setMotorConstantPower", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             motorChannel: motorChannel,
             motorPower: powerLevel,
         });
@@ -647,8 +606,7 @@ export class ControlHubInternal implements ControlHub {
         pid: PidCoefficients,
     ): Promise<void> {
         await this.sendCommand("setMotorPidCoefficients", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             motorChannel: motorChannel,
             motorMode: motorMode,
             p: pid.p,
@@ -663,8 +621,7 @@ export class ControlHubInternal implements ControlHub {
         targetTolerance_counts: number,
     ): Promise<void> {
         await this.sendCommand("setMotorTargetPosition", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             motorChannel: motorChannel,
             targetPositionCounts: targetPosition_counts,
             targetToleranceCounts: targetTolerance_counts,
@@ -676,8 +633,7 @@ export class ControlHubInternal implements ControlHub {
         velocity_cps: number,
     ): Promise<void> {
         await this.sendCommand("setMotorTargetVelocity", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             motorChannel: motorChannel,
             velocityCps: velocity_cps,
         });
@@ -685,16 +641,14 @@ export class ControlHubInternal implements ControlHub {
 
     async setNewModuleAddress(newModuleAddress: number): Promise<void> {
         await this.sendCommand("setNewModuleAddress", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             address: newModuleAddress,
         });
     }
 
     async setPhoneChargeControl(chargeEnable: boolean): Promise<void> {
         await this.sendCommand("setPhoneChargeControl", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             enabled: chargeEnable,
         });
     }
@@ -704,8 +658,7 @@ export class ControlHubInternal implements ControlHub {
         framePeriod: number,
     ): Promise<void> {
         await this.sendCommand("setServoConfiguration", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             servoChannel: servoChannel,
             framePeriod: framePeriod,
         });
@@ -713,8 +666,7 @@ export class ControlHubInternal implements ControlHub {
 
     async setServoEnable(servoChannel: number, enable: boolean): Promise<void> {
         await this.sendCommand("setServoEnable", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             servoChannel: servoChannel,
             enabled: enable,
         });
@@ -722,8 +674,7 @@ export class ControlHubInternal implements ControlHub {
 
     async setServoPulseWidth(servoChannel: number, pulseWidth: number): Promise<void> {
         await this.sendCommand("setServoPulseWidth", {
-            serialNumber: this.serialNumber,
-            moduleAddress: this.moduleAddress,
+            id: this.id,
             servoChannel: servoChannel,
             pulseWidth: pulseWidth,
         });
@@ -755,7 +706,7 @@ export class ControlHubInternal implements ControlHub {
     }
 
     async sendCommand<P, R>(type: string, params: P, timeout: number = 1000): Promise<R> {
-        let key = 0;
+        let key = this.keyGenerator++;
         let messagePayload = {
             commandKey: key,
             commandPayload: JSON.stringify(params),
@@ -793,11 +744,13 @@ export class ControlHubInternal implements ControlHub {
         });
     }
 
-    addChild(hub: RevHub): void {
+    async addChild(hub: RevHub): Promise<void> {
         throw new Error("not implemented");
     }
 
-    addChildByAddress(moduleAddress: number): Promise<RevHub> {
-        throw new Error("not implemented");
+    async addChildByAddress(moduleAddress: number): Promise<RevHub> {
+        let id: string = await this.sendCommand("addChild", moduleAddress);
+
+        return new ControlHubInternal("(embedded)", id);
     }
 }
