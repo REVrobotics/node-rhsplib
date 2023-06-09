@@ -31,26 +31,17 @@ import { performance } from "perf_hooks";
 const openSerialMap = new Map<string, typeof NativeSerial>();
 
 /**
- * Opens the hub with the given module address if there is only one parent hub.
- * @throws if there are multiple parent hubs.
  *
+ * @param parentSerialNumber the parent's serial number
  * @param parentAddress the parent to open
  * @param moduleAddress the exact hub to open
  */
 export async function openHubWithAddress(
+    parentSerialNumber: string,
     parentAddress: number,
     moduleAddress: number = parentAddress,
 ): Promise<RevHub> {
-    let serialNumbers = await getPossibleExpansionHubSerialNumbers();
-
-    if (serialNumbers.length > 1) {
-        //there are multiple hubs connected. We can't distinguish without a serial number
-        throw new Error(
-            `There are ${serialNumbers.length} parent hubs. Please specify a serialNumber`,
-        );
-    }
-
-    let parentHub = await openParentExpansionHub(serialNumbers[0], parentAddress);
+    let parentHub = await openParentExpansionHub(parentSerialNumber, parentAddress);
 
     if (parentAddress == moduleAddress) {
         return parentHub;

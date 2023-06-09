@@ -5,6 +5,7 @@ import { list } from "./command/list.js";
 import { led } from "./command/led.js";
 import {
     ExpansionHub,
+    getPossibleExpansionHubSerialNumbers,
     openConnectedExpansionHubs,
     openHubWithAddress,
     openParentExpansionHub,
@@ -136,7 +137,21 @@ async function getExpansionHubOrThrow(): Promise<ExpansionHub> {
         //if the user specifies a module address, use that, else use parent address as module address.
         let realModuleAddress =
             moduleAddress !== undefined ? moduleAddress : parentAddress;
-        let hub = await openHubWithAddress(parentAddress, realModuleAddress);
+        let serialNumbers = await getPossibleExpansionHubSerialNumbers();
+
+        if (serialNumbers.length > 1) {
+            //there are multiple hubs connected. We can't distinguish without a serial number
+            throw new Error(
+                `There are ${serialNumbers.length} parent hubs. Please specify a serialNumber`,
+            );
+        }
+
+        let hub = await openHubWithAddress(
+            serialNumbers[0],
+            parentAddress,
+            realModuleAddress,
+        );
+
         if (hub.isExpansionHub()) {
             return hub;
         } else {
