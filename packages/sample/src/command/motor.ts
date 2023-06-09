@@ -8,8 +8,9 @@ export async function runMotorConstantPower(channel: number, power: number) {
     await hub.setMotorChannelMode(channel, MotorMode.OPEN_LOOP, true);
     await hub.setMotorConstantPower(channel, power);
     await hub.setMotorChannelEnable(channel, true);
+
     process.on("SIGINT", () => {
-        hub.setMotorChannelEnable(channel, false);
+        hub.close();
         process.exit();
     });
 }

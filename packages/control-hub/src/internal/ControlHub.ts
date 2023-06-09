@@ -540,10 +540,6 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
     }
 
-    async addChild(hub: RevHub): Promise<void> {
-        throw new Error("not implemented");
-    }
-
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {
         return this.addHubBySerialNumberAndAddress(this.serialNumber, moduleAddress);
     }
@@ -602,7 +598,7 @@ export class ControlHubInternal implements ControlHub {
         let timer!: NodeJS.Timer;
         let timeoutPromise: Promise<R> = new Promise((_, reject) => {
             timer = setTimeout(() => {
-                console.log(`Got timeout for ${type}`);
+                console.error(`Got timeout for ${type}`);
                 reject(new TimeoutError());
             }, timeout);
         });
