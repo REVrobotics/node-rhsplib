@@ -10,7 +10,7 @@ export async function openConnectedControlHub(): Promise<ControlHub | undefined>
 }
 
 async function createWiFiControlHub(): Promise<ControlHub> {
-    let hub = new ControlHubInternal("Placeholder");
+    let hub = new ControlHubInternal("Placeholder", 173);
 
     if (!(await hub.isWiFiConnected())) {
         throw new Error("Hub is not connected via WiFi");

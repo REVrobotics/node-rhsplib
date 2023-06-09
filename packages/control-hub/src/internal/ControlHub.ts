@@ -34,7 +34,7 @@ export class ControlHubInternal implements ControlHub {
     readonly serialNumber: string;
     readonly children: ReadonlyArray<RevHub> = [];
 
-    private id: string | null;
+    private id: any | null;
     private keyGenerator = 0;
 
     private supportedManualControlMajorVersion = 0;
@@ -51,8 +51,9 @@ export class ControlHubInternal implements ControlHub {
         (response: any | undefined, error: any | undefined) => void
     >();
 
-    constructor(serialNumber: string, id: string | null = null) {
+    constructor(serialNumber: string, moduleAddress: number, id: any | null = null) {
         this.serialNumber = serialNumber;
+        this.moduleAddress = moduleAddress;
         this.id = id;
     }
 
@@ -96,6 +97,10 @@ export class ControlHubInternal implements ControlHub {
         return new Promise((resolve, reject) => {
             this.webSocketConnection.on("open", async () => {
                 this.isConnected = true;
+                this.id = await this.sendCommand("openHub", {
+                    serialNumber: this.serialNumber,
+                    moduleAddress: this.moduleAddress,
+                });
                 let apiVersion: { majorVersion: number; minorVersion: number } =
                     await this.sendCommand("start", {});
 
@@ -749,8 +754,8 @@ export class ControlHubInternal implements ControlHub {
     }
 
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {
-        let id: string = await this.sendCommand("addChild", moduleAddress);
+        let id: any = await this.sendCommand("addChild", moduleAddress);
 
-        return new ControlHubInternal("(embedded)", id);
+        return new ControlHubInternal("(embedded)", moduleAddress, id);
     }
 }
