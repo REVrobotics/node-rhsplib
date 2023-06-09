@@ -24,7 +24,8 @@
     },
     "scripts": {
         "build": "tsc",
-        "install": "node-gyp-build \"node scripts/build-RHSPlib.mjs\"",
+        "install": "",
+        "postinstall": "node-gyp-build \"node scripts/build-RHSPlib.mjs\"",
         "prepublishOnly": "prebuildify --napi && tsc"
     },
     "gypfile": true

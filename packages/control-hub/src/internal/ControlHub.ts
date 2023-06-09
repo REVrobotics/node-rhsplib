@@ -53,11 +53,12 @@ export class ControlHubInternal implements ControlHub {
     }
 
     isParent(): this is ParentRevHub {
-        return this.serialNumber !== undefined;
+        return true;
     }
 
     async open(ip: string = "192.168.43.1", port: string = "8081"): Promise<void> {
         this.webSocketConnection = new WebSocket(`ws://${ip}:${port}`);
+        console.log(`Opening on port ${port}`);
 
         this.webSocketConnection.on("message", (data) => {
             let rawMessage = JSON.parse(data.toString());
@@ -104,7 +105,7 @@ export class ControlHubInternal implements ControlHub {
                 }
 
                 this.moduleAddress = await this.sendCommand("getModuleAddress", {
-                    serialNumber: "Embedded",
+                    serialNumber: "(embedded)",
                     moduleAddress: 173,
                 });
                 resolve();
@@ -690,7 +691,7 @@ export class ControlHubInternal implements ControlHub {
     async sendCommand<P, R>(type: string, params: P, timeout: number = 1000): Promise<R> {
         let key = 0;
         let messagePayload = {
-            key: key,
+            commandKey: key,
             commandPayload: JSON.stringify(params),
         };
         let payload = {
@@ -706,6 +707,7 @@ export class ControlHubInternal implements ControlHub {
                 if (response !== undefined) {
                     resolve(response);
                 } else {
+                    console.error(`Got error for ${type}`);
                     let e = new Error();
                     Object.assign(e, error);
                     reject(e);
