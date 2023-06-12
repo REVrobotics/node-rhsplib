@@ -547,7 +547,7 @@ export class ControlHubInternal implements ControlHub {
         );
     }
 
-    writeI2CSingleByte(
+    async writeI2CSingleByte(
         i2cChannel: number,
         slaveAddress: number,
         byte: number,
