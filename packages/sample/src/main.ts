@@ -224,7 +224,6 @@ program
         let channelValue = Number(channel);
         let pulseWidthValue = Number(pulseWidth);
         let frameWidthValue = frameWidth ? Number(frameWidth) : 4000;
-
         let hub = await getExpansionHubOrThrow();
 
         await runServo(hub, channelValue, pulseWidthValue, frameWidthValue);
