@@ -78,7 +78,6 @@ export class ControlHubInternal implements ControlHub {
 
     async open(ip: string = "192.168.43.1", port: string = "8081"): Promise<void> {
         this.webSocketConnection = new WebSocket(`ws://${ip}:${port}`);
-        console.log(`Opening on port ${port}`);
 
         this.webSocketConnection.on("message", (data) => {
             let rawMessage = JSON.parse(data.toString());
@@ -105,7 +104,7 @@ export class ControlHubInternal implements ControlHub {
 
         this.webSocketConnection.on("error", (_: WebSocket, err: Error) => {
             console.log("Websocket error");
-            console.log(err);
+            console.error(err);
             this.isConnected = false;
         });
 
