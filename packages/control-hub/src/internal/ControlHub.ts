@@ -30,11 +30,7 @@ import { ControlHubConnected } from "./ControlHubConnected.js";
 
 export class ControlHubInternal implements ControlHub {
     readonly isOpen: boolean = true;
-<<<<<<< HEAD
     readonly moduleAddress: number = 173;
-=======
-    moduleAddress: number = 173;
->>>>>>> 9da9a17 (add bulk input command)
     responseTimeoutMs: number = 0;
     type: RevHubType = RevHubType.ControlHub;
     readonly serialNumber: string;
@@ -81,6 +77,7 @@ export class ControlHubInternal implements ControlHub {
     }
 
     async open(ip: string = "192.168.43.1", port: string = "8081"): Promise<void> {
+        console.log(`Port is ${port}`);
         this.webSocketConnection = new WebSocket(`ws://${ip}:${port}`);
 
         this.webSocketConnection.on("message", (data) => {
@@ -231,31 +228,7 @@ export class ControlHubInternal implements ControlHub {
     }
 
     async getBulkInputData(): Promise<BulkInputData> {
-<<<<<<< HEAD
         return this.embedded.getBulkInputData();
-=======
-        let response: any = await this.sendCommand("getBulkInputData", {
-            id: this.id,
-        });
-
-        return {
-            digitalInputs: response.digitalInputs,
-            motor0position_enc: response.motor0EncoderCounts,
-            motor1position_enc: response.motor1EncoderCounts,
-            motor2position_enc: response.motor2EncoderCounts,
-            motor3position_enc: response.motor3EncoderCounts,
-            motorStatus: response.motorStatus,
-            motor0velocity_cps: response.motor0Velocity,
-            motor1velocity_cps: response.motor1Velocity,
-            motor2velocity_cps: response.motor2Velocity,
-            motor3velocity_cps: response.motor3Velocity,
-            analog0_mV: response.analog0mV,
-            analog1_mV: response.analog1mV,
-            analog2_mV: response.analog2mV,
-            analog3_mV: response.analog3mV,
-            attentionRequired: 0,
-        };
->>>>>>> 9da9a17 (add bulk input command)
     }
 
     async getAllDigitalInputs(): Promise<number> {
@@ -454,15 +427,7 @@ export class ControlHubInternal implements ControlHub {
     }
 
     async setDigitalOutput(dioPin: number, value: DigitalState): Promise<void> {
-<<<<<<< HEAD
         return this.embedded.setDigitalOutput(dioPin, value);
-=======
-        await this.sendCommand("readVersionString", {
-            id: this.id,
-            pin: dioPin,
-            value: value.isHigh() ?? false,
-        });
->>>>>>> 9da9a17 (add bulk input command)
     }
 
     async setFTDIResetControl(ftdiResetControl: boolean): Promise<void> {
@@ -597,7 +562,6 @@ export class ControlHubInternal implements ControlHub {
     async addHubBySerialNumberAndAddress(
         serialNumber: string,
         moduleAddress: number,
-<<<<<<< HEAD
     ): Promise<ParentExpansionHub> {
         let id = await this.openHub(serialNumber, moduleAddress, moduleAddress);
 
@@ -617,15 +581,6 @@ export class ControlHubInternal implements ControlHub {
             throw new Error("A child hub with a serial number must also be a parent.");
         }
         return newHub;
-=======
-        parentAddress: number = moduleAddress,
-    ): Promise<any> {
-        return await this.sendCommand("openHub", {
-            parentSerialNumber: serialNumber,
-            parentHubAddress: parentAddress,
-            hubAddress: moduleAddress,
-        });
->>>>>>> 9da9a17 (add bulk input command)
     }
 
     async sendCommand<P, R>(type: string, params: P, timeout: number = 1000): Promise<R> {

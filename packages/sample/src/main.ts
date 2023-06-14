@@ -9,7 +9,7 @@ import {
     runMotorToPosition,
 } from "./command/motor.js";
 import { list } from "./command/list.js";
-import { led } from "./command/led.js";
+import { led, ledPattern } from "./command/ledPattern.js";
 import { runServo } from "./command/servo.js";
 import { openUsbControlHubs } from "./adb-setup.js";
 import {
@@ -58,11 +58,23 @@ program
     });
 
 program
-    .command("led")
+    .command("pattern")
     .description("Run LED steps")
     .action(async () => {
         let hub = await getExpansionHubOrThrow();
-        await led(hub);
+        await ledPattern(hub);
+    });
+
+program
+    .command("led <r> <g> <b>")
+    .description("Set LED color")
+    .action(async (r, g, b) => {
+        console.log("Running led color");
+        let hubs = await openUsbControlHubs();
+        let rValue = Number(r);
+        let gValue = Number(g);
+        let bValue = Number(b);
+        await led(hubs[0], rValue, gValue, bValue);
     });
 
 program.command("bulk input").action(async () => {
@@ -164,14 +176,6 @@ program
     .description("List all connected expansion hubs")
     .action(async () => {
         await list();
-    });
-
-program
-    .command("led")
-    .description("Run LED steps")
-    .action(async () => {
-        let hub = await getExpansionHubOrThrow();
-        await led(hub);
     });
 
 program
