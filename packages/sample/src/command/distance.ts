@@ -13,7 +13,7 @@ export async function distance(channel: number, isContinuous: boolean) {
     if (isContinuous) {
         sensor.startMeasuringDistance((distance) => {
             console.log(`Distance is ${distance}mm`);
-        }, 1000);
+        }, 10);
     } else {
         let distance = await sensor.getDistanceMillimeters();
         console.log(`Distance is ${distance}mm`);

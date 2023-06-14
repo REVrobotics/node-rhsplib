@@ -25,6 +25,7 @@ import {
 } from "@rev-robotics/expansion-hub";
 import { digitalRead, digitalWrite } from "./command/digital.js";
 import { distance } from "./command/distance.js";
+import { getBulkInputData } from "./command/bulkinput.js";
 
 const program = new Command();
 
@@ -38,37 +39,6 @@ program
         "-a --address <address>",
         "module address. If this is specified, you must also specify a parent address",
     );
-
-let digitalCommand = program.command("digital");
-
-digitalCommand
-    .command("write <channel> <state>")
-    .description("write digital pin. Valid values for <state> are high, low, 0, and 1.")
-    .action(async (channel, state) => {
-        let channelNumber = Number(channel);
-        let stateBoolean = false;
-        if (state === "high" || state === "1") {
-            stateBoolean = true;
-        } else if (state === "low" || state === "0") {
-            stateBoolean = false;
-        } else {
-            program.error("Please provide only one of {high, low, 1, 0}");
-        }
-        let digitalState = stateBoolean ? DigitalState.High : DigitalState.Low;
-
-        await digitalWrite(channelNumber, digitalState);
-    });
-
-digitalCommand
-    .command("read <channel>")
-    .option("--continuous", "run continuously")
-    .description("read digital pin")
-    .action(async (channel, options) => {
-        let isContinuous = options.continuous !== undefined;
-        let channelNumber = Number(channel);
-
-        await digitalRead(channelNumber, isContinuous);
-    });
 
 program
     .command("testErrorHandling")
@@ -93,6 +63,44 @@ program
     .action(async () => {
         let hub = await getExpansionHubOrThrow();
         await led(hub);
+    });
+
+program.command("bulk input").action(async () => {
+    let hubs = await openUsbControlHubs();
+    await getBulkInputData(hubs[0]);
+});
+
+let digitalCommand = program.command("digital");
+
+digitalCommand
+    .command("write <channel> <state>")
+    .description("write digital pin. Valid values for <state> are high, low, 0, and 1.")
+    .action(async (channel, state) => {
+        let channelNumber = Number(channel);
+        let stateBoolean = false;
+        if (state === "high" || state === "1") {
+            stateBoolean = true;
+        } else if (state === "low" || state === "0") {
+            stateBoolean = false;
+        } else {
+            program.error("Please provide only one of {high, low, 1, 0}");
+        }
+        let digitalState = stateBoolean ? DigitalState.High : DigitalState.Low;
+        let hubs = await openUsbControlHubs();
+
+        await digitalWrite(hubs[0], channelNumber, digitalState);
+    });
+
+digitalCommand
+    .command("read <channel>")
+    .option("--continuous", "run continuously")
+    .description("read digital pin")
+    .action(async (channel, options) => {
+        let isContinuous = options.continuous !== undefined;
+        let channelNumber = Number(channel);
+        let hubs = await openUsbControlHubs();
+
+        await digitalRead(hubs[0], channelNumber, isContinuous);
     });
 
 let motorCommand = program.command("motor");

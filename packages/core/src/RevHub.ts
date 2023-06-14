@@ -18,6 +18,13 @@ export interface RevHub {
 }
 
 export interface ParentRevHub extends RevHub {
+    /**
+     * This only contains directly-connected children (all devices in an RS-485
+     * daisy chain count as directly-connected). If any devices in this array
+     * are themselves parents (call {@link RevHub.isParent}), their children
+     * will not be included, and you will need to access their
+     * {@link ParentRevHub.children} property.
+     */
     readonly children: ReadonlyArray<RevHub>;
     readonly serialNumber: string;
 
