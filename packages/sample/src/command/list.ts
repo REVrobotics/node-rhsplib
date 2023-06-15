@@ -1,13 +1,15 @@
-import { hubHierarchyToString } from "../HubStringify.js";
-import { openConnectedControlHub } from "@rev-robotics/control-hub";
+import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
+import { controlHubHierarchyToString } from "../HubStringify.js";
+import {
+    openConnectedControlHub, openUsbControlHubsAndChildren,
+} from "@rev-robotics/control-hub";
 import { ExpansionHub } from "@rev-robotics/rev-hub-core";
-import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub"
-import { openUsbControlHubs } from "../adb-setup.js";
 
 export async function list() {
-    let usbControlHubs = await openUsbControlHubs();
+    let usbControlHubs = await openUsbControlHubsAndChildren();
     for (const hub of usbControlHubs) {
-        console.log(`USB Control Hub: ${hub.serialNumber} ${hub.moduleAddress}\n\n`);
+        let hierarchy = controlHubHierarchyToString(hub);
+        console.log(hierarchy);
         hub.close();
     }
 
@@ -23,7 +25,7 @@ export async function list() {
             console.log(`Got error:`);
             console.log(e);
         });
-        console.log(hubHierarchyToString(hub));
+        //console.log(controlHubHierarchyToString(hub));
     }
     hubs.forEach((hub) => {
         hub.close();
