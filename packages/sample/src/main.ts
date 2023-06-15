@@ -134,10 +134,14 @@ async function getExpansionHubOrThrow(): Promise<ExpansionHub> {
                 moduleAddress!,
             );
         } else {
-            return await controlHub.addHubBySerialNumberAndAddress(
-                "(embedded)",
-                moduleAddress!,
-            );
+            if (moduleAddress !== undefined) {
+                return await controlHub.addHubBySerialNumberAndAddress(
+                    "(embedded)",
+                    moduleAddress!,
+                );
+            } else {
+                return controlHub;
+            }
         }
     } else {
         if (serialNumber) {
