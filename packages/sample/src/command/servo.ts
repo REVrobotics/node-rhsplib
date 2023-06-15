@@ -1,8 +1,7 @@
-import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
-import { openUsbControlHubs } from "../adb-setup.js";
+import { openUsbControlHubsAndChildren } from "@rev-robotics/control-hub";
 
 export async function runServo(channel: number, pulseWidth: number, framePeriod: number) {
-    const hubs = await openUsbControlHubs();
+    const hubs = await openUsbControlHubsAndChildren();
 
     for (let hub of hubs) {
         await hub.setServoConfiguration(channel, framePeriod);

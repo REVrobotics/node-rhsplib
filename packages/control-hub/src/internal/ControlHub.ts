@@ -1,38 +1,47 @@
+import axios from "axios";
+import semver from "semver";
+import WebSocket from "isomorphic-ws";
 import {
     BulkInputData,
+    ControlHub,
     DebugGroup,
     DioDirection,
+    ExpansionHub,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
     LedPattern,
     ModuleInterface,
     ModuleStatus,
-    PidCoefficients,
-    Rgb,
-    VerbosityLevel,
-    Version,
-} from "@rev-robotics/rhsplib";
-import axios from "axios";
-import semver from "semver";
-import WebSocket from "isomorphic-ws";
-import {
-    ControlHub,
-    ExpansionHub,
     ParentRevHub,
+    PidCoefficients,
     RevHub,
     RevHubType,
+    Rgb,
     TimeoutError,
+    VerbosityLevel,
+    Version,
 } from "@rev-robotics/rev-hub-core";
+import { openUsbControlHubs } from "rev-hub-cli/dist/adb-setup.js";
 import { clearTimeout } from "timers";
+import { ControlHubConnected } from "./ControlHubConnected.js";
 
 export class ControlHubInternal implements ControlHub {
     readonly isOpen: boolean = true;
-    moduleAddress: number = 0;
+    readonly moduleAddress: number = 173;
     responseTimeoutMs: number = 0;
     type: RevHubType = RevHubType.ControlHub;
     readonly serialNumber: string;
-    readonly children: ReadonlyArray<RevHub> = [];
+
+    /**
+     * All children connected over USB, as well as the one embedded hub.
+     */
+    readonly children: RevHub[] = [];
+
+    /**
+     * All children connected over USB.
+     */
+    readonly usbChildren: RevHub[] = [];
 
     private id: any | null;
     private keyGenerator = 0;
@@ -45,16 +54,20 @@ export class ControlHubInternal implements ControlHub {
      */
     isConnected = false;
 
+    /**
+     * The board for this control hub. All Expansion Hub commands go through
+     * this delegate.
+     */
+    private embedded!: ControlHubConnected;
+
     private webSocketConnection!: WebSocket;
     private currentActiveCommands = new Map<
         any,
         (response: any | undefined, error: any | undefined) => void
     >();
 
-    constructor(serialNumber: string, moduleAddress: number, id: any | null = null) {
+    constructor(serialNumber: string) {
         this.serialNumber = serialNumber;
-        this.moduleAddress = moduleAddress;
-        this.id = id;
     }
 
     isParent(): this is ParentRevHub {
@@ -97,26 +110,34 @@ export class ControlHubInternal implements ControlHub {
         return new Promise((resolve, reject) => {
             this.webSocketConnection.on("open", async () => {
                 this.isConnected = true;
-                this.id = await this.sendCommand("openHub", {
-                    serialNumber: this.serialNumber,
-                    moduleAddress: this.moduleAddress,
-                });
+                await this.subscribe();
                 let apiVersion: { majorVersion: number; minorVersion: number } =
                     await this.sendCommand("start", {});
 
+                this.id = await this.openHub("(embedded)", this.moduleAddress);
+
+                this.embedded = new ControlHubConnected(
+                    true,
+                    RevHubType.ControlHub,
+                    this.sendCommand,
+                    "(embedded)",
+                    this.moduleAddress,
+                    this.id,
+                );
+
+                this.children.push(this.embedded);
+
                 if (
-                    apiVersion.majorVersion != this.supportedManualControlMajorVersion ||
+                    apiVersion.majorVersion !== this.supportedManualControlMajorVersion ||
                     apiVersion.minorVersion < this.supportedManualControlMinorVersion
                 ) {
-                    throw new Error(
-                        `API Version ${apiVersion.majorVersion}.${apiVersion.minorVersion} is not supported`,
+                    reject(
+                        new Error(
+                            `API Version ${apiVersion.majorVersion}.${apiVersion.minorVersion} is not supported`,
+                        ),
                     );
                 }
 
-                this.moduleAddress = await this.sendCommand("getModuleAddress", {
-                    serialNumber: "(embedded)",
-                    moduleAddress: 173,
-                });
                 resolve();
             });
         });
@@ -142,275 +163,180 @@ export class ControlHubInternal implements ControlHub {
         return path.includes("_box") && path.includes("msm8916_64");
     }
 
-    close(): void {
-        this.sendCommand("stop", {}).then(() => {
-            this.webSocketConnection.close();
+    async subscribe(): Promise<void> {
+        let payload = {
+            namespace: "system",
+            type: "subscribeToNamespace",
+            payload: "MC",
+        };
+        this.webSocketConnection.send(JSON.stringify(payload));
+    }
+
+    async openHub(
+        serialNumber: string,
+        parentAddress: number,
+        address: number = parentAddress,
+    ): Promise<any> {
+        return await this.sendCommand("openHub", {
+            parentSerialNumber: serialNumber,
+            parentHubAddress: parentAddress,
+            hubAddress: address,
         });
+    }
+
+    close() {
+        this.embedded.close();
+        this.webSocketConnection.close();
     }
 
     async getAnalogInput(channel: number): Promise<number> {
-        return await this.sendCommand("getAnalogInput", {
-            id: this.id,
-            channel: channel,
-        });
+        return this.embedded.getAnalogInput(channel);
     }
 
     async get5VBusVoltage(): Promise<number> {
-        return await this.sendCommand("get5VBusVoltage", {
-            id: this.id,
-        });
+        return this.embedded.get5VBusVoltage();
     }
 
     async getBatteryCurrent(): Promise<number> {
-        return await this.sendCommand("getBatteryCurrent", {
-            id: this.id,
-        });
+        return this.embedded.getBatteryCurrent();
     }
 
     async getBatteryVoltage(): Promise<number> {
-        return await this.sendCommand("getBatteryVoltage", {
-            id: this.id,
-        });
+        return this.embedded.getBatteryVoltage();
     }
 
     async getDigitalBusCurrent(): Promise<number> {
-        return await this.sendCommand("getDigitalBusCurrent", {
-            id: this.id,
-        });
+        return this.embedded.getDigitalBusCurrent();
     }
 
     async getI2CCurrent(): Promise<number> {
-        return await this.sendCommand("getI2CCurrent", {
-            id: this.id,
-        });
+        return this.embedded.getI2CCurrent();
     }
 
     async getMotorCurrent(motorChannel: number): Promise<number> {
-        return await this.sendCommand("getMotorCurrent", {
-            id: this.id,
-        });
+        return this.embedded.getMotorCurrent(motorChannel);
     }
 
     async getServoCurrent(): Promise<number> {
-        return await this.sendCommand("getMotorCurrent", {
-            id: this.id,
-        });
+        return this.embedded.getServoCurrent();
     }
 
     async getTemperature(): Promise<number> {
-        return await this.sendCommand("getTemperature", {
-            id: this.id,
-        });
+        return this.embedded.getTemperature();
     }
 
     async getBulkInputData(): Promise<BulkInputData> {
-        return await this.sendCommand("getBulkInputData", {
-            id: this.id,
-        });
+        return this.embedded.getBulkInputData();
     }
 
     async getDigitalAllInputs(): Promise<number> {
-        return await this.sendCommand("getAllDigitalInputs", {
-            id: this.id,
-        });
+        return this.embedded.getDigitalAllInputs();
     }
 
     async getDigitalDirection(dioPin: number): Promise<DioDirection> {
-        let isOutput = await this.sendCommand("getDigitalDirection", {
-            id: this.id,
-            channel: dioPin,
-        });
-
-        return isOutput ? DioDirection.Output : DioDirection.Input;
+        return this.embedded.getDigitalDirection(dioPin);
     }
 
     async getDigitalSingleInput(dioPin: number): Promise<boolean> {
-        return await this.sendCommand("getDigitalInput", {
-            id: this.id,
-            channel: dioPin,
-        });
+        return this.embedded.getDigitalSingleInput(dioPin);
     }
 
     async getFTDIResetControl(): Promise<boolean> {
-        return await this.sendCommand("getFtdiResetControl", {
-            id: this.id,
-        });
+        return this.embedded.getFTDIResetControl();
     }
 
     async getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode> {
-        let speedCode = await this.sendCommand("getI2CChannelConfiguration", {
-            id: this.id,
-            channel: i2cChannel,
-        });
-
-        return speedCode == 1
-            ? I2CSpeedCode.SpeedCode400_Kbps
-            : I2CSpeedCode.SpeedCode100_Kbps;
+        return this.embedded.getI2CChannelConfiguration(i2cChannel);
     }
 
     getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus> {
-        throw new Error("not implemented");
+        return this.embedded.getI2CReadStatus(i2cChannel);
     }
 
     getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus> {
-        throw new Error("not implemented");
+        return this.embedded.getI2CWriteStatus(i2cChannel);
     }
 
     async getInterfacePacketID(
         interfaceName: string,
         functionNumber: number,
     ): Promise<number> {
-        return await this.sendCommand("getInterfacePacketId", {
-            id: this.id,
-            interfaceName: interfaceName,
-            functionNumber: functionNumber,
-        });
+        return this.embedded.getInterfacePacketID(interfaceName, functionNumber);
     }
 
     async getModuleLedColor(): Promise<Rgb> {
-        let result: { r: number; g: number; b: number } = await this.sendCommand(
-            "getLedColor",
-            {
-                serialNumber: this.serialNumber,
-                moduleAddress: this.moduleAddress,
-            },
-        );
-
-        return {
-            red: result.r,
-            green: result.g,
-            blue: result.b,
-        };
+        return this.embedded.getModuleLedColor();
     }
 
     getModuleLedPattern(): Promise<LedPattern> {
-        throw new Error("not implemented");
+        return this.embedded.getModuleLedPattern();
     }
 
     async getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus> {
-        return await this.sendCommand("getModuleStatus", {
-            id: this.id,
-        });
+        return this.embedded.getModuleStatus(clearStatusAfterResponse);
     }
 
     async getMotorAtTarget(motorChannel: number): Promise<boolean> {
-        return await this.sendCommand("getIsMotorAtTarget", {
-            id: this.id,
-        });
+        return this.embedded.getMotorAtTarget(motorChannel);
     }
 
     async getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<number> {
-        return await this.sendCommand("getMotorAlertLevel", {
-            id: this.id,
-            motorChannel: motorChannel,
-        });
+        return this.embedded.getMotorChannelCurrentAlertLevel(motorChannel);
     }
 
     async getMotorChannelEnable(motorChannel: number): Promise<boolean> {
-        return await this.sendCommand("getMotorChannelEnable", {
-            id: this.id,
-            motorChannel: motorChannel,
-        });
+        return this.embedded.getMotorChannelEnable(motorChannel);
     }
 
     async getMotorChannelMode(
         motorChannel: number,
     ): Promise<{ motorMode: number; floatAtZero: boolean }> {
-        return await this.sendCommand("getMotorMode", {
-            id: this.id,
-            motorChannel: motorChannel,
-        });
+        return this.embedded.getMotorChannelMode(motorChannel);
     }
 
     async getMotorConstantPower(motorChannel: number): Promise<number> {
-        return await this.sendCommand("getMotorConstantPower", {
-            id: this.id,
-            motorChannel: motorChannel,
-        });
+        return this.embedded.getMotorConstantPower(motorChannel);
     }
 
     async getMotorEncoderPosition(motorChannel: number): Promise<number> {
-        return await this.sendCommand("getMotorEncoderPosition", {
-            id: this.id,
-            motorChannel: motorChannel,
-        });
+        return this.embedded.getMotorEncoderPosition(motorChannel);
     }
 
     async getMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
     ): Promise<PidCoefficients> {
-        let result: { p: number; i: number; d: number } = await this.sendCommand(
-            "getMotorPidCoefficients",
-            {
-                serialNumber: this.serialNumber,
-                moduleAddress: this.moduleAddress,
-                motorChannel: motorChannel,
-            },
-        );
-
-        return {
-            p: result.p,
-            i: result.i,
-            d: result.d,
-        };
+        return this.embedded.getMotorPIDCoefficients(motorChannel, motorMode);
     }
 
     async getMotorTargetPosition(
         motorChannel: number,
     ): Promise<{ targetPosition: number; targetTolerance: number }> {
-        let result: { targetPositionCounts: number; targetToleranceCounts: number } =
-            await this.sendCommand("getMotorTargetPosition", {
-                serialNumber: this.serialNumber,
-                moduleAddress: this.moduleAddress,
-                motorChannel: motorChannel,
-            });
-
-        return {
-            targetPosition: result.targetPositionCounts,
-            targetTolerance: result.targetToleranceCounts,
-        };
+        return this.embedded.getMotorTargetPosition(motorChannel);
     }
 
     async getMotorTargetVelocity(motorChannel: number): Promise<number> {
-        return await this.sendCommand("getMotorTargetVelocity", {
-            id: this.id,
-            motorChannel: motorChannel,
-        });
+        return this.embedded.getMotorTargetVelocity(motorChannel);
     }
 
     async getPhoneChargeControl(): Promise<boolean> {
-        return await this.sendCommand("getPhoneChargeControl", {
-            id: this.id,
-        });
+        return this.embedded.getPhoneChargeControl();
     }
 
     async getServoConfiguration(servoChannel: number): Promise<number> {
-        return await this.sendCommand("getServoConfiguration", {
-            id: this.id,
-            servoChannel: servoChannel,
-        });
+        return this.embedded.getServoConfiguration(servoChannel);
     }
 
     async getServoEnable(servoChannel: number): Promise<boolean> {
-        return await this.sendCommand("getServoEnable", {
-            id: this.id,
-            servoChannel: servoChannel,
-        });
+        return this.embedded.getServoEnable(servoChannel);
     }
 
     async getServoPulseWidth(servoChannel: number): Promise<number> {
-        return await this.sendCommand("getServoPulseWidth", {
-            id: this.id,
-            servoChannel: servoChannel,
-        });
+        return this.embedded.getServoPulseWidth(servoChannel);
     }
 
     async injectDataLogHint(hintText: string): Promise<void> {
-        await this.sendCommand("injectDebugLogHint", {
-            id: this.id,
-            hint: hintText,
-        });
+        return this.embedded.injectDataLogHint(hintText);
     }
 
     isExpansionHub(): this is ExpansionHub {
@@ -418,22 +344,11 @@ export class ControlHubInternal implements ControlHub {
     }
 
     on(eventName: "error", listener: (error: Error) => void): RevHub {
-        throw new Error("not implemented");
+        return this.embedded.on(eventName, listener);
     }
 
     async queryInterface(interfaceName: string): Promise<ModuleInterface> {
-        let result: { name: string; firstPacketId: number; numberIds: number } =
-            await this.sendCommand("queryInterface", {
-                serialNumber: this.serialNumber,
-                moduleAddress: this.moduleAddress,
-                interfaceName: interfaceName,
-            });
-
-        return {
-            name: result.name,
-            firstPacketID: result.firstPacketId,
-            numberIDValues: result.numberIds,
-        };
+        return this.embedded.queryInterface(interfaceName);
     }
 
     readI2CMultipleBytes(
@@ -441,147 +356,95 @@ export class ControlHubInternal implements ControlHub {
         slaveAddress: number,
         numBytesToRead: number,
     ): Promise<void> {
-        throw new Error("not implemented");
+        return this.embedded.readI2CMultipleBytes(
+            i2cChannel,
+            slaveAddress,
+            numBytesToRead,
+        );
     }
 
     readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void> {
-        throw new Error("not implemented");
+        return this.embedded.readI2CSingleByte(i2cChannel, slaveAddress);
     }
 
     async readVersion(): Promise<Version> {
-        let versionString = await this.readVersionString();
-        //ToDo(landry) parse version string
-        throw new Error("not implemented");
+        return this.embedded.readVersion();
     }
 
     async readVersionString(): Promise<string> {
-        return await this.sendCommand("readVersionString", {
-            id: this.id,
-        });
+        return this.embedded.readVersionString();
     }
 
     async resetMotorEncoder(motorChannel: number): Promise<void> {
-        await this.sendCommand("resetMotorEncoder", {
-            id: this.id,
-            motorChannel: motorChannel,
-        });
+        return this.embedded.resetMotorEncoder(motorChannel);
     }
 
     async sendFailSafe(): Promise<void> {
-        await this.sendCommand("readVersionString", {
-            id: this.id,
-        });
+        return this.embedded.sendFailSafe();
     }
 
-    async sendKeepAlive(): Promise<void> {}
+    async sendKeepAlive(): Promise<void> {
+        return this.embedded.sendKeepAlive();
+    }
 
     async sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
-        return Promise.resolve([]);
+        return this.embedded.sendReadCommand(packetTypeID, payload);
     }
 
     sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
-        return Promise.resolve([]);
+        return this.embedded.sendWriteCommand(packetTypeID, payload);
     }
 
     async setDebugLogLevel(
         debugGroup: DebugGroup,
         verbosityLevel: VerbosityLevel,
     ): Promise<void> {
-        await this.sendCommand("readVersionString", {
-            id: this.id,
-            debugGroup: debugGroup,
-            verbosityLevel: verbosityLevel,
-        });
+        return this.embedded.setDebugLogLevel(debugGroup, verbosityLevel);
     }
 
     async setDigitalAllOutputs(bitPackedField: number): Promise<void> {
-        await this.sendCommand("readVersionString", {
-            id: this.id,
-            bitField: bitPackedField,
-        });
+        return this.embedded.setDigitalAllOutputs(bitPackedField);
     }
 
     async setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void> {
-        await this.sendCommand("readVersionString", {
-            id: this.id,
-            pin: dioPin,
-            isOutput: direction == DioDirection.Output,
-        });
+        return this.embedded.setDigitalDirection(dioPin, direction);
     }
 
     async setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void> {
-        await this.sendCommand("readVersionString", {
-            id: this.id,
-            pin: dioPin,
-            value: value ?? false,
-        });
+        return this.embedded.setDigitalSingleOutput(dioPin, value);
     }
 
     async setFTDIResetControl(ftdiResetControl: boolean): Promise<void> {
-        await this.sendCommand("setFtdiResetControl", {
-            id: this.id,
-        });
+        return this.embedded.setFTDIResetControl(ftdiResetControl);
     }
 
     async setI2CChannelConfiguration(
         i2cChannel: number,
         speedCode: I2CSpeedCode,
     ): Promise<void> {
-        await this.sendCommand("setI2CChannelConfiguration", {
-            id: this.id,
-            i2cChannel: i2cChannel,
-            speedCode: speedCode,
-        });
+        return this.embedded.setI2CChannelConfiguration(i2cChannel, speedCode);
     }
 
     async setModuleLedColor(red: number, green: number, blue: number): Promise<void> {
-        await this.sendCommand("setLedColor", {
-            id: this.id,
-            r: red,
-            g: green,
-            b: blue,
-        });
+        return this.embedded.setModuleLedColor(red, green, blue);
     }
 
     async setModuleLedPattern(ledPattern: LedPattern): Promise<void> {
-        await this.sendCommand("setLedPattern", {
-            id: this.id,
-            rgbtPatternStep0: ledPattern.rgbtPatternStep0,
-            rgbtPatternStep1: ledPattern.rgbtPatternStep1,
-            rgbtPatternStep2: ledPattern.rgbtPatternStep2,
-            rgbtPatternStep3: ledPattern.rgbtPatternStep3,
-            rgbtPatternStep4: ledPattern.rgbtPatternStep4,
-            rgbtPatternStep5: ledPattern.rgbtPatternStep5,
-            rgbtPatternStep6: ledPattern.rgbtPatternStep6,
-            rgbtPatternStep7: ledPattern.rgbtPatternStep7,
-            rgbtPatternStep8: ledPattern.rgbtPatternStep8,
-            rgbtPatternStep9: ledPattern.rgbtPatternStep9,
-            rgbtPatternStep10: ledPattern.rgbtPatternStep10,
-            rgbtPatternStep11: ledPattern.rgbtPatternStep11,
-            rgbtPatternStep12: ledPattern.rgbtPatternStep12,
-            rgbtPatternStep13: ledPattern.rgbtPatternStep13,
-            rgbtPatternStep14: ledPattern.rgbtPatternStep14,
-            rgbtPatternStep15: ledPattern.rgbtPatternStep15,
-        });
+        return this.embedded.setModuleLedPattern(ledPattern);
     }
 
     async setMotorChannelCurrentAlertLevel(
         motorChannel: number,
         currentLimit_mA: number,
     ): Promise<void> {
-        await this.sendCommand("setMotorAlertLevel", {
-            id: this.id,
-            motorChannel: motorChannel,
-            currentLimit_mA: currentLimit_mA,
-        });
+        return this.embedded.setMotorChannelCurrentAlertLevel(
+            motorChannel,
+            currentLimit_mA,
+        );
     }
 
     async setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void> {
-        await this.sendCommand("setMotorEnabled", {
-            id: this.id,
-            motorChannel: motorChannel,
-            enable: enable,
-        });
+        return this.embedded.setMotorChannelEnable(motorChannel, enable);
     }
 
     async setMotorChannelMode(
@@ -589,20 +452,11 @@ export class ControlHubInternal implements ControlHub {
         motorMode: number,
         floatAtZero: boolean,
     ): Promise<void> {
-        await this.sendCommand("setMotorChannelMode", {
-            id: this.id,
-            motorChannel: motorChannel,
-            motorMode: motorMode,
-            floatAtZero: floatAtZero,
-        });
+        return this.embedded.setMotorChannelMode(motorChannel, motorMode, floatAtZero);
     }
 
     async setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
-        await this.sendCommand("setMotorConstantPower", {
-            id: this.id,
-            motorChannel: motorChannel,
-            motorPower: powerLevel,
-        });
+        return this.embedded.setMotorConstantPower(motorChannel, powerLevel);
     }
 
     async setMotorPIDCoefficients(
@@ -610,14 +464,7 @@ export class ControlHubInternal implements ControlHub {
         motorMode: number,
         pid: PidCoefficients,
     ): Promise<void> {
-        await this.sendCommand("setMotorPidCoefficients", {
-            id: this.id,
-            motorChannel: motorChannel,
-            motorMode: motorMode,
-            p: pid.p,
-            i: pid.i,
-            d: pid.d,
-        });
+        return this.embedded.setMotorPIDCoefficients(motorChannel, motorMode, pid);
     }
 
     async setMotorTargetPosition(
@@ -625,64 +472,41 @@ export class ControlHubInternal implements ControlHub {
         targetPosition_counts: number,
         targetTolerance_counts: number,
     ): Promise<void> {
-        await this.sendCommand("setMotorTargetPosition", {
-            id: this.id,
-            motorChannel: motorChannel,
-            targetPositionCounts: targetPosition_counts,
-            targetToleranceCounts: targetTolerance_counts,
-        });
+        return this.embedded.setMotorTargetPosition(
+            motorChannel,
+            targetPosition_counts,
+            targetTolerance_counts,
+        );
     }
 
     async setMotorTargetVelocity(
         motorChannel: number,
         velocity_cps: number,
     ): Promise<void> {
-        await this.sendCommand("setMotorTargetVelocity", {
-            id: this.id,
-            motorChannel: motorChannel,
-            velocityCps: velocity_cps,
-        });
+        return this.embedded.setMotorTargetVelocity(motorChannel, velocity_cps);
     }
 
     async setNewModuleAddress(newModuleAddress: number): Promise<void> {
-        await this.sendCommand("setNewModuleAddress", {
-            id: this.id,
-            address: newModuleAddress,
-        });
+        return this.embedded.setNewModuleAddress(newModuleAddress);
     }
 
     async setPhoneChargeControl(chargeEnable: boolean): Promise<void> {
-        await this.sendCommand("setPhoneChargeControl", {
-            id: this.id,
-            enabled: chargeEnable,
-        });
+        return this.embedded.setPhoneChargeControl(chargeEnable);
     }
 
     async setServoConfiguration(
         servoChannel: number,
         framePeriod: number,
     ): Promise<void> {
-        await this.sendCommand("setServoConfiguration", {
-            id: this.id,
-            servoChannel: servoChannel,
-            framePeriod: framePeriod,
-        });
+        return this.embedded.setServoConfiguration(servoChannel, framePeriod);
     }
 
     async setServoEnable(servoChannel: number, enable: boolean): Promise<void> {
-        await this.sendCommand("setServoEnable", {
-            id: this.id,
-            servoChannel: servoChannel,
-            enabled: enable,
-        });
+        return this.embedded.setServoEnable(servoChannel, enable);
     }
 
     async setServoPulseWidth(servoChannel: number, pulseWidth: number): Promise<void> {
-        await this.sendCommand("setServoPulseWidth", {
-            id: this.id,
-            servoChannel: servoChannel,
-            pulseWidth: pulseWidth,
-        });
+        return this.embedded.setServoPulseWidth(servoChannel, pulseWidth);
     }
 
     writeI2CMultipleBytes(
@@ -690,7 +514,7 @@ export class ControlHubInternal implements ControlHub {
         slaveAddress: number,
         bytes: number[],
     ): Promise<void> {
-        throw new Error("not implemented");
+        return this.embedded.writeI2CMultipleBytes(i2cChannel, slaveAddress, bytes);
     }
 
     writeI2CReadMultipleBytes(
@@ -699,7 +523,12 @@ export class ControlHubInternal implements ControlHub {
         numBytesToRead: number,
         startAddress: number,
     ): Promise<void> {
-        throw new Error("not implemented");
+        return this.embedded.writeI2CReadMultipleBytes(
+            i2cChannel,
+            slaveAddress,
+            numBytesToRead,
+            startAddress,
+        );
     }
 
     writeI2CSingleByte(
@@ -707,7 +536,39 @@ export class ControlHubInternal implements ControlHub {
         slaveAddress: number,
         byte: number,
     ): Promise<void> {
+        return this.embedded.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
+    }
+
+    async addChild(hub: RevHub): Promise<void> {
         throw new Error("not implemented");
+    }
+
+    async addChildByAddress(moduleAddress: number): Promise<RevHub> {
+        return this.addHubBySerialNumberAndAddress(this.serialNumber, moduleAddress);
+    }
+
+    async addHubBySerialNumberAndAddress(
+        serialNumber: string,
+        moduleAddress: number,
+    ): Promise<ParentRevHub> {
+        let id: any = this.openHub(serialNumber, moduleAddress, moduleAddress);
+
+        let newHub = new ControlHubConnected(
+            true,
+            RevHubType.ExpansionHub,
+            this.sendCommand.bind(this),
+            serialNumber,
+            moduleAddress,
+            id,
+        );
+
+        this.usbChildren.push(newHub);
+        this.children.push(newHub);
+
+        if (!newHub.isParentHub) {
+            throw new Error("A child hub with a serial number must also be a parent.");
+        }
+        return newHub;
     }
 
     async sendCommand<P, R>(type: string, params: P, timeout: number = 1000): Promise<R> {
@@ -722,7 +583,7 @@ export class ControlHubInternal implements ControlHub {
             payload: JSON.stringify(messagePayload),
         };
 
-        this.webSocketConnection?.send(JSON.stringify(payload));
+        this.webSocketConnection.send(JSON.stringify(payload));
 
         let callbackPromise: Promise<R> = new Promise((resolve, reject) => {
             this.currentActiveCommands.set(key, (response, error) => {
@@ -740,6 +601,7 @@ export class ControlHubInternal implements ControlHub {
         let timer!: NodeJS.Timer;
         let timeoutPromise: Promise<R> = new Promise((_, reject) => {
             timer = setTimeout(() => {
+                console.log(`Got timeout for ${type}`);
                 reject(new TimeoutError());
             }, timeout);
         });
@@ -748,14 +610,38 @@ export class ControlHubInternal implements ControlHub {
             clearTimeout(timer);
         });
     }
+}
 
-    async addChild(hub: RevHub): Promise<void> {
-        throw new Error("not implemented");
+export async function openUsbControlHubsAndChildren(): Promise<ControlHub[]> {
+    let hubs = await openUsbControlHubs();
+    let result: ControlHub[] = [];
+
+    for (let hub of hubs) {
+        let controlHub = hub as ControlHubInternal;
+        let addresses: Record<
+            string,
+            {
+                serialNumber: string;
+                parentHubAddress: number;
+                childAddresses: number[];
+            }
+        > = await controlHub.sendCommand("scanAndDiscover", {}, 20000);
+
+        for (let serialNumber in addresses) {
+            if (serialNumber === "(embedded)") continue;
+
+            let parentHubInfo = addresses[serialNumber];
+            let parentHub = await controlHub.addHubBySerialNumberAndAddress(
+                serialNumber,
+                parentHubInfo.parentHubAddress,
+            );
+
+            for (let childAddress of parentHubInfo.childAddresses) {
+                await parentHub.addChildByAddress(childAddress);
+            }
+        }
+        result.push(controlHub);
     }
 
-    async addChildByAddress(moduleAddress: number): Promise<RevHub> {
-        let id: any = await this.sendCommand("addChild", moduleAddress);
-
-        return new ControlHubInternal("(embedded)", moduleAddress, id);
-    }
+    return result;
 }

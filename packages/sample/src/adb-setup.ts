@@ -15,7 +15,7 @@ export async function openUsbControlHubs(): Promise<ControlHub[]> {
             let port = await configureHubTcp(deviceClient);
             let serialNumber = device.id;
 
-            let hub = await openControlHub("(embedded)", 173, port);
+            let hub = await openControlHub(serialNumber, 173, port);
             controlHubs.push(hub);
         }
     }
