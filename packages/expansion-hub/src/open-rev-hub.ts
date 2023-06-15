@@ -1,9 +1,14 @@
 import {
     ExpansionHub,
+    GeneralSerialError,
     InvalidSerialArguments,
+    NoExpansionHubWithAddressError,
     ParentExpansionHub,
+    RevHub,
     SerialConfigurationError,
     SerialIoError,
+    SerialParity,
+    TimeoutError,
     UnableToOpenSerialError,
 } from "@rev-robotics/rev-hub-core";
 import {
@@ -16,12 +21,7 @@ import {
 import { SerialPort as SerialLister } from "serialport";
 import { ExpansionHubInternal } from "./internal/ExpansionHub.js";
 import { startKeepAlive } from "./start-keep-alive.js";
-import {
-    GeneralSerialError,
-    NoExpansionHubWithAddressError,
-    SerialParity,
-    TimeoutError,
-} from "@rev-robotics/rev-hub-core";
+import { performance } from "perf_hooks";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
@@ -29,6 +29,26 @@ import {
  * the map upon closing.
  */
 const openSerialMap = new Map<string, typeof NativeSerial>();
+
+/**
+ *
+ * @param parentSerialNumber the parent's serial number
+ * @param parentAddress the parent to open
+ * @param moduleAddress the exact hub to open
+ */
+export async function openHubWithAddress(
+    parentSerialNumber: string,
+    parentAddress: number,
+    moduleAddress: number = parentAddress,
+): Promise<RevHub> {
+    let parentHub = await openParentExpansionHub(parentSerialNumber, parentAddress);
+
+    if (parentAddress == moduleAddress) {
+        return parentHub;
+    }
+
+    return await parentHub.addChildByAddress(moduleAddress);
+}
 
 /**
  * Opens a parent Expansion Hub. Does not open any child hubs.
@@ -62,6 +82,18 @@ export async function openParentExpansionHub(
 
     try {
         await parentHub.open(moduleAddress);
+        // If discovery has not occurred on the hub, then we will
+        // need to send keep-alive signals until the hub responds.
+        // If we don't do this, the hub will be stuck waiting to
+        // find out if it's a parent or child and won't respond.
+        let startTime = performance.now();
+        while (true) {
+            try {
+                if (performance.now() - startTime >= 500) break;
+                await parentHub.sendKeepAlive();
+                break;
+            } catch (e) {}
+        }
         await parentHub.queryInterface("DEKA");
     } catch (e: any) {
         if (e instanceof TimeoutError)
@@ -97,16 +129,10 @@ export async function openExpansionHubAndAllChildren(
 
     let discoveredModules = await NativeRevHub.discoverRevHubs(serialPort);
     let parentAddress = discoveredModules.parentAddress;
-    let parentHub = (await openParentExpansionHub(
-        serialNumber,
-        parentAddress,
-    )) as ParentExpansionHub & ExpansionHubInternal;
+    let parentHub = await openParentExpansionHub(serialNumber, parentAddress);
 
     for (let address of discoveredModules.childAddresses) {
-        let hub = await parentHub.addChildByAddress(address);
-        if (hub.isExpansionHub()) {
-            startKeepAlive(hub as ExpansionHubInternal, 1000);
-        }
+        await parentHub.addChildByAddress(address);
     }
 
     return parentHub;

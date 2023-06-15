@@ -13,6 +13,7 @@ import {
     LedPattern,
     ModuleInterface,
     ModuleStatus,
+    ParentExpansionHub,
     ParentRevHub,
     PidCoefficients,
     RevHub,
@@ -550,7 +551,7 @@ export class ControlHubInternal implements ControlHub {
     async addHubBySerialNumberAndAddress(
         serialNumber: string,
         moduleAddress: number,
-    ): Promise<ParentRevHub> {
+    ): Promise<ParentExpansionHub> {
         let id = await this.openHub(serialNumber, moduleAddress, moduleAddress);
 
         let newHub = new ControlHubConnected(
