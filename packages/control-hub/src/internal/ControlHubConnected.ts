@@ -58,7 +58,7 @@ export class ControlHubConnected implements ParentExpansionHub {
     async getAnalogInput(channel: number): Promise<number> {
         return await this.sendCommand("getAnalogInput", {
             id: this.id,
-            channel: channel,
+            analogChannel: channel,
         });
     }
 
@@ -95,6 +95,7 @@ export class ControlHubConnected implements ParentExpansionHub {
     async getMotorCurrent(motorChannel: number): Promise<number> {
         return await this.sendCommand("getMotorCurrent", {
             id: this.id,
+            motorChannel: motorChannel,
         });
     }
 
@@ -125,7 +126,7 @@ export class ControlHubConnected implements ParentExpansionHub {
     async getDigitalDirection(dioPin: number): Promise<DioDirection> {
         let isOutput = await this.sendCommand("getDigitalDirection", {
             id: this.id,
-            channel: dioPin,
+            digitalChannel: dioPin,
         });
 
         return isOutput ? DioDirection.Output : DioDirection.Input;
@@ -134,7 +135,7 @@ export class ControlHubConnected implements ParentExpansionHub {
     async getDigitalSingleInput(dioPin: number): Promise<boolean> {
         return await this.sendCommand("getDigitalInput", {
             id: this.id,
-            channel: dioPin,
+            digitalChannel: dioPin,
         });
     }
 
@@ -419,7 +420,7 @@ export class ControlHubConnected implements ParentExpansionHub {
     async setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void> {
         await this.sendCommand("readVersionString", {
             id: this.id,
-            pin: dioPin,
+            digitalChannel: dioPin,
             value: value ?? false,
         });
     }
