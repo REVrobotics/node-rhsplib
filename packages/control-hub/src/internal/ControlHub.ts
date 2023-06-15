@@ -132,7 +132,7 @@ export class ControlHubInternal implements ControlHub {
                 this.embedded = new ControlHubConnected(
                     true,
                     RevHubType.ControlHub,
-                    this.sendCommand,
+                    this.sendCommand.bind(this),
                     "(embedded)",
                     this.moduleAddress,
                     this.id,
@@ -564,7 +564,7 @@ export class ControlHubInternal implements ControlHub {
         serialNumber: string,
         moduleAddress: number,
     ): Promise<ParentRevHub> {
-        let id: any = this.openHub(serialNumber, moduleAddress, moduleAddress);
+        let id = await this.openHub(serialNumber, moduleAddress, moduleAddress);
 
         let newHub = new ControlHubConnected(
             true,
