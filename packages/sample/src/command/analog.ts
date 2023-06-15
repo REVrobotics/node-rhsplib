@@ -1,16 +1,18 @@
-import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
 import { openUsbControlHubs } from "../adb-setup.js";
+import { ExpansionHub, ParentExpansionHub } from "@rev-robotics/rev-hub-core";
+import { openUsbControlHubsAndChildren } from "@rev-robotics/control-hub";
 
 export async function analog(channel: number, continuous: boolean) {
-    const hubs = await openUsbControlHubs();
+    const hubs = await openUsbControlHubsAndChildren();
+    let hub: ExpansionHub = hubs[0].children[1] as ExpansionHub;
 
     if (continuous) {
         while (true) {
-            let value = await hubs[0].getAnalogInput(channel);
+            let value = await hub.getAnalogInput(channel);
             console.log(`ADC: ${value} mV`);
         }
     } else {
-        let value = await hubs[0].getAnalogInput(channel);
+        let value = await hub.getAnalogInput(channel);
         console.log(`ADC: ${value} mV`);
         hubs.forEach((hub) => {
             hub.close();

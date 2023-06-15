@@ -1,15 +1,20 @@
 import { openUsbControlHubsAndChildren } from "@rev-robotics/control-hub";
+import { ExpansionHub } from "@rev-robotics/rev-hub-core";
 
 export async function runServo(channel: number, pulseWidth: number, framePeriod: number) {
+    console.log("Opening hubs");
     const hubs = await openUsbControlHubsAndChildren();
+    console.log("Hubs opened");
+    let hub: ExpansionHub = hubs[0].children[1] as ExpansionHub;
+    console.log(`Got hub: ${hub}`);
 
-    for (let hub of hubs) {
-        await hub.setServoConfiguration(channel, framePeriod);
-        await hub.setServoPulseWidth(channel, pulseWidth);
-        await hub.setServoEnable(channel, true);
+    await hub.setServoConfiguration(channel, framePeriod);
+    await hub.setServoPulseWidth(channel, pulseWidth);
+    await hub.setServoEnable(channel, true);
 
-        setTimeout(() => {
-            hub.close();
-        }, 10000);
-    }
+    console.log("Finished sending commands");
+
+    setTimeout(() => {
+        hub.close();
+    }, 10000);
 }

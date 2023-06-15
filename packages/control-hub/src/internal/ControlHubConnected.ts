@@ -22,7 +22,7 @@ import {
 export class ControlHubConnected implements ParentExpansionHub {
     isParentHub: boolean;
     type: RevHubType;
-    id: any;
+    id: Exclude<any, Promise<any>>;
     serialNumber: string;
     moduleAddress: number;
     sendCommand: <P, R>(name: string, params: P, timeout?: number) => Promise<R>;
@@ -626,7 +626,7 @@ export class ControlHubConnected implements ParentExpansionHub {
         let newHub = new ControlHubConnected(
             false,
             RevHubType.ExpansionHub,
-            this.sendCommand,
+            this.sendCommand.bind(this),
             this.serialNumber,
             moduleAddress,
             id,
