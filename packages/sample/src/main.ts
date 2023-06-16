@@ -261,7 +261,7 @@ program.parse(process.argv);
 async function getExpansionHubOrThrow(): Promise<ExpansionHub> {
     let options = program.opts();
     let serialNumber = options.serial;
-    let isControlHub = options.control !== undefined;
+    let isControlHub = true;
     let moduleAddress = options.address ? Number(options.address) : undefined;
     let parentAddress = options.parent ? Number(options.parent) : undefined;
 
