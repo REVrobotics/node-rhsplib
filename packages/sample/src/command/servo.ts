@@ -12,5 +12,6 @@ export async function runServo(
 
     process.on("SIGINT", () => {
         hub.close();
+        process.exit();
     });
 }
