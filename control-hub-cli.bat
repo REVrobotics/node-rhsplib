@@ -1,0 +1,2 @@
+
+node.exe output.js %*
