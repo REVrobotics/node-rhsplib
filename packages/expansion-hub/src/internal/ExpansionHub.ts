@@ -1,5 +1,4 @@
 import {
-    DigitalChannelDirection,
     DigitalState,
     ExpansionHub,
     ParentRevHub,
@@ -33,7 +32,7 @@ import {
     CommandNotSupportedError,
     I2cOperationInProgressError,
 } from "@rev-robotics/rev-hub-core";
-import { closeSerialPort } from "../open-rev-hub.js";
+import { closeSerialPort } from "../serial.js";
 import { EventEmitter } from "events";
 import { RevHubType, MotorMode } from "@rev-robotics/rev-hub-core";
 import { RhspLibError } from "../errors/RhspLibError.js";

@@ -15,11 +15,7 @@ Modified to use Object.setPrototypeOf instead of __proto__ and to be a global
 function
  */
 import { RevHubError } from "../RevHubError.js";
-
-export function setPrototypeOf(obj: any, proto: any) {
-    Object.setPrototypeOf(obj, proto);
-    return obj;
-}
+import { setPrototypeOf } from "./set-prototype.js";
 
 export class NackError extends RevHubError {
     nackCode: number;

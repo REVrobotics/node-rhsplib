@@ -24,7 +24,6 @@ import {
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rev-hub-core";
-import { openUsbControlHubs } from "rev-hub-cli/dist/adb-setup.js";
 import { clearTimeout } from "timers";
 import { ControlHubConnected } from "./ControlHubConnected.js";
 
@@ -622,38 +621,4 @@ export class ControlHubInternal implements ControlHub {
             clearTimeout(timer);
         });
     }
-}
-
-export async function openUsbControlHubsAndChildren(): Promise<ControlHub[]> {
-    let hubs = await openUsbControlHubs();
-    let result: ControlHub[] = [];
-
-    for (let hub of hubs) {
-        let controlHub = hub as ControlHubInternal;
-        let addresses: Record<
-            string,
-            {
-                serialNumber: string;
-                parentHubAddress: number;
-                childAddresses: number[];
-            }
-        > = await controlHub.sendCommand("scanAndDiscover", {}, 20000);
-
-        for (let serialNumber in addresses) {
-            if (serialNumber === "(embedded)") continue;
-
-            let parentHubInfo = addresses[serialNumber];
-            let parentHub = await controlHub.addHubBySerialNumberAndAddress(
-                serialNumber,
-                parentHubInfo.parentHubAddress,
-            );
-
-            for (let childAddress of parentHubInfo.childAddresses) {
-                await parentHub.addChildByAddress(childAddress);
-            }
-        }
-        result.push(controlHub);
-    }
-
-    return result;
 }

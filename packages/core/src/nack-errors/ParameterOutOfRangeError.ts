@@ -1,4 +1,5 @@
-import { NackError, setPrototypeOf } from "./NackError.js";
+import { setPrototypeOf } from "./set-prototype.js";
+import { NackError } from "./NackError.js";
 
 export class ParameterOutOfRangeError extends NackError {
     /**

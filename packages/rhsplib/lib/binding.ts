@@ -24,7 +24,9 @@ import { SerialParity } from "@rev-robotics/rev-hub-core";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const require = createRequire(import.meta.url);
-const addon = require("node-gyp-build")(path.join(__dirname, ".."));
+console.log(`Directory: ${__dirname}`);
+const nodeBuild = require("node-gyp-build");
+const addon = nodeBuild(path.join(__dirname, ".."));
 
 export * from "./error-codes.js";
 export * from "./serial-errors.js";
