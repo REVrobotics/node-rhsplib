@@ -32,12 +32,12 @@ const program = new Command();
 program.version("1.0.0");
 
 program
-    .option("--control", "specify that you are connecting via control hub")
-    .option("-s --serial <serial>", "serial number")
-    .option("-p --parent <address>", "parent address")
+    // .option("--control", "specify that you are connecting via control hub")
+    // .option("-s --serial <serial>", "serial number")
+    // .option("-p --parent <address>", "parent address")
     .option(
         "-a --address <address>",
-        "module address. If this is specified, you must also specify a parent address",
+        "address of Expansion Hub connected via RS-485",
     );
 
 program
