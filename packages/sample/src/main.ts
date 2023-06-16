@@ -124,11 +124,12 @@ motorCommand
     .description("Get the current encoder position of a motor")
     .action(async (channel, options) => {
         let channelNumber = Number(channel);
+        let hub = await getExpansionHubOrThrow();
         if (options.reset) {
-            await resetEncoder(channelNumber);
+            await resetEncoder(hub, channelNumber);
         } else {
             let isContinuous = options.continuous !== undefined;
-            await runEncoder(channelNumber, isContinuous);
+            await runEncoder(hub, channelNumber, isContinuous);
         }
     });
 
@@ -141,7 +142,8 @@ motorCommand
         console.log(`${channel} ${power}`);
         let channelNumber = Number(channel);
         let powerNumber = Number(power);
-        await runMotorConstantPower(channelNumber, powerNumber);
+        let hub = await getExpansionHubOrThrow();
+        await runMotorConstantPower(hub, channelNumber, powerNumber);
     });
 
 motorCommand
@@ -151,7 +153,8 @@ motorCommand
         console.log(`${channel} ${speed}`);
         let channelNumber = Number(channel);
         let speedNumber = Number(speed);
-        await runMotorConstantVelocity(channelNumber, speedNumber);
+        let hub = await getExpansionHubOrThrow();
+        await runMotorConstantVelocity(hub, channelNumber, speedNumber);
     });
 
 motorCommand
@@ -163,7 +166,9 @@ motorCommand
         let positionNumber = Number(position);
         let toleranceNumber = Number(tolerance);
         let velocityNumber = Number(velocity);
+        let hub = await getExpansionHubOrThrow();
         await runMotorToPosition(
+            hub,
             channelNumber,
             velocityNumber,
             positionNumber,
