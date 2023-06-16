@@ -129,10 +129,21 @@ async function getExpansionHubOrThrow(): Promise<ExpansionHub> {
         let controlHub = controlHubs[0];
 
         if (serialNumber) {
-            return await controlHub.addHubBySerialNumberAndAddress(
+            if (moduleAddress === undefined) {
+                moduleAddress = parentAddress;
+            }
+            let parent = await controlHub.addHubBySerialNumberAndAddress(
                 serialNumber,
-                moduleAddress!,
+                parentAddress!,
             );
+            if (parentAddress === moduleAddress) {
+                return parent;
+            }
+            if (parent.isParent()) {
+                return (await parent.addChildByAddress(moduleAddress!)) as ExpansionHub;
+            } else {
+                throw new Error();
+            }
         } else {
             if (moduleAddress !== undefined) {
                 return await controlHub.addHubBySerialNumberAndAddress(
