@@ -59,7 +59,7 @@ export class ControlHubConnected implements ParentExpansionHub {
     async getAnalogInput(channel: number): Promise<number> {
         return await this.sendCommand("getAnalogInput", {
             hId: this.id,
-            analogChannel: channel,
+            c: channel,
         });
     }
 
@@ -88,7 +88,7 @@ export class ControlHubConnected implements ParentExpansionHub {
     }
 
     async getI2CCurrent(): Promise<number> {
-        return await this.sendCommand("getI2CCurrent", {
+        return await this.sendCommand("getI2cCurrent", {
             hId: this.id,
         });
     }
@@ -127,7 +127,7 @@ export class ControlHubConnected implements ParentExpansionHub {
     async getDigitalDirection(dioPin: number): Promise<DioDirection> {
         let isOutput = await this.sendCommand("getDigitalDirection", {
             hId: this.id,
-            digitalChannel: dioPin,
+            c: dioPin,
         });
 
         return isOutput ? DioDirection.Output : DioDirection.Input;
@@ -136,7 +136,7 @@ export class ControlHubConnected implements ParentExpansionHub {
     async getDigitalInput(dioPin: number): Promise<DigitalState> {
         let result: boolean = await this.sendCommand("getDigitalInput", {
             hId: this.id,
-            digitalChannel: dioPin,
+            c: dioPin,
         });
 
         return result ? DigitalState.High : DigitalState.Low;
@@ -149,9 +149,9 @@ export class ControlHubConnected implements ParentExpansionHub {
     }
 
     async getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode> {
-        let speedCode = await this.sendCommand("getI2CChannelConfiguration", {
+        let speedCode = await this.sendCommand("getI2cChannelConfiguration", {
             hId: this.id,
-            channel: i2cChannel,
+            c: i2cChannel,
         });
 
         return speedCode == 1
@@ -182,8 +182,7 @@ export class ControlHubConnected implements ParentExpansionHub {
         let result: { r: number; g: number; b: number } = await this.sendCommand(
             "getLedColor",
             {
-                serialNumber: this.serialNumber,
-                moduleAddress: this.moduleAddress,
+                hId: this.id,
             },
         );
 
@@ -254,8 +253,7 @@ export class ControlHubConnected implements ParentExpansionHub {
         let result: { p: number; i: number; d: number } = await this.sendCommand(
             "getMotorPidCoefficients",
             {
-                serialNumber: this.serialNumber,
-                moduleAddress: this.moduleAddress,
+                hId: this.id,
                 c: motorChannel,
                 m: motorMode,
             },
@@ -271,16 +269,15 @@ export class ControlHubConnected implements ParentExpansionHub {
     async getMotorTargetPosition(
         motorChannel: number,
     ): Promise<{ targetPosition: number; targetTolerance: number }> {
-        let result: { targetPositionCounts: number; targetToleranceCounts: number } =
+        let result: { tpc: number; ttc: number } =
             await this.sendCommand("getMotorTargetPosition", {
-                serialNumber: this.serialNumber,
-                moduleAddress: this.moduleAddress,
+                hId: this.id,
                 c: motorChannel,
             });
 
         return {
-            targetPosition: result.targetPositionCounts,
-            targetTolerance: result.targetToleranceCounts,
+            targetPosition: result.tpc,
+            targetTolerance: result.ttc,
         };
     }
 
@@ -336,8 +333,7 @@ export class ControlHubConnected implements ParentExpansionHub {
     async queryInterface(interfaceName: string): Promise<ModuleInterface> {
         let result: { name: string; firstPacketId: number; numberIds: number } =
             await this.sendCommand("queryInterface", {
-                serialNumber: this.serialNumber,
-                moduleAddress: this.moduleAddress,
+                hId: this.id,
                 interfaceName: interfaceName,
             });
 
@@ -376,7 +372,7 @@ export class ControlHubConnected implements ParentExpansionHub {
     }
 
     async readVersionString(): Promise<string> {
-        return await this.sendCommand("readVersionString", {
+        return await this.sendCommand("getHubFwVersionString", {
             hId: this.id,
         });
     }
@@ -389,7 +385,7 @@ export class ControlHubConnected implements ParentExpansionHub {
     }
 
     async sendFailSafe(): Promise<void> {
-        await this.sendCommand("readVersionString", {
+        await this.sendCommand("sendFailSafe", {
             hId: this.id,
         });
     }
@@ -408,7 +404,7 @@ export class ControlHubConnected implements ParentExpansionHub {
         debugGroup: DebugGroup,
         verbosityLevel: VerbosityLevel,
     ): Promise<void> {
-        await this.sendCommand("readVersionString", {
+        await this.sendCommand("setDebugLogLevel", {
             hId: this.id,
             debugGroup: debugGroup,
             verbosityLevel: verbosityLevel,
@@ -416,25 +412,25 @@ export class ControlHubConnected implements ParentExpansionHub {
     }
 
     async setAllDigitalOutputs(bitPackedField: number): Promise<void> {
-        await this.sendCommand("readVersionString", {
+        await this.sendCommand("setAllDigitalOutputs", {
             hId: this.id,
-            bitField: bitPackedField,
+            bf: bitPackedField,
         });
     }
 
     async setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void> {
-        await this.sendCommand("readVersionString", {
+        await this.sendCommand("setDigitalDirection", {
             hId: this.id,
-            pin: dioPin,
-            isOutput: direction == DioDirection.Output,
+            c: dioPin,
+            o: direction == DioDirection.Output,
         });
     }
 
     async setDigitalOutput(dioPin: number, value: DigitalState): Promise<void> {
-        await this.sendCommand("readVersionString", {
+        await this.sendCommand("setDigitalOutput", {
             hId: this.id,
-            digitalChannel: dioPin,
-            value: value.isHigh(),
+            c: dioPin,
+            v: value.isHigh(),
         });
     }
 
@@ -448,10 +444,10 @@ export class ControlHubConnected implements ParentExpansionHub {
         i2cChannel: number,
         speedCode: I2CSpeedCode,
     ): Promise<void> {
-        await this.sendCommand("setI2CChannelConfiguration", {
+        await this.sendCommand("setI2cChannelConfiguration", {
             hId: this.id,
-            i2cChannel: i2cChannel,
-            speedCode: speedCode,
+            c: i2cChannel,
+            sc: speedCode,
         });
     }
 
@@ -467,22 +463,22 @@ export class ControlHubConnected implements ParentExpansionHub {
     async setModuleLedPattern(ledPattern: LedPattern): Promise<void> {
         await this.sendCommand("setLedPattern", {
             hId: this.id,
-            rgbtPatternStep0: ledPattern.rgbtPatternStep0,
-            rgbtPatternStep1: ledPattern.rgbtPatternStep1,
-            rgbtPatternStep2: ledPattern.rgbtPatternStep2,
-            rgbtPatternStep3: ledPattern.rgbtPatternStep3,
-            rgbtPatternStep4: ledPattern.rgbtPatternStep4,
-            rgbtPatternStep5: ledPattern.rgbtPatternStep5,
-            rgbtPatternStep6: ledPattern.rgbtPatternStep6,
-            rgbtPatternStep7: ledPattern.rgbtPatternStep7,
-            rgbtPatternStep8: ledPattern.rgbtPatternStep8,
-            rgbtPatternStep9: ledPattern.rgbtPatternStep9,
-            rgbtPatternStep10: ledPattern.rgbtPatternStep10,
-            rgbtPatternStep11: ledPattern.rgbtPatternStep11,
-            rgbtPatternStep12: ledPattern.rgbtPatternStep12,
-            rgbtPatternStep13: ledPattern.rgbtPatternStep13,
-            rgbtPatternStep14: ledPattern.rgbtPatternStep14,
-            rgbtPatternStep15: ledPattern.rgbtPatternStep15,
+            s0: ledPattern.rgbtPatternStep0,
+            s1: ledPattern.rgbtPatternStep1,
+            s2: ledPattern.rgbtPatternStep2,
+            s3: ledPattern.rgbtPatternStep3,
+            s4: ledPattern.rgbtPatternStep4,
+            s5: ledPattern.rgbtPatternStep5,
+            s6: ledPattern.rgbtPatternStep6,
+            s7: ledPattern.rgbtPatternStep7,
+            s8: ledPattern.rgbtPatternStep8,
+            s9: ledPattern.rgbtPatternStep9,
+            s10: ledPattern.rgbtPatternStep10,
+            s11: ledPattern.rgbtPatternStep11,
+            s12: ledPattern.rgbtPatternStep12,
+            s13: ledPattern.rgbtPatternStep13,
+            s14: ledPattern.rgbtPatternStep14,
+            s15: ledPattern.rgbtPatternStep15,
         });
     }
 
@@ -549,8 +545,8 @@ export class ControlHubConnected implements ParentExpansionHub {
         await this.sendCommand("setMotorTargetPosition", {
             hId: this.id,
             c: motorChannel,
-            targetPositionCounts: targetPosition_counts,
-            targetToleranceCounts: targetTolerance_counts,
+            tpc: targetPosition_counts,
+            ttc: targetTolerance_counts,
         });
     }
 
@@ -561,14 +557,14 @@ export class ControlHubConnected implements ParentExpansionHub {
         await this.sendCommand("setMotorTargetVelocity", {
             hId: this.id,
             c: motorChannel,
-            velocityCps: velocity_cps,
+            tv: velocity_cps,
         });
     }
 
     async setNewModuleAddress(newModuleAddress: number): Promise<void> {
-        await this.sendCommand("setNewModuleAddress", {
+        await this.sendCommand("setHubAddress", {
             hId: this.id,
-            address: newModuleAddress,
+            newAddress: newModuleAddress,
         });
     }
 
@@ -586,7 +582,7 @@ export class ControlHubConnected implements ParentExpansionHub {
         await this.sendCommand("setServoConfiguration", {
             hId: this.id,
             c: servoChannel,
-            framePeriod: framePeriod,
+            fp: framePeriod,
         });
     }
 
@@ -594,7 +590,7 @@ export class ControlHubConnected implements ParentExpansionHub {
         await this.sendCommand("setServoEnable", {
             hId: this.id,
             c: servoChannel,
-            enabled: enable,
+            enable: enable,
         });
     }
 
@@ -602,7 +598,7 @@ export class ControlHubConnected implements ParentExpansionHub {
         await this.sendCommand("setServoPulseWidth", {
             hId: this.id,
             c: servoChannel,
-            pulseWidth: pulseWidth,
+            pw: pulseWidth,
         });
     }
 
