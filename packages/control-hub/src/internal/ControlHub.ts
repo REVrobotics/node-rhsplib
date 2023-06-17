@@ -126,8 +126,6 @@ export class ControlHubInternal implements ControlHub {
                     this.id,
                 );
 
-                this.children.push(this.embedded);
-
                 if (
                     apiVersion.majorVersion !== this.supportedManualControlMajorVersion ||
                     apiVersion.minorVersion < this.supportedManualControlMinorVersion
