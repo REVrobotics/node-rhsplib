@@ -29,6 +29,8 @@ import { getBulkInputData } from "./command/bulkinput.js";
 
 const program = new Command();
 
+program.name("ch");
+
 program.version("1.0.0");
 
 program
