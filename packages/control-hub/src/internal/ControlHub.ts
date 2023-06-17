@@ -555,9 +555,29 @@ export class ControlHubInternal implements ControlHub {
     }
 
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {
-        return this.addHubBySerialNumberAndAddress(this.serialNumber, moduleAddress);
+        // Note from Noah: This should not just call addHubBySerialNumberAndAddress(), because that
+        //                 will add the hub to usbChildren.
+        // ToDo(landry): Extract the embedded constant somewhere
+        let id = await this.openHub("(embedded)", this.moduleAddress, moduleAddress);
+
+        let newHub = new ControlHubConnected(
+            false,
+            RevHubType.ExpansionHub,
+            this.sendCommand.bind(this),
+            "(embedded)",
+            moduleAddress,
+            id,
+        );
+
+        this.children.push(newHub);
+
+        if (newHub.isParentHub) {
+            throw new Error("A child hub without a serial number must not be a parent.");
+        }
+        return newHub;
     }
 
+    // ToDo(landry): Rename this addUsbConnectedHub (I'm not sure we need all these byX suffixes)
     async addHubBySerialNumberAndAddress(
         serialNumber: string,
         moduleAddress: number,
