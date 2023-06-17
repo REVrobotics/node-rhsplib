@@ -186,10 +186,8 @@ export class ControlHubInternal implements ControlHub {
     // ToDo(landry): Always call close() on the parent hub when the sample exits
     close() {
         this.embedded.close();
-        console.log("Sending stop command");
-        // noinspection JSIgnoredPromiseFromCall
-        this.sendCommand("stop", {});
-        this.webSocketConnection.close();
+        this.sendCommand("stop", {})
+            .then(() => this.webSocketConnection.close());
     }
 
     async getAnalogInput(channel: number): Promise<number> {
