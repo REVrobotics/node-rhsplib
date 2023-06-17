@@ -1,4 +1,4 @@
-import { ControlHub } from "@rev-robotics/rev-hub-core";
+import {ControlHub, ParentRevHub} from "@rev-robotics/rev-hub-core";
 import { ControlHubInternal } from "@rev-robotics/control-hub/dist/internal/ControlHub.js";
 import { openUsbControlHubs } from "./adb-setup.js";
 
@@ -18,15 +18,20 @@ export async function openUsbControlHubsAndChildren(): Promise<ControlHub[]> {
         > = await controlHub.sendCommand("scanAndDiscover", {}, 20000);
 
         for (let serialNumber in addresses) {
-            if (serialNumber === "(embedded)") continue;
+            let parentHub: ParentRevHub;
+            let childAddresses = addresses[serialNumber].childAddresses;
 
-            let parentHubInfo = addresses[serialNumber];
-            let parentHub = await controlHub.addHubBySerialNumberAndAddress(
-                serialNumber,
-                parentHubInfo.parentHubAddress,
-            );
+            if (serialNumber === "(embedded)") {
+                parentHub = controlHub;
+            } else {
+                let parentHubInfo = addresses[serialNumber];
+                parentHub = await controlHub.addHubBySerialNumberAndAddress(
+                    serialNumber,
+                    parentHubInfo.parentHubAddress,
+                );
+            }
 
-            for (let childAddress of parentHubInfo.childAddresses) {
+            for (let childAddress of childAddresses) {
                 await parentHub.addChildByAddress(childAddress);
             }
         }
