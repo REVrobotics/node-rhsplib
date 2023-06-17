@@ -213,7 +213,7 @@ program
     });
 
 program
-    .command("voltage")
+    .command("5vRailVoltage")
     .option("--continuous", "Run continuously")
     .description(
         "Read the current 5V rail voltage. Specify --continuous to run continuously",
