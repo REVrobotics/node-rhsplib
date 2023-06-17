@@ -57,6 +57,7 @@ export async function runEncoder(
         if (!continuous) break;
     }
     hub.close();
+    // ToDo(landry): Somehow, when continuous is false, code placed here gets executed, but the program doesn't exit without Ctrl-C
 }
 
 export async function resetEncoder(hub: ExpansionHub, channel: number) {
