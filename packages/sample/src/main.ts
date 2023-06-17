@@ -77,7 +77,7 @@ program
         await led(hubs[0], rValue, gValue, bValue);
     });
 
-program.command("bulk input").action(async () => {
+program.command("bulkInput").action(async () => {
     let hubs = await openUsbControlHubs();
     await getBulkInputData(hubs[0]);
 });
