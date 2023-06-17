@@ -54,7 +54,12 @@ export class ControlHubConnected implements ParentExpansionHub {
         return this.isParentHub;
     }
 
-    close(): void {}
+    close(): void {
+        // noinspection JSIgnoredPromiseFromCall
+        this.sendCommand("closeHub", {
+            hId: this.id,
+        });
+    }
 
     async getAnalogInput(channel: number): Promise<number> {
         return await this.sendCommand("getAnalogInput", {
