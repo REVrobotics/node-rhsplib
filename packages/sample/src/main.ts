@@ -189,7 +189,7 @@ program
     .command("analog <port>")
     .option("--continuous", "Run continuously")
     .description(
-        "Read the analog value of the given port. Specify" +
+        "Read the analog value of the given port. Specify " +
             "--continuous to run continuously.",
     )
     .action(async (port, options) => {
