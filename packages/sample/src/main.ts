@@ -9,7 +9,7 @@ import {
     runMotorToPosition,
 } from "./command/motor.js";
 import { list } from "./command/list.js";
-import { led, ledPattern } from "./command/ledPattern.js";
+import { led, ledPattern } from "./command/led.js";
 import { runServo } from "./command/servo.js";
 import { openUsbControlHubs } from "./adb-setup.js";
 import {
@@ -37,10 +37,7 @@ program
     // .option("--control", "specify that you are connecting via control hub")
     // .option("-s --serial <serial>", "serial number")
     // .option("-p --parent <address>", "parent address")
-    .option(
-        "-a --address <address>",
-        "address of Expansion Hub connected via RS-485",
-    );
+    .option("-a --address <address>", "address of Expansion Hub connected via RS-485");
 
 program
     .command("testErrorHandling")
@@ -60,18 +57,27 @@ program
     });
 
 program
-    .command("pattern")
-    .description("Run LED steps")
-    .action(async () => {
+    .command("pattern <steps...>")
+    .description(
+        "Run LED pattern. Provide steps as a space-separated list in the " +
+            "format <time><colorHexString>, where time is in seconds, and " +
+            "colorHexString is a hex color code. Example: 100FF00 for 1 second " +
+            "green, 0.5FF0000 for half-second red.",
+    )
+    .action(async (steps) => {
         let hub = await getExpansionHubOrThrow();
-        await ledPattern(hub);
+        await ledPattern(hub, steps);
+
+        process.on("SIGINT", () => {
+            hub.close();
+        });
     });
 
 program
     .command("led <r> <g> <b>")
     .description("Set LED color")
     .action(async (r, g, b) => {
-        console.log("Running led color");
+        console.log("Running led color. Values are [0, 255]");
         let hubs = await openUsbControlHubs();
         let rValue = Number(r);
         let gValue = Number(g);
