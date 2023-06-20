@@ -29,13 +29,13 @@ import { ControlHubConnected } from "./ControlHubConnected.js";
 
 export class ControlHubInternal implements ControlHub {
     readonly isOpen: boolean = true;
-    readonly moduleAddress: number = 173;
+    moduleAddress: number = 173;
     responseTimeoutMs: number = 0;
     type: RevHubType = RevHubType.ControlHub;
     readonly serialNumber: string;
 
     /**
-     * All children connected over USB, as well as the one embedded hub.
+     * All children connected over USB or RS-485.
      */
     readonly children: RevHub[] = [];
 
@@ -93,6 +93,49 @@ export class ControlHubInternal implements ControlHub {
 
                 if (callback) {
                     callback(response, error);
+                }
+            } else {
+                //we have a message
+                console.log(JSON.stringify(rawMessage));
+                if (rawMessage.type === "sessionEnded") {
+                    let allHubs = this.flattenChildren();
+                    for (let hub of allHubs) {
+                        hub.emit("sessionEnded");
+                    }
+                } else if (rawMessage.type === "hubAddressChanged") {
+                    //notify that hub address changed
+                    let payload = rawMessage.payload;
+                    let addressChangedPayload = JSON.parse(payload);
+                    let handles: number[] = addressChangedPayload.hIds;
+
+                    let allHubs = this.flattenChildren();
+
+                    for (let hub of allHubs) {
+                        if (handles.includes(hub.id)) {
+                            hub.moduleAddress = addressChangedPayload.na;
+                            hub.emit(
+                                "addressChanged",
+                                addressChangedPayload.oa,
+                                addressChangedPayload.na,
+                            );
+                        }
+                    }
+                } else if (rawMessage.type === "hubStatusChanged") {
+                    let payloadString = rawMessage.payload;
+                    let payload = JSON.parse(payloadString);
+                    let handles = payload.hIds;
+                    let status: ModuleStatus = {
+                        statusWord: payload.sw,
+                        motorAlerts: payload.ma,
+                    };
+
+                    let allHubs = this.flattenChildren();
+
+                    for (let hub of allHubs) {
+                        if (handles.includes(hub.id)) {
+                            hub.emit("statusChanged", status);
+                        }
+                    }
                 }
             }
         });
@@ -343,8 +386,20 @@ export class ControlHubInternal implements ControlHub {
         return true;
     }
 
-    on(eventName: "error", listener: (error: Error) => void): RevHub {
-        return this.embedded.on(eventName, listener);
+    on(eventName: "error", listener: (error: Error) => void): this;
+    on(eventName: "statusChanged", listener: (status: ModuleStatus) => void): this;
+    on(
+        eventName: "addressChanged",
+        listener: (oldAddress: number, newAddress: number) => void,
+    ): this;
+    on(eventName: "sessionEnded", listener: () => void): this;
+
+    on(
+        eventName: "error" | "statusChanged" | "addressChanged" | "sessionEnded",
+        listener: (...args: any) => void,
+    ): this {
+        this.embedded.on(eventName, listener);
+        return this;
     }
 
     async queryInterface(interfaceName: string): Promise<ModuleInterface> {
@@ -537,6 +592,25 @@ export class ControlHubInternal implements ControlHub {
         byte: number,
     ): Promise<void> {
         return this.embedded.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
+    }
+
+    /**
+     * Returns all connected hubs in the hierarchy as a flat list. Intended for
+     * operations that could affect all hubs.
+     * @private
+     */
+    private flattenChildren(): ControlHubConnected[] {
+        let result: ControlHubConnected[] = [];
+        result.push(this.embedded);
+
+        for (let child of this.children) {
+            if (child instanceof ControlHubConnected) {
+                result.push(child);
+                result.push(...child.flattenChildren());
+            }
+        }
+
+        return result;
     }
 
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {

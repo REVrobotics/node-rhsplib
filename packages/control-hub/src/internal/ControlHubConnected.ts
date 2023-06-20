@@ -19,6 +19,7 @@ import {
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rev-hub-core";
+import { EventEmitter } from "events";
 
 export class ControlHubConnected implements ParentExpansionHub {
     isParentHub: boolean;
@@ -33,6 +34,8 @@ export class ControlHubConnected implements ParentExpansionHub {
     responseTimeoutMs = 1000;
 
     readonly children: RevHub[] = [];
+
+    private emitter = new EventEmitter();
 
     constructor(
         isParent: boolean,
@@ -333,8 +336,21 @@ export class ControlHubConnected implements ParentExpansionHub {
         return true;
     }
 
-    on(eventName: "error", listener: (error: Error) => void): RevHub {
-        throw new Error("not implemented");
+    on(
+        eventName: "error" | "statusChanged" | "addressChanged" | "sessionEnded",
+        listener: (...param: any) => void,
+    ): this {
+        this.emitter.on(eventName, listener);
+        return this;
+    }
+
+    emit(eventName: "error", error: Error): void;
+    emit(eventName: "statusChanged", status: ModuleStatus): void;
+    emit(eventName: "addressChanged", oldAddress: number, newAddress: number): void;
+    emit(eventName: "sessionEnded"): void;
+
+    emit(eventName: string, ...args: any): void {
+        this.emitter.emit(eventName, ...args);
     }
 
     async queryInterface(interfaceName: string): Promise<ModuleInterface> {
@@ -659,5 +675,17 @@ export class ControlHubConnected implements ParentExpansionHub {
         this.children.push(newHub);
 
         return newHub;
+    }
+
+    flattenChildren(): ControlHubConnected[] {
+        let result: ControlHubConnected[] = [];
+        for (let child of this.children) {
+            if (child instanceof ControlHubConnected) {
+                result.push(child);
+                result.push(...child.flattenChildren());
+            }
+        }
+
+        return result;
     }
 }

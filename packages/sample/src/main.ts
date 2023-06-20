@@ -13,6 +13,7 @@ import { led, ledPattern } from "./command/led.js";
 import { runServo } from "./command/servo.js";
 import { openUsbControlHubs } from "./adb-setup.js";
 import {
+    ControlHub,
     DigitalState,
     ExpansionHub,
     ParentExpansionHub,
@@ -26,6 +27,8 @@ import {
 import { digitalRead, digitalWrite } from "./command/digital.js";
 import { distance } from "./command/distance.js";
 import { getBulkInputData } from "./command/bulkinput.js";
+import { status } from "./command/status.js";
+import { openUsbControlHubsAndChildren } from "./open-usb-control-hub.js";
 
 const program = new Command();
 
@@ -94,6 +97,21 @@ program
         let hub = await getExpansionHubOrThrow();
         await getBulkInputData(hub, isContinuous);
     });
+
+program.command("status").action(async () => {
+    let hubs = await openUsbControlHubsAndChildren();
+    let allHubs = hubs.flatMap((hub) => [hub, ...hub.children]);
+    for (let hub of allHubs) {
+        await status(hub as ControlHub);
+    }
+
+    process.on("SIGINT", () => {
+        for (let hub of hubs) {
+            hub.close();
+        }
+        process.exit();
+    });
+});
 
 let digitalCommand = program.command("digital");
 
