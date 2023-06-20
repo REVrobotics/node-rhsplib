@@ -85,10 +85,15 @@ program
         await led(hubs[0], rValue, gValue, bValue);
     });
 
-program.command("bulkInput").action(async () => {
-    let hubs = await openUsbControlHubs();
-    await getBulkInputData(hubs[0]);
-});
+program
+    .command("bulkInput")
+    .description("Get all input data at once. Specify --continuous to run continuously.")
+    .option("--continuous", "run continuously")
+    .action(async (options) => {
+        let isContinuous = options.continuous !== undefined;
+        let hub = await getExpansionHubOrThrow();
+        await getBulkInputData(hub, isContinuous);
+    });
 
 let digitalCommand = program.command("digital");
 
