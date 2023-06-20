@@ -1,11 +1,13 @@
 import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
 import { DistanceSensor } from "@rev-robotics/distance-sensor";
+import { ExpansionHub } from "@rev-robotics/rev-hub-core";
 
-export async function distance(channel: number, isContinuous: boolean) {
+export async function distance(
+    hub: ExpansionHub,
+    channel: number,
+    isContinuous: boolean,
+) {
     console.log(`Channel number is ${channel}`);
-
-    let hubs = await openConnectedExpansionHubs();
-    let hub = hubs[0];
 
     let sensor = new DistanceSensor(hub, channel);
     await sensor.setup();

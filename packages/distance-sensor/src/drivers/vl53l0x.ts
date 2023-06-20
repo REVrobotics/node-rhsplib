@@ -59,7 +59,7 @@ export class VL53L0X implements DistanceSensorDriver {
             if ((await this.readRegister(0xc2)) != 0x10) return false;
             if ((await this.readRegister(0x61)) != 0x00) return false;
             else return true;
-        } catch {
+        } catch (e: any) {
             //if there's an I2C error, we don't have a working sensor.
             return false;
         }

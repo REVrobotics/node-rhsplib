@@ -186,8 +186,7 @@ export class ControlHubInternal implements ControlHub {
     // ToDo(landry): Always call close() on the parent hub when the sample exits
     close() {
         this.embedded.close();
-        this.sendCommand("stop", {})
-            .then(() => this.webSocketConnection.close());
+        this.sendCommand("stop", {}).then(() => this.webSocketConnection.close());
     }
 
     async getAnalogInput(channel: number): Promise<number> {
@@ -530,20 +529,6 @@ export class ControlHubInternal implements ControlHub {
         bytes: number[],
     ): Promise<void> {
         return this.embedded.writeI2CMultipleBytes(i2cChannel, slaveAddress, bytes);
-    }
-
-    writeI2CReadMultipleBytes(
-        i2cChannel: number,
-        slaveAddress: number,
-        numBytesToRead: number,
-        startAddress: number,
-    ): Promise<void> {
-        return this.embedded.writeI2CReadMultipleBytes(
-            i2cChannel,
-            slaveAddress,
-            numBytesToRead,
-            startAddress,
-        );
     }
 
     async writeI2CSingleByte(

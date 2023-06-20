@@ -274,11 +274,13 @@ export class ControlHubConnected implements ParentExpansionHub {
     async getMotorTargetPosition(
         motorChannel: number,
     ): Promise<{ targetPosition: number; targetTolerance: number }> {
-        let result: { tpc: number; ttc: number } =
-            await this.sendCommand("getMotorTargetPosition", {
+        let result: { tpc: number; ttc: number } = await this.sendCommand(
+            "getMotorTargetPosition",
+            {
                 hId: this.id,
                 c: motorChannel,
-            });
+            },
+        );
 
         return {
             targetPosition: result.tpc,
@@ -349,25 +351,36 @@ export class ControlHubConnected implements ParentExpansionHub {
         };
     }
 
-    readI2CRegister(
+    async readI2CRegister(
         i2cChannel: number,
         targetAddress: number,
         numBytesToRead: number,
         register: number,
     ): Promise<number[]> {
-        throw new Error("not implemented");
+        return await this.sendCommand("readI2cRegister", {
+            hId: this.id,
+            a: targetAddress,
+            c: i2cChannel,
+            cb: numBytesToRead,
+            r: register,
+        });
     }
 
-    readI2CMultipleBytes(
+    async readI2CMultipleBytes(
         i2cChannel: number,
         targetAddress: number,
         numBytesToRead: number,
     ): Promise<number[]> {
-        throw new Error("not implemented");
+        return await this.sendCommand("readI2cData", {
+            hId: this.id,
+            a: targetAddress,
+            c: i2cChannel,
+            cb: numBytesToRead,
+        });
     }
 
-    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<number> {
-        throw new Error("not implemented");
+    async readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<number> {
+        return (await this.readI2CMultipleBytes(i2cChannel, targetAddress, 1))[0];
     }
 
     async readVersion(): Promise<Version> {
@@ -607,29 +620,25 @@ export class ControlHubConnected implements ParentExpansionHub {
         });
     }
 
-    writeI2CMultipleBytes(
+    async writeI2CMultipleBytes(
         i2cChannel: number,
         targetAddress: number,
         bytes: number[],
     ): Promise<void> {
-        throw new Error("not implemented");
+        await this.sendCommand("writeI2cData", {
+            hId: this.id,
+            a: targetAddress,
+            c: i2cChannel,
+            d: bytes,
+        });
     }
 
-    writeI2CReadMultipleBytes(
-        i2cChannel: number,
-        targetAddress: number,
-        numBytesToRead: number,
-        startAddress: number,
-    ): Promise<void> {
-        throw new Error("not implemented");
-    }
-
-    writeI2CSingleByte(
+    async writeI2CSingleByte(
         i2cChannel: number,
         targetAddress: number,
         byte: number,
     ): Promise<void> {
-        throw new Error("not implemented");
+        await this.writeI2CMultipleBytes(i2cChannel, targetAddress, [byte]);
     }
 
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {
