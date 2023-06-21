@@ -121,9 +121,27 @@ export class ControlHubConnected implements ParentExpansionHub {
     }
 
     async getBulkInputData(): Promise<BulkInputData> {
-        return await this.sendCommand("getBulkInputData", {
+        let rawData: any = await this.sendCommand("getBulkInputData", {
             hId: this.id,
         });
+
+        return {
+            analog0_mV: rawData.a0,
+            analog1_mV: rawData.a1,
+            analog2_mV: rawData.a3,
+            analog3_mV: rawData.a4,
+            digitalInputs: rawData.diBf,
+            motor0position_enc: rawData.m0ep,
+            motor1position_enc: rawData.m1ep,
+            motor2position_enc: rawData.m2ep,
+            motor3position_enc: rawData.m3ep,
+            motor0velocity_cps: rawData.m0v,
+            motor1velocity_cps: rawData.m1v,
+            motor2velocity_cps: rawData.m2v,
+            motor3velocity_cps: rawData.m3v,
+            motorStatus: rawData.msBf,
+            attentionRequired: 0,
+        };
     }
 
     async getAllDigitalInputs(): Promise<number> {
