@@ -96,7 +96,6 @@ export class ControlHubInternal implements ControlHub {
                 }
             } else {
                 //we have a message
-                console.log(JSON.stringify(rawMessage));
                 if (rawMessage.type === "sessionEnded") {
                     let allHubs = this.flattenChildren();
                     for (let hub of allHubs) {

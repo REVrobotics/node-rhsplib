@@ -29,6 +29,7 @@ import { distance } from "./command/distance.js";
 import { getBulkInputData } from "./command/bulkinput.js";
 import { status } from "./command/status.js";
 import { openUsbControlHubsAndChildren } from "./open-usb-control-hub.js";
+import { injectLog } from "./command/log.js";
 
 const program = new Command();
 
@@ -96,6 +97,14 @@ program
         let isContinuous = options.continuous !== undefined;
         let hub = await getExpansionHubOrThrow();
         await getBulkInputData(hub, isContinuous);
+    });
+
+program
+    .command("log <text>")
+    .description("Inject a log hint")
+    .action(async (text) => {
+        let hub = await getExpansionHubOrThrow();
+        await injectLog(hub, text);
     });
 
 program.command("status").action(async () => {
