@@ -31,6 +31,7 @@ import { status } from "./command/status.js";
 import { openUsbControlHubsAndChildren } from "./open-usb-control-hub.js";
 import { injectLog } from "./command/log.js";
 import { sendFailSafe } from "./command/failsafe.js";
+import { queryInterface } from "./command/query.js";
 
 const program = new Command();
 
@@ -114,6 +115,14 @@ program
     .action(async () => {
         let hub = await getExpansionHubOrThrow();
         await sendFailSafe(hub);
+    });
+
+program
+    .command("query <name>")
+    .description("Query interface information")
+    .action(async (name) => {
+        let hub = await getExpansionHubOrThrow();
+        await queryInterface(hub, name);
     });
 
 program.command("status").action(async () => {
