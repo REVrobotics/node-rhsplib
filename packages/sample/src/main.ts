@@ -30,6 +30,7 @@ import { getBulkInputData } from "./command/bulkinput.js";
 import { status } from "./command/status.js";
 import { openUsbControlHubsAndChildren } from "./open-usb-control-hub.js";
 import { injectLog } from "./command/log.js";
+import { sendFailSafe } from "./command/failsafe.js";
 
 const program = new Command();
 
@@ -105,6 +106,14 @@ program
     .action(async (text) => {
         let hub = await getExpansionHubOrThrow();
         await injectLog(hub, text);
+    });
+
+program
+    .command("failsafe")
+    .description("Send failsafe command")
+    .action(async () => {
+        let hub = await getExpansionHubOrThrow();
+        await sendFailSafe(hub);
     });
 
 program.command("status").action(async () => {
