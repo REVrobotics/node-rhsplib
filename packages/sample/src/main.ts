@@ -33,6 +33,7 @@ import { injectLog } from "./command/log.js";
 import { sendFailSafe } from "./command/failsafe.js";
 import { queryInterface } from "./command/query.js";
 import { setHubAddress } from "./command/set-hub-address.js";
+import { firmwareVersion } from "./command/firmware-version.js";
 
 const program = new Command();
 
@@ -121,6 +122,15 @@ program
     .action(async () => {
         let [hub, close] = await getExpansionHubOrThrow();
         await sendFailSafe(hub, close);
+    });
+
+program
+    .command("version")
+    .description("Get firmware version")
+    .action(async () => {
+        let [hub, close] = await getExpansionHubOrThrow();
+        await firmwareVersion(hub);
+        close();
     });
 
 program
