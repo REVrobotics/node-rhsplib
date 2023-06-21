@@ -115,11 +115,12 @@ program
 
 program
     .command("failsafe")
-    .description("Send failsafe command")
+    .description(
+        "Start servo 0 for 2 seconds, then send failsafe. Wait 2 more seconds to close. The servo should stop after 2 seconds.",
+    )
     .action(async () => {
         let [hub, close] = await getExpansionHubOrThrow();
-        await sendFailSafe(hub);
-        close();
+        await sendFailSafe(hub, close);
     });
 
 program
