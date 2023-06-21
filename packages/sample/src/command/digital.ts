@@ -6,15 +6,13 @@ export async function digitalRead(
     continuous: boolean,
 ): Promise<void> {
     await hub.setDigitalDirection(channel, DioDirection.Input);
-
-    if (continuous) {
-        while (true) {
-            let state = await hub.getDigitalInput(channel);
-            console.log(`${state}`);
-        }
-    } else {
+    console.log(
+        `Channel ${channel} direction is ${await hub.getDigitalDirection(channel)}`,
+    );
+    while (true) {
         let state = await hub.getDigitalInput(channel);
         console.log(`${state}`);
+        if (!continuous) break;
     }
 }
 
@@ -24,5 +22,8 @@ export async function digitalWrite(
     state: DigitalState,
 ): Promise<void> {
     await hub.setDigitalDirection(channel, DioDirection.Output);
+    console.log(
+        `Channel ${channel} direction is ${await hub.getDigitalDirection(channel)}`,
+    );
     await hub.setDigitalOutput(channel, state);
 }

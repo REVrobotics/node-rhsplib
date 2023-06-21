@@ -224,14 +224,16 @@ export class ControlHubConnected implements ParentExpansionHub {
     }
 
     async getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus> {
-        return await this.sendCommand("getModuleStatus", {
+        return await this.sendCommand("getHubStatus", {
             hId: this.id,
+            clr: clearStatusAfterResponse,
         });
     }
 
     async getMotorAtTarget(motorChannel: number): Promise<boolean> {
         return await this.sendCommand("getIsMotorAtTarget", {
             hId: this.id,
+            c: motorChannel,
         });
     }
 
@@ -243,7 +245,7 @@ export class ControlHubConnected implements ParentExpansionHub {
     }
 
     async getMotorChannelEnable(motorChannel: number): Promise<boolean> {
-        return await this.sendCommand("getMotorChannelEnable", {
+        return await this.sendCommand("getMotorEnable", {
             hId: this.id,
             c: motorChannel,
         });

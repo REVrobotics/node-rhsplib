@@ -8,6 +8,10 @@ export async function runMotorConstantPower(
     await hub.setMotorChannelMode(channel, MotorMode.OPEN_LOOP, true);
     await hub.setMotorConstantPower(channel, power);
     await hub.setMotorChannelEnable(channel, true);
+
+    console.log(`Mode: ${JSON.stringify(await hub.getMotorChannelMode(channel))}`);
+    console.log(`Power: ${await hub.getMotorConstantPower(channel)}`);
+    console.log(`Enabled: ${await hub.getMotorChannelEnable(channel)}`);
 }
 
 export async function runMotorConstantVelocity(
@@ -18,6 +22,11 @@ export async function runMotorConstantVelocity(
     await hub.setMotorChannelMode(channel, MotorMode.REGULATED_VELOCITY, true);
     await hub.setMotorTargetVelocity(channel, velocity);
     await hub.setMotorChannelEnable(channel, true);
+
+    console.log(`Mode: ${JSON.stringify(await hub.getMotorChannelMode(channel))}`);
+    console.log(`Power: ${await hub.getMotorConstantPower(channel)}`);
+    console.log(`Velocity: ${await hub.getMotorTargetVelocity(channel)}`);
+    console.log(`Enabled: ${await hub.getMotorChannelEnable(channel)}`);
 }
 
 export async function runMotorToPosition(
@@ -31,6 +40,15 @@ export async function runMotorToPosition(
     await hub.setMotorTargetVelocity(channel, velocity);
     await hub.setMotorTargetPosition(channel, position, tolerance);
     await hub.setMotorChannelEnable(channel, true);
+
+    console.log(`Mode: ${JSON.stringify(await hub.getMotorChannelMode(channel))}`);
+    console.log(`Power: ${await hub.getMotorConstantPower(channel)}`);
+    console.log(`Velocity: ${await hub.getMotorTargetVelocity(channel)}`);
+    console.log(`Position: ${JSON.stringify(await hub.getMotorTargetPosition(channel))}`);
+    console.log(`Enabled: ${await hub.getMotorChannelEnable(channel)}`);
+
+    while (!(await hub.getMotorAtTarget(channel))) {}
+    console.log("Motor reached target");
 }
 
 export async function runEncoder(
