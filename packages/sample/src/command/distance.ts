@@ -21,6 +21,5 @@ export async function distance(
         console.log(`Distance is ${distance}mm`);
 
         sensor.stop();
-        hub.close();
     }
 }

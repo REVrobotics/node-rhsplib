@@ -8,11 +8,6 @@ export async function runMotorConstantPower(
     await hub.setMotorChannelMode(channel, MotorMode.OPEN_LOOP, true);
     await hub.setMotorConstantPower(channel, power);
     await hub.setMotorChannelEnable(channel, true);
-
-    process.on("SIGINT", () => {
-        hub.close();
-        process.exit();
-    });
 }
 
 export async function runMotorConstantVelocity(
@@ -23,10 +18,6 @@ export async function runMotorConstantVelocity(
     await hub.setMotorChannelMode(channel, MotorMode.REGULATED_VELOCITY, true);
     await hub.setMotorTargetVelocity(channel, velocity);
     await hub.setMotorChannelEnable(channel, true);
-    process.on("SIGINT", () => {
-        hub.setMotorChannelEnable(channel, false);
-        process.exit();
-    });
 }
 
 export async function runMotorToPosition(
@@ -40,10 +31,6 @@ export async function runMotorToPosition(
     await hub.setMotorTargetVelocity(channel, velocity);
     await hub.setMotorTargetPosition(channel, position, tolerance);
     await hub.setMotorChannelEnable(channel, true);
-    process.on("SIGINT", () => {
-        hub.setMotorChannelEnable(channel, false);
-        process.exit();
-    });
 }
 
 export async function runEncoder(
@@ -56,11 +43,8 @@ export async function runEncoder(
         console.log(`Encoder count is ${encoder}`);
         if (!continuous) break;
     }
-    hub.close();
-    // ToDo(landry): Somehow, when continuous is false, code placed here gets executed, but the program doesn't exit without Ctrl-C
 }
 
 export async function resetEncoder(hub: ExpansionHub, channel: number) {
     await hub.resetMotorEncoder(channel);
-    hub.close();
 }

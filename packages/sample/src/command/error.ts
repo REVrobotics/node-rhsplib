@@ -49,5 +49,4 @@ export async function error() {
         console.log("Got error opening child hub with invalid address");
         console.log(e);
     }
-    hubs[0].close();
 }

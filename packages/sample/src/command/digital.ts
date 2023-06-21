@@ -1,9 +1,4 @@
-import {
-    DigitalChannelDirection,
-    DigitalState,
-    DioDirection,
-    ExpansionHub,
-} from "@rev-robotics/rev-hub-core";
+import { DigitalState, DioDirection, ExpansionHub } from "@rev-robotics/rev-hub-core";
 
 export async function digitalRead(
     hub: ExpansionHub,
@@ -21,7 +16,6 @@ export async function digitalRead(
         let state = await hub.getDigitalInput(channel);
         console.log(`${state}`);
     }
-    hub.close();
 }
 
 export async function digitalWrite(
@@ -31,5 +25,4 @@ export async function digitalWrite(
 ): Promise<void> {
     await hub.setDigitalDirection(channel, DioDirection.Output);
     await hub.setDigitalOutput(channel, state);
-    hub.close();
 }

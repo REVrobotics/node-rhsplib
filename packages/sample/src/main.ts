@@ -32,6 +32,7 @@ import { openUsbControlHubsAndChildren } from "./open-usb-control-hub.js";
 import { injectLog } from "./command/log.js";
 import { sendFailSafe } from "./command/failsafe.js";
 import { queryInterface } from "./command/query.js";
+import { setHubAddress } from "./command/set-hub-address.js";
 
 const program = new Command();
 
@@ -71,11 +72,11 @@ program
             "green, 0.5FF0000 for half-second red.",
     )
     .action(async (steps) => {
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         await ledPattern(hub, steps);
 
         process.on("SIGINT", () => {
-            hub.close();
+            close();
         });
     });
 
@@ -84,11 +85,12 @@ program
     .description("Set LED color")
     .action(async (r, g, b) => {
         console.log("Running led color. Values are [0, 255]");
-        let hubs = await openUsbControlHubs();
+        let [hub, close] = await getExpansionHubOrThrow();
         let rValue = Number(r);
         let gValue = Number(g);
         let bValue = Number(b);
-        await led(hubs[0], rValue, gValue, bValue);
+        await led(hub, rValue, gValue, bValue);
+        close();
     });
 
 program
@@ -97,32 +99,46 @@ program
     .option("--continuous", "run continuously")
     .action(async (options) => {
         let isContinuous = options.continuous !== undefined;
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         await getBulkInputData(hub, isContinuous);
+        close();
     });
 
 program
     .command("log <text>")
     .description("Inject a log hint")
     .action(async (text) => {
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         await injectLog(hub, text);
+        close();
     });
 
 program
     .command("failsafe")
     .description("Send failsafe command")
     .action(async () => {
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         await sendFailSafe(hub);
+        close();
     });
 
 program
     .command("query <name>")
     .description("Query interface information")
     .action(async (name) => {
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         await queryInterface(hub, name);
+        close();
+    });
+
+program
+    .command("set-address <address>")
+    .description("Set Module Address")
+    .action(async (address) => {
+        let addressNumber = Number(address);
+        let [hub, close] = await getExpansionHubOrThrow();
+        await setHubAddress(hub as ControlHub, addressNumber);
+        close();
     });
 
 program.command("status").action(async () => {
@@ -156,9 +172,10 @@ digitalCommand
             program.error("Please provide only one of {high, low, 1, 0}");
         }
         let digitalState = stateBoolean ? DigitalState.High : DigitalState.Low;
-        let hubs = await openUsbControlHubs();
+        let [hub, close] = await getExpansionHubOrThrow();
 
-        await digitalWrite(hubs[0], channelNumber, digitalState);
+        await digitalWrite(hub, channelNumber, digitalState);
+        close();
     });
 
 digitalCommand
@@ -168,9 +185,10 @@ digitalCommand
     .action(async (channel, options) => {
         let isContinuous = options.continuous !== undefined;
         let channelNumber = Number(channel);
-        let hubs = await openUsbControlHubs();
+        let [hub, close] = await getExpansionHubOrThrow();
 
-        await digitalRead(hubs[0], channelNumber, isContinuous);
+        await digitalRead(hub, channelNumber, isContinuous);
+        close();
     });
 
 let motorCommand = program.command("motor");
@@ -182,12 +200,14 @@ motorCommand
     .description("Get the current encoder position of a motor")
     .action(async (channel, options) => {
         let channelNumber = Number(channel);
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         if (options.reset) {
             await resetEncoder(hub, channelNumber);
+            close();
         } else {
             let isContinuous = options.continuous !== undefined;
             await runEncoder(hub, channelNumber, isContinuous);
+            close();
         }
     });
 
@@ -200,8 +220,13 @@ motorCommand
         console.log(`${channel} ${power}`);
         let channelNumber = Number(channel);
         let powerNumber = Number(power);
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         await runMotorConstantPower(hub, channelNumber, powerNumber);
+
+        process.on("SIGINT", () => {
+            close();
+            process.exit();
+        });
     });
 
 motorCommand
@@ -211,8 +236,12 @@ motorCommand
         console.log(`${channel} ${speed}`);
         let channelNumber = Number(channel);
         let speedNumber = Number(speed);
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         await runMotorConstantVelocity(hub, channelNumber, speedNumber);
+        process.on("SIGINT", () => {
+            close();
+            process.exit();
+        });
     });
 
 motorCommand
@@ -224,7 +253,7 @@ motorCommand
         let positionNumber = Number(position);
         let toleranceNumber = Number(tolerance);
         let velocityNumber = Number(velocity);
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         await runMotorToPosition(
             hub,
             channelNumber,
@@ -232,6 +261,11 @@ motorCommand
             positionNumber,
             toleranceNumber,
         );
+        process.on("SIGINT", () => {
+            hub.setMotorChannelEnable(channelNumber, false);
+            close();
+            process.exit();
+        });
     });
 
 program
@@ -249,10 +283,11 @@ program
             "--continuous to run continuously.",
     )
     .action(async (port, options) => {
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
         let portNumber = Number(port);
         await analog(hub, portNumber, isContinuous);
+        close();
     });
 
 program
@@ -263,9 +298,10 @@ program
             "Specify --continuous to run continuously",
     )
     .action(async (options) => {
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
         await temperature(hub, isContinuous);
+        close();
     });
 
 program
@@ -275,9 +311,10 @@ program
         "Read the current 5V rail voltage. Specify --continuous to run continuously",
     )
     .action(async (options) => {
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
         await voltageRail(hub, isContinuous);
+        close();
     });
 
 program
@@ -287,9 +324,10 @@ program
         "Read the current battery Voltage. Specify --continuous to run continuously",
     )
     .action(async (options) => {
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
         await battery(hub, isContinuous);
+        close();
     });
 
 program
@@ -299,9 +337,14 @@ program
         let channelValue = Number(channel);
         let pulseWidthValue = Number(pulseWidth);
         let frameWidthValue = frameWidth ? Number(frameWidth) : 4000;
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
 
         await runServo(hub, channelValue, pulseWidthValue, frameWidthValue);
+
+        process.on("SIGINT", () => {
+            close();
+            process.exit();
+        });
     });
 
 program
@@ -311,13 +354,15 @@ program
     .action(async (channel, options): Promise<void> => {
         let isContinuous = options.continuous !== undefined;
         let channelNumber = Number(channel);
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         await distance(hub, channelNumber, isContinuous);
     });
 
 program.parse(process.argv);
 
-async function getExpansionHubOrThrow(): Promise<ExpansionHub> {
+async function getExpansionHubOrThrow(): Promise<
+    [hub: ExpansionHub, onClose: () => void]
+> {
     let options = program.opts();
     let serialNumber = options.serial;
     let isControlHub = true;
@@ -327,6 +372,9 @@ async function getExpansionHubOrThrow(): Promise<ExpansionHub> {
     if (isControlHub) {
         let controlHubs = await openUsbControlHubs();
         let controlHub = controlHubs[0];
+        let onClose = () => {
+            controlHub.close();
+        };
 
         if (serialNumber) {
             if (moduleAddress === undefined) {
@@ -337,32 +385,41 @@ async function getExpansionHubOrThrow(): Promise<ExpansionHub> {
                 parentAddress!,
             );
             if (parentAddress === moduleAddress) {
-                return parent;
+                return [parent, onClose];
             }
             if (parent.isParent()) {
-                return (await parent.addChildByAddress(moduleAddress!)) as ExpansionHub;
+                return [
+                    (await parent.addChildByAddress(moduleAddress!)) as ExpansionHub,
+                    onClose,
+                ];
             } else {
                 throw new Error();
             }
         } else {
             if (moduleAddress !== undefined) {
-                return await controlHub.addHubBySerialNumberAndAddress(
-                    "(embedded)",
-                    moduleAddress!,
-                );
+                return [
+                    await controlHub.addHubBySerialNumberAndAddress(
+                        "(embedded)",
+                        moduleAddress!,
+                    ),
+                    onClose,
+                ];
             } else {
-                return controlHub;
+                return [controlHub, onClose];
             }
         }
     } else {
         if (serialNumber) {
             let parentHub = await openParentExpansionHub(serialNumber, parentAddress);
+            let onClose = () => {
+                parentHub.close();
+            };
             if (moduleAddress === undefined || moduleAddress == parentHub.moduleAddress) {
-                return parentHub;
+                return [parentHub, onClose];
             } else {
                 let childHub = await parentHub.addChildByAddress(moduleAddress);
                 if (childHub.isExpansionHub()) {
-                    return childHub;
+                    return [childHub, onClose];
                 }
             }
         } else if (parentAddress !== undefined) {
@@ -379,14 +436,19 @@ async function getExpansionHubOrThrow(): Promise<ExpansionHub> {
                 );
             }
 
-            let hub = await openHubWithAddress(
+            const hub = await openHubWithAddress(
                 serialNumbers[0],
                 parentAddress,
                 realModuleAddress,
             );
 
             if (hub.isExpansionHub()) {
-                return hub;
+                return [
+                    hub,
+                    () => {
+                        hub.close();
+                    },
+                ];
             } else {
                 program.error(
                     `No expansion hub found with module address ${moduleAddress}`,
@@ -404,6 +466,11 @@ async function getExpansionHubOrThrow(): Promise<ExpansionHub> {
             );
         }
 
-        return connectedHubs[0];
+        return [
+            connectedHubs[0],
+            () => {
+                connectedHubs[0].close();
+            },
+        ];
     }
 }

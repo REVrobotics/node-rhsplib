@@ -9,7 +9,6 @@ export async function analog(hub: ExpansionHub, channel: number, continuous: boo
     } else {
         let value = await hub.getAnalogInput(channel);
         console.log(`ADC: ${value} mV`);
-        hub.close();
     }
 }
 
@@ -22,7 +21,6 @@ export async function temperature(hub: ExpansionHub, continuous: boolean) {
     } else {
         let value = await hub.getTemperature();
         console.log(`Temperature: ${value} C`);
-        hub.close();
     }
 }
 
@@ -35,7 +33,6 @@ export async function battery(hub: ExpansionHub, continuous: boolean) {
     } else {
         let value = await hub.getBatteryVoltage();
         console.log(`Battery: ${value} mV`);
-        hub.close();
     }
 }
 
@@ -48,6 +45,5 @@ export async function voltageRail(hub: ExpansionHub, continuous: boolean) {
     } else {
         let value = await hub.get5VBusVoltage();
         console.log(`5V rail: ${value} mV`);
-        hub.close();
     }
 }

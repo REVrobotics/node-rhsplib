@@ -9,9 +9,4 @@ export async function runServo(
     await hub.setServoConfiguration(channel, framePeriod);
     await hub.setServoPulseWidth(channel, pulseWidth);
     await hub.setServoEnable(channel, true);
-
-    process.on("SIGINT", () => {
-        hub.close();
-        process.exit();
-    });
 }

@@ -596,10 +596,14 @@ export class ControlHubConnected implements ParentExpansionHub {
     }
 
     async setNewModuleAddress(newModuleAddress: number): Promise<void> {
-        await this.sendCommand("setHubAddress", {
-            hId: this.id,
-            newAddress: newModuleAddress,
-        });
+        await this.sendCommand(
+            "setHubAddress",
+            {
+                hId: this.id,
+                newAddress: newModuleAddress,
+            },
+            100000,
+        );
     }
 
     async setPhoneChargeControl(chargeEnable: boolean): Promise<void> {

@@ -6,6 +6,4 @@ export async function queryInterface(hub: ExpansionHub, name: string): Promise<v
     console.log(
         `Interface: ${iface.name} has ${iface.numberIDValues} ids, starting at ${iface.firstPacketID}`,
     );
-
-    hub.close();
 }

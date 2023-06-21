@@ -640,7 +640,7 @@ export class ControlHubInternal implements ControlHub {
         serialNumber: string,
         moduleAddress: number,
     ): Promise<ParentExpansionHub> {
-        let id = await this.openHub(serialNumber, moduleAddress, moduleAddress);
+        let id = await this.openHub(serialNumber, this.moduleAddress, moduleAddress);
 
         let newHub = new ControlHubConnected(
             true,
