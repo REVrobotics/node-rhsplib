@@ -25,7 +25,7 @@ import {
     Version,
 } from "@rev-robotics/rev-hub-core";
 import { clearTimeout } from "timers";
-import { ControlHubConnected } from "./ControlHubConnected.js";
+import { ControlHubConnectedExpansionHub } from "./ControlHubConnectedExpansionHub.js";
 
 export class ControlHubInternal implements ControlHub {
     readonly isOpen: boolean = true;
@@ -59,7 +59,7 @@ export class ControlHubInternal implements ControlHub {
      * The board for this control hub. All Expansion Hub commands go through
      * this delegate.
      */
-    private embedded!: ControlHubConnected;
+    private embedded!: ControlHubConnectedExpansionHub;
 
     private webSocketConnection!: WebSocket;
     private currentActiveCommands = new Map<
@@ -159,7 +159,7 @@ export class ControlHubInternal implements ControlHub {
 
                 this.id = await this.openHub("(embedded)", this.moduleAddress);
 
-                this.embedded = new ControlHubConnected(
+                this.embedded = new ControlHubConnectedExpansionHub(
                     true,
                     RevHubType.ControlHub,
                     this.sendCommand.bind(this),
@@ -582,12 +582,12 @@ export class ControlHubInternal implements ControlHub {
      * operations that could affect all hubs.
      * @private
      */
-    private flattenChildren(): ControlHubConnected[] {
-        let result: ControlHubConnected[] = [];
+    private flattenChildren(): ControlHubConnectedExpansionHub[] {
+        let result: ControlHubConnectedExpansionHub[] = [];
         result.push(this.embedded);
 
         for (let child of this.children) {
-            if (child instanceof ControlHubConnected) {
+            if (child instanceof ControlHubConnectedExpansionHub) {
                 result.push(child);
                 result.push(...child.flattenChildren());
             }
@@ -602,7 +602,7 @@ export class ControlHubInternal implements ControlHub {
         // ToDo(landry): Extract the embedded constant somewhere
         let id = await this.openHub("(embedded)", this.moduleAddress, moduleAddress);
 
-        let newHub = new ControlHubConnected(
+        let newHub = new ControlHubConnectedExpansionHub(
             false,
             RevHubType.ExpansionHub,
             this.sendCommand.bind(this),
@@ -626,7 +626,7 @@ export class ControlHubInternal implements ControlHub {
     ): Promise<ParentExpansionHub> {
         let id = await this.openHub(serialNumber, moduleAddress, moduleAddress);
 
-        let newHub = new ControlHubConnected(
+        let newHub = new ControlHubConnectedExpansionHub(
             true,
             RevHubType.ExpansionHub,
             this.sendCommand.bind(this),

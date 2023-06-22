@@ -19,7 +19,7 @@ import {
 } from "@rev-robotics/rev-hub-core";
 import { EventEmitter } from "events";
 
-export class ControlHubConnected implements ParentExpansionHub {
+export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     isParentHub: boolean;
     type: RevHubType;
     id: Exclude<any, Promise<any>>;
@@ -694,7 +694,7 @@ export class ControlHubConnected implements ParentExpansionHub {
             parentHubAddress: this.moduleAddress,
             hubAddress: moduleAddress,
         });
-        let newHub = new ControlHubConnected(
+        let newHub = new ControlHubConnectedExpansionHub(
             false,
             RevHubType.ExpansionHub,
             this.sendCommand.bind(this),
@@ -708,10 +708,10 @@ export class ControlHubConnected implements ParentExpansionHub {
         return newHub;
     }
 
-    flattenChildren(): ControlHubConnected[] {
-        let result: ControlHubConnected[] = [];
+    flattenChildren(): ControlHubConnectedExpansionHub[] {
+        let result: ControlHubConnectedExpansionHub[] = [];
         for (let child of this.children) {
-            if (child instanceof ControlHubConnected) {
+            if (child instanceof ControlHubConnectedExpansionHub) {
                 result.push(child);
                 result.push(...child.flattenChildren());
             }
