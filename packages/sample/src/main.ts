@@ -120,7 +120,10 @@ program
         let gValue = Number(g);
         let bValue = Number(b);
         await led(hub, rValue, gValue, bValue);
-        close();
+
+        process.on("SIGINT", () => {
+            close();
+        });
     });
 
 program
@@ -598,10 +601,7 @@ async function getExpansionHubOrThrow(): Promise<
         } else {
             if (moduleAddress !== undefined) {
                 return [
-                    await controlHub.addHubBySerialNumberAndAddress(
-                        "(embedded)",
-                        moduleAddress!,
-                    ),
+                    (await controlHub.addChildByAddress(moduleAddress!)) as ExpansionHub,
                     onClose,
                 ];
             } else {
