@@ -124,8 +124,8 @@ export class ControlHubInternal implements ControlHub {
                     let payload = JSON.parse(payloadString);
                     let handles = payload.hIds;
                     let status: ModuleStatus = {
-                        statusWord: payload.sw,
-                        motorAlerts: payload.ma,
+                        statusWord: payload.sBf,
+                        motorAlerts: payload.maBf,
                     };
 
                     let allHubs = this.flattenChildren();
@@ -640,7 +640,7 @@ export class ControlHubInternal implements ControlHub {
         serialNumber: string,
         moduleAddress: number,
     ): Promise<ParentExpansionHub> {
-        let id = await this.openHub(serialNumber, this.moduleAddress, moduleAddress);
+        let id = await this.openHub(serialNumber, moduleAddress, moduleAddress);
 
         let newHub = new ControlHubConnected(
             true,
