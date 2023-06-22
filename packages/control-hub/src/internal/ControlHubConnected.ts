@@ -109,7 +109,7 @@ export class ControlHubConnected implements ParentExpansionHub {
     }
 
     async getServoCurrent(): Promise<number> {
-        return await this.sendCommand("getMotorCurrent", {
+        return await this.sendCommand("getServoCurrent", {
             hId: this.id,
         });
     }

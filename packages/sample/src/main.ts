@@ -1,5 +1,15 @@
 import { Command } from "commander";
-import { analog, battery, temperature, voltageRail } from "./command/analog.js";
+import {
+    analog,
+    batteryCurrent,
+    batteryVoltage,
+    digitalBusCurrent,
+    i2cCurrent,
+    motorCurrent,
+    servoCurrent,
+    temperature,
+    voltageRail,
+} from "./command/analog.js";
 import { error } from "./command/error.js";
 import {
     getMotorAlertLevel_mA,
@@ -208,6 +218,20 @@ digitalCommand
 let motorCommand = program.command("motor");
 
 motorCommand
+    .command("current <channel>")
+    .option("--continuous", "Run continuously")
+    .description(
+        "Read the current through a motor. Specify --continuous to run continuously",
+    )
+    .action(async (channel, options) => {
+        let [hub, close] = await getExpansionHubOrThrow();
+        let isContinuous = options.continuous !== undefined;
+        let channelNumber = Number(channel);
+        await motorCurrent(hub, channelNumber, isContinuous);
+        close();
+    });
+
+motorCommand
     .command("encoder <channel>")
     .option("-r --reset", "reset the encoder count")
     .option("--continuous", "run continuously")
@@ -372,8 +396,12 @@ program
         close();
     });
 
-program
+let batteryCommand = program
     .command("battery")
+    .description("Get information about the battery");
+
+batteryCommand
+    .command("voltage")
     .option("--continuous", "Run continuously")
     .description(
         "Read the current battery Voltage. Specify --continuous to run continuously",
@@ -381,7 +409,57 @@ program
     .action(async (options) => {
         let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
-        await battery(hub, isContinuous);
+        await batteryVoltage(hub, isContinuous);
+        close();
+    });
+
+batteryCommand
+    .command("current")
+    .option("--continuous", "Run continuously")
+    .description(
+        "Read the current battery current (mA). Specify --continuous to run continuously",
+    )
+    .action(async (options) => {
+        let [hub, close] = await getExpansionHubOrThrow();
+        let isContinuous = options.continuous !== undefined;
+        await batteryCurrent(hub, isContinuous);
+        close();
+    });
+
+program
+    .command("i2c-current")
+    .option("--continuous", "Run continuously")
+    .description(
+        "Read the I2C sub-system current. Specify --continuous to run continuously",
+    )
+    .action(async (options) => {
+        let [hub, close] = await getExpansionHubOrThrow();
+        let isContinuous = options.continuous !== undefined;
+        await i2cCurrent(hub, isContinuous);
+        close();
+    });
+
+program
+    .command("digital-current")
+    .option("--continuous", "Run continuously")
+    .description("Read the digital bus current. Specify --continuous to run continuously")
+    .action(async (options) => {
+        let [hub, close] = await getExpansionHubOrThrow();
+        let isContinuous = options.continuous !== undefined;
+        await digitalBusCurrent(hub, isContinuous);
+        close();
+    });
+
+program
+    .command("servo-current")
+    .option("--continuous", "Run continuously")
+    .description(
+        "Read the total current through all servos. Specify --continuous to run continuously",
+    )
+    .action(async (options) => {
+        let [hub, close] = await getExpansionHubOrThrow();
+        let isContinuous = options.continuous !== undefined;
+        await servoCurrent(hub, isContinuous);
         close();
     });
 
@@ -411,6 +489,10 @@ program
         let channelNumber = Number(channel);
         let [hub, close] = await getExpansionHubOrThrow();
         await distance(hub, channelNumber, isContinuous);
+
+        process.on("SIGINT", () => {
+            close();
+        });
     });
 
 program.parse(process.argv);
