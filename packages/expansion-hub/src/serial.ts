@@ -1,4 +1,9 @@
-import { NativeSerial, SerialError, SerialFlowControl } from "@rev-robotics/rhsplib";
+import {
+    NativeSerial,
+    Serial,
+    SerialError,
+    SerialFlowControl,
+} from "@rev-robotics/rhsplib";
 import {
     GeneralSerialError,
     InvalidSerialArguments,
@@ -38,7 +43,9 @@ export async function getSerial(serialPortPath: string): Promise<typeof NativeSe
     return openSerialMap.get(serialPortPath);
 }
 
-async function openSerialPort(serialPortPath: string): Promise<typeof NativeSerial> {
+async function openSerialPort(serialPortPath: string): Promise<Serial> {
+    console.log(NativeSerial);
+    console.log(JSON.stringify(NativeSerial));
     let serial = new NativeSerial();
     try {
         await serial.open(

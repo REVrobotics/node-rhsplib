@@ -22,7 +22,7 @@ import {
     setMotorPid,
 } from "./command/motor.js";
 import { list } from "./command/list.js";
-import { led, ledPattern } from "./command/led.js";
+import { getLed, getLedPattern, led, ledPattern } from "./command/led.js";
 import { runServo } from "./command/servo.js";
 import { openUsbControlHubs } from "./adb-setup.js";
 import {
@@ -94,9 +94,20 @@ program
         let [hub, close] = await getExpansionHubOrThrow();
         await ledPattern(hub, steps);
 
+        await getLedPattern(hub);
         process.on("SIGINT", () => {
             close();
         });
+    });
+
+program
+    .command("get-pattern")
+    .description("Get LED Pattern steps")
+    .action(async () => {
+        let [hub, close] = await getExpansionHubOrThrow();
+
+        await getLedPattern(hub);
+        close();
     });
 
 program
@@ -109,6 +120,16 @@ program
         let gValue = Number(g);
         let bValue = Number(b);
         await led(hub, rValue, gValue, bValue);
+        close();
+    });
+
+program
+    .command("get-led")
+    .description("Get LED color. Values are [0,255]")
+    .action(async (r, g, b) => {
+        let [hub, close] = await getExpansionHubOrThrow();
+        await getLed(hub);
+
         close();
     });
 

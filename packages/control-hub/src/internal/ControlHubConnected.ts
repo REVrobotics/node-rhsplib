@@ -219,8 +219,29 @@ export class ControlHubConnected implements ParentExpansionHub {
         };
     }
 
-    getModuleLedPattern(): Promise<LedPattern> {
-        throw new Error("not implemented");
+    async getModuleLedPattern(): Promise<LedPattern> {
+        let pattern: any = await this.sendCommand("getLedPattern", {
+            hId: this.id,
+        });
+
+        return {
+            rgbtPatternStep0: pattern.s0,
+            rgbtPatternStep1: pattern.s1,
+            rgbtPatternStep2: pattern.s2,
+            rgbtPatternStep3: pattern.s3,
+            rgbtPatternStep4: pattern.s4,
+            rgbtPatternStep5: pattern.s5,
+            rgbtPatternStep6: pattern.s6,
+            rgbtPatternStep7: pattern.s7,
+            rgbtPatternStep8: pattern.s8,
+            rgbtPatternStep9: pattern.s9,
+            rgbtPatternStep10: pattern.s10,
+            rgbtPatternStep11: pattern.s11,
+            rgbtPatternStep12: pattern.s12,
+            rgbtPatternStep13: pattern.s13,
+            rgbtPatternStep14: pattern.s14,
+            rgbtPatternStep15: pattern.s15,
+        };
     }
 
     async getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus> {

@@ -2,6 +2,7 @@ import {
     createLedPattern,
     LedPatternStep,
     openConnectedExpansionHubs,
+    Rgb,
 } from "@rev-robotics/expansion-hub";
 import { ExpansionHub } from "@rev-robotics/rev-hub-core";
 import { openUsbControlHubs } from "../adb-setup.js";
@@ -49,4 +50,39 @@ export async function led(
 ): Promise<void> {
     console.log(`Setting color to ${r} ${g}, ${b}`);
     await hub.setModuleLedColor(r, g, b);
+}
+
+export async function getLed(hub: ExpansionHub) {
+    let rgb = await hub.getModuleLedColor();
+
+    console.log(`r: ${rgb.red}, g: ${rgb.green}, b: ${rgb.blue}`);
+}
+
+export async function getLedPattern(hub: ExpansionHub) {
+    let pattern = await hub.getModuleLedPattern();
+    let steps = [
+        pattern.rgbtPatternStep0,
+        pattern.rgbtPatternStep1,
+        pattern.rgbtPatternStep2,
+        pattern.rgbtPatternStep3,
+        pattern.rgbtPatternStep4,
+        pattern.rgbtPatternStep5,
+        pattern.rgbtPatternStep6,
+        pattern.rgbtPatternStep7,
+        pattern.rgbtPatternStep8,
+        pattern.rgbtPatternStep9,
+        pattern.rgbtPatternStep10,
+        pattern.rgbtPatternStep11,
+        pattern.rgbtPatternStep12,
+        pattern.rgbtPatternStep13,
+        pattern.rgbtPatternStep14,
+        pattern.rgbtPatternStep15,
+    ];
+
+    for (let step of steps) {
+        if (step === 0) break;
+        console.log(
+            `t: ${(step & 0xff) * 10}, color: ${((step & 0xffffff00) >> 8).toString(16)}`,
+        );
+    }
 }
