@@ -1,4 +1,4 @@
-import { ExpansionHub, MotorMode } from "@rev-robotics/rev-hub-core";
+import { ExpansionHub, MotorMode, PidCoefficients } from "@rev-robotics/rev-hub-core";
 
 export async function runMotorConstantPower(
     hub: ExpansionHub,
@@ -65,4 +65,40 @@ export async function runEncoder(
 
 export async function resetEncoder(hub: ExpansionHub, channel: number) {
     await hub.resetMotorEncoder(channel);
+}
+
+export async function setMotorAlertLevel(
+    hub: ExpansionHub,
+    channel: number,
+    currentLimit_mA: number,
+) {
+    await hub.setMotorChannelCurrentAlertLevel(channel, currentLimit_mA);
+}
+
+export async function getMotorAlertLevel_mA(
+    hub: ExpansionHub,
+    channel: number,
+): Promise<number> {
+    return await hub.getMotorChannelCurrentAlertLevel(channel);
+}
+
+export async function setMotorPid(
+    hub: ExpansionHub,
+    channel: number,
+    p: number,
+    i: number,
+    d: number,
+) {
+    await hub.setMotorPIDCoefficients(channel, MotorMode.REGULATED_VELOCITY, {
+        p: p,
+        i: i,
+        d: d,
+    });
+
+    let pid: PidCoefficients = await hub.getMotorPIDCoefficients(
+        channel,
+        MotorMode.REGULATED_VELOCITY,
+    );
+
+    console.log(JSON.stringify(pid));
 }

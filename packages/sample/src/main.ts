@@ -2,11 +2,14 @@ import { Command } from "commander";
 import { analog, battery, temperature, voltageRail } from "./command/analog.js";
 import { error } from "./command/error.js";
 import {
+    getMotorAlertLevel_mA,
     resetEncoder,
     runEncoder,
     runMotorConstantPower,
     runMotorConstantVelocity,
     runMotorToPosition,
+    setMotorAlertLevel,
+    setMotorPid,
 } from "./command/motor.js";
 import { list } from "./command/list.js";
 import { led, ledPattern } from "./command/led.js";
@@ -241,6 +244,20 @@ motorCommand
     });
 
 motorCommand
+    .command("pid <channel> <p> <i> <d>")
+    .description("Set PID coefficients for a motor")
+    .action(async (channel, p, i, d) => {
+        let channelNumber = Number(channel);
+        let pValue = Number(p);
+        let iValue = Number(i);
+        let dValue = Number(d);
+        let [hub, close] = await getExpansionHubOrThrow();
+
+        await setMotorPid(hub, channelNumber, pValue, iValue, dValue);
+        close();
+    });
+
+motorCommand
     .command("velocity <channel> <speed>")
     .description("Tell a motor to run at a given speed")
     .action(async (channel, speed) => {
@@ -277,6 +294,33 @@ motorCommand
             close();
             process.exit();
         });
+    });
+
+let alertCommand = motorCommand
+    .command("alert")
+    .description("Get or set motor alert current (mA)");
+
+alertCommand
+    .command("get <channel>")
+    .description("Get motor alert current (mA)")
+    .action(async (channel) => {
+        let channelNumber = Number(channel);
+        let [hub, close] = await getExpansionHubOrThrow();
+        let current = await getMotorAlertLevel_mA(hub, channelNumber);
+
+        console.log(`Motor alert for channel ${channelNumber} is ${current} mA`);
+        close();
+    });
+
+alertCommand
+    .command("set <channel> <current>")
+    .description("Set motor alert current (mA)")
+    .action(async (channel, current) => {
+        let channelNumber = Number(channel);
+        let currentValue = Number(current);
+        let [hub, close] = await getExpansionHubOrThrow();
+        await setMotorAlertLevel(hub, channelNumber, currentValue);
+        close();
     });
 
 program
