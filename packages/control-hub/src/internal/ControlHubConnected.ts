@@ -4,9 +4,7 @@ import {
     DigitalState,
     DioDirection,
     ExpansionHub,
-    I2CReadStatus,
     I2CSpeedCode,
-    I2CWriteStatus,
     LedPattern,
     ModuleInterface,
     ModuleStatus,
@@ -432,8 +430,18 @@ export class ControlHubConnected implements ParentExpansionHub {
 
     async readVersion(): Promise<Version> {
         let versionString = await this.readVersionString();
-        //ToDo(landry) parse version string
-        throw new Error("not implemented");
+        let parts = versionString.split(".");
+        if (parts.length != 3) {
+            throw new Error(`Version ${versionString} does not have 3 parts`);
+        }
+        return {
+            majorVersion: Number(parts[0]),
+            minorVersion: Number(parts[1]),
+            engineeringRevision: Number(parts[2]),
+            minorHwRevision: 0, //hardcoded in RHSPlib_device_control.c
+            majorHwRevision: 2, //hardcoded in RHSPlib_device_control.c
+            hwType: 0x311153, //hardcoded in RHSPlib_device_control.c
+        };
     }
 
     async readVersionString(): Promise<string> {
