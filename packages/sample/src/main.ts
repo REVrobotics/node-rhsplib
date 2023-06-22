@@ -47,7 +47,7 @@ import { distance } from "./command/distance.js";
 import { getBulkInputData } from "./command/bulkinput.js";
 import { status } from "./command/status.js";
 import { openUsbControlHubsAndChildren } from "./open-usb-control-hub.js";
-import { injectLog } from "./command/log.js";
+import { injectLog, setDebugLogLevel } from "./command/log.js";
 import { sendFailSafe } from "./command/failsafe.js";
 import { queryInterface } from "./command/query.js";
 import { setHubAddress } from "./command/set-hub-address.js";
@@ -150,6 +150,16 @@ program
     .action(async (text) => {
         let [hub, close] = await getExpansionHubOrThrow();
         await injectLog(hub, text);
+        close();
+    });
+
+program
+    .command("loglevel <group> <level>")
+    .description("Inject a log hint")
+    .action(async (group, level) => {
+        let [hub, close] = await getExpansionHubOrThrow();
+        let levelNumber = Number(level);
+        await setDebugLogLevel(hub, group, levelNumber);
         close();
     });
 
