@@ -169,9 +169,7 @@ export class ControlHubConnected implements ParentExpansionHub {
     }
 
     async getFTDIResetControl(): Promise<boolean> {
-        return await this.sendCommand("getFtdiResetControl", {
-            hId: this.id,
-        });
+        return false;
     }
 
     async getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode> {
@@ -183,14 +181,6 @@ export class ControlHubConnected implements ParentExpansionHub {
         return speedCode == 1
             ? I2CSpeedCode.SpeedCode400_Kbps
             : I2CSpeedCode.SpeedCode100_Kbps;
-    }
-
-    getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus> {
-        throw new Error("not implemented");
-    }
-
-    getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus> {
-        throw new Error("not implemented");
     }
 
     async getInterfacePacketID(
@@ -467,14 +457,6 @@ export class ControlHubConnected implements ParentExpansionHub {
 
     async sendKeepAlive(): Promise<void> {}
 
-    async sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
-        return Promise.resolve([]);
-    }
-
-    sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
-        return Promise.resolve([]);
-    }
-
     async setDebugLogLevel(
         debugGroup: DebugGroup,
         verbosityLevel: VerbosityLevel,
@@ -509,11 +491,7 @@ export class ControlHubConnected implements ParentExpansionHub {
         });
     }
 
-    async setFTDIResetControl(ftdiResetControl: boolean): Promise<void> {
-        await this.sendCommand("setFtdiResetControl", {
-            hId: this.id,
-        });
-    }
+    async setFTDIResetControl(_ftdiResetControl: boolean): Promise<void> {}
 
     async setI2CChannelConfiguration(
         i2cChannel: number,

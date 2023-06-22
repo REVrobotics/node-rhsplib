@@ -291,14 +291,6 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.getI2CChannelConfiguration(i2cChannel);
     }
 
-    getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus> {
-        return this.embedded.getI2CReadStatus(i2cChannel);
-    }
-
-    getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus> {
-        return this.embedded.getI2CWriteStatus(i2cChannel);
-    }
-
     async getInterfacePacketID(
         interfaceName: string,
         functionNumber: number,
@@ -453,14 +445,6 @@ export class ControlHubInternal implements ControlHub {
 
     async sendKeepAlive(): Promise<void> {
         return this.embedded.sendKeepAlive();
-    }
-
-    async sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
-        return this.embedded.sendReadCommand(packetTypeID, payload);
-    }
-
-    sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
-        return this.embedded.sendWriteCommand(packetTypeID, payload);
     }
 
     async setDebugLogLevel(

@@ -10,7 +10,6 @@ import { Version } from "./Version.js";
 import { DioDirection } from "./DioDirection.js";
 import { I2CSpeedCode } from "./I2CSpeedCode.js";
 import { I2CWriteStatus } from "./I2CWriteStatus.js";
-import { I2CReadStatus } from "./I2CReadStatus.js";
 import { PidCoefficients } from "./PidCoefficients.js";
 import { MotorMode } from "./MotorMode.js";
 import { DigitalState } from "./digital-state.js";
@@ -28,8 +27,6 @@ export interface ExpansionHub extends RevHub {
      * it has been closed.
      */
     close(): void;
-    sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
-    sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
     getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus>;
     sendKeepAlive(): Promise<void>;
     sendFailSafe(): Promise<void>;
@@ -151,7 +148,6 @@ export interface ExpansionHub extends RevHub {
         targetAddress: number,
         bytes: number[],
     ): Promise<void>;
-    getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus>;
 
     /**
      * Read a single byte from a target device. Use {@link getI2CReadStatus} to
@@ -187,13 +183,6 @@ export interface ExpansionHub extends RevHub {
         numBytesToRead: number,
         register: number,
     ): Promise<number[]>;
-
-    /**
-     * Get the read status, indicating whether a read was successful and how
-     * much data was read.
-     * @param i2cChannel
-     */
-    getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus>;
 
     // Motor
     /**
