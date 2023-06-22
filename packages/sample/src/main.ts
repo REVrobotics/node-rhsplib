@@ -37,7 +37,12 @@ import {
     openHubWithAddress,
     openParentExpansionHub,
 } from "@rev-robotics/expansion-hub";
-import { digitalRead, digitalWrite } from "./command/digital.js";
+import {
+    digitalRead,
+    digitalReadAll,
+    digitalWrite,
+    digitalWriteAll,
+} from "./command/digital.js";
 import { distance } from "./command/distance.js";
 import { getBulkInputData } from "./command/bulkinput.js";
 import { status } from "./command/status.js";
@@ -212,6 +217,33 @@ digitalCommand
         let [hub, close] = await getExpansionHubOrThrow();
 
         await digitalRead(hub, channelNumber, isContinuous);
+        close();
+    });
+
+digitalCommand
+    .command("readall")
+    .option("--continuous", "run continuously")
+    .description("read all digital pins")
+    .action(async (options) => {
+        let isContinuous = options.continuous !== undefined;
+        let [hub, close] = await getExpansionHubOrThrow();
+
+        await digitalReadAll(hub, isContinuous);
+        close();
+    });
+
+digitalCommand
+    .command("writeall <bitfield> <bitmask>")
+    .option("--continuous", "run continuously")
+    .description(
+        "Write all digital pins. Input value as a binary bitfield and a binary bitmask, where 1=output",
+    )
+    .action(async (bitfield, bitmask) => {
+        let bitfieldValue = parseInt(bitfield, 2);
+        let bitmaskValue = parseInt(bitmask, 2);
+        let [hub, close] = await getExpansionHubOrThrow();
+
+        await digitalWriteAll(hub, bitfieldValue, bitmaskValue);
         close();
     });
 

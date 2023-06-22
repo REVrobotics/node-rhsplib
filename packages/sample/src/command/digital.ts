@@ -27,3 +27,26 @@ export async function digitalWrite(
     );
     await hub.setDigitalOutput(channel, state);
 }
+
+export async function digitalReadAll(hub: ExpansionHub, continuous: boolean) {
+    while (true) {
+        let inputs = await hub.getAllDigitalInputs();
+        console.log(`Digital Pins: ${inputs.toString(2).padStart(8, "0")}`);
+        if (!continuous) break;
+    }
+}
+
+export async function digitalWriteAll(
+    hub: ExpansionHub,
+    bitfield: number,
+    bitmask: number,
+) {
+    for (let i = 0; i < 8; i++) {
+        if (((bitmask >> i) & 1) == 1) {
+            await hub.setDigitalDirection(i, DioDirection.Output);
+        } else {
+            await hub.setDigitalDirection(i, DioDirection.Input);
+        }
+    }
+    await hub.setAllDigitalOutputs(bitfield);
+}

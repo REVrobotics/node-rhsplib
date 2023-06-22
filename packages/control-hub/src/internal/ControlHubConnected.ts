@@ -151,7 +151,7 @@ export class ControlHubConnected implements ParentExpansionHub {
     }
 
     async getDigitalDirection(dioPin: number): Promise<DioDirection> {
-        let isOutput = await this.sendCommand("getDigitalDirection", {
+        let isOutput: boolean = await this.sendCommand("isDigitalOutput", {
             hId: this.id,
             c: dioPin,
         });
