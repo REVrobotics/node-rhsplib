@@ -1,5 +1,6 @@
-import { ExpansionHub, openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
 import { hubHierarchyToString } from "../HubStringify.js";
+import { ExpansionHub } from "@rev-robotics/rev-hub-core";
+import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
 
 export async function list() {
     const hubs: ExpansionHub[] = await openConnectedExpansionHubs();
