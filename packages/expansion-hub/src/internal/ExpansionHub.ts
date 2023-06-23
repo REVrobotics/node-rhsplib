@@ -1,7 +1,7 @@
 import {
     BulkInputData,
     ClosedLoopControlAlgorithm,
-    CommandNotSupportedError,
+    CommandNotSupportedError, ControlHub,
     DebugGroup,
     DigitalChannelDirection,
     DigitalState,
@@ -64,6 +64,10 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     isExpansionHub(): this is ExpansionHub {
         return true;
+    }
+
+    isControlHub(): this is ControlHub {
+        return false;
     }
 
     close(): void {

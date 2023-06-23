@@ -172,10 +172,6 @@ export class ControlHubInternal implements ControlHub {
         }
     }
 
-    private isControlHub(path: string): boolean {
-        return path.includes("_box") && path.includes("msm8916_64");
-    }
-
     async subscribe(): Promise<void> {
         let payload = {
             namespace: "system",
@@ -353,6 +349,10 @@ export class ControlHubInternal implements ControlHub {
     }
 
     isExpansionHub(): this is ExpansionHub {
+        return true;
+    }
+
+    isControlHub(): this is ControlHub {
         return true;
     }
 

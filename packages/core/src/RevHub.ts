@@ -1,5 +1,6 @@
 import { RevHubType } from "./RevHubType.js";
 import { ExpansionHub } from "./ExpansionHub.js";
+import { ControlHub } from "./ControlHub.js";
 
 export interface RevHub {
     readonly moduleAddress: number;
@@ -7,6 +8,7 @@ export interface RevHub {
 
     isParent(): this is ParentRevHub;
     isExpansionHub(): this is ExpansionHub;
+    isControlHub(): this is ControlHub;
 
     /**
      * Listen for errors that do not happen as a result of a specific function call

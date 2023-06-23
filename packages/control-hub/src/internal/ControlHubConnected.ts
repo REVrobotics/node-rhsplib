@@ -1,6 +1,6 @@
 import {
     BulkInputData,
-    ClosedLoopControlAlgorithm,
+    ClosedLoopControlAlgorithm, ControlHub,
     DebugGroup,
     DigitalChannelDirection,
     ExpansionHub,
@@ -324,6 +324,11 @@ export class ControlHubConnected implements ParentExpansionHub {
 
     isExpansionHub(): this is ExpansionHub {
         return true;
+    }
+
+    isControlHub(): this is ControlHub {
+        //this class represents the expansion hub board, so it is not a control hub.
+        return false;
     }
 
     on(eventName: "error", listener: (error: Error) => void): RevHub {
