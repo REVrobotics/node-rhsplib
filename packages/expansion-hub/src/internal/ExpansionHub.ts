@@ -1,4 +1,9 @@
-import { ExpansionHub, ParentRevHub, RevHub } from "@rev-robotics/rev-hub-core";
+import {
+    ControlHub,
+    ExpansionHub,
+    ParentRevHub,
+    RevHub,
+} from "@rev-robotics/rev-hub-core";
 import {
     NativeRevHub,
     Serial as SerialPort,
@@ -63,6 +68,10 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     isExpansionHub(): this is ExpansionHub {
         return true;
+    }
+
+    isControlHub(): this is ControlHub {
+        return false;
     }
 
     close(): void {
