@@ -159,9 +159,9 @@ program
 program
     .command("loglevel <group> <level>")
     .description(
-        "Set log level. Valid values are: Main, " +
+        "Set log level. Valid values for group are: Main, " +
             "TransmitterToHost, ReceiverFromHost, ADC, PWMAndServo, ModuleLED, " +
-            "DigitalIO, I2C, Motor0, Motor1, Motor2, or Motor3",
+            "DigitalIO, I2C, Motor0, Motor1, Motor2, or Motor3. Valid values for level are [0,3]",
     )
     .action(async (group, level) => {
         let [hub, close] = await getExpansionHubOrThrow();
