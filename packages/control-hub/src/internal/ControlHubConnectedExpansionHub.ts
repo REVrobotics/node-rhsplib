@@ -20,7 +20,7 @@ import {
     Version,
 } from "@rev-robotics/rev-hub-core";
 
-export class ControlHubConnected implements ParentExpansionHub {
+export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     isParentHub: boolean;
     type: RevHubType;
     id: Exclude<any, Promise<any>>;
@@ -630,7 +630,7 @@ export class ControlHubConnected implements ParentExpansionHub {
             parentHubAddress: this.moduleAddress,
             hubAddress: moduleAddress,
         });
-        let newHub = new ControlHubConnected(
+        let newHub = new ControlHubConnectedExpansionHub(
             false,
             RevHubType.ExpansionHub,
             this.sendCommand.bind(this),
