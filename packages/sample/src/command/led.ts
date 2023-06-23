@@ -2,7 +2,6 @@ import {
     createLedPattern,
     ExpansionHub,
     LedPatternStep,
-    openConnectedExpansionHubs,
 } from "@rev-robotics/expansion-hub";
 
 export async function led(hub: ExpansionHub) {
