@@ -24,7 +24,7 @@ import {
 } from "@rev-robotics/rev-hub-core";
 import { openUsbControlHubs } from "rev-hub-cli/dist/adb-setup.js";
 import { clearTimeout } from "timers";
-import { ControlHubConnected } from "./ControlHubConnected.js";
+import { ControlHubConnectedExpansionHub } from "./ControlHubConnectedExpansionHub.js";
 
 export class ControlHubInternal implements ControlHub {
     readonly isOpen: boolean = true;
@@ -58,7 +58,7 @@ export class ControlHubInternal implements ControlHub {
      * The board for this control hub. All Expansion Hub commands go through
      * this delegate.
      */
-    private embedded!: ControlHubConnected;
+    private embedded!: ControlHubConnectedExpansionHub;
 
     private webSocketConnection!: WebSocket;
     private currentActiveCommands = new Map<
@@ -116,7 +116,7 @@ export class ControlHubInternal implements ControlHub {
 
                 this.id = await this.openHub("(embedded)", this.moduleAddress);
 
-                this.embedded = new ControlHubConnected(
+                this.embedded = new ControlHubConnectedExpansionHub(
                     true,
                     RevHubType.ControlHub,
                     this.sendCommand.bind(this),
@@ -553,7 +553,7 @@ export class ControlHubInternal implements ControlHub {
     ): Promise<ParentRevHub> {
         let id = await this.openHub(serialNumber, moduleAddress, moduleAddress);
 
-        let newHub = new ControlHubConnected(
+        let newHub = new ControlHubConnectedExpansionHub(
             true,
             RevHubType.ExpansionHub,
             this.sendCommand.bind(this),
