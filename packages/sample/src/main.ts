@@ -4,6 +4,7 @@ import { error } from "./command/error.js";
 import { list } from "./command/list.js";
 import { led } from "./command/led.js";
 import { runServo } from "./command/servo.js";
+import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
 
 const program = new Command();
 
@@ -30,7 +31,9 @@ program
     .command("led")
     .description("Run LED steps")
     .action(async () => {
-        await led();
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        await led(hub);
     });
 
 program
@@ -43,7 +46,9 @@ program
     .action(async (port, options) => {
         let isContinuous = options.continuous !== undefined;
         let portNumber = Number(port);
-        await analog(portNumber, isContinuous);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        await analog(hub, portNumber, isContinuous);
     });
 
 program
@@ -55,7 +60,9 @@ program
     )
     .action(async (options) => {
         let isContinuous = options.continuous !== undefined;
-        await temperature(isContinuous);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        await temperature(hub, isContinuous);
     });
 
 program
@@ -66,7 +73,9 @@ program
     )
     .action(async (options) => {
         let isContinuous = options.continuous !== undefined;
-        await voltageRail(isContinuous);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        await voltageRail(hub, isContinuous);
     });
 
 program
@@ -77,7 +86,9 @@ program
     )
     .action(async (options) => {
         let isContinuous = options.continuous !== undefined;
-        await battery(isContinuous);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        await battery(hub, isContinuous);
     });
 
 program
@@ -87,8 +98,10 @@ program
         let channelValue = Number(channel);
         let pulseWidthValue = Number(pulseWidth);
         let frameWidthValue = frameWidth ? Number(frameWidth) : 4000;
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
 
-        await runServo(channelValue, pulseWidthValue, frameWidthValue);
+        await runServo(hub, channelValue, pulseWidthValue, frameWidthValue);
     });
 
 program.parse(process.argv);
