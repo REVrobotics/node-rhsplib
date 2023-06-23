@@ -129,7 +129,7 @@ program
 program
     .command("get-led")
     .description("Get LED color. Values are [0,255]")
-    .action(async (r, g, b) => {
+    .action(async () => {
         let [hub, close] = await getExpansionHubOrThrow();
         await getLed(hub);
 
@@ -158,7 +158,7 @@ program
 
 program
     .command("loglevel <group> <level>")
-    .description("Inject a log hint")
+    .description("Set log level")
     .action(async (group, level) => {
         let [hub, close] = await getExpansionHubOrThrow();
         let levelNumber = Number(level);
