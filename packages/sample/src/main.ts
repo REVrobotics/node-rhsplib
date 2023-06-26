@@ -6,6 +6,8 @@ import {
     runMotorConstantVelocity,
     runMotorToPosition,
     setMotorPid,
+    setMotorAlertLevel,
+    getMotorAlertLevel_mA,
 } from "./command/motor.js";
 import { analog, battery, temperature, voltageRail } from "./command/analog.js";
 import { error } from "./command/error.js";
@@ -96,6 +98,44 @@ motorCommand
         });
 
         await setMotorPid(hub, channelNumber, pValue, iValue, dValue);
+        hub.close();
+    });
+let alertCommand = motorCommand
+    .command("alert")
+    .description("Get or set motor alert current (mA)");
+
+alertCommand
+    .command("get <channel>")
+    .description("Get motor alert current (mA)")
+    .action(async (channel) => {
+        let channelNumber = Number(channel);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        let current = await getMotorAlertLevel_mA(hub, channelNumber);
+
+        console.log(`Motor alert for channel ${channelNumber} is ${current} mA`);
+        hub.close();
+    });
+
+alertCommand
+    .command("set <channel> <current>")
+    .description("Set motor alert current (mA)")
+    .action(async (channel, current) => {
+        let channelNumber = Number(channel);
+        let currentValue = Number(current);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await setMotorAlertLevel(hub, channelNumber, currentValue);
         hub.close();
     });
 
