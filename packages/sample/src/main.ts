@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import {
     resetEncoder,
-    runEncoder,
+    readEncoder,
     runMotorConstantPower,
     runMotorConstantVelocity,
     runMotorToPosition,
@@ -67,7 +67,7 @@ motorCommand
             await resetEncoder(channelNumber);
         } else {
             let isContinuous = options.continuous !== undefined;
-            await runEncoder(channelNumber, isContinuous);
+            await readEncoder(channelNumber, isContinuous);
         }
     });
 

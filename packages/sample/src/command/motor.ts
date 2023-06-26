@@ -34,7 +34,7 @@ export async function runMotorToPosition(
     await hub.setMotorChannelEnable(channel, true);
 }
 
-export async function runEncoder(channel: number, continuous: boolean) {
+export async function readEncoder(channel: number, continuous: boolean) {
     const hubs = await openConnectedExpansionHubs();
     let hub = hubs[0];
 
