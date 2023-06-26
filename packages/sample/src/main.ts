@@ -77,32 +77,54 @@ motorCommand
         "Tell a motor to run at a given pwm duty cycle. Power is in the range [-1.0, 1.0]",
     )
     .action(async (channel, power) => {
-        console.log(`${channel} ${power}`);
         let channelNumber = Number(channel);
         let powerNumber = Number(power);
-        await runMotorConstantPower(channelNumber, powerNumber);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.setMotorChannelEnable(channelNumber, false);
+            hub.close();
+        });
+
+        await runMotorConstantPower(hub, channelNumber, powerNumber);
     });
 
 motorCommand
     .command("velocity <channel> <speed>")
     .description("Tell a motor to run at a given speed")
     .action(async (channel, speed) => {
-        console.log(`${channel} ${speed}`);
         let channelNumber = Number(channel);
         let speedNumber = Number(speed);
-        await runMotorConstantVelocity(channelNumber, speedNumber);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.setMotorChannelEnable(channelNumber, false);
+            hub.close();
+        });
+
+        await runMotorConstantVelocity(hub, channelNumber, speedNumber);
     });
 
 motorCommand
     .command("position <channel> <velocity> <position> <tolerance>")
     .description("Tell a motor to run to a given position")
     .action(async (channel, velocity, position, tolerance) => {
-        console.log(`${channel} ${position} ${tolerance}`);
         let channelNumber = Number(channel);
         let positionNumber = Number(position);
         let toleranceNumber = Number(tolerance);
         let velocityNumber = Number(velocity);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.setMotorChannelEnable(channelNumber, false);
+            hub.close();
+        });
+
         await runMotorToPosition(
+            hub,
             channelNumber,
             velocityNumber,
             positionNumber,
