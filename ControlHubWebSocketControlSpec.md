@@ -31,90 +31,38 @@ We don't want to fight with a user Op Mode over control of the hardware; that wo
 
 There will be additional commands for the various things that an Expansion/Control Hub can do, which typically map to the different RHSP commands.
 
-### Close
+### Stop
 
-**Name**: `close` \
+Stops the MC op mode.
+
+**Name**: `stop` \
 **Payload**: None \
 **Response**: None
-
-### Send Write Command
-
-**Name**: `sendWriteCommand`
-
-#### Payload
-
-```
-{
-    packetTypeId: number
-    payload: number[]
-}
-```
-
-#### Response
-
-```
-{
-    response: number[]
-}
-```
-
-### Send Read Command
-
-**Name**: `sendReadCommand`
-
-#### Payload
-
-```
-{
-    packetTypeId: number
-    payload: number[]
-}
-```
-
-#### Response
-
-```
-{
-    response: number[]
-}
-```
-
-### Get Module Status
-
-**Name**: `getModuleStatus`
-
-#### Payload
-
-```
-{
-    clear: boolean
-}
-```
-
-#### Response
-
-```
-{
-    statusWord: number // range: [0,7]
-    motorAlerts: number // range: [0,5]
-}
-```
 
 ### Send Fail Safe
 
-**Name**: `sendFailSafe` \
-**Payload**: None \
-**Response**: None
-
-### Set Module Address
-
-**Name**: `setModuleAddress`
+**Name**: `sendFailSafe`
 
 #### Payload
 
 ```
 {
-    address: number
+  hId: any
+}
+```
+
+**Response**: None
+
+### Set Hub Address
+
+**Name**: `setHubAddress`
+
+#### Payload
+
+```
+{
+  hId: any,
+  newAddress: [0,255]
 }
 ```
 
@@ -128,6 +76,7 @@ Name: `queryInterface`
 
 ```
 {
+  hId: any,
   interfaceName: string
 }
 ```
@@ -136,22 +85,24 @@ Name: `queryInterface`
 
 ```
 {
-  packetId: number
-  numIdValues: number
+  name: string,
+  firstPacketId: number,
+  numberIds: number
 }
 ```
 
 ### Set Module LED color
 
-**Name**: `setModuleLedColor`
+**Name**: `setLedColor`
 
 #### Payload
 
 ```
 {
-    red: number //range: [0,255]
-    green: number //range: [0,255]
-    blue: number //range: [0,255]
+  hId: any,
+  r: [0,255],
+  g: [0,255],
+  b: [0,255]
 }
 ```
 
@@ -159,28 +110,52 @@ Name: `queryInterface`
 
 ### Get Module LED Color
 
-**Name**: `getModuleLedColor`\
-**Payload**: None
-
-#### Response
-
-```
-{
-  red: number
-  green: number
-  blue: number
-}
-```
-
-### Set Module LED Pattern
-
-**Name**: `setModuleLedPattern`
+**Name**: `getLedColor`\
 
 #### Payload
 
 ```
 {
-    pattern: number[][] //array of 4-element number arrays in t,r,g,b format.
+  hId: any
+}
+```
+
+#### Response
+
+```
+{
+  hId: any,
+  r: [0,255],
+  g: [0,255],
+  b: [0,255]
+}
+```
+
+### Set Module LED Pattern
+
+**Name**: `setLedPattern`
+
+#### Payload
+
+```
+{
+  hId: any,
+  s0: number, //bytes in t,r,g,b format.
+  s1: number, //bytes in t,r,g,b format.
+  s2: number, //bytes in t,r,g,b format.
+  s3: number, //bytes in t,r,g,b format.
+  s4: number, //bytes in t,r,g,b format.
+  s5: number, //bytes in t,r,g,b format.
+  s6: number, //bytes in t,r,g,b format.
+  s7: number, //bytes in t,r,g,b format.
+  s8: number, //bytes in t,r,g,b format.
+  s9: number, //bytes in t,r,g,b format.
+  s10: number, //bytes in t,r,g,b format.
+  s11: number, //bytes in t,r,g,b format.
+  s12: number, //bytes in t,r,g,b format.
+  s13: number, //bytes in t,r,g,b format.
+  s14: number, //bytes in t,r,g,b format.
+  s15: number //bytes in t,r,g,b format.
 }
 ```
 
@@ -188,14 +163,36 @@ Name: `queryInterface`
 
 ### Get Module LED Pattern
 
-**Name**: `getModuleLedPattern` \
-**Payload**: None
+**Name**: `getLedPattern` \
+
+#### Payload
+
+```
+{
+  hId: any
+}
+```
 
 #### Response
 
 ```
 {
-    pattern: number[][] //array of 4-element number arrays in t,r,g,b format.
+  s0: number, //bytes in t,r,g,b format.
+  s1: number, //bytes in t,r,g,b format.
+  s2: number, //bytes in t,r,g,b format.
+  s3: number, //bytes in t,r,g,b format.
+  s4: number, //bytes in t,r,g,b format.
+  s5: number, //bytes in t,r,g,b format.
+  s6: number, //bytes in t,r,g,b format.
+  s7: number, //bytes in t,r,g,b format.
+  s8: number, //bytes in t,r,g,b format.
+  s9: number, //bytes in t,r,g,b format.
+  s10: number, //bytes in t,r,g,b format.
+  s11: number, //bytes in t,r,g,b format.
+  s12: number, //bytes in t,r,g,b format.
+  s13: number, //bytes in t,r,g,b format.
+  s14: number, //bytes in t,r,g,b format.
+  s15: number //bytes in t,r,g,b format.
 }
 ```
 
@@ -207,39 +204,36 @@ Name: `queryInterface`
 
 ```
 {
-    /*
-        Main = 1
-        Transmitter (to Host) = 2
-        Receiver (from Host) = 3
-        ADC = 4
-        PWM and Servo = 5
-        Module LED = 6
-        Digital IO = 7
-        I2C = 8
-        Motor 0 = 9
-        Motor 1 = 10
-        Motor 2 = 11
-        Motor 3 = 12
-    */
-    debugGroup: number
-    verbosity: number // [1 = least verbose, 3 = most verbose]
+  /*
+     Main = 1
+     Transmitter (to Host) = 2
+     Receiver (from Host) = 3
+     ADC = 4
+     PWM and Servo = 5
+     Module LED = 6
+     Digital IO = 7
+     I2C = 8
+     Motor 0 = 9
+     Motor 1 = 10
+     Motor 2 = 11
+     Motor 3 = 12
+     */
+     debugGroup: number
+     verbosity: number // [0 = off, 1 = least verbose, 3 = most verbose]
 }
 ```
 
 **Response**: None
 
-### Get Interface Packet ID
+### Get Bulk Input Data
 
-This method is not well-documented
-
-**Name**: `getInterfacePacketId`
+**Name**: `getBulkInputData` \
 
 #### Payload
 
 ```
 {
-    interfaceName: string
-    functionNumber: number
+  hId: any
 }
 ```
 
@@ -247,83 +241,185 @@ This method is not well-documented
 
 ```
 {
-    response: number
-}
-```
-
-### Get Bulk Input Data
-
-**Name**: `getBulkInputData` \
-**Payload**: None
-
-#### Response
-
-```
-{
-    digitalInputs: number //bitmap of digital pins
-    motor0position_enc: number //Motor 0 encoder raw counts
-    motor1position_enc: number //Motor 1 encoder raw counts
-    motor2position_enc: number //Motor 2 encoder raw counts
-    motor3position_enc: number //Motor 3 encoder raw counts
-    motorStatus: number //Motor Status byte [0,0x0F]
-    motor0velocity_cps: number //Motor 0 velocity counts per second
-    motor1velocity_cps: number //Motor 1 velocity counts per second
-    motor2velocity_cps: number //Motor 2 velocity counts per second
-    motor3velocity_cps: number //Motor 3 velocity counts per second
-    analog0_mV: number //analog input 0 mV
-    analog1_mV: number //analog input 1 mV
-    analog2_mV: number //analog input 2 mV
-    analog3_mV: number //analog input 3 mV
-    attentionRequired: number
+  diBf: number //bitmap of digital pins
+  m0ep: number //Motor 0 encoder raw counts
+  m1ep: number //Motor 1 encoder raw counts
+  m2ep: number //Motor 2 encoder raw counts
+  m3ep: number //Motor 3 encoder raw counts
+  msBf: number //Motor Status byte [0,0x0F]
+  m0v: number //Motor 0 velocity counts per second
+  m1v: number //Motor 1 velocity counts per second
+  m2v: number //Motor 2 velocity counts per second
+  m3v: number //Motor 3 velocity counts per second
+  a0: number //analog input 0 mV
+  a1: number //analog input 1 mV
+  a2: number //analog input 2 mV
+  a3: number //analog input 3 mV
 }
 ```
 
 ### Get ADC Value
 
-**Name**: `getADC`
+**Name**: `getAnalogInput`
 
 #### Payload
 
 ```
 {
-    channel: number // ADC channel [0,14]
-    rawMode: boolean // Use engineering units or raw counts
+  hId: any,
+  c: number // ADC channel [0,3]
 }
 ```
 
 #### Response
 
 ```
-{
-    value: number
-}
+number
 ```
 
-### Set Phone Charge Control
+### Get Battery Current
 
-**Name**: `setPhoneChargeControl`
+**Name**: `getBatteryCurrent`
 
 #### Payload
 
 ```
 {
-    chargeEnable: boolean
+  hId: any,
 }
 ```
-
-**Response**: None
-
-### Get Phone Charge Control
-
-**Name**: `getPhoneChargeControl` \
-**Payload**: None
 
 #### Response
 
 ```
+number
+```
+
+### Get Battery Voltage
+
+**Name**: `getBatteryVoltage`
+
+#### Payload
+
+```
 {
-    chargeEnable: boolean
+  hId: any,
 }
+```
+
+#### Response
+
+```
+number
+```
+
+### Get Temperature
+
+**Name**: `getTemperature`
+
+#### Payload
+
+```
+{
+  hId: any,
+}
+```
+
+#### Response
+
+```
+number // degrees Celsius
+```
+
+### Get I2C current
+
+**Name**: `getI2cCurrent`
+
+#### Payload
+
+```
+{
+  hId: any,
+}
+```
+
+#### Response
+
+```
+number //mA
+```
+
+### Get Servo Current
+
+**Name**: `getServoCurrent`
+
+#### Payload
+
+```
+{
+  hId: any,
+}
+```
+
+#### Response
+
+```
+number //mA
+```
+
+### Get Digital Bus Current
+
+**Name**: `getDigitalBusCurrent`
+
+#### Payload
+
+```
+{
+  hId: any,
+}
+```
+
+#### Response
+
+```
+number //mA
+```
+
+### Get Motor Current
+
+**Name**: `getMotorCurrent`
+
+#### Payload
+
+```
+{
+  hId: any,
+  c: [0,3]
+}
+```
+
+#### Response
+
+```
+number //mA
+```
+
+### Get 5V Bus Voltage
+
+**Name**: `get5VBusVoltage`
+
+#### Payload
+
+```
+{
+  hId: any,
+}
+```
+
+#### Response
+
+```
+number //mV
 ```
 
 ### Inject Data Log Hint
@@ -334,7 +430,8 @@ This method is not well-documented
 
 ```
 {
-    hint: string // text to log
+  hId: any,
+  hint: string // text to log
 }
 ```
 
@@ -343,41 +440,19 @@ This method is not well-documented
 ### Read Version String
 
 **Name**: `readVersionString` \
-**Payload**: None
-
-#### Response
-
-```
-{
-    verson: string
-}
-```
-
-### Set FTDI Reset Control
-
-**Name**: `setFtdiResetControl`
 
 #### Payload
 
 ```
 {
-    shouldReset: boolean //whether to reset FTDI chip on keep alive timeout
+  hId: any
 }
 ```
-
-**Response**: None
-
-### Get FTDI Reset Control
-
-**Name**: `getFTDI Reset Control` \
-**Payload**: None
 
 #### Response
 
 ```
-{
-    shouldReset: boolean //see above command
-}
+string
 ```
 
 ### Set Digital Output
@@ -388,22 +463,24 @@ This method is not well-documented
 
 ```
 {
-    pin: number
-    value: boolean
+  hId: any
+  c: [0,7]
+  v: boolean
 }
 ```
 
 **Response**: None
 
-### Set Digital All Outputs
+### Set All Digital Outputs
 
-**Name**: `setDigitalAllOutputs`
+**Name**: `setAllDigitalOutputs`
 
 #### Payload
 
 ```
 {
-    bitpacked: number // bitpacked field of pin states
+  hId: any,
+  bf: number // bitpacked field of pin states
 }
 ```
 
@@ -417,8 +494,9 @@ This method is not well-documented
 
 ```
 {
-    pin: number
-    direction: number // input = 0, output = 1
+  hId: any,
+  c: [0,7],
+  o: boolean // input = false, output = true
 }
 ```
 
@@ -432,61 +510,65 @@ This method is not well-documented
 
 ```
 {
-    pin: number
+  hId: any,
+  c: [0,7]
 }
 ```
 
 #### Response
 
 ```
-{
-    value: boolean
-}
+boolean
 ```
 
-### Get Digital All Inputs
+### Get All Digital Inputs
 
-**Name**: `getDigitalAllInputs` \
-**Payload**: None
+**Name**: `getAllDigitalInputs` \
+
+#### Payload
+
+```
+{
+  hId: any
+}
+```
 
 #### Response
 
 ```
-{
-    bitpacked: number //bitpacked field of all input pins
-}
+number //bitpacked field of all input pins
 ```
 
 ### Get Digital Direction
 
-**Name**: `getDigitalDirection`
+**Name**: `isDigitalOutput`
 
 #### Payload
 
 ```
 {
-    pin: number
+  hid: any,
+  c: [0,7]
 }
 ```
 
 #### Response
 
 ```
-{
-    direction: number //input = 0, output = 1
-}
+boolean //input = false, output = true
 ```
 
 ### Set I2C Channel Configuration
 
-**Name**: `setI2CChannelConfiguration`
+**Name**: `setI2cChannelConfiguration`
 
 #### Payload
 
 ```
 {
-    channel: number
-    speedCode: number //standard = 0, fast = 1
+  hId: any,
+  c: [0,3]
+  sc: number //standard = 0, fast = 1
 }
 ```
 
@@ -494,158 +576,105 @@ This method is not well-documented
 
 ### Get I2C Channel Configuration
 
-**Name**: `getI2CChannelConfiguration`
+**Name**: `getI2cChannelConfiguration`
 
 #### Payload
 
 ```
 {
-    channel: number
+  hId: any,
+  c: [0,3]
 }
 ```
 
 #### Response
 
 ```
-{
-    speedCode: number //see above command
-}
+//see above command for speed code values
 ```
 
-### Write I2C Single Byte
+### Write I2C Data
 
-**Name**: `writeI2CSingleByte`
+**Name**: `writeI2cData`
 
 #### Payload
 
 ```
 {
-    channel: number
-    targetAddress: number
-    data: number //[0,255]
+  hId: any,
+  c: [0,3]
+  a: number
+  d: number[]
 }
 ```
 
 **Response**: None
 
-### Write I2C Multiple Bytes
+### Write I2C Register
 
-**Name**: `writeI2CMultipleBytes`
+**Name**: `writeI2cRegister`
 
 #### Payload
 
 ```
 {
-    channel: number
-    targetAddress: number
-    data: number[] //each element [0,255]
+  hId: any,
+  c: [0,3], //channel
+  a: number, //target address
+  d: number[],
+  r: number //register
 }
 ```
 
 **Response**: None
 
-### Get I2C Status
+### Read I2C Data
 
-**Name**: `getI2CStatus`
-
-#### Payload
-
-```
-{
-    channel: number
-}
-```
-
-#### Response
-
-```
-{
-    status: number // bitmap of [!SCL, !SDA, Res, Res, MCLK, MARB, MDAK, MADDR]
-    bytesWritten: number
-}
-```
-
-### Read I2C Single Byte
-
-**Name**: `readI2CSingleByte`
+**Name**: `readI2cData`
 
 #### Payload
 
 ```
 {
-    channel: number
-    targetAddress: number
-}
-```
-
-**Response**: None //get the read status
-
-### Read I2C multiple bytes
-
-**Name**: `readI2CMultipleBytes`
-
-#### Payload
-
-```
-{
-    channel: number
-    targetAddress: number
-    numBytesToRead: number
-}
-```
-
-**Response**: None //get the read status
-
-### Write and Read I2C Multiple Bytes
-
-**Name**: `writeI2CReadMultipleBytes`
-
-#### Payload
-
-```
-{
-    channel: number
-    targetAddress: number
-    numBytesToRead: number
-    startAdress: number //value to send before reading [0,255]
+  hId: any,
+  c: [0,3], //channel
+  a: number, //target address
+  cb: number //number of bytes to read
 }
 ```
 
 **Response**: None
 
-### Get I2C Read Status
+### Read I2C Register
 
-**Name**: `getI2CReadStatus`
+**Name**: `readI2cRegister`
 
 #### Payload
 
 ```
 {
-    channel: number
+  hId: any,
+  c: [0,3], //channel
+  a: number, //target address
+  cb: number, //number of bytes to read
+  r: number //register
 }
 ```
 
-#### Response
-
-```
-{
-    status: number [0, 255]
-    numBytesRead: number
-    data: number[] //each element [0, 255]
-}
-```
+**Response**: None
 
 ### Set Motor Channel Mode
 
-**Name**: `setMotorChannelMode`
+**Name**: `setMotorMode`
 
 #### Payload
 
 ```
 {
-    channel: number
-    motorMode: number //Constant Power = 0, Constant Velocity = 1, Position Target = 2
-    floatAtZero: boolean //whether to brake or coast when power is 0
+  hId: any,
+  c: [0,3]
+  m: number //Constant Power = 0, Constant Velocity = 1, Position Target = 2
+  faz: boolean //whether to brake or coast when power is 0
 }
 ```
 
@@ -653,13 +682,14 @@ This method is not well-documented
 
 ### Get Motor Channel Mode
 
-**Name**: `getMotorChannelMode`
+**Name**: `getMotorMode`
 
 #### Payload
 
 ```
 {
-    channel: number
+  hId: any,
+  c: [0,3] //channel
 }
 ```
 
@@ -667,21 +697,22 @@ This method is not well-documented
 
 ```
 {
-    motorMode: number //Constant Power = 0, Constant Velocity = 1, Position Target = 2
-    floatAtZero: boolean //whether to brake or coast when power is 0
+    m: number, //Constant Power = 0, Constant Velocity = 1, Position Target = 2
+    faz: boolean //whether to brake or coast when power is 0
 }
 ```
 
 ### Set Motor Chanel Enable
 
-**Name**: `setMotorChannelEnable`
+**Name**: `setMotorEnabled`
 
 #### Payload
 
 ```
 {
-    channel: number
-    enable: boolean
+  hId: any,
+  c: [0,3] //channel
+  enable: boolean
 }
 ```
 
@@ -689,34 +720,34 @@ This method is not well-documented
 
 ### Get Motor Channel Enable
 
-**Name**: `getMotorChannelEnable`
+**Name**: `getMotorEnable`
 
 #### Payload
 
 ```
 {
-    channel: number
+  hId: any,
+  c: [0,3] //channel
 }
 ```
 
 #### Response
 
 ```
-{
-    enable: boolean
-}
+boolean
 ```
 
 ### Set Motor Channel Current Alert
 
-**Name**: `setMotorChannelCurrentAlert`
+**Name**: `setMotorAlertLevel`
 
 #### Payload
 
 ```
 {
-    channel: number
-    currentLimitMa: number //current limit (in mA)
+  hId: any,
+  c: [0,3], //channel
+  cl: number //current limit (in mA)
 }
 ```
 
@@ -724,22 +755,21 @@ This method is not well-documented
 
 ### Get Motor Channel Current Alert
 
-**Name**: `getMotorChannelCurrentAlert`
+**Name**: `getMotorAlertLevel`
 
 #### Payload
 
 ```
 {
-    channel: number
+  hId: any,
+  c: [0,3]
 }
 ```
 
 #### Response
 
 ```
-{
-        currentLimitMa: number //current limit (in mA)
-}
+number //current limit (in mA)
 ```
 
 ### Reset Motor Encoder
@@ -750,7 +780,8 @@ This method is not well-documented
 
 ```
 {
-    channel: number
+  hId: any,
+  c: [0,3] //channel
 }
 ```
 
@@ -764,8 +795,9 @@ This method is not well-documented
 
 ```
 {
-    channel: number
-    power: number [-1,1]
+  hId: any,
+  c: [0,3], //channel
+  p: [-1.0,1.0] //power
 }
 ```
 
@@ -779,16 +811,15 @@ This method is not well-documented
 
 ```
 {
-    channel: number
+  hId: any,
+  c: [0,3] //channel
 }
 ```
 
 #### Response
 
 ```
-{
-    power: number
-}
+number
 ```
 
 ### Set Motor Target Velocity
@@ -799,8 +830,9 @@ This method is not well-documented
 
 ```
 {
-    channel: number
-    velocityCps: number //encoder counts per second
+  hId: any,
+  c: [0,3] //channel
+  tv: number //encoder counts per second
 }
 ```
 
@@ -814,16 +846,15 @@ This method is not well-documented
 
 ```
 {
-    channel: number
+  hId: any,
+  c: [0,3]
 }
 ```
 
 #### Response
 
 ```
-{
-    velocityCps: number //encoder counts per second
-}
+number //encoder counts per second
 ```
 
 ### Set Motor Target Position
@@ -834,9 +865,9 @@ This method is not well-documented
 
 ```
 {
-    channel: number
-    position: number //encoder counts
-    tolerance: number //encoder counts
+    c: [0,3]
+    tpc: number //position in encoder counts
+    ttc: number //tolerance in encoder counts
 }
 ```
 
@@ -850,7 +881,8 @@ This method is not well-documented
 
 ```
 {
-    channel: number
+  hId: any,
+  c: [0,3]
 }
 ```
 
@@ -858,49 +890,47 @@ This method is not well-documented
 
 ```
 {
-    position: number //encoder counts
-    tolerance: number //encoder counts
+  tpc: number //position in encoder counts
+  ttc: number //tolerance in encoder counts
 }
 ```
 
 ### Is Motor At Target
 
-**Name**: `isMotorAtTarget`
+**Name**: `getIsMotorAtTarget`
 
 #### Payload
 
 ```
 {
-    channel: number
+  hId: any,
+  c: [0,3] //channel
 }
 ```
 
 #### Response
 
 ```
-{
-    isAtTarget: boolean
-}
+boolean //isAtTarget
 ```
 
 ### Get Motor Encoder position
 
-**Name**: `getMotorEncoderPosition`
+**Name**: `getMotorEncoder`
 
 #### Payload
 
 ```
 {
-    channel: number
+  hId: any,
+  c: [0,3] //channel
 }
 ```
 
 #### Response
 
 ```
-{
-    position: number //encoder counts
-}
+number //position in encoder counts
 ```
 
 ### Set Motor PID Coefficients
@@ -911,13 +941,12 @@ This method is not well-documented
 
 ```
 {
-    channel: number
-    motorMode: number //Constant Power = 0, Target Velocity = 1, Target Position = 2
-    coefficients: {
-        p: number
-        i: number
-        d: number
-    }
+  hId: any,
+  c: [0,3]
+  m: number //Constant Power = 0, Target Velocity = 1, Target Position = 2
+  p: number,
+  i: number,
+  d: number
 }
 ```
 
@@ -931,8 +960,9 @@ This method is not well-documented
 
 ```
 {
-    channel: number
-    motorMode: number //Constant Power = 0, Target Velocity = 1, Target Position = 2
+  hId: any,
+  c: [0,3]
+  m: number //Constant Power = 0, Target Velocity = 1, Target Position = 2
 }
 ```
 
@@ -940,11 +970,9 @@ This method is not well-documented
 
 ```
 {
-    coefficients: {
-        p: number
-        i: number
-        d: number
-    }
+  p: number,
+  i: number,
+  d: number
 }
 ```
 
@@ -956,8 +984,9 @@ This method is not well-documented
 
 ```
 {
-    channel: number
-    framePeriod: number
+  hId: any,
+  c: [0,5], //channel
+  fp: number //frame period
 }
 ```
 
@@ -971,16 +1000,15 @@ This method is not well-documented
 
 ```
 {
-    channel: number
+  hId: any,
+  c: [0,5] //channel
 }
 ```
 
 #### Response
 
 ```
-{
-    framePeriod: number
-}
+number //frame period
 ```
 
 ### Set Servo Pulse Width
@@ -991,10 +1019,13 @@ This method is not well-documented
 
 ```
 {
-    channel: number
-    pulseWidth: number
+  hId: any,
+  c: [0,5],
+  pulseWidth: number
 }
 ```
+
+**Response**: None
 
 ### Get Servo Pulse Width
 
@@ -1004,16 +1035,15 @@ This method is not well-documented
 
 ```
 {
-    channel: number
+  hId: any,
+  c: [0,5]
 }
 ```
 
 #### Response
 
 ```
-{
-    pulseWidth: number
-}
+number //pulse width
 ```
 
 ### Set Servo Enable
@@ -1024,8 +1054,9 @@ This method is not well-documented
 
 ```
 {
-    channel: number
-    enable: boolean
+  hId: any,
+  c: [0,5], //channel
+  enable: boolean
 }
 ```
 
@@ -1039,14 +1070,13 @@ This method is not well-documented
 
 ```
 {
-    channel: number
+  hId: any,
+  c: [0,3] //channel
 }
 ```
 
 #### Response
 
 ```
-{
-    enable: boolean
-}
+boolean
 ```
