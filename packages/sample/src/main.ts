@@ -55,7 +55,15 @@ program
     .action(async (channel, options): Promise<void> => {
         let isContinuous = options.continuous !== undefined;
         let channelNumber = Number(channel);
-        await distance(channelNumber, isContinuous);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await distance(hub, channelNumber, isContinuous);
+        hub.close();
     });
 
 program
