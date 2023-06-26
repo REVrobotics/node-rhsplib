@@ -140,6 +140,7 @@ program
         let pulseWidthValue = Number(pulseWidth);
         let frameWidthValue = frameWidth ? Number(frameWidth) : 4000;
         runOnSigint(() => {
+            hub.setServoEnable(channelValue, false);
             hub.close();
         });
 
