@@ -110,7 +110,7 @@ Name: `queryInterface`
 
 ### Get Module LED Color
 
-**Name**: `getLedColor`\
+**Name**: `getLedColor`
 
 #### Payload
 
@@ -163,7 +163,7 @@ Name: `queryInterface`
 
 ### Get Module LED Pattern
 
-**Name**: `getLedPattern` \
+**Name**: `getLedPattern`
 
 #### Payload
 
@@ -227,7 +227,7 @@ Name: `queryInterface`
 
 ### Get Bulk Input Data
 
-**Name**: `getBulkInputData` \
+**Name**: `getBulkInputData`
 
 #### Payload
 
@@ -267,7 +267,7 @@ Name: `queryInterface`
 ```
 {
   hId: any,
-  c: number // ADC channel [0,3]
+  c: [0,3] // channel
 }
 ```
 
@@ -292,7 +292,7 @@ number
 #### Response
 
 ```
-number
+number //mA
 ```
 
 ### Get Battery Voltage
@@ -310,7 +310,7 @@ number
 #### Response
 
 ```
-number
+number //mV
 ```
 
 ### Get Temperature
@@ -463,9 +463,9 @@ string
 
 ```
 {
-  hId: any
-  c: [0,7]
-  v: boolean
+  hId: any,
+  c: [0,7], //channel
+  v: boolean //output value
 }
 ```
 
@@ -523,7 +523,7 @@ boolean
 
 ### Get All Digital Inputs
 
-**Name**: `getAllDigitalInputs` \
+**Name**: `getAllDigitalInputs`
 
 #### Payload
 
@@ -548,7 +548,7 @@ number //bitpacked field of all input pins
 ```
 {
   hid: any,
-  c: [0,7]
+  c: [0,7] //channel
 }
 ```
 
@@ -567,8 +567,8 @@ boolean //input = false, output = true
 ```
 {
   hId: any,
-  c: [0,3]
-  sc: number //standard = 0, fast = 1
+  c: [0,3], //channel
+  sc: number //speed code: standard = 0, fast = 1
 }
 ```
 
@@ -583,14 +583,14 @@ boolean //input = false, output = true
 ```
 {
   hId: any,
-  c: [0,3]
+  c: [0,3] //channel
 }
 ```
 
 #### Response
 
 ```
-//see above command for speed code values
+number //see above command for speed code values
 ```
 
 ### Write I2C Data
@@ -602,9 +602,9 @@ boolean //input = false, output = true
 ```
 {
   hId: any,
-  c: [0,3]
-  a: number
-  d: number[]
+  c: [0,3], //channel
+  a: number, //target address
+  d: number[] //data
 }
 ```
 
@@ -621,7 +621,7 @@ boolean //input = false, output = true
   hId: any,
   c: [0,3], //channel
   a: number, //target address
-  d: number[],
+  d: number[], //data
   r: number //register
 }
 ```
@@ -672,8 +672,8 @@ boolean //input = false, output = true
 ```
 {
   hId: any,
-  c: [0,3]
-  m: number //Constant Power = 0, Constant Velocity = 1, Position Target = 2
+  c: [0,3], //channel
+  m: number, //Constant Power = 0, Constant Velocity = 1, Position Target = 2
   faz: boolean //whether to brake or coast when power is 0
 }
 ```
@@ -711,7 +711,7 @@ boolean //input = false, output = true
 ```
 {
   hId: any,
-  c: [0,3] //channel
+  c: [0,3], //channel
   enable: boolean
 }
 ```
@@ -831,7 +831,7 @@ number
 ```
 {
   hId: any,
-  c: [0,3] //channel
+  c: [0,3], //channel
   tv: number //encoder counts per second
 }
 ```
@@ -865,8 +865,8 @@ number //encoder counts per second
 
 ```
 {
-    c: [0,3]
-    tpc: number //position in encoder counts
+    c: [0,3], //channel
+    tpc: number, //position in encoder counts
     ttc: number //tolerance in encoder counts
 }
 ```
@@ -890,7 +890,7 @@ number //encoder counts per second
 
 ```
 {
-  tpc: number //position in encoder counts
+  tpc: number, //position in encoder counts
   ttc: number //tolerance in encoder counts
 }
 ```
@@ -942,8 +942,8 @@ number //position in encoder counts
 ```
 {
   hId: any,
-  c: [0,3]
-  m: number //Constant Power = 0, Target Velocity = 1, Target Position = 2
+  c: [0,3],
+  m: number, //Constant Power = 0, Target Velocity = 1, Target Position = 2
   p: number,
   i: number,
   d: number
@@ -961,7 +961,7 @@ number //position in encoder counts
 ```
 {
   hId: any,
-  c: [0,3]
+  c: [0,3],
   m: number //Constant Power = 0, Target Velocity = 1, Target Position = 2
 }
 ```
