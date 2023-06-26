@@ -124,6 +124,11 @@ program
     .command("servo <channel> <pulseWidth> [frameWidth]")
     .description("Run a servo with pulse width and optional frame width")
     .action(async (channel, pulseWidth, frameWidth) => {
+        runOnSigint(async () => {
+            await hub.setServoEnable(channelValue, false);
+            hub.close();
+        });
+
         let channelValue = Number(channel);
         let pulseWidthValue = Number(pulseWidth);
         let frameWidthValue = frameWidth ? Number(frameWidth) : 4000;
@@ -131,11 +136,6 @@ program
         let hub = hubs[0];
 
         await runServo(hub, channelValue, pulseWidthValue, frameWidthValue);
-
-        runOnSigint(async () => {
-            await hub.setServoEnable(channelValue, false);
-            hub.close();
-        });
     });
 
 program.parse(process.argv);
