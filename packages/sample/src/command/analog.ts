@@ -1,53 +1,33 @@
 import { ExpansionHub, openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
 
 export async function analog(hub: ExpansionHub, channel: number, continuous: boolean) {
-    if (continuous) {
-        while (true) {
-            let value = await hub.getAnalogInput(channel);
-            console.log(`ADC: ${value} mV`);
-        }
-    } else {
+    while (true) {
         let value = await hub.getAnalogInput(channel);
         console.log(`ADC: ${value} mV`);
-        hub.close();
+        if (!continuous) break;
     }
 }
 
 export async function temperature(hub: ExpansionHub, continuous: boolean) {
-    if (continuous) {
-        while (true) {
-            let value = await hub.getTemperature();
-            console.log(`Temperature: ${value} C`);
-        }
-    } else {
+    while (true) {
         let value = await hub.getTemperature();
         console.log(`Temperature: ${value} C`);
-        hub.close();
+        if (!continuous) break;
     }
 }
 
 export async function battery(hub: ExpansionHub, continuous: boolean) {
-    if (continuous) {
-        while (true) {
-            let value = await hub.getBatteryVoltage();
-            console.log(`Battery: ${value} mV`);
-        }
-    } else {
-        let value = await hub.getBatteryVoltage();
-        console.log(`Battery: ${value} mV`);
-        hub.close();
+    while (true) {
+        let value = await hub.getTemperature();
+        console.log(`Temperature: ${value} C`);
+        if (!continuous) break;
     }
 }
 
 export async function voltageRail(hub: ExpansionHub, continuous: boolean) {
-    if (continuous) {
-        while (true) {
-            let value = await hub.get5VBusVoltage();
-            console.log(`5V rail: ${value} mV`);
-        }
-    } else {
+    while (true) {
         let value = await hub.get5VBusVoltage();
         console.log(`5V rail: ${value} mV`);
-        hub.close();
+        if (!continuous) break;
     }
 }

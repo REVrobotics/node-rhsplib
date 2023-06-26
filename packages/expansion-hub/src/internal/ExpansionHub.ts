@@ -120,7 +120,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    async getDigitalBusVoltage(): Promise<number> {
+    async getDigitalBusCurrent(): Promise<number> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.getADC(4, 0);
         });

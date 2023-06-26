@@ -12,15 +12,7 @@ export async function led(hub: ExpansionHub) {
         new LedPatternStep(1, 255, 0, 255), //magenta
         new LedPatternStep(1, 255, 255, 0), //yellow
     ];
+
     const pattern = createLedPattern(steps);
-
     await hub.setModuleLedPattern(pattern);
-
-    if (hub.isParent()) {
-        for (let child of hub.children) {
-            if (child.isExpansionHub()) {
-                await child.setModuleLedPattern(pattern);
-            }
-        }
-    }
 }

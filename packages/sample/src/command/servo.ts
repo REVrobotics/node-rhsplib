@@ -1,4 +1,4 @@
-import { ExpansionHub, openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
+import { ExpansionHub } from "@rev-robotics/expansion-hub";
 
 export async function runServo(
     hub: ExpansionHub,

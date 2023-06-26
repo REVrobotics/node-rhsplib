@@ -13,6 +13,13 @@ import {
 } from "@rev-robotics/expansion-hub";
 import { runServo } from "./command/servo.js";
 
+function runOnSigint(block: () => void) {
+    process.on("SIGINT", () => {
+        block();
+        process.exit();
+    });
+}
+
 const program = new Command();
 
 program.version("1.0.0");
@@ -48,6 +55,10 @@ program
     .description("Run LED steps")
     .action(async () => {
         let hub = await getExpansionHubOrThrow();
+        runOnSigint(() => {
+            hub.close();
+        });
+
         await led(hub);
     });
 
@@ -62,6 +73,10 @@ program
         let hub = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
         let portNumber = Number(port);
+        runOnSigint(() => {
+            hub.close();
+        });
+
         await analog(hub, portNumber, isContinuous);
     });
 
@@ -75,6 +90,10 @@ program
     .action(async (options) => {
         let hub = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
+        runOnSigint(() => {
+            hub.close();
+        });
+
         await temperature(hub, isContinuous);
     });
 
@@ -87,7 +106,12 @@ program
     .action(async (options) => {
         let hub = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
+        runOnSigint(() => {
+            hub.close();
+        });
+
         await voltageRail(hub, isContinuous);
+        hub.close();
     });
 
 program
@@ -99,18 +123,25 @@ program
     .action(async (options) => {
         let hub = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
+        runOnSigint(() => {
+            hub.close();
+        });
+
         await battery(hub, isContinuous);
+        hub.close();
     });
 
 program
     .command("servo <channel> <pulseWidth> [frameWidth]")
     .description("Run a servo with pulse width and optional frame width")
     .action(async (channel, pulseWidth, frameWidth) => {
+        let hub = await getExpansionHubOrThrow();
         let channelValue = Number(channel);
         let pulseWidthValue = Number(pulseWidth);
         let frameWidthValue = frameWidth ? Number(frameWidth) : 4000;
-
-        let hub = await getExpansionHubOrThrow();
+        runOnSigint(() => {
+            hub.close();
+        });
 
         await runServo(hub, channelValue, pulseWidthValue, frameWidthValue);
     });
