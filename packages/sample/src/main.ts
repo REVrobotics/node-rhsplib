@@ -48,12 +48,13 @@ program
     .command("led")
     .description("Run LED steps")
     .action(async () => {
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
         runOnSigint(() => {
             hub.close();
         });
 
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
         await led(hub);
     });
 
@@ -66,13 +67,15 @@ motorCommand
         "Read the current through a motor. Specify --continuous to run continuously",
     )
     .action(async (channel, options) => {
-        runOnSigint(() => {
-            hub.close();
-        });
         let hubs = await openConnectedExpansionHubs();
         let hub = hubs[0];
         let isContinuous = options.continuous !== undefined;
         let channelNumber = Number(channel);
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
         await motorCurrent(hub, channelNumber, isContinuous);
         hub.close();
     });
@@ -85,14 +88,15 @@ program
             "--continuous to run continuously.",
     )
     .action(async (port, options) => {
-        runOnSigint(() => {
-            hub.close();
-        });
-
         let isContinuous = options.continuous !== undefined;
         let portNumber = Number(port);
         let hubs = await openConnectedExpansionHubs();
         let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
         await analog(hub, portNumber, isContinuous);
         hub.close();
     });
@@ -105,13 +109,14 @@ program
             "Specify --continuous to run continuously",
     )
     .action(async (options) => {
+        let isContinuous = options.continuous !== undefined;
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
         runOnSigint(() => {
             hub.close();
         });
 
-        let isContinuous = options.continuous !== undefined;
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
         await temperature(hub, isContinuous);
     });
 
@@ -122,13 +127,14 @@ program
         "Read the current 5V rail voltage. Specify --continuous to run continuously",
     )
     .action(async (options) => {
+        let isContinuous = options.continuous !== undefined;
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
         runOnSigint(() => {
             hub.close();
         });
 
-        let isContinuous = options.continuous !== undefined;
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
         await voltageRail(hub, isContinuous);
         hub.close();
     });
@@ -144,13 +150,14 @@ batteryCommand
         "Read the current battery Voltage. Specify --continuous to run continuously",
     )
     .action(async (options) => {
+        let isContinuous = options.continuous !== undefined;
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
         runOnSigint(() => {
             hub.close();
         });
 
-        let isContinuous = options.continuous !== undefined;
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
         await batteryVoltage(hub, isContinuous);
         hub.close();
     });
@@ -160,13 +167,14 @@ batteryCommand
     .option("--continuous", "Run continuously")
     .description("Read the battery current. Specify --continuous to run continuously")
     .action(async (options) => {
+        let isContinuous = options.continuous !== undefined;
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
         runOnSigint(() => {
             hub.close();
         });
 
-        let isContinuous = options.continuous !== undefined;
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
         await batteryCurrent(hub, isContinuous);
         hub.close();
     });
@@ -178,13 +186,14 @@ program
         "Read the I2C sub-system current. Specify --continuous to run continuously",
     )
     .action(async (options) => {
+        let isContinuous = options.continuous !== undefined;
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
         runOnSigint(() => {
             hub.close();
         });
 
-        let isContinuous = options.continuous !== undefined;
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
         await i2cCurrent(hub, isContinuous);
         hub.close();
     });
@@ -194,13 +203,14 @@ program
     .option("--continuous", "Run continuously")
     .description("Read the digital bus current. Specify --continuous to run continuously")
     .action(async (options) => {
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        let isContinuous = options.continuous !== undefined;
+
         runOnSigint(() => {
             hub.close();
         });
 
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
-        let isContinuous = options.continuous !== undefined;
         await digitalBusCurrent(hub, isContinuous);
         hub.close();
     });
@@ -212,13 +222,14 @@ program
         "Read the total current through all servos. Specify --continuous to run continuously",
     )
     .action(async (options) => {
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        let isContinuous = options.continuous !== undefined;
+
         runOnSigint(() => {
             hub.close();
         });
 
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
-        let isContinuous = options.continuous !== undefined;
         await servoCurrent(hub, isContinuous);
         hub.close();
     });
@@ -227,16 +238,16 @@ program
     .command("servo <channel> <pulseWidth> [frameWidth]")
     .description("Run a servo with pulse width and optional frame width")
     .action(async (channel, pulseWidth, frameWidth) => {
-        runOnSigint(async () => {
-            await hub.setServoEnable(channelValue, false);
-            hub.close();
-        });
-
         let channelValue = Number(channel);
         let pulseWidthValue = Number(pulseWidth);
         let frameWidthValue = frameWidth ? Number(frameWidth) : 4000;
         let hubs = await openConnectedExpansionHubs();
         let hub = hubs[0];
+
+        runOnSigint(async () => {
+            await hub.setServoEnable(channelValue, false);
+            hub.close();
+        });
 
         await runServo(hub, channelValue, pulseWidthValue, frameWidthValue);
     });
