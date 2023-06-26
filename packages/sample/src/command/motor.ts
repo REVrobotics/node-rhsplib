@@ -1,4 +1,8 @@
-import { ExpansionHub, openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
+import {
+    ExpansionHub,
+    openConnectedExpansionHubs,
+    PidCoefficients,
+} from "@rev-robotics/expansion-hub";
 import { MotorMode } from "@rev-robotics/expansion-hub/dist/MotorMode.js";
 
 export async function runMotorConstantPower(
@@ -9,6 +13,10 @@ export async function runMotorConstantPower(
     await hub.setMotorChannelMode(channel, MotorMode.OPEN_LOOP, true);
     await hub.setMotorConstantPower(channel, power);
     await hub.setMotorChannelEnable(channel, true);
+
+    console.log(`Mode: ${JSON.stringify(await hub.getMotorChannelMode(channel))}`);
+    console.log(`Power: ${await hub.getMotorConstantPower(channel)}`);
+    console.log(`Enabled: ${await hub.getMotorChannelEnable(channel)}`);
 }
 
 export async function runMotorConstantVelocity(
@@ -19,6 +27,11 @@ export async function runMotorConstantVelocity(
     await hub.setMotorChannelMode(channel, MotorMode.REGULATED_VELOCITY, true);
     await hub.setMotorTargetVelocity(channel, velocity);
     await hub.setMotorChannelEnable(channel, true);
+
+    console.log(`Mode: ${JSON.stringify(await hub.getMotorChannelMode(channel))}`);
+    console.log(`Power: ${await hub.getMotorConstantPower(channel)}`);
+    console.log(`Velocity: ${await hub.getMotorTargetVelocity(channel)}`);
+    console.log(`Enabled: ${await hub.getMotorChannelEnable(channel)}`);
 }
 
 export async function runMotorToPosition(
@@ -32,24 +45,65 @@ export async function runMotorToPosition(
     await hub.setMotorTargetVelocity(channel, velocity);
     await hub.setMotorTargetPosition(channel, position, tolerance);
     await hub.setMotorChannelEnable(channel, true);
+
+    console.log(`Mode: ${JSON.stringify(await hub.getMotorChannelMode(channel))}`);
+    console.log(`Power: ${await hub.getMotorConstantPower(channel)}`);
+    console.log(`Velocity: ${await hub.getMotorTargetVelocity(channel)}`);
+    console.log(`Position: ${JSON.stringify(await hub.getMotorTargetPosition(channel))}`);
+    console.log(`Enabled: ${await hub.getMotorChannelEnable(channel)}`);
+
+    while (!(await hub.getMotorAtTarget(channel))) {}
+    console.log("Motor reached target");
 }
 
-export async function readEncoder(channel: number, continuous: boolean) {
-    const hubs = await openConnectedExpansionHubs();
-    let hub = hubs[0];
-
+export async function readEncoder(
+    hub: ExpansionHub,
+    channel: number,
+    continuous: boolean,
+) {
     while (true) {
         let encoder = await hub.getMotorEncoderPosition(channel);
         console.log(`Encoder count is ${encoder}`);
         if (!continuous) break;
     }
-    hub.close();
 }
 
-export async function resetEncoder(channel: number) {
-    const hubs = await openConnectedExpansionHubs();
-    let hub = hubs[0];
-
+export async function resetEncoder(hub: ExpansionHub, channel: number) {
     await hub.resetMotorEncoder(channel);
-    hub.close();
+}
+
+export async function setMotorAlertLevel(
+    hub: ExpansionHub,
+    channel: number,
+    currentLimit_mA: number,
+) {
+    await hub.setMotorChannelCurrentAlertLevel(channel, currentLimit_mA);
+}
+
+export async function getMotorAlertLevel_mA(
+    hub: ExpansionHub,
+    channel: number,
+): Promise<number> {
+    return await hub.getMotorChannelCurrentAlertLevel(channel);
+}
+
+export async function setMotorPid(
+    hub: ExpansionHub,
+    channel: number,
+    p: number,
+    i: number,
+    d: number,
+) {
+    await hub.setMotorPIDCoefficients(channel, MotorMode.REGULATED_VELOCITY, {
+        p: p,
+        i: i,
+        d: d,
+    });
+
+    let pid: PidCoefficients = await hub.getMotorPIDCoefficients(
+        channel,
+        MotorMode.REGULATED_VELOCITY,
+    );
+
+    console.log(JSON.stringify(pid));
 }

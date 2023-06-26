@@ -5,6 +5,7 @@ import {
     runMotorConstantPower,
     runMotorConstantVelocity,
     runMotorToPosition,
+    setMotorPid,
 } from "./command/motor.js";
 import { analog, battery, temperature, voltageRail } from "./command/analog.js";
 import { error } from "./command/error.js";
@@ -63,12 +64,39 @@ motorCommand
     .description("Get the current encoder position of a motor")
     .action(async (channel, options) => {
         let channelNumber = Number(channel);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
         if (options.reset) {
-            await resetEncoder(channelNumber);
+            await resetEncoder(hub, channelNumber);
         } else {
             let isContinuous = options.continuous !== undefined;
-            await readEncoder(channelNumber, isContinuous);
+            await readEncoder(hub, channelNumber, isContinuous);
         }
+        hub.close();
+    });
+
+motorCommand
+    .command("pid <channel> <p> <i> <d>")
+    .description("Set PID coefficients for a motor")
+    .action(async (channel, p, i, d) => {
+        let channelNumber = Number(channel);
+        let pValue = Number(p);
+        let iValue = Number(i);
+        let dValue = Number(d);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await setMotorPid(hub, channelNumber, pValue, iValue, dValue);
+        hub.close();
     });
 
 motorCommand
