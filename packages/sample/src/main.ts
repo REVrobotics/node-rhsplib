@@ -5,6 +5,7 @@ import { list } from "./command/list.js";
 import { led } from "./command/led.js";
 import { runServo } from "./command/servo.js";
 import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
+import { getBulkInputData } from "./command/bulkinput.js";
 
 function runOnSigint(block: () => void) {
     process.on("SIGINT", () => {
@@ -45,6 +46,23 @@ program
         let hubs = await openConnectedExpansionHubs();
         let hub = hubs[0];
         await led(hub);
+    });
+
+program
+    .command("bulkInput")
+    .description("Get all input data at once. Specify --continuous to run continuously.")
+    .option("--continuous", "run continuously")
+    .action(async (options) => {
+        let isContinuous = options.continuous !== undefined;
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await getBulkInputData(hub, isContinuous);
+        hub.close();
     });
 
 program
