@@ -44,6 +44,9 @@ export interface ExpansionHub extends RevHub {
     getInterfacePacketID(interfaceName: string, functionNumber: number): Promise<number>;
 
     // Device Control
+    /**
+     * Read several inputs at once
+     */
     getBulkInputData(): Promise<BulkInputData>;
 
     /**
