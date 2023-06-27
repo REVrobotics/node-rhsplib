@@ -1,4 +1,3 @@
-import { ExpansionHub, ParentExpansionHub } from "./ExpansionHub.js";
 import {
     DiscoveredAddresses,
     NativeRevHub,
@@ -11,16 +10,15 @@ import { ExpansionHubInternal } from "./internal/ExpansionHub.js";
 import { startKeepAlive } from "./start-keep-alive.js";
 import {
     GeneralSerialError,
-    NoExpansionHubWithAddressError,
-    SerialParity,
-    TimeoutError,
-} from "@rev-robotics/rev-hub-core";
-import {
     InvalidSerialArguments,
+    NoExpansionHubWithAddressError,
+    ParentExpansionHub,
     SerialConfigurationError,
     SerialIoError,
+    SerialParity,
+    TimeoutError,
     UnableToOpenSerialError,
-} from "@rev-robotics/rev-hub-core/dist/serial-errors.js";
+} from "@rev-robotics/rev-hub-core";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
