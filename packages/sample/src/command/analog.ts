@@ -1,4 +1,4 @@
-import { ExpansionHub, openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
+import { ExpansionHub } from "@rev-robotics/rev-hub-core";
 
 export async function analog(hub: ExpansionHub, channel: number, continuous: boolean) {
     while (true) {
