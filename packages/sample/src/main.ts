@@ -6,11 +6,10 @@ import { led } from "./command/led.js";
 import {
     getPossibleExpansionHubSerialNumbers,
     openConnectedExpansionHubs,
-    openHubWithAddress,
     openParentExpansionHub,
 } from "@rev-robotics/expansion-hub";
 import { runServo } from "./command/servo.js";
-import { ExpansionHub, ParentExpansionHub } from "@rev-robotics/rev-hub-core";
+import { ExpansionHub, ParentExpansionHub, RevHub } from "@rev-robotics/rev-hub-core";
 import { getBulkInputData } from "./command/bulkinput.js";
 
 function runOnSigint(block: () => void) {
@@ -278,11 +277,14 @@ async function openExpansionHubWithAddress(
         );
     }
 
-    let [parent, hub] = await openHubWithAddress(
-        serialNumbers[0],
-        parentAddress,
-        realModuleAddress,
-    );
+    let parent = await openParentExpansionHub(serialNumbers[0], parentAddress);
+    let hub: RevHub;
+
+    if (parentAddress == moduleAddress) {
+        hub = parent;
+    }
+
+    hub = await parent.addChildByAddress(realModuleAddress);
 
     if (hub.isExpansionHub()) {
         let closeHub = () => {

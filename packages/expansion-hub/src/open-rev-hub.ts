@@ -30,26 +30,6 @@ import { performance } from "perf_hooks";
 const openSerialMap = new Map<string, typeof NativeSerial>();
 
 /**
- *
- * @param parentSerialNumber the parent's serial number
- * @param parentAddress the parent to open
- * @param moduleAddress the exact hub to open
- */
-export async function openHubWithAddress(
-    parentSerialNumber: string,
-    parentAddress: number,
-    moduleAddress: number = parentAddress,
-): Promise<[parent: RevHub, child: RevHub]> {
-    let parentHub = await openParentExpansionHub(parentSerialNumber, parentAddress);
-
-    if (parentAddress == moduleAddress) {
-        return [parentHub, parentHub];
-    }
-
-    return [parentHub, await parentHub.addChildByAddress(moduleAddress)];
-}
-
-/**
  * Opens a parent Expansion Hub. Does not open any child hubs.
  *
  * Call {@link ExpansionHub#addChildByAddress} to add known children.
