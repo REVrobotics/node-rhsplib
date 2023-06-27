@@ -106,7 +106,7 @@ export interface ExpansionHub extends RevHub {
     getPhoneChargeControl(): Promise<boolean>;
 
     /**
-     * Inject log value. Useful for debugging.
+     * Inject log value. Useful for debugging. The text gets printed over UART (and LogCat for Control Hubs).
      * @param hintText
      */
     injectDataLogHint(hintText: string): Promise<void>;
