@@ -1,4 +1,4 @@
-import { ExpansionHub, openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
+import { ExpansionHub } from "@rev-robotics/expansion-hub";
 import { DigitalState } from "@rev-robotics/expansion-hub/dist/digital-state.js";
 import { DigitalChannelDirection } from "@rev-robotics/expansion-hub/dist/DigitalChannelDirection.js";
 
@@ -21,4 +21,27 @@ export async function digitalWrite(
 ): Promise<void> {
     await hub.setDigitalDirection(channel, DigitalChannelDirection.Output);
     await hub.setDigitalOutput(channel, state);
+}
+
+export async function digitalReadAll(hub: ExpansionHub, continuous: boolean) {
+    while (true) {
+        let inputs = await hub.getAllDigitalInputs();
+        console.log(`Digital Pins: ${inputs.toString(2).padStart(8, "0")}`);
+        if (!continuous) break;
+    }
+}
+
+export async function digitalWriteAll(
+    hub: ExpansionHub,
+    bitfield: number,
+    bitmask: number,
+) {
+    for (let i = 0; i < 8; i++) {
+        if (((bitmask >> i) & 1) == 1) {
+            await hub.setDigitalDirection(i, DigitalChannelDirection.Output);
+        } else {
+            await hub.setDigitalDirection(i, DigitalChannelDirection.Input);
+        }
+    }
+    await hub.setAllDigitalOutputs(bitfield);
 }

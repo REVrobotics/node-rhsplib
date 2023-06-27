@@ -1,5 +1,10 @@
 import { Command } from "commander";
-import { digitalRead, digitalWrite } from "./commands/digital.js";
+import {
+    digitalRead,
+    digitalReadAll,
+    digitalWrite,
+    digitalWriteAll,
+} from "./commands/digital.js";
 import { DigitalState, openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
 import { analog, battery, temperature, voltageRail } from "./command/analog.js";
 import { error } from "./command/error.js";
@@ -92,6 +97,45 @@ digitalCommand
         });
 
         await digitalRead(hub, channelNumber, isContinuous);
+        hub.close();
+    });
+
+digitalCommand
+    .command("readall")
+    .option("--continuous", "run continuously")
+    .description("read all digital pins")
+    .action(async (options) => {
+        let isContinuous = options.continuous !== undefined;
+
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await digitalReadAll(hub, isContinuous);
+        hub.close();
+    });
+
+digitalCommand
+    .command("writeall <bitfield> <bitmask>")
+    .option("--continuous", "run continuously")
+    .description(
+        "Write all digital pins. Input value as a binary bitfield and a binary bitmask, where 1=output",
+    )
+    .action(async (bitfield, bitmask) => {
+        let bitfieldValue = parseInt(bitfield, 2);
+        let bitmaskValue = parseInt(bitmask, 2);
+
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await digitalWriteAll(hub, bitfieldValue, bitmaskValue);
         hub.close();
     });
 
