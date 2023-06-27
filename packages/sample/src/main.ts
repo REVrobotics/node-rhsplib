@@ -143,12 +143,13 @@ program
     .command("log <text>")
     .description("Inject a log hint")
     .action(async (text) => {
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
         runOnSigint(() => {
             hub.close();
         });
 
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
         await injectLog(hub, text);
         hub.close();
     });
@@ -161,12 +162,13 @@ program
             "DigitalIO, I2C, Motor0, Motor1, Motor2, or Motor3. Valid values for level are [0,3]",
     )
     .action(async (group, level) => {
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
         runOnSigint(() => {
             hub.close();
         });
 
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
         let levelNumber = Number(level);
         await setDebugLogLevel(hub, group, levelNumber);
         hub.close();
