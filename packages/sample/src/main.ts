@@ -165,59 +165,18 @@ async function getExpansionHubOrThrow(): Promise<[hub: ExpansionHub, close: () =
         throw new Error("0 is not a valid parent address");
     }
     if (serialNumber !== undefined) {
-        let parentHub = await openParentExpansionHub(serialNumber, parentAddress);
-        if (moduleAddress === undefined || moduleAddress == parentHub.moduleAddress) {
-            return [
-                parentHub,
-                () => {
-                    parentHub.close();
-                },
-            ];
-        } else {
-            let childHub = await parentHub.addChildByAddress(moduleAddress);
-            if (childHub.isExpansionHub()) {
-                let closeChild = () => {
-                    parentHub.close();
-                    if (childHub.isExpansionHub()) {
-                        childHub.close();
-                    }
-                };
-                return [childHub, closeChild];
-            }
-        }
-    } else if (parentAddress !== undefined) {
-        //module address specified, but no serial number
-        //if the user specifies a module address, use that, else use parent address as module address.
-        let realModuleAddress =
-            moduleAddress !== undefined ? moduleAddress : parentAddress;
-        let serialNumbers = await getPossibleExpansionHubSerialNumbers();
-
-        if (serialNumbers.length > 1) {
-            //there are multiple hubs connected. We can't distinguish without a serial number
+        if (parentAddress === undefined) {
             throw new Error(
-                `There are ${serialNumbers.length} parent hubs. Please specify a serialNumber`,
+                "parent address must be specified if serial number is specified.",
             );
         }
-
-        let [parent, hub] = await openHubWithAddress(
-            serialNumbers[0],
+        return openExpansionHubWithSerialNumber(
+            serialNumber,
             parentAddress,
-            realModuleAddress,
+            moduleAddress,
         );
-
-        if (hub.isExpansionHub()) {
-            let closeHub = () => {
-                if (parent.isExpansionHub()) {
-                    parent.close();
-                }
-                if (hub.isExpansionHub()) {
-                    hub.close();
-                }
-            };
-            return [hub, closeHub];
-        } else {
-            program.error(`No expansion hub found with module address ${moduleAddress}`);
-        }
+    } else if (parentAddress !== undefined) {
+        return openExpansionHubWithAddress(parentAddress, moduleAddress);
     }
 
     let connectedHubs: ParentExpansionHub[] = await openConnectedExpansionHubs();
@@ -236,4 +195,73 @@ async function getExpansionHubOrThrow(): Promise<[hub: ExpansionHub, close: () =
         }
     };
     return [connectedHubs[0], closeHubs];
+}
+
+async function openExpansionHubWithSerialNumber(
+    serialNumber: string,
+    parentAddress: number,
+    moduleAddress: number | undefined,
+): Promise<[hub: ExpansionHub, close: () => void]> {
+    let parentHub = await openParentExpansionHub(serialNumber, parentAddress);
+    if (moduleAddress === undefined || moduleAddress == parentHub.moduleAddress) {
+        return [
+            parentHub,
+            () => {
+                parentHub.close();
+            },
+        ];
+    } else {
+        let childHub = await parentHub.addChildByAddress(moduleAddress);
+        if (childHub.isExpansionHub()) {
+            let closeChild = () => {
+                parentHub.close();
+                if (childHub.isExpansionHub()) {
+                    childHub.close();
+                }
+            };
+            return [childHub, closeChild];
+        } else {
+            throw new Error(
+                `Hub (${serialNumber}) ${moduleAddress} is not an Expansion hub`,
+            );
+        }
+    }
+}
+
+async function openExpansionHubWithAddress(
+    parentAddress: number,
+    moduleAddress: number | undefined,
+): Promise<[hub: ExpansionHub, close: () => void]> {
+    //parent address specified, but no serial number
+    //if the user specifies a module address, use that, else use parent address as module address.
+    let realModuleAddress = moduleAddress !== undefined ? moduleAddress : parentAddress;
+    let serialNumbers = await getPossibleExpansionHubSerialNumbers();
+
+    if (serialNumbers.length > 1) {
+        //there are multiple hubs connected. We can't distinguish without a serial number
+        throw new Error(
+            `There are ${serialNumbers.length} parent hubs. Please specify a serialNumber`,
+        );
+    }
+
+    let [parent, hub] = await openHubWithAddress(
+        serialNumbers[0],
+        parentAddress,
+        realModuleAddress,
+    );
+
+    if (hub.isExpansionHub()) {
+        let closeHub = () => {
+            if (parent.isExpansionHub()) {
+                parent.close();
+            }
+            if (hub.isExpansionHub()) {
+                hub.close();
+            }
+        };
+        return [hub, closeHub];
+    } else {
+        program.error(`No expansion hub found with module address ${moduleAddress}`);
+        throw new Error("unreachable"); //TS 5.0.4 isn't recognizing the 'never' type on program.error.
+    }
 }
