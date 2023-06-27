@@ -4,6 +4,15 @@ import { error } from "./command/error.js";
 import { list } from "./command/list.js";
 import { led } from "./command/led.js";
 import { runServo } from "./command/servo.js";
+import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
+import { getBulkInputData } from "./command/bulkinput.js";
+
+function runOnSigint(block: () => void) {
+    process.on("SIGINT", () => {
+        block();
+        process.exit();
+    });
+}
 
 const program = new Command();
 
@@ -30,7 +39,30 @@ program
     .command("led")
     .description("Run LED steps")
     .action(async () => {
-        await led();
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        await led(hub);
+    });
+
+program
+    .command("bulkInput")
+    .description("Get all input data at once. Specify --continuous to run continuously.")
+    .option("--continuous", "run continuously")
+    .action(async (options) => {
+        let isContinuous = options.continuous !== undefined;
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await getBulkInputData(hub, isContinuous);
+        hub.close();
     });
 
 program
@@ -41,9 +73,15 @@ program
             "--continuous to run continuously.",
     )
     .action(async (port, options) => {
+        runOnSigint(() => {
+            hub.close();
+        });
+
         let isContinuous = options.continuous !== undefined;
         let portNumber = Number(port);
-        await analog(portNumber, isContinuous);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        await analog(hub, portNumber, isContinuous);
     });
 
 program
@@ -54,8 +92,14 @@ program
             "Specify --continuous to run continuously",
     )
     .action(async (options) => {
+        runOnSigint(() => {
+            hub.close();
+        });
+
         let isContinuous = options.continuous !== undefined;
-        await temperature(isContinuous);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        await temperature(hub, isContinuous);
     });
 
 program
@@ -65,8 +109,15 @@ program
         "Read the current 5V rail voltage. Specify --continuous to run continuously",
     )
     .action(async (options) => {
+        runOnSigint(() => {
+            hub.close();
+        });
+
         let isContinuous = options.continuous !== undefined;
-        await voltageRail(isContinuous);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        await voltageRail(hub, isContinuous);
+        hub.close();
     });
 
 program
@@ -76,19 +127,33 @@ program
         "Read the current battery Voltage. Specify --continuous to run continuously",
     )
     .action(async (options) => {
+        runOnSigint(() => {
+            hub.close();
+        });
+
         let isContinuous = options.continuous !== undefined;
-        await battery(isContinuous);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        await battery(hub, isContinuous);
+        hub.close();
     });
 
 program
     .command("servo <channel> <pulseWidth> [frameWidth]")
     .description("Run a servo with pulse width and optional frame width")
     .action(async (channel, pulseWidth, frameWidth) => {
+        runOnSigint(async () => {
+            await hub.setServoEnable(channelValue, false);
+            hub.close();
+        });
+
         let channelValue = Number(channel);
         let pulseWidthValue = Number(pulseWidth);
         let frameWidthValue = frameWidth ? Number(frameWidth) : 4000;
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
 
-        await runServo(channelValue, pulseWidthValue, frameWidthValue);
+        await runServo(hub, channelValue, pulseWidthValue, frameWidthValue);
     });
 
 program.parse(process.argv);

@@ -2,11 +2,9 @@ import {
     createLedPattern,
     ExpansionHub,
     LedPatternStep,
-    openConnectedExpansionHubs,
-} from "@rev-robotics/expansion-hub";
+} from "@rev-robotics/rev-hub-core";
 
-export async function led() {
-    const hubs: ExpansionHub[] = await openConnectedExpansionHubs();
+export async function led(hub: ExpansionHub) {
     const steps = [
         new LedPatternStep(1, 0, 255, 0), //green
         new LedPatternStep(1, 255, 0, 0), //red
@@ -14,7 +12,7 @@ export async function led() {
         new LedPatternStep(1, 255, 0, 255), //magenta
         new LedPatternStep(1, 255, 255, 0), //yellow
     ];
-    await hubs[0].sendKeepAlive();
+    await hub.sendKeepAlive();
     const pattern = createLedPattern(steps);
-    await hubs[0].setModuleLedPattern(pattern);
+    await hub.setModuleLedPattern(pattern);
 }

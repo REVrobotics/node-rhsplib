@@ -1,18 +1,16 @@
-import {
-    BulkInputData,
-    DebugGroup,
-    DioDirection,
-    I2CReadStatus,
-    I2CSpeedCode,
-    I2CWriteStatus,
-    LedPattern,
-    ModuleInterface,
-    ModuleStatus,
-    PidCoefficients,
-    Rgb,
-    VerbosityLevel,
-    Version,
-} from "@rev-robotics/rev-hub-core";
+import { ModuleStatus } from "./ModuleStatus.js";
+import { ModuleInterface } from "./ModuleInterface.js";
+import { Rgb } from "./Rgb.js";
+import { LedPattern } from "./LedPattern.js";
+import { DebugGroup } from "./DebugGroup.js";
+import { VerbosityLevel } from "./VerbosityLevel.js";
+import { BulkInputData } from "./BulkInputData.js";
+import { Version } from "./Version.js";
+import { DioDirection } from "./DioDirection.js";
+import { I2CSpeedCode } from "./I2CSpeedCode.js";
+import { I2CWriteStatus } from "./I2CWriteStatus.js";
+import { I2CReadStatus } from "./I2CReadStatus.js";
+import { PidCoefficients } from "./PidCoefficients.js";
 import { ParentRevHub, RevHub } from "./RevHub.js";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
@@ -46,6 +44,9 @@ export interface ExpansionHub extends RevHub {
     getInterfacePacketID(interfaceName: string, functionNumber: number): Promise<number>;
 
     // Device Control
+    /**
+     * Read several inputs at once
+     */
     getBulkInputData(): Promise<BulkInputData>;
 
     /**
