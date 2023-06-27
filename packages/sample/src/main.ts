@@ -149,6 +149,11 @@ program
 
 program.parse(process.argv);
 
+/**
+ * Returns the expansion hub referred to by the options provided to the program.
+ * This method also returns a close method. Other hubs may need to be opened, so
+ * prefer calling the returned close method over closing the hub directly.
+ */
 async function getExpansionHubOrThrow(): Promise<[hub: ExpansionHub, close: () => void]> {
     let options = program.opts();
     let serialNumber = options.serial;
