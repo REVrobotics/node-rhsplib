@@ -196,15 +196,15 @@ async function getExpansionHubOrThrow(): Promise<[hub: ExpansionHub, close: () =
         );
 
         if (hub.isExpansionHub()) {
-            let close = () => {
+            let closeHub = () => {
                 if (parent.isExpansionHub()) {
                     parent.close();
                 }
                 if (hub.isExpansionHub()) {
-                    close();
+                    hub.close();
                 }
             };
-            return [hub, close];
+            return [hub, closeHub];
         } else {
             program.error(`No expansion hub found with module address ${moduleAddress}`);
         }
@@ -220,10 +220,10 @@ async function getExpansionHubOrThrow(): Promise<[hub: ExpansionHub, close: () =
         );
     }
 
-    let close = () => {
+    let closeHubs = () => {
         for (let hub of connectedHubs) {
-            close();
+            hub.close();
         }
     };
-    return [connectedHubs[0], close];
+    return [connectedHubs[0], closeHubs];
 }
