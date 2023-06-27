@@ -37,6 +37,13 @@ export interface ExpansionHub extends RevHub {
     getModuleLedColor(): Promise<Rgb>;
     setModuleLedPattern(ledPattern: LedPattern): Promise<void>;
     getModuleLedPattern(): Promise<LedPattern>;
+
+    /**
+     * Set the log level for a specific DebugGroup.
+     *
+     * @param debugGroup
+     * @param verbosityLevel
+     */
     setDebugLogLevel(
         debugGroup: DebugGroup,
         verbosityLevel: VerbosityLevel,
@@ -97,6 +104,11 @@ export interface ExpansionHub extends RevHub {
 
     setPhoneChargeControl(chargeEnable: boolean): Promise<void>;
     getPhoneChargeControl(): Promise<boolean>;
+
+    /**
+     * Inject log value. Useful for debugging.
+     * @param hintText
+     */
     injectDataLogHint(hintText: string): Promise<void>;
     readVersionString(): Promise<string>;
     readVersion(): Promise<Version>;
