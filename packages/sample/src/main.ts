@@ -147,7 +147,7 @@ batteryCommand
     .command("voltage")
     .option("--continuous", "Run continuously")
     .description(
-        "Read the current battery Voltage. Specify --continuous to run continuously",
+        "Read the current battery voltage. Specify --continuous to run continuously",
     )
     .action(async (options) => {
         let isContinuous = options.continuous !== undefined;
