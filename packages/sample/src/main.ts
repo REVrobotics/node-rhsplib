@@ -197,6 +197,14 @@ async function getExpansionHubOrThrow(): Promise<[hub: ExpansionHub, close: () =
     return [connectedHubs[0], closeHubs];
 }
 
+/**
+ * Open an Expansion hub, specifying a serial number and parent address. Module address
+ * is optional, and will default to parent address if not provided. Also returns a close method that will
+ * close the module and its parent.
+ * @param serialNumber
+ * @param parentAddress
+ * @param moduleAddress
+ */
 async function openExpansionHubWithSerialNumber(
     serialNumber: string,
     parentAddress: number,
@@ -228,6 +236,15 @@ async function openExpansionHubWithSerialNumber(
     }
 }
 
+/**
+ * Find a connected hub with the given parent and address.
+ * If the module address is undefined, we use the parent address
+ * as the module address. Also returns a close method that will
+ * close the module and its parent.
+ *
+ * @param parentAddress
+ * @param moduleAddress
+ */
 async function openExpansionHubWithAddress(
     parentAddress: number,
     moduleAddress: number | undefined,
