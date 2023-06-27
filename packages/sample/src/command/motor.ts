@@ -1,5 +1,5 @@
-import { ExpansionHub, PidCoefficients } from "@rev-robotics/expansion-hub";
-import { MotorMode } from "@rev-robotics/expansion-hub/dist/MotorMode.js";
+import { PidCoefficients } from "@rev-robotics/expansion-hub";
+import { ExpansionHub, MotorMode } from "@rev-robotics/rev-hub-core";
 
 export async function runMotorConstantPower(
     hub: ExpansionHub,

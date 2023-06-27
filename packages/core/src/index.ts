@@ -1,4 +1,9 @@
 export * from "./nack-errors/nack-codes.js";
+export * from "./ExpansionHub.js";
+export * from "./serial-errors.js";
+export * from "./RevHub.js";
+export * from "./RevHubType.js";
+export * from "./led-pattern.js";
 export * from "./BulkInputData.js";
 export * from "./DebugGroup.js";
 export * from "./DioDirection.js";
@@ -11,6 +16,7 @@ export * from "./ModuleInterface.js";
 export * from "./ModuleStatus.js";
 export * from "./PidCoefficients.js";
 export * from "./Rgb.js";
+export * from "./MotorMode.js";
 export * from "./SerialFlowControl.js";
 export * from "./SerialParity.js";
 export * from "./VerbosityLevel.js";

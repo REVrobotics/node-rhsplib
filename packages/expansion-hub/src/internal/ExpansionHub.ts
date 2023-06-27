@@ -1,4 +1,3 @@
-import { ExpansionHub } from "../ExpansionHub.js";
 import {
     NativeRevHub,
     Serial as SerialPort,
@@ -25,12 +24,12 @@ import {
     ParameterOutOfRangeError,
     GeneralSerialError,
     CommandNotSupportedError,
+    ExpansionHub,
+    MotorMode,
 } from "@rev-robotics/rev-hub-core";
 import { closeSerialPort } from "../open-rev-hub.js";
-import { ParentRevHub, RevHub } from "../RevHub.js";
+import { ParentRevHub, RevHub, RevHubType } from "@rev-robotics/rev-hub-core";
 import { EventEmitter } from "events";
-import { MotorMode } from "../MotorMode.js";
-import { RevHubType } from "../RevHubType.js";
 import { RhspLibError } from "../errors/RhspLibError.js";
 
 export class ExpansionHubInternal implements ExpansionHub {
@@ -513,7 +512,10 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setMotorConstantPower(motorChannel, powerLevel * 32_767);
+            return this.nativeRevHub.setMotorConstantPower(
+                motorChannel,
+                powerLevel * 32_767,
+            );
         });
     }
 
