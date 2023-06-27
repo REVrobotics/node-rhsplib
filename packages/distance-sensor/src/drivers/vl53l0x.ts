@@ -1,4 +1,4 @@
-import { ExpansionHub } from "@rev-robotics/expansion-hub";
+import { ExpansionHub } from "@rev-robotics/rev-hub-core";
 import * as register from "../registers.js";
 import { SYSTEM_SEQUENCE_CONFIG } from "../registers.js";
 import {
