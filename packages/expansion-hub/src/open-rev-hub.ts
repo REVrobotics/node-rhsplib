@@ -40,14 +40,14 @@ export async function openHubWithAddress(
     parentSerialNumber: string,
     parentAddress: number,
     moduleAddress: number = parentAddress,
-): Promise<RevHub> {
+): Promise<[parent: RevHub, child: RevHub]> {
     let parentHub = await openParentExpansionHub(parentSerialNumber, parentAddress);
 
     if (parentAddress == moduleAddress) {
-        return parentHub;
+        return [parentHub, parentHub];
     }
 
-    return await parentHub.addChildByAddress(moduleAddress);
+    return [parentHub, await parentHub.addChildByAddress(moduleAddress)];
 }
 
 /**

@@ -54,9 +54,9 @@ program
     .command("led")
     .description("Run LED steps")
     .action(async () => {
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await led(hub);
@@ -70,11 +70,11 @@ program
             "--continuous to run continuously.",
     )
     .action(async (port, options) => {
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
         let portNumber = Number(port);
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await analog(hub, portNumber, isContinuous);
@@ -88,10 +88,10 @@ program
             "Specify --continuous to run continuously",
     )
     .action(async (options) => {
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await temperature(hub, isContinuous);
@@ -104,14 +104,14 @@ program
         "Read the current 5V rail voltage. Specify --continuous to run continuously",
     )
     .action(async (options) => {
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await voltageRail(hub, isContinuous);
-        hub.close();
+        close();
     });
 
 program
@@ -121,27 +121,27 @@ program
         "Read the current battery Voltage. Specify --continuous to run continuously",
     )
     .action(async (options) => {
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await battery(hub, isContinuous);
-        hub.close();
+        close();
     });
 
 program
     .command("servo <channel> <pulseWidth> [frameWidth]")
     .description("Run a servo with pulse width and optional frame width")
     .action(async (channel, pulseWidth, frameWidth) => {
-        let hub = await getExpansionHubOrThrow();
+        let [hub, close] = await getExpansionHubOrThrow();
         let channelValue = Number(channel);
         let pulseWidthValue = Number(pulseWidth);
         let frameWidthValue = frameWidth ? Number(frameWidth) : 4000;
         runOnSigint(() => {
             hub.setServoEnable(channelValue, false);
-            hub.close();
+            close();
         });
 
         await runServo(hub, channelValue, pulseWidthValue, frameWidthValue);
@@ -149,7 +149,7 @@ program
 
 program.parse(process.argv);
 
-async function getExpansionHubOrThrow(): Promise<ExpansionHub> {
+async function getExpansionHubOrThrow(): Promise<[hub: ExpansionHub, close: () => void]> {
     let options = program.opts();
     let serialNumber = options.serial;
     let moduleAddress = options.address ? Number(options.address) : undefined;
@@ -157,11 +157,22 @@ async function getExpansionHubOrThrow(): Promise<ExpansionHub> {
     if (serialNumber) {
         let parentHub = await openParentExpansionHub(serialNumber, parentAddress);
         if (moduleAddress === undefined || moduleAddress == parentHub.moduleAddress) {
-            return parentHub;
+            return [
+                parentHub,
+                () => {
+                    parentHub.close();
+                },
+            ];
         } else {
             let childHub = await parentHub.addChildByAddress(moduleAddress);
             if (childHub.isExpansionHub()) {
-                return childHub;
+                let closeChild = () => {
+                    parentHub.close();
+                    if (childHub.isExpansionHub()) {
+                        childHub.close();
+                    }
+                };
+                return [childHub, closeChild];
             }
         }
     } else if (parentAddress !== undefined) {
@@ -178,14 +189,22 @@ async function getExpansionHubOrThrow(): Promise<ExpansionHub> {
             );
         }
 
-        let hub = await openHubWithAddress(
+        let [parent, hub] = await openHubWithAddress(
             serialNumbers[0],
             parentAddress,
             realModuleAddress,
         );
 
         if (hub.isExpansionHub()) {
-            return hub;
+            let close = () => {
+                if (parent.isExpansionHub()) {
+                    parent.close();
+                }
+                if (hub.isExpansionHub()) {
+                    close();
+                }
+            };
+            return [hub, close];
         } else {
             program.error(`No expansion hub found with module address ${moduleAddress}`);
         }
@@ -201,5 +220,10 @@ async function getExpansionHubOrThrow(): Promise<ExpansionHub> {
         );
     }
 
-    return connectedHubs[0];
+    let close = () => {
+        for (let hub of connectedHubs) {
+            close();
+        }
+    };
+    return [connectedHubs[0], close];
 }
