@@ -1,6 +1,8 @@
-import { ExpansionHub } from "@rev-robotics/expansion-hub";
-import { DigitalState } from "@rev-robotics/expansion-hub/dist/digital-state.js";
-import { DigitalChannelDirection } from "@rev-robotics/expansion-hub/dist/DigitalChannelDirection.js";
+import {
+    DigitalChannelDirection,
+    DigitalState,
+    ExpansionHub,
+} from "@rev-robotics/rev-hub-core";
 
 export async function digitalRead(
     hub: ExpansionHub,

@@ -1,21 +1,18 @@
-import {
-    BulkInputData,
-    DebugGroup,
-    DioDirection,
-    I2CReadStatus,
-    I2CSpeedCode,
-    I2CWriteStatus,
-    LedPattern,
-    ModuleInterface,
-    ModuleStatus,
-    PidCoefficients,
-    Rgb,
-    VerbosityLevel,
-    Version,
-} from "@rev-robotics/rev-hub-core";
+import { ParentRevHub, RevHub } from "./RevHub.js";
+import { ModuleStatus } from "./ModuleStatus.js";
+import { ModuleInterface } from "./ModuleInterface.js";
+import { Rgb } from "./Rgb.js";
+import { LedPattern } from "./LedPattern.js";
+import { DebugGroup } from "./DebugGroup.js";
+import { VerbosityLevel } from "./VerbosityLevel.js";
+import { BulkInputData } from "./BulkInputData.js";
+import { Version } from "./Version.js";
 import { DigitalState } from "./digital-state.js";
 import { DigitalChannelDirection } from "./DigitalChannelDirection.js";
-import { ParentRevHub, RevHub } from "./RevHub.js";
+import { I2CSpeedCode } from "./I2CSpeedCode.js";
+import { I2CWriteStatus } from "./I2CWriteStatus.js";
+import { I2CReadStatus } from "./I2CReadStatus.js";
+import { PidCoefficients } from "./PidCoefficients.js";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
 

@@ -5,12 +5,13 @@ import {
     digitalWrite,
     digitalWriteAll,
 } from "./commands/digital.js";
-import { DigitalState, openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
+import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
 import { analog, battery, temperature, voltageRail } from "./command/analog.js";
 import { error } from "./command/error.js";
 import { list } from "./command/list.js";
 import { led } from "./command/led.js";
 import { runServo } from "./command/servo.js";
+import { DigitalState } from "@rev-robotics/rev-hub-core";
 
 function runOnSigint(block: () => void) {
     process.on("SIGINT", () => {

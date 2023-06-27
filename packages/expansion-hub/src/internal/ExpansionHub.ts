@@ -1,4 +1,3 @@
-import { ExpansionHub } from "../ExpansionHub.js";
 import {
     NativeRevHub,
     Serial as SerialPort,
@@ -25,13 +24,13 @@ import {
     ParameterOutOfRangeError,
     GeneralSerialError,
     CommandNotSupportedError,
+    ExpansionHub,
+    DigitalChannelDirection,
+    DigitalState,
 } from "@rev-robotics/rev-hub-core";
 import { closeSerialPort } from "../open-rev-hub.js";
-import { ParentRevHub, RevHub } from "../RevHub.js";
+import { ParentRevHub, RevHub, RevHubType } from "@rev-robotics/rev-hub-core";
 import { EventEmitter } from "events";
-import { RevHubType } from "../RevHubType.js";
-import { DigitalState } from "../digital-state.js";
-import { DigitalChannelDirection } from "../DigitalChannelDirection.js";
 import { RhspLibError } from "../errors/RhspLibError.js";
 
 export class ExpansionHubInternal implements ExpansionHub {
