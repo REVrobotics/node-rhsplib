@@ -2,7 +2,7 @@ import {
     createLedPattern,
     ExpansionHub,
     LedPatternStep,
-} from "@rev-robotics/expansion-hub";
+} from "@rev-robotics/rev-hub-core";
 
 export async function led(hub: ExpansionHub) {
     const steps = [

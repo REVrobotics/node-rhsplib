@@ -3,6 +3,7 @@
       "declaration": true,
       "module": "es2022",
       "moduleResolution": "nodenext",
+      "sourceMap": true,
       "strict": true,
       "lib": ["es2021"],
       "target": "es2021",

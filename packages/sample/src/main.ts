@@ -4,14 +4,13 @@ import { error } from "./command/error.js";
 import { list } from "./command/list.js";
 import { led } from "./command/led.js";
 import {
-    ExpansionHub,
     getPossibleExpansionHubSerialNumbers,
     openConnectedExpansionHubs,
     openHubWithAddress,
     openParentExpansionHub,
-    ParentExpansionHub,
 } from "@rev-robotics/expansion-hub";
 import { runServo } from "./command/servo.js";
+import { ExpansionHub, ParentExpansionHub } from "@rev-robotics/rev-hub-core";
 
 function runOnSigint(block: () => void) {
     process.on("SIGINT", () => {

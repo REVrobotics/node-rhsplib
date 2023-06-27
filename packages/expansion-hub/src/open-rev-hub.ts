@@ -1,4 +1,3 @@
-import { ExpansionHub, ParentExpansionHub } from "./ExpansionHub.js";
 import {
     DiscoveredAddresses,
     NativeRevHub,
@@ -9,11 +8,12 @@ import {
 import { SerialPort as SerialLister } from "serialport";
 import { ExpansionHubInternal } from "./internal/ExpansionHub.js";
 import { startKeepAlive } from "./start-keep-alive.js";
-import { RevHub } from "./RevHub.js";
 import {
     GeneralSerialError,
     InvalidSerialArguments,
     NoExpansionHubWithAddressError,
+    ParentExpansionHub,
+    RevHub,
     SerialConfigurationError,
     SerialIoError,
     SerialParity,

@@ -1,5 +1,5 @@
-import { ExpansionHub } from "@rev-robotics/expansion-hub";
 import { hubHierarchyToString } from "../HubStringify.js";
+import { ExpansionHub } from "@rev-robotics/rev-hub-core";
 
 export async function list(hubs: ExpansionHub[]) {
     for (const hub of hubs) {
