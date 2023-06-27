@@ -60,7 +60,7 @@ export interface ExpansionHub extends RevHub {
     /**
      * Read the total current through the digital IO bus in mA
      */
-    getDigitalBusVoltage(): Promise<number>;
+    getDigitalBusCurrent(): Promise<number>;
 
     /**
      * Read the total current through the I2C busses in mA
