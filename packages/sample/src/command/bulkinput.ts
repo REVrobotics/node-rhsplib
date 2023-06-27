@@ -1,4 +1,4 @@
-import { ExpansionHub } from "@rev-robotics/expansion-hub";
+import { ExpansionHub } from "@rev-robotics/rev-hub-core";
 
 export async function getBulkInputData(
     hub: ExpansionHub,
