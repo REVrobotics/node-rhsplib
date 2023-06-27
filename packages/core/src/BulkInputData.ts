@@ -13,5 +13,4 @@ export interface BulkInputData {
     analog1_mV: number;
     analog2_mV: number;
     analog3_mV: number;
-    attentionRequired: number;
 }
