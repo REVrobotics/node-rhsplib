@@ -1,4 +1,4 @@
-import { RevHub } from "@rev-robotics/expansion-hub";
+import { RevHub } from "@rev-robotics/rev-hub-core";
 
 export function hubHierarchyToString(hub: RevHub): string {
     let result = `RevHub: ${hub.moduleAddress}\n`;
