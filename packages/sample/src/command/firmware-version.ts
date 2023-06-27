@@ -1,4 +1,4 @@
-import { ExpansionHub } from "@rev-robotics/expansion-hub";
+import { ExpansionHub } from "@rev-robotics/rev-hub-core";
 
 export async function firmwareVersion(hub: ExpansionHub) {
     let version = await hub.readVersionString();
