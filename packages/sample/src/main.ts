@@ -1,12 +1,11 @@
 import { Command } from "commander";
 import { digitalRead, digitalWrite } from "./commands/digital.js";
-import { DigitalState } from "@rev-robotics/expansion-hub";
+import { DigitalState, openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
 import { analog, battery, temperature, voltageRail } from "./command/analog.js";
 import { error } from "./command/error.js";
 import { list } from "./command/list.js";
 import { led } from "./command/led.js";
 import { runServo } from "./command/servo.js";
-import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
 
 function runOnSigint(block: () => void) {
     process.on("SIGINT", () => {
@@ -66,7 +65,15 @@ digitalCommand
         }
         let digitalState = stateBoolean ? DigitalState.High : DigitalState.Low;
 
-        await digitalWrite(channelNumber, digitalState);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await digitalWrite(hub, channelNumber, digitalState);
+        hub.close();
     });
 
 digitalCommand
@@ -77,7 +84,15 @@ digitalCommand
         let isContinuous = options.continuous !== undefined;
         let channelNumber = Number(channel);
 
-        await digitalRead(channelNumber, isContinuous);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await digitalRead(hub, channelNumber, isContinuous);
+        hub.close();
     });
 
 program
