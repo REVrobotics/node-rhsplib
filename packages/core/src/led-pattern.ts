@@ -1,4 +1,4 @@
-import { LedPattern } from "@rev-robotics/rev-hub-core";
+import { LedPattern } from "./LedPattern.js";
 
 /**
  * Create the value representing an LED step.
