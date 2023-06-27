@@ -10,7 +10,6 @@ import { SerialPort as SerialLister } from "serialport";
 import { ExpansionHubInternal } from "./internal/ExpansionHub.js";
 import { startKeepAlive } from "./start-keep-alive.js";
 import { RevHub } from "./RevHub.js";
-import { getPossibleExpansionHubSerialNumbers } from "./discovery.js";
 import {
     GeneralSerialError,
     InvalidSerialArguments,
