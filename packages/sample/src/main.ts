@@ -159,7 +159,12 @@ async function getExpansionHubOrThrow(): Promise<[hub: ExpansionHub, close: () =
     let serialNumber = options.serial;
     let moduleAddress = options.address ? Number(options.address) : undefined;
     let parentAddress = options.parent ? Number(options.parent) : undefined;
-    if (serialNumber) {
+    if (moduleAddress === 0) {
+        throw new Error("0 is not a valid module address");
+    } else if (parentAddress === 0) {
+        throw new Error("0 is not a valid parent address");
+    }
+    if (serialNumber !== undefined) {
         let parentHub = await openParentExpansionHub(serialNumber, parentAddress);
         if (moduleAddress === undefined || moduleAddress == parentHub.moduleAddress) {
             return [
