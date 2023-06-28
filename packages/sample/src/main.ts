@@ -290,6 +290,7 @@ program.parse(process.argv);
 async function getExpansionHubOrThrow(): Promise<[hub: ExpansionHub, close: () => void]> {
     let options = program.opts();
     let serialNumber = options.serial;
+    // options.address is a string, so a specified address of "0" will be treated as truthy, and will not be ignored.
     let moduleAddress = options.address ? Number(options.address) : undefined;
     let parentAddress = options.parent ? Number(options.parent) : undefined;
     if (moduleAddress === 0) {
