@@ -30,6 +30,7 @@ import {
     DigitalState,
     MotorMode,
     I2cOperationInProgressError,
+    ControlHub,
 } from "@rev-robotics/rev-hub-core";
 import { EventEmitter } from "events";
 import { RevHubType } from "@rev-robotics/rev-hub-core";
@@ -70,6 +71,10 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     isExpansionHub(): this is ExpansionHub {
         return true;
+    }
+
+    isControlHub(): this is ControlHub {
+        return false;
     }
 
     close(): void {
