@@ -1,4 +1,3 @@
-import { ParentRevHub, RevHub } from "./RevHub.js";
 import { ModuleStatus } from "./ModuleStatus.js";
 import { ModuleInterface } from "./ModuleInterface.js";
 import { Rgb } from "./Rgb.js";
@@ -9,10 +8,10 @@ import { BulkInputData } from "./BulkInputData.js";
 import { Version } from "./Version.js";
 import { DioDirection } from "./DioDirection.js";
 import { I2CSpeedCode } from "./I2CSpeedCode.js";
-import { I2CWriteStatus } from "./I2CWriteStatus.js";
 import { PidCoefficients } from "./PidCoefficients.js";
-import { MotorMode } from "./MotorMode.js";
+import { ParentRevHub, RevHub } from "./RevHub.js";
 import { DigitalState } from "./digital-state.js";
+import { MotorMode } from "./MotorMode.js";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
 
@@ -43,6 +42,9 @@ export interface ExpansionHub extends RevHub {
     getInterfacePacketID(interfaceName: string, functionNumber: number): Promise<number>;
 
     // Device Control
+    /**
+     * Read several inputs at once
+     */
     getBulkInputData(): Promise<BulkInputData>;
 
     /**
@@ -97,6 +99,10 @@ export interface ExpansionHub extends RevHub {
     setPhoneChargeControl(chargeEnable: boolean): Promise<void>;
     getPhoneChargeControl(): Promise<boolean>;
     injectDataLogHint(hintText: string): Promise<void>;
+
+    /**
+     * Read the current version of the firmware as a human-readable string
+     */
     readVersionString(): Promise<string>;
     readVersion(): Promise<Version>;
     setFTDIResetControl(ftdiResetControl: boolean): Promise<void>;

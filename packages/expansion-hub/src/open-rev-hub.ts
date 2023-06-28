@@ -1,28 +1,16 @@
 import {
-    ExpansionHub,
-    GeneralSerialError,
-    InvalidSerialArguments,
+    DiscoveredAddresses,
     NoExpansionHubWithAddressError,
     ParentExpansionHub,
     RevHub,
-    SerialConfigurationError,
-    SerialIoError,
-    SerialParity,
     TimeoutError,
-    UnableToOpenSerialError,
 } from "@rev-robotics/rev-hub-core";
-import {
-    DiscoveredAddresses,
-    NativeRevHub,
-    NativeSerial,
-    SerialError,
-    SerialFlowControl,
-} from "@rev-robotics/rhsplib";
-import { SerialPort as SerialLister } from "serialport";
-import { ExpansionHubInternal } from "./internal/ExpansionHub.js";
-import { startKeepAlive } from "./start-keep-alive.js";
-import { performance } from "perf_hooks";
 import { getSerial } from "./serial.js";
+import { ExpansionHubInternal } from "./internal/ExpansionHub.js";
+import { NativeRevHub } from "@rev-robotics/rhsplib";
+import { performance } from "perf_hooks";
+import { startKeepAlive } from "./start-keep-alive.js";
+import { SerialPort as SerialLister } from "serialport";
 
 /**
  *

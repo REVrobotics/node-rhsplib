@@ -1,10 +1,4 @@
 import {
-    DigitalState,
-    ExpansionHub,
-    ParentRevHub,
-    RevHub,
-} from "@rev-robotics/rev-hub-core";
-import {
     NativeRevHub,
     Serial as SerialPort,
     RhspLibErrorCode,
@@ -30,14 +24,19 @@ import {
     ParameterOutOfRangeError,
     GeneralSerialError,
     CommandNotSupportedError,
+    ExpansionHub,
+    ParentRevHub,
+    RevHub,
+    DigitalState,
+    MotorMode,
     I2cOperationInProgressError,
 } from "@rev-robotics/rev-hub-core";
-import { closeSerialPort } from "../serial.js";
 import { EventEmitter } from "events";
-import { RevHubType, MotorMode } from "@rev-robotics/rev-hub-core";
+import { RevHubType } from "@rev-robotics/rev-hub-core";
 import { RhspLibError } from "../errors/RhspLibError.js";
-import { startKeepAlive } from "../start-keep-alive.js";
 import { performance } from "perf_hooks";
+import { startKeepAlive } from "../start-keep-alive.js";
+import { closeSerialPort } from "../serial.js";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);

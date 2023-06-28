@@ -2,7 +2,6 @@ export { NackError } from "@rev-robotics/rev-hub-core";
 export * from "./errors/RhspLibError.js";
 export * from "./discovery.js";
 export * from "./open-rev-hub.js";
-export * from "./led-pattern.js";
 export {
     openParentExpansionHub,
     openExpansionHubAndAllChildren,

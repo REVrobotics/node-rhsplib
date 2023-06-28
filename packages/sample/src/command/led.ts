@@ -1,11 +1,9 @@
 import {
     createLedPattern,
+    ExpansionHub,
     LedPatternStep,
-    openConnectedExpansionHubs,
-    Rgb,
-} from "@rev-robotics/expansion-hub";
-import { ExpansionHub } from "@rev-robotics/rev-hub-core";
-import { openUsbControlHubs } from "../adb-setup.js";
+} from "@rev-robotics/rev-hub-core";
+
 export async function ledPattern(hub: ExpansionHub, args: string[]) {
     function parse(step: string): LedPatternStep {
         function hex2rgb(hex: string) {

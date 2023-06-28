@@ -138,7 +138,6 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
             motor2velocity_cps: rawData.m2v,
             motor3velocity_cps: rawData.m3v,
             motorStatus: rawData.msBf,
-            attentionRequired: 0,
         };
     }
 

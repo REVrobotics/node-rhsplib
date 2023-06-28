@@ -11,6 +11,35 @@ import {
     voltageRail,
 } from "./command/analog.js";
 import { error } from "./command/error.js";
+import { list } from "./command/list.js";
+import { getLed, getLedPattern, led, ledPattern } from "./command/led.js";
+import { runServo } from "./command/servo.js";
+import {
+    getPossibleExpansionHubSerialNumbers,
+    openConnectedExpansionHubs,
+    openHubWithAddress,
+    openParentExpansionHub,
+} from "@rev-robotics/expansion-hub";
+import { firmwareVersion } from "./command/firmware-version.js";
+import { getBulkInputData } from "./command/bulkinput.js";
+import { injectLog, setDebugLogLevel } from "./command/log.js";
+import { sendFailSafe } from "./command/failsafe.js";
+import { queryInterface } from "./command/query.js";
+import { setHubAddress } from "./command/set-hub-address.js";
+import {
+    ControlHub,
+    DigitalState,
+    ExpansionHub,
+    ParentExpansionHub,
+} from "@rev-robotics/rev-hub-core";
+import { openUsbControlHubsAndChildren } from "./open-usb-control-hub.js";
+import { status } from "./command/status.js";
+import {
+    digitalRead,
+    digitalReadAll,
+    digitalWrite,
+    digitalWriteAll,
+} from "./command/digital.js";
 import {
     getMotorAlertLevel_mA,
     resetEncoder,
@@ -21,37 +50,15 @@ import {
     setMotorAlertLevel,
     setMotorPid,
 } from "./command/motor.js";
-import { list } from "./command/list.js";
-import { getLed, getLedPattern, led, ledPattern } from "./command/led.js";
-import { runServo } from "./command/servo.js";
-import { openUsbControlHubs } from "./adb-setup.js";
-import {
-    ControlHub,
-    DigitalState,
-    ExpansionHub,
-    ParentExpansionHub,
-} from "@rev-robotics/rev-hub-core";
-import {
-    getPossibleExpansionHubSerialNumbers,
-    openConnectedExpansionHubs,
-    openHubWithAddress,
-    openParentExpansionHub,
-} from "@rev-robotics/expansion-hub";
-import {
-    digitalRead,
-    digitalReadAll,
-    digitalWrite,
-    digitalWriteAll,
-} from "./command/digital.js";
 import { distance } from "./command/distance.js";
-import { getBulkInputData } from "./command/bulkinput.js";
-import { status } from "./command/status.js";
-import { openUsbControlHubsAndChildren } from "./open-usb-control-hub.js";
-import { injectLog, setDebugLogLevel } from "./command/log.js";
-import { sendFailSafe } from "./command/failsafe.js";
-import { queryInterface } from "./command/query.js";
-import { setHubAddress } from "./command/set-hub-address.js";
-import { firmwareVersion } from "./command/firmware-version.js";
+import { openUsbControlHubs } from "./adb-setup.js";
+
+function runOnSigint(block: () => void) {
+    process.on("SIGINT", () => {
+        block();
+        process.exit();
+    });
+}
 
 const program = new Command();
 
@@ -418,13 +425,6 @@ alertCommand
     });
 
 program
-    .command("list")
-    .description("List all connected expansion hubs")
-    .action(async () => {
-        await list();
-    });
-
-program
     .command("analog <port>")
     .option("--continuous", "Run continuously")
     .description(
@@ -435,6 +435,11 @@ program
         let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
         let portNumber = Number(port);
+
+        runOnSigint(() => {
+            close();
+        });
+
         await analog(hub, portNumber, isContinuous);
         close();
     });
@@ -449,6 +454,11 @@ program
     .action(async (options) => {
         let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
+
+        runOnSigint(() => {
+            close();
+        });
+
         await temperature(hub, isContinuous);
         close();
     });
@@ -462,6 +472,11 @@ program
     .action(async (options) => {
         let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
+
+        runOnSigint(() => {
+            close();
+        });
+
         await voltageRail(hub, isContinuous);
         close();
     });
@@ -474,11 +489,16 @@ batteryCommand
     .command("voltage")
     .option("--continuous", "Run continuously")
     .description(
-        "Read the current battery Voltage. Specify --continuous to run continuously",
+        "Read the current battery voltage. Specify --continuous to run continuously",
     )
     .action(async (options) => {
         let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
+
+        runOnSigint(() => {
+            close();
+        });
+
         await batteryVoltage(hub, isContinuous);
         close();
     });
@@ -492,6 +512,11 @@ batteryCommand
     .action(async (options) => {
         let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
+
+        runOnSigint(() => {
+            close();
+        });
+
         await batteryCurrent(hub, isContinuous);
         close();
     });
@@ -505,6 +530,11 @@ program
     .action(async (options) => {
         let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
+
+        runOnSigint(() => {
+            close();
+        });
+
         await i2cCurrent(hub, isContinuous);
         close();
     });
@@ -516,6 +546,11 @@ program
     .action(async (options) => {
         let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
+
+        runOnSigint(() => {
+            close();
+        });
+
         await digitalBusCurrent(hub, isContinuous);
         close();
     });
@@ -529,6 +564,11 @@ program
     .action(async (options) => {
         let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
+
+        runOnSigint(() => {
+            close();
+        });
+
         await servoCurrent(hub, isContinuous);
         close();
     });
@@ -544,9 +584,8 @@ program
 
         await runServo(hub, channelValue, pulseWidthValue, frameWidthValue);
 
-        process.on("SIGINT", () => {
+        runOnSigint(() => {
             close();
-            process.exit();
         });
     });
 
@@ -560,7 +599,7 @@ program
         let [hub, close] = await getExpansionHubOrThrow();
         await distance(hub, channelNumber, isContinuous);
 
-        process.on("SIGINT", () => {
+        runOnSigint(() => {
             close();
         });
     });

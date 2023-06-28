@@ -9,5 +9,4 @@ export async function getBulkInputData(
         console.log(JSON.stringify(data));
         if (!isContinuous) break;
     }
-    hub.close();
 }
