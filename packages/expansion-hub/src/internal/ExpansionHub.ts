@@ -25,6 +25,7 @@ import {
     GeneralSerialError,
     CommandNotSupportedError,
     ExpansionHub,
+    MotorMode,
 } from "@rev-robotics/rev-hub-core";
 import { closeSerialPort } from "../open-rev-hub.js";
 import { ParentRevHub, RevHub, RevHubType } from "@rev-robotics/rev-hub-core";
@@ -262,7 +263,7 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     getMotorChannelMode(
         motorChannel: number,
-    ): Promise<{ motorMode: number; floatAtZero: boolean }> {
+    ): Promise<{ motorMode: MotorMode; floatAtZero: boolean }> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.getMotorChannelMode(motorChannel);
         });
@@ -282,9 +283,10 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     getMotorPIDCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
     ): Promise<PidCoefficients> {
         return this.convertErrorPromise(() => {
+            //ToDo (landry): convert the PID coefficients in C code
             return this.nativeRevHub.getMotorPIDCoefficients(motorChannel, motorMode);
         });
     }
@@ -497,7 +499,7 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     setMotorChannelMode(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
         floatAtZero: boolean,
     ): Promise<void> {
         return this.convertErrorPromise(() => {
@@ -511,16 +513,20 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setMotorConstantPower(motorChannel, powerLevel);
+            return this.nativeRevHub.setMotorConstantPower(
+                motorChannel,
+                powerLevel * 32_767,
+            );
         });
     }
 
     setMotorPIDCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
         pid: PidCoefficients,
     ): Promise<void> {
         return this.convertErrorPromise(() => {
+            //ToDo (landry): convert the PID coefficients in C code
             return this.nativeRevHub.setMotorPIDCoefficients(
                 motorChannel,
                 motorMode,

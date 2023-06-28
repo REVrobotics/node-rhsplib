@@ -1,5 +1,16 @@
 import { Command } from "commander";
 import {
+    resetEncoder,
+    readEncoder,
+    runMotorConstantPower,
+    runMotorConstantVelocity,
+    runMotorToPosition,
+    setMotorRegulatedVelocityPid,
+    setMotorAlertLevel,
+    getMotorAlertLevel_mA,
+    getMotorRegulatedVelocityPid,
+} from "./command/motor.js";
+import {
     analog,
     batteryCurrent,
     batteryVoltage,
@@ -61,28 +72,6 @@ program
         await led(hub);
     });
 
-let motorCommand = program.command("motor");
-
-motorCommand
-    .command("current <channel>")
-    .option("--continuous", "Run continuously")
-    .description(
-        "Read the current through a motor. Specify --continuous to run continuously",
-    )
-    .action(async (channel, options) => {
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
-        let isContinuous = options.continuous !== undefined;
-        let channelNumber = Number(channel);
-
-        runOnSigint(() => {
-            hub.close();
-        });
-
-        await motorCurrent(hub, channelNumber, isContinuous);
-        hub.close();
-    });
-
 program
     .command("bulkInput")
     .description("Get all input data at once. Specify --continuous to run continuously.")
@@ -109,6 +98,188 @@ program
 
         await firmwareVersion(hub);
         hub.close();
+    });
+
+let motorCommand = program.command("motor");
+
+motorCommand
+    .command("current <channel>")
+    .option("--continuous", "Run continuously")
+    .description(
+        "Read the current through a motor. Specify --continuous to run continuously",
+    )
+    .action(async (channel, options) => {
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        let isContinuous = options.continuous !== undefined;
+        let channelNumber = Number(channel);
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await motorCurrent(hub, channelNumber, isContinuous);
+        hub.close();
+    });
+
+motorCommand
+    .command("encoder <channel>")
+    .option("-r --reset", "reset the encoder count")
+    .option("--continuous", "run continuously")
+    .description("Get the current encoder position of a motor")
+    .action(async (channel, options) => {
+        let channelNumber = Number(channel);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        if (options.reset) {
+            await resetEncoder(hub, channelNumber);
+        } else {
+            let isContinuous = options.continuous !== undefined;
+            await readEncoder(hub, channelNumber, isContinuous);
+        }
+        hub.close();
+    });
+
+let pidCommand = motorCommand.command("pid").description("Get or set PID coefficients");
+
+pidCommand
+    .command("set <channel> <p> <i> <d>")
+    .description("Set PID coefficients for regulated velocity mode for a motor")
+    .action(async (channel, p, i, d) => {
+        let channelNumber = Number(channel);
+        let pValue = Number(p);
+        let iValue = Number(i);
+        let dValue = Number(d);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await setMotorRegulatedVelocityPid(hub, channelNumber, pValue, iValue, dValue);
+        hub.close();
+    });
+
+pidCommand
+    .command("get <channel>")
+    .description("Get PID coefficients for regulated velocity mode for a motor")
+    .action(async (channel) => {
+        let channelNumber = Number(channel);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await getMotorRegulatedVelocityPid(hub, channelNumber);
+        hub.close();
+    });
+
+let alertCommand = motorCommand
+    .command("alert")
+    .description("Get or set motor alert current (mA)");
+
+alertCommand
+    .command("get <channel>")
+    .description("Get motor alert current (mA)")
+    .action(async (channel) => {
+        let channelNumber = Number(channel);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        let current = await getMotorAlertLevel_mA(hub, channelNumber);
+
+        console.log(`Motor alert for channel ${channelNumber} is ${current} mA`);
+        hub.close();
+    });
+
+alertCommand
+    .command("set <channel> <current>")
+    .description("Set motor alert current (mA)")
+    .action(async (channel, current) => {
+        let channelNumber = Number(channel);
+        let currentValue = Number(current);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await setMotorAlertLevel(hub, channelNumber, currentValue);
+        hub.close();
+    });
+
+motorCommand
+    .command("power <channel> <power>")
+    .description(
+        "Tell a motor to run at a given pwm duty cycle. Power is in the range [-1.0, 1.0]",
+    )
+    .action(async (channel, power) => {
+        let channelNumber = Number(channel);
+        let powerNumber = Number(power);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.setMotorChannelEnable(channelNumber, false);
+            hub.close();
+        });
+
+        await runMotorConstantPower(hub, channelNumber, powerNumber);
+    });
+
+motorCommand
+    .command("velocity <channel> <speed>")
+    .description("Tell a motor to run at a given speed")
+    .action(async (channel, speed) => {
+        let channelNumber = Number(channel);
+        let speedNumber = Number(speed);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.setMotorChannelEnable(channelNumber, false);
+            hub.close();
+        });
+
+        await runMotorConstantVelocity(hub, channelNumber, speedNumber);
+    });
+
+motorCommand
+    .command("position <channel> <velocity> <position> <tolerance>")
+    .description("Tell a motor to run to a given position")
+    .action(async (channel, velocity, position, tolerance) => {
+        let channelNumber = Number(channel);
+        let positionNumber = Number(position);
+        let toleranceNumber = Number(tolerance);
+        let velocityNumber = Number(velocity);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.setMotorChannelEnable(channelNumber, false);
+            hub.close();
+        });
+
+        await runMotorToPosition(
+            hub,
+            channelNumber,
+            velocityNumber,
+            positionNumber,
+            toleranceNumber,
+        );
     });
 
 program
