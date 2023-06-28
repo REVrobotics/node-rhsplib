@@ -123,7 +123,7 @@ export interface ExpansionHub extends RevHub {
     ): Promise<void>;
 
     /**
-     * Get the speed for a I2C channel
+     * Get the speed of an I2C channel
      * @param i2cChannel
      */
     getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode>;
