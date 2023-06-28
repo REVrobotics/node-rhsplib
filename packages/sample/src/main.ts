@@ -15,6 +15,7 @@ import { list } from "./command/list.js";
 import { led } from "./command/led.js";
 import { runServo } from "./command/servo.js";
 import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
+import { injectLog, setDebugLogLevel } from "./command/log.js";
 import { firmwareVersion } from "./command/firmware-version.js";
 import { getBulkInputData } from "./command/bulkinput.js";
 
@@ -261,6 +262,41 @@ program
         });
 
         await servoCurrent(hub, isContinuous);
+        hub.close();
+    });
+
+program
+    .command("log <text>")
+    .description("Inject a log hint")
+    .action(async (text) => {
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await injectLog(hub, text);
+        hub.close();
+    });
+
+program
+    .command("loglevel <group> <level>")
+    .description(
+        "Set log level. Valid values for group are: Main, " +
+            "TransmitterToHost, ReceiverFromHost, ADC, PWMAndServo, ModuleLED, " +
+            "DigitalIO, I2C, Motor0, Motor1, Motor2, or Motor3. Valid values for level are [0,3]",
+    )
+    .action(async (group, level) => {
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        let levelNumber = Number(level);
+        await setDebugLogLevel(hub, group, levelNumber);
         hub.close();
     });
 
