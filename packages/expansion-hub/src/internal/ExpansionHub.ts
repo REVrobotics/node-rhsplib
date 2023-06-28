@@ -286,6 +286,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         motorMode: MotorMode,
     ): Promise<PidCoefficients> {
         return this.convertErrorPromise(() => {
+            //ToDo (landry): convert the PID coefficients in C code
             return this.nativeRevHub.getMotorPIDCoefficients(motorChannel, motorMode);
         });
     }
@@ -525,6 +526,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         pid: PidCoefficients,
     ): Promise<void> {
         return this.convertErrorPromise(() => {
+            //ToDo (landry): convert the PID coefficients in C code
             return this.nativeRevHub.setMotorPIDCoefficients(
                 motorChannel,
                 motorMode,

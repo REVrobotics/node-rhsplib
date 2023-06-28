@@ -96,6 +96,10 @@ export async function setMotorPid(
         d: d,
     });
 
+    await getMotorPid(hub, channel);
+}
+
+export async function getMotorPid(hub: ExpansionHub, channel: number) {
     let pid: PidCoefficients = await hub.getMotorPIDCoefficients(
         channel,
         MotorMode.REGULATED_VELOCITY,

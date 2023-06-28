@@ -8,6 +8,7 @@ import {
     setMotorPid,
     setMotorAlertLevel,
     getMotorAlertLevel_mA,
+    getMotorPid,
 } from "./command/motor.js";
 import {
     analog,
@@ -143,8 +144,10 @@ motorCommand
         hub.close();
     });
 
-motorCommand
-    .command("pid <channel> <p> <i> <d>")
+let pidCommand = motorCommand.command("pid").description("Get or set PID coefficients");
+
+pidCommand
+    .command("set <channel> <p> <i> <d>")
     .description("Set PID coefficients for a motor")
     .action(async (channel, p, i, d) => {
         let channelNumber = Number(channel);
@@ -159,6 +162,22 @@ motorCommand
         });
 
         await setMotorPid(hub, channelNumber, pValue, iValue, dValue);
+        hub.close();
+    });
+
+pidCommand
+    .command("get <channel>")
+    .description("Set PID coefficients for a motor")
+    .action(async (channel) => {
+        let channelNumber = Number(channel);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await getMotorPid(hub, channelNumber);
         hub.close();
     });
 
