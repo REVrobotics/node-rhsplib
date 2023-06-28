@@ -7,7 +7,7 @@ import {
 import {
     BulkInputData,
     DebugGroup,
-    DioDirection,
+    DigitalChannelDirection,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
@@ -25,7 +25,6 @@ import {
     GeneralSerialError,
     CommandNotSupportedError,
     ExpansionHub,
-    DigitalChannelDirection,
     DigitalState,
 } from "@rev-robotics/rev-hub-core";
 import { closeSerialPort } from "../open-rev-hub.js";
@@ -185,11 +184,9 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     async getDigitalDirection(digitalChannel: number): Promise<DigitalChannelDirection> {
-        return (await this.convertErrorPromise(() => {
+        return await this.convertErrorPromise(() => {
             return this.nativeRevHub.getDigitalDirection(digitalChannel);
-        })) == DioDirection.Input
-            ? DigitalChannelDirection.Input
-            : DigitalChannelDirection.Output;
+        });
     }
 
     async getDigitalInput(digitalChannel: number): Promise<DigitalState> {
@@ -451,12 +448,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         direction: DigitalChannelDirection,
     ): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setDigitalDirection(
-                digitalChannel,
-                direction == DigitalChannelDirection.Input
-                    ? DioDirection.Input
-                    : DioDirection.Output,
-            );
+            return this.nativeRevHub.setDigitalDirection(digitalChannel, direction);
         });
     }
 
