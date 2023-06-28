@@ -356,9 +356,7 @@ async function openExpansionHubWithSerialNumber(
         if (childHub.isExpansionHub()) {
             let closeChild = () => {
                 parentHub.close();
-                if (childHub.isExpansionHub()) {
-                    childHub.close();
-                }
+                childHub.close();
             };
             return [childHub, closeChild];
         } else {
@@ -405,13 +403,10 @@ async function openExpansionHubWithAddress(
 
     if (hub.isExpansionHub()) {
         let closeHub = () => {
-            if (parent.isExpansionHub()) {
-                parent.close();
-            }
+            parent.close();
         };
         return [hub, closeHub];
     } else {
-        program.error(`No expansion hub found with module address ${moduleAddress}`);
-        throw new Error("unreachable"); //TS 5.0.4 isn't recognizing the 'never' type on program.error.
+        throw new Error(`No expansion hub found with module address ${moduleAddress}`);
     }
 }
