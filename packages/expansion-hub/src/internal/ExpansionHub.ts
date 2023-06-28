@@ -193,8 +193,8 @@ export class ExpansionHubInternal implements ExpansionHub {
         return (await this.convertErrorPromise(() => {
             return this.nativeRevHub.getDigitalSingleInput(digitalChannel);
         }))
-            ? DigitalState.High
-            : DigitalState.Low;
+            ? DigitalState.HIGH
+            : DigitalState.LOW;
     }
 
     getFTDIResetControl(): Promise<boolean> {

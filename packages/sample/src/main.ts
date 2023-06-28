@@ -132,7 +132,7 @@ digitalCommand
         } else {
             program.error("Please provide only one of {high, low, 1, 0}");
         }
-        let digitalState = stateBoolean ? DigitalState.High : DigitalState.Low;
+        let digitalState = stateBoolean ? DigitalState.HIGH : DigitalState.LOW;
 
         let hubs = await openConnectedExpansionHubs();
         let hub = hubs[0];

@@ -7,7 +7,7 @@ export * from "./led-pattern.js";
 export * from "./BulkInputData.js";
 export * from "./DebugGroup.js";
 export * from "./DigitalChannelDirection.js";
-export * from "./digital-state.js";
+export * from "./DigitalState.js";
 export * from "./DiscoveredAddresses.js";
 export * from "./I2CReadStatus.js";
 export * from "./I2CSpeedCode.js";

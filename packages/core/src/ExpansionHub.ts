@@ -7,7 +7,7 @@ import { DebugGroup } from "./DebugGroup.js";
 import { VerbosityLevel } from "./VerbosityLevel.js";
 import { BulkInputData } from "./BulkInputData.js";
 import { Version } from "./Version.js";
-import { DigitalState } from "./digital-state.js";
+import { DigitalState } from "./DigitalState.js";
 import { I2CSpeedCode } from "./I2CSpeedCode.js";
 import { I2CWriteStatus } from "./I2CWriteStatus.js";
 import { I2CReadStatus } from "./I2CReadStatus.js";
