@@ -17,6 +17,10 @@ export async function setDebugLogLevel(hub: ExpansionHub, group: string, level: 
 
     let debugGroup = debugGroups[lowercaseValue];
 
+    if (debugGroup === undefined) {
+        throw new Error(`${group} is not a valid DebugGroup`);
+    }
+
     let levels = [
         VerbosityLevel.Off,
         VerbosityLevel.Level1,
