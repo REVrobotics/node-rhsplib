@@ -5,7 +5,7 @@ import { dirname } from "path";
 import {
     BulkInputData,
     DebugGroup,
-    DioDirection,
+    DigitalChannelDirection,
     DiscoveredAddresses,
     I2CReadStatus,
     I2CSpeedCode,
@@ -31,7 +31,7 @@ export * from "./serial-errors.js";
 export {
     BulkInputData,
     DebugGroup,
-    DioDirection,
+    DigitalChannelDirection,
     DiscoveredAddresses,
     I2CReadStatus,
     I2CSpeedCode,
@@ -108,8 +108,11 @@ export declare class RevHub {
     // DIO
     setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void>;
     setDigitalAllOutputs(bitPackedField: number): Promise<void>;
-    setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void>;
-    getDigitalDirection(dioPin: number): Promise<DioDirection>;
+    setDigitalDirection(
+        dioPin: number,
+        direction: DigitalChannelDirection,
+    ): Promise<void>;
+    getDigitalDirection(dioPin: number): Promise<DigitalChannelDirection>;
     getDigitalSingleInput(dioPin: number): Promise<boolean>;
     getDigitalAllInputs(): Promise<number>;
 

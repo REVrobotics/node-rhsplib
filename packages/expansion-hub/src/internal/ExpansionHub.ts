@@ -7,7 +7,7 @@ import {
 import {
     BulkInputData,
     DebugGroup,
-    DioDirection,
+    DigitalChannelDirection,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
@@ -25,6 +25,8 @@ import {
     GeneralSerialError,
     CommandNotSupportedError,
     ExpansionHub,
+    DigitalState,
+    MotorMode,
 } from "@rev-robotics/rev-hub-core";
 import { closeSerialPort } from "../open-rev-hub.js";
 import { ParentRevHub, RevHub, RevHubType } from "@rev-robotics/rev-hub-core";
@@ -178,22 +180,24 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    getDigitalAllInputs(): Promise<number> {
+    getAllDigitalInputs(): Promise<number> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.getDigitalAllInputs();
         });
     }
 
-    getDigitalDirection(dioPin: number): Promise<DioDirection> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.getDigitalDirection(dioPin);
+    async getDigitalDirection(digitalChannel: number): Promise<DigitalChannelDirection> {
+        return await this.convertErrorPromise(() => {
+            return this.nativeRevHub.getDigitalDirection(digitalChannel);
         });
     }
 
-    getDigitalSingleInput(dioPin: number): Promise<boolean> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.getDigitalSingleInput(dioPin);
-        });
+    async getDigitalInput(digitalChannel: number): Promise<DigitalState> {
+        return (await this.convertErrorPromise(() => {
+            return this.nativeRevHub.getDigitalSingleInput(digitalChannel);
+        }))
+            ? DigitalState.HIGH
+            : DigitalState.LOW;
     }
 
     getFTDIResetControl(): Promise<boolean> {
@@ -264,7 +268,7 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     getMotorChannelMode(
         motorChannel: number,
-    ): Promise<{ motorMode: number; floatAtZero: boolean }> {
+    ): Promise<{ motorMode: MotorMode; floatAtZero: boolean }> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.getMotorChannelMode(motorChannel);
         });
@@ -284,9 +288,10 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     getMotorPIDCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
     ): Promise<PidCoefficients> {
         return this.convertErrorPromise(() => {
+            //ToDo (landry): convert the PID coefficients in C code
             return this.nativeRevHub.getMotorPIDCoefficients(motorChannel, motorMode);
         });
     }
@@ -431,24 +436,32 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     setDestAddress(destAddress: number): void {
-        this.nativeRevHub.setDestAddress(destAddress);
+        this.convertErrorSync(() => {
+            this.nativeRevHub.setDestAddress(destAddress);
+        });
     }
 
-    setDigitalAllOutputs(bitPackedField: number): Promise<void> {
+    setAllDigitalOutputs(bitPackedField: number): Promise<void> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.setDigitalAllOutputs(bitPackedField);
         });
     }
 
-    setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void> {
+    setDigitalDirection(
+        digitalChannel: number,
+        direction: DigitalChannelDirection,
+    ): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setDigitalDirection(dioPin, direction);
+            return this.nativeRevHub.setDigitalDirection(digitalChannel, direction);
         });
     }
 
-    setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void> {
+    setDigitalOutput(digitalChannel: number, value: DigitalState): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setDigitalSingleOutput(dioPin, value);
+            return this.nativeRevHub.setDigitalSingleOutput(
+                digitalChannel,
+                value.isHigh(),
+            );
         });
     }
 
@@ -499,7 +512,7 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     setMotorChannelMode(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
         floatAtZero: boolean,
     ): Promise<void> {
         return this.convertErrorPromise(() => {
@@ -513,16 +526,20 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setMotorConstantPower(motorChannel, powerLevel);
+            return this.nativeRevHub.setMotorConstantPower(
+                motorChannel,
+                powerLevel * 32_767,
+            );
         });
     }
 
     setMotorPIDCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
         pid: PidCoefficients,
     ): Promise<void> {
         return this.convertErrorPromise(() => {
+            //ToDo (landry): convert the PID coefficients in C code
             return this.nativeRevHub.setMotorPIDCoefficients(
                 motorChannel,
                 motorMode,
