@@ -113,6 +113,10 @@ export interface ExpansionHub extends RevHub {
      * @param hintText
      */
     injectDataLogHint(hintText: string): Promise<void>;
+
+    /**
+     * Read the current version of the firmware as a human-readable string
+     */
     readVersionString(): Promise<string>;
     readVersion(): Promise<Version>;
     setFTDIResetControl(ftdiResetControl: boolean): Promise<void>;
