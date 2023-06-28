@@ -323,6 +323,8 @@ async function getExpansionHubOrThrow(): Promise<[hub: ExpansionHub, close: () =
         );
     }
 
+    // The user did not specify a specific Hub to open. Open all of them.
+
     let closeHubs = () => {
         for (let hub of connectedHubs) {
             hub.close();
