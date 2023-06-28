@@ -1,3 +1,4 @@
+import { ParentRevHub, RevHub } from "./RevHub.js";
 import { ModuleStatus } from "./ModuleStatus.js";
 import { ModuleInterface } from "./ModuleInterface.js";
 import { Rgb } from "./Rgb.js";
@@ -6,12 +7,12 @@ import { DebugGroup } from "./DebugGroup.js";
 import { VerbosityLevel } from "./VerbosityLevel.js";
 import { BulkInputData } from "./BulkInputData.js";
 import { Version } from "./Version.js";
-import { DioDirection } from "./DioDirection.js";
+import { DigitalState } from "./DigitalState.js";
 import { I2CSpeedCode } from "./I2CSpeedCode.js";
 import { I2CWriteStatus } from "./I2CWriteStatus.js";
 import { I2CReadStatus } from "./I2CReadStatus.js";
 import { PidCoefficients } from "./PidCoefficients.js";
-import { ParentRevHub, RevHub } from "./RevHub.js";
+import { DigitalChannelDirection } from "./DigitalChannelDirection.js";
 import { MotorMode } from "./MotorMode.js";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
@@ -124,12 +125,48 @@ export interface ExpansionHub extends RevHub {
     getFTDIResetControl(): Promise<boolean>;
 
     // DIO
-    setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void>;
-    setDigitalAllOutputs(bitPackedField: number): Promise<void>;
-    setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void>;
-    getDigitalDirection(dioPin: number): Promise<DioDirection>;
-    getDigitalSingleInput(dioPin: number): Promise<boolean>;
-    getDigitalAllInputs(): Promise<number>;
+    /**
+     * Set the output state of a digital pin.
+     * @param digitalChannel
+     * @param value whether the pin should be High or Low
+     */
+    setDigitalOutput(digitalChannel: number, value: DigitalState): Promise<void>;
+
+    /**
+     * Set the output state of all digital pins.
+     *
+     * @param bitPackedField a bit-field indicating the output states
+     */
+    setAllDigitalOutputs(bitPackedField: number): Promise<void>;
+
+    /**
+     * Set a digital pin as input or output.
+     * @param digitalChannel
+     * @param direction
+     */
+    setDigitalDirection(
+        digitalChannel: number,
+        direction: DigitalChannelDirection,
+    ): Promise<void>;
+
+    /**
+     * Get the Input/Output direction of a digital channel
+     * @param digitalChannel
+     */
+    getDigitalDirection(digitalChannel: number): Promise<DigitalChannelDirection>;
+
+    /**
+     * Read the state of a given digital pin.
+     * Throws an error if the pin is not configured for input
+     *
+     * @param digitalChannel
+     */
+    getDigitalInput(digitalChannel: number): Promise<DigitalState>;
+
+    /**
+     * Read all digital inputs as a bit-packed number.
+     */
+    getAllDigitalInputs(): Promise<number>;
 
     // I2C
     setI2CChannelConfiguration(

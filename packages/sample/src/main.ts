@@ -29,6 +29,13 @@ import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
 import { injectLog, setDebugLogLevel } from "./command/log.js";
 import { firmwareVersion } from "./command/firmware-version.js";
 import { getBulkInputData } from "./command/bulkinput.js";
+import { DigitalState } from "@rev-robotics/rev-hub-core";
+import {
+    digitalRead,
+    digitalReadAll,
+    digitalWrite,
+    digitalWriteAll,
+} from "./commands/digital.js";
 
 function runOnSigint(block: () => void) {
     process.on("SIGINT", () => {
@@ -97,6 +104,92 @@ program
         let hub = hubs[0];
 
         await firmwareVersion(hub);
+        hub.close();
+    });
+
+let digitalCommand = program.command("digital");
+
+digitalCommand
+    .command("write <channel> <state>")
+    .description("write digital pin. Valid values for <state> are high, low, 0, and 1.")
+    .action(async (channel, state) => {
+        let channelNumber = Number(channel);
+        let stateBoolean = false;
+        if (state === "high" || state === "1") {
+            stateBoolean = true;
+        } else if (state === "low" || state === "0") {
+            stateBoolean = false;
+        } else {
+            program.error("Please provide only one of {high, low, 1, 0}");
+        }
+        let digitalState = stateBoolean ? DigitalState.HIGH : DigitalState.LOW;
+
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await digitalWrite(hub, channelNumber, digitalState);
+        hub.close();
+    });
+
+digitalCommand
+    .command("read <channel>")
+    .option("--continuous", "run continuously")
+    .description("read digital pin")
+    .action(async (channel, options) => {
+        let isContinuous = options.continuous !== undefined;
+        let channelNumber = Number(channel);
+
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await digitalRead(hub, channelNumber, isContinuous);
+        hub.close();
+    });
+
+digitalCommand
+    .command("readall")
+    .option("--continuous", "run continuously")
+    .description("read all digital pins")
+    .action(async (options) => {
+        let isContinuous = options.continuous !== undefined;
+
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await digitalReadAll(hub, isContinuous);
+        hub.close();
+    });
+
+digitalCommand
+    .command("writeall <bitfield> <bitmask>")
+    .option("--continuous", "run continuously")
+    .description(
+        "Write all digital pins. Input value as a binary bitfield and a binary bitmask, where 1=output",
+    )
+    .action(async (bitfield, bitmask) => {
+        let bitfieldValue = parseInt(bitfield, 2);
+        let bitmaskValue = parseInt(bitmask, 2);
+
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await digitalWriteAll(hub, bitfieldValue, bitmaskValue);
         hub.close();
     });
 

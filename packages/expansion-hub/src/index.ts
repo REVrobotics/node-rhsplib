@@ -10,7 +10,7 @@ export {
 export {
     BulkInputData,
     DebugGroup,
-    DioDirection,
+    DigitalChannelDirection,
     DiscoveredAddresses,
     I2CReadStatus,
     I2CSpeedCode,

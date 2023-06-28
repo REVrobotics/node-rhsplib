@@ -7,7 +7,7 @@ import {
 import {
     BulkInputData,
     DebugGroup,
-    DioDirection,
+    DigitalChannelDirection,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
@@ -25,6 +25,7 @@ import {
     GeneralSerialError,
     CommandNotSupportedError,
     ExpansionHub,
+    DigitalState,
     MotorMode,
 } from "@rev-robotics/rev-hub-core";
 import { closeSerialPort } from "../open-rev-hub.js";
@@ -177,22 +178,24 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    getDigitalAllInputs(): Promise<number> {
+    getAllDigitalInputs(): Promise<number> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.getDigitalAllInputs();
         });
     }
 
-    getDigitalDirection(dioPin: number): Promise<DioDirection> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.getDigitalDirection(dioPin);
+    async getDigitalDirection(digitalChannel: number): Promise<DigitalChannelDirection> {
+        return await this.convertErrorPromise(() => {
+            return this.nativeRevHub.getDigitalDirection(digitalChannel);
         });
     }
 
-    getDigitalSingleInput(dioPin: number): Promise<boolean> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.getDigitalSingleInput(dioPin);
-        });
+    async getDigitalInput(digitalChannel: number): Promise<DigitalState> {
+        return (await this.convertErrorPromise(() => {
+            return this.nativeRevHub.getDigitalSingleInput(digitalChannel);
+        }))
+            ? DigitalState.HIGH
+            : DigitalState.LOW;
     }
 
     getFTDIResetControl(): Promise<boolean> {
@@ -431,24 +434,32 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     setDestAddress(destAddress: number): void {
-        this.nativeRevHub.setDestAddress(destAddress);
+        this.convertErrorSync(() => {
+            this.nativeRevHub.setDestAddress(destAddress);
+        });
     }
 
-    setDigitalAllOutputs(bitPackedField: number): Promise<void> {
+    setAllDigitalOutputs(bitPackedField: number): Promise<void> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.setDigitalAllOutputs(bitPackedField);
         });
     }
 
-    setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void> {
+    setDigitalDirection(
+        digitalChannel: number,
+        direction: DigitalChannelDirection,
+    ): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setDigitalDirection(dioPin, direction);
+            return this.nativeRevHub.setDigitalDirection(digitalChannel, direction);
         });
     }
 
-    setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void> {
+    setDigitalOutput(digitalChannel: number, value: DigitalState): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setDigitalSingleOutput(dioPin, value);
+            return this.nativeRevHub.setDigitalSingleOutput(
+                digitalChannel,
+                value.isHigh(),
+            );
         });
     }
 
