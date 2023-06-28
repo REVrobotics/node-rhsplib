@@ -408,9 +408,6 @@ async function openExpansionHubWithAddress(
             if (parent.isExpansionHub()) {
                 parent.close();
             }
-            if (hub.isExpansionHub()) {
-                hub.close();
-            }
         };
         return [hub, closeHub];
     } else {
