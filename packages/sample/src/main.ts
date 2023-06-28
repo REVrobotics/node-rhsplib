@@ -15,6 +15,7 @@ import { list } from "./command/list.js";
 import { led } from "./command/led.js";
 import { runServo } from "./command/servo.js";
 import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
+import { firmwareVersion } from "./command/firmware-version.js";
 import { getBulkInputData } from "./command/bulkinput.js";
 
 function runOnSigint(block: () => void) {
@@ -95,6 +96,17 @@ program
         });
 
         await getBulkInputData(hub, isContinuous);
+        hub.close();
+    });
+
+program
+    .command("version")
+    .description("Get firmware version")
+    .action(async () => {
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        await firmwareVersion(hub);
         hub.close();
     });
 

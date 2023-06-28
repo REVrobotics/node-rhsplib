@@ -101,6 +101,10 @@ export interface ExpansionHub extends RevHub {
     setPhoneChargeControl(chargeEnable: boolean): Promise<void>;
     getPhoneChargeControl(): Promise<boolean>;
     injectDataLogHint(hintText: string): Promise<void>;
+
+    /**
+     * Read the current version of the firmware as a human-readable string
+     */
     readVersionString(): Promise<string>;
     readVersion(): Promise<Version>;
     setFTDIResetControl(ftdiResetControl: boolean): Promise<void>;
