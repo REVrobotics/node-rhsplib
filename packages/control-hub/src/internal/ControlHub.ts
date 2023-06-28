@@ -5,7 +5,8 @@ import {
     BulkInputData,
     ControlHub,
     DebugGroup,
-    DioDirection,
+    DigitalState,
+    DigitalChannelDirection,
     ExpansionHub,
     I2CReadStatus,
     I2CSpeedCode,
@@ -225,16 +226,16 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.getBulkInputData();
     }
 
-    async getDigitalAllInputs(): Promise<number> {
-        return this.embedded.getDigitalAllInputs();
+    async getAllDigitalInputs(): Promise<number> {
+        return this.embedded.getAllDigitalInputs();
     }
 
-    async getDigitalDirection(dioPin: number): Promise<DioDirection> {
+    async getDigitalDirection(dioPin: number): Promise<DigitalChannelDirection> {
         return this.embedded.getDigitalDirection(dioPin);
     }
 
-    async getDigitalSingleInput(dioPin: number): Promise<boolean> {
-        return this.embedded.getDigitalSingleInput(dioPin);
+    async getDigitalInput(dioPin: number): Promise<DigitalState> {
+        return this.embedded.getDigitalInput(dioPin);
     }
 
     async getFTDIResetControl(): Promise<boolean> {
@@ -402,16 +403,19 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.setDebugLogLevel(debugGroup, verbosityLevel);
     }
 
-    async setDigitalAllOutputs(bitPackedField: number): Promise<void> {
-        return this.embedded.setDigitalAllOutputs(bitPackedField);
+    async setAllDigitalOutputs(bitPackedField: number): Promise<void> {
+        return this.embedded.setAllDigitalOutputs(bitPackedField);
     }
 
-    async setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void> {
+    async setDigitalDirection(
+        dioPin: number,
+        direction: DigitalChannelDirection,
+    ): Promise<void> {
         return this.embedded.setDigitalDirection(dioPin, direction);
     }
 
-    async setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void> {
-        return this.embedded.setDigitalSingleOutput(dioPin, value);
+    async setDigitalOutput(dioPin: number, value: DigitalState): Promise<void> {
+        return this.embedded.setDigitalOutput(dioPin, value);
     }
 
     async setFTDIResetControl(ftdiResetControl: boolean): Promise<void> {

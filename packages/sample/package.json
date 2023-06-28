@@ -7,8 +7,8 @@
     "private": true,
     "type": "module",
     "dependencies": {
-        "@rev-robotics/control-hub": "*",
-        "@rev-robotics/expansion-hub": "*",
+        "@rev-robotics/control-hub": "1.0.0",
+        "@rev-robotics/expansion-hub": "1.0.0",
         "ws": "8.13.0",
         "commander": "^10.0.1",
         "@u4/adbkit": "^4.1.19",
@@ -21,6 +21,7 @@
     },
     "scripts": {
         "build": "tsc",
+        "motor": "node dist/main.js motor power 1 0.60",
         "analog": "node dist/main.js analog 0",
         "battery": "node dist/main.js battery --continuous",
         "voltage": "node dist/main.js voltage --continuous",

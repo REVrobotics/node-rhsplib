@@ -2,7 +2,8 @@ import {
     BulkInputData,
     ControlHub,
     DebugGroup,
-    DioDirection,
+    DigitalState,
+    DigitalChannelDirection,
     ExpansionHub,
     I2CReadStatus,
     I2CSpeedCode,
@@ -117,26 +118,28 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         });
     }
 
-    async getDigitalAllInputs(): Promise<number> {
+    async getAllDigitalInputs(): Promise<number> {
         return await this.sendCommand("getAllDigitalInputs", {
             id: this.id,
         });
     }
 
-    async getDigitalDirection(dioPin: number): Promise<DioDirection> {
+    async getDigitalDirection(dioPin: number): Promise<DigitalChannelDirection> {
         let isOutput = await this.sendCommand("getDigitalDirection", {
             id: this.id,
             channel: dioPin,
         });
 
-        return isOutput ? DioDirection.Output : DioDirection.Input;
+        return isOutput ? DigitalChannelDirection.Output : DigitalChannelDirection.Input;
     }
 
-    async getDigitalSingleInput(dioPin: number): Promise<boolean> {
-        return await this.sendCommand("getDigitalInput", {
+    async getDigitalInput(dioPin: number): Promise<DigitalState> {
+        let state: boolean = await this.sendCommand("getDigitalInput", {
             id: this.id,
             channel: dioPin,
         });
+
+        return state ? DigitalState.HIGH : DigitalState.LOW;
     }
 
     async getFTDIResetControl(): Promise<boolean> {
@@ -407,26 +410,29 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         });
     }
 
-    async setDigitalAllOutputs(bitPackedField: number): Promise<void> {
+    async setAllDigitalOutputs(bitPackedField: number): Promise<void> {
         await this.sendCommand("readVersionString", {
             id: this.id,
             bitField: bitPackedField,
         });
     }
 
-    async setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void> {
+    async setDigitalDirection(
+        dioPin: number,
+        direction: DigitalChannelDirection,
+    ): Promise<void> {
         await this.sendCommand("readVersionString", {
             id: this.id,
             pin: dioPin,
-            isOutput: direction == DioDirection.Output,
+            isOutput: direction == DigitalChannelDirection.Output,
         });
     }
 
-    async setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void> {
+    async setDigitalOutput(dioPin: number, value: DigitalState): Promise<void> {
         await this.sendCommand("readVersionString", {
             id: this.id,
             pin: dioPin,
-            value: value ?? false,
+            value: value.isHigh(),
         });
     }
 
