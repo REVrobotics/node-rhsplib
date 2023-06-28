@@ -113,7 +113,7 @@ export interface ExpansionHub extends RevHub {
 
     // I2C
     /**
-     * Configure the speed for a I2C channel
+     * Configure the speed of an I2C channel
      * @param i2cChannel
      * @param speedCode
      */
