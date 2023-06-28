@@ -148,7 +148,7 @@ let pidCommand = motorCommand.command("pid").description("Get or set PID coeffic
 
 pidCommand
     .command("set <channel> <p> <i> <d>")
-    .description("Set PID coefficients for a motor")
+    .description("Set PID coefficients for regulated velocity mode for a motor")
     .action(async (channel, p, i, d) => {
         let channelNumber = Number(channel);
         let pValue = Number(p);
@@ -167,7 +167,7 @@ pidCommand
 
 pidCommand
     .command("get <channel>")
-    .description("Set PID coefficients for a motor")
+    .description("Get PID coefficients for regulated velocity mode for a motor")
     .action(async (channel) => {
         let channelNumber = Number(channel);
         let hubs = await openConnectedExpansionHubs();
