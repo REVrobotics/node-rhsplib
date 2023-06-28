@@ -385,7 +385,6 @@ async function openExpansionHubWithAddress(
 ): Promise<[hub: ExpansionHub, close: () => void]> {
     //parent address specified, but no serial number
     //if the user specifies a module address, use that, else use parent address as module address.
-    let realModuleAddress = moduleAddress !== undefined ? moduleAddress : parentAddress;
     let serialNumbers = await getPossibleExpansionHubSerialNumbers();
 
     if (serialNumbers.length > 1) {
@@ -400,9 +399,11 @@ async function openExpansionHubWithAddress(
 
     if (parentAddress == moduleAddress) {
         hub = parent;
+    } else {
+        let realModuleAddress =
+            moduleAddress !== undefined ? moduleAddress : parentAddress;
+        hub = await parent.addChildByAddress(realModuleAddress);
     }
-
-    hub = await parent.addChildByAddress(realModuleAddress);
 
     if (hub.isExpansionHub()) {
         let closeHub = () => {
