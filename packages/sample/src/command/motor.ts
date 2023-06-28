@@ -83,7 +83,7 @@ export async function getMotorAlertLevel_mA(
     return await hub.getMotorChannelCurrentAlertLevel(channel);
 }
 
-export async function setMotorPid(
+export async function setMotorRegulatedVelocityPid(
     hub: ExpansionHub,
     channel: number,
     p: number,
@@ -96,10 +96,10 @@ export async function setMotorPid(
         d: d,
     });
 
-    await getMotorPid(hub, channel);
+    await getMotorRegulatedVelocityPid(hub, channel);
 }
 
-export async function getMotorPid(hub: ExpansionHub, channel: number) {
+export async function getMotorRegulatedVelocityPid(hub: ExpansionHub, channel: number) {
     let pid: PidCoefficients = await hub.getMotorPIDCoefficients(
         channel,
         MotorMode.REGULATED_VELOCITY,

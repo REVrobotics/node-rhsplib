@@ -5,10 +5,10 @@ import {
     runMotorConstantPower,
     runMotorConstantVelocity,
     runMotorToPosition,
-    setMotorPid,
+    setMotorRegulatedVelocityPid,
     setMotorAlertLevel,
     getMotorAlertLevel_mA,
-    getMotorPid,
+    getMotorRegulatedVelocityPid,
 } from "./command/motor.js";
 import {
     analog,
@@ -161,7 +161,7 @@ pidCommand
             hub.close();
         });
 
-        await setMotorPid(hub, channelNumber, pValue, iValue, dValue);
+        await setMotorRegulatedVelocityPid(hub, channelNumber, pValue, iValue, dValue);
         hub.close();
     });
 
@@ -177,7 +177,7 @@ pidCommand
             hub.close();
         });
 
-        await getMotorPid(hub, channelNumber);
+        await getMotorRegulatedVelocityPid(hub, channelNumber);
         hub.close();
     });
 
