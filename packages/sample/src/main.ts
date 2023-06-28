@@ -293,11 +293,19 @@ async function getExpansionHubOrThrow(): Promise<[hub: ExpansionHub, close: () =
     // options.address is a string, so a specified address of "0" will be treated as truthy, and will not be ignored.
     let moduleAddress = options.address ? Number(options.address) : undefined;
     let parentAddress = options.parent ? Number(options.parent) : undefined;
-    if (moduleAddress === 0) {
-        throw new Error("0 is not a valid module address");
-    } else if (parentAddress === 0) {
-        throw new Error("0 is not a valid parent address");
+    if (moduleAddress !== undefined && (moduleAddress < 1 || moduleAddress > 255)) {
+        throw new Error(`${moduleAddress} is not a valid module address`);
+    } else if (
+        parentAddress !== undefined &&
+        (parentAddress < 1 || parentAddress > 255)
+    ) {
+        throw new Error(`${parentAddress} is not a valid parent address`);
     }
+
+    if (moduleAddress !== undefined && parentAddress === undefined) {
+        throw new Error("A module address cannot be specified without a parent address.");
+    }
+
     if (serialNumber !== undefined) {
         if (parentAddress === undefined) {
             throw new Error(
