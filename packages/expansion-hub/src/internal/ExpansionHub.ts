@@ -1,10 +1,4 @@
 import {
-    ControlHub,
-    ExpansionHub,
-    ParentRevHub,
-    RevHub,
-} from "@rev-robotics/rev-hub-core";
-import {
     NativeRevHub,
     Serial as SerialPort,
     RhspLibErrorCode,
@@ -30,6 +24,10 @@ import {
     ParameterOutOfRangeError,
     GeneralSerialError,
     CommandNotSupportedError,
+    ExpansionHub,
+    ParentRevHub,
+    RevHub,
+    ControlHub,
 } from "@rev-robotics/rev-hub-core";
 import { closeSerialPort } from "../open-rev-hub.js";
 import { EventEmitter } from "events";

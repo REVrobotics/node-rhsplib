@@ -1,72 +1,95 @@
-import { openUsbControlHubs } from "../adb-setup.js";
-import { ExpansionHub, ParentExpansionHub } from "@rev-robotics/rev-hub-core";
-import { openUsbControlHubsAndChildren } from "@rev-robotics/control-hub";
+import { ExpansionHub } from "@rev-robotics/rev-hub-core";
 
-export async function analog(channel: number, continuous: boolean) {
-    const hubs = await openUsbControlHubsAndChildren();
-    let hub: ExpansionHub = hubs[0].children[1] as ExpansionHub;
-
-    if (continuous) {
-        while (true) {
-            let value = await hub.getAnalogInput(channel);
-            console.log(`ADC: ${value} mV`);
-        }
-    } else {
+export async function analog(hub: ExpansionHub, channel: number, continuous: boolean) {
+    while (true) {
         let value = await hub.getAnalogInput(channel);
         console.log(`ADC: ${value} mV`);
-        hubs.forEach((hub) => {
-            hub.close();
-        });
+        if (!continuous) {
+            break;
+        }
     }
 }
 
-export async function temperature(continuous: boolean) {
-    const hubs = await openUsbControlHubs();
-
-    if (continuous) {
-        while (true) {
-            let value = await hubs[0].getTemperature();
-            console.log(`Temperature: ${value} C`);
-        }
-    } else {
-        let value = await hubs[0].getTemperature();
+export async function temperature(hub: ExpansionHub, continuous: boolean) {
+    while (true) {
+        let value = await hub.getTemperature();
         console.log(`Temperature: ${value} C`);
-        hubs.forEach((hub) => {
-            hub.close();
-        });
+        if (!continuous) {
+            break;
+        }
     }
 }
 
-export async function battery(continuous: boolean) {
-    const hubs = await openUsbControlHubs();
-
-    if (continuous) {
-        while (true) {
-            let value = await hubs[0].getBatteryVoltage();
-            console.log(`Battery: ${value} mV`);
+export async function batteryVoltage(hub: ExpansionHub, continuous: boolean) {
+    while (true) {
+        let value = await hub.getBatteryVoltage();
+        console.log(`Battery Voltage: ${value} mV`);
+        if (!continuous) {
+            break;
         }
-    } else {
-        let value = await hubs[0].getBatteryVoltage();
-        console.log(`Battery: ${value} mV`);
-        hubs.forEach((hub) => {
-            hub.close();
-        });
     }
 }
 
-export async function voltageRail(continuous: boolean) {
-    const hubs = await openUsbControlHubs();
-
-    if (continuous) {
-        while (true) {
-            let value = await hubs[0].get5VBusVoltage();
-            console.log(`5V rail: ${value} mV`);
+export async function batteryCurrent(hub: ExpansionHub, continuous: boolean) {
+    while (true) {
+        let value = await hub.getBatteryCurrent();
+        console.log(`Battery Current: ${value} mA`);
+        if (!continuous) {
+            break;
         }
-    } else {
-        let value = await hubs[0].get5VBusVoltage();
+    }
+}
+
+export async function voltageRail(hub: ExpansionHub, continuous: boolean) {
+    while (true) {
+        let value = await hub.get5VBusVoltage();
         console.log(`5V rail: ${value} mV`);
-        hubs.forEach((hub) => {
-            hub.close();
-        });
+        if (!continuous) {
+            break;
+        }
+    }
+}
+
+export async function i2cCurrent(hub: ExpansionHub, continuous: boolean) {
+    while (true) {
+        let value = await hub.getI2CCurrent();
+        console.log(`I2C Current: ${value} mA`);
+        if (!continuous) {
+            break;
+        }
+    }
+}
+
+export async function servoCurrent(hub: ExpansionHub, continuous: boolean) {
+    while (true) {
+        let value = await hub.getServoCurrent();
+        console.log(`Servo Current: ${value} mA`);
+        if (!continuous) {
+            break;
+        }
+    }
+}
+
+export async function motorCurrent(
+    hub: ExpansionHub,
+    channel: number,
+    continuous: boolean,
+) {
+    while (true) {
+        let value = await hub.getMotorCurrent(channel);
+        console.log(`Motor ${channel} Current: ${value} mA`);
+        if (!continuous) {
+            break;
+        }
+    }
+}
+
+export async function digitalBusCurrent(hub: ExpansionHub, continuous: boolean) {
+    while (true) {
+        let value = await hub.getBatteryCurrent();
+        console.log(`Digital Bus Current: ${value} mA`);
+        if (!continuous) {
+            break;
+        }
     }
 }
