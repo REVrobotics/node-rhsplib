@@ -20,6 +20,7 @@ import {
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rev-hub-core";
+import { EventEmitter } from "events";
 
 export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     isParentHub: boolean;
@@ -34,6 +35,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     responseTimeoutMs = 1000;
 
     readonly children: RevHub[] = [];
+    private emitter = new EventEmitter();
 
     constructor(
         isParent: boolean,
@@ -55,78 +57,101 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         return this.isParentHub;
     }
 
-    close(): void {}
+    close(): void {
+        // noinspection JSIgnoredPromiseFromCall
+        this.sendCommand("closeHub", {
+            hId: this.id,
+        });
+    }
 
     async getAnalogInput(channel: number): Promise<number> {
         return await this.sendCommand("getAnalogInput", {
-            id: this.id,
+            hId: this.id,
             channel: channel,
         });
     }
 
     async get5VBusVoltage(): Promise<number> {
         return await this.sendCommand("get5VBusVoltage", {
-            id: this.id,
+            hId: this.id,
         });
     }
 
     async getBatteryCurrent(): Promise<number> {
         return await this.sendCommand("getBatteryCurrent", {
-            id: this.id,
+            hId: this.id,
         });
     }
 
     async getBatteryVoltage(): Promise<number> {
         return await this.sendCommand("getBatteryVoltage", {
-            id: this.id,
+            hId: this.id,
         });
     }
 
     async getDigitalBusCurrent(): Promise<number> {
         return await this.sendCommand("getDigitalBusCurrent", {
-            id: this.id,
+            hId: this.id,
         });
     }
 
     async getI2CCurrent(): Promise<number> {
         return await this.sendCommand("getI2CCurrent", {
-            id: this.id,
+            hId: this.id,
         });
     }
 
     async getMotorCurrent(motorChannel: number): Promise<number> {
         return await this.sendCommand("getMotorCurrent", {
-            id: this.id,
+            hId: this.id,
+            c: motorChannel,
         });
     }
 
     async getServoCurrent(): Promise<number> {
         return await this.sendCommand("getMotorCurrent", {
-            id: this.id,
+            hId: this.id,
         });
     }
 
     async getTemperature(): Promise<number> {
         return await this.sendCommand("getTemperature", {
-            id: this.id,
+            hId: this.id,
         });
     }
 
     async getBulkInputData(): Promise<BulkInputData> {
-        return await this.sendCommand("getBulkInputData", {
-            id: this.id,
+        let rawData: any = await this.sendCommand("getBulkInputData", {
+            hId: this.id,
         });
+
+        return {
+            analog0_mV: rawData.a0,
+            analog1_mV: rawData.a1,
+            analog2_mV: rawData.a3,
+            analog3_mV: rawData.a4,
+            digitalInputs: rawData.diBf,
+            motor0position_enc: rawData.m0ep,
+            motor1position_enc: rawData.m1ep,
+            motor2position_enc: rawData.m2ep,
+            motor3position_enc: rawData.m3ep,
+            motor0velocity_cps: rawData.m0v,
+            motor1velocity_cps: rawData.m1v,
+            motor2velocity_cps: rawData.m2v,
+            motor3velocity_cps: rawData.m3v,
+            motorStatus: rawData.msBf,
+        };
     }
 
     async getAllDigitalInputs(): Promise<number> {
         return await this.sendCommand("getAllDigitalInputs", {
-            id: this.id,
+            hId: this.id,
         });
     }
 
     async getDigitalDirection(dioPin: number): Promise<DigitalChannelDirection> {
         let isOutput = await this.sendCommand("getDigitalDirection", {
-            id: this.id,
+            hId: this.id,
             channel: dioPin,
         });
 
@@ -135,8 +160,8 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
 
     async getDigitalInput(dioPin: number): Promise<DigitalState> {
         let state: boolean = await this.sendCommand("getDigitalInput", {
-            id: this.id,
-            channel: dioPin,
+            hId: this.id,
+            c: dioPin,
         });
 
         return state ? DigitalState.HIGH : DigitalState.LOW;
@@ -144,14 +169,14 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
 
     async getFTDIResetControl(): Promise<boolean> {
         return await this.sendCommand("getFtdiResetControl", {
-            id: this.id,
+            hId: this.id,
         });
     }
 
     async getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode> {
         let speedCode = await this.sendCommand("getI2CChannelConfiguration", {
-            id: this.id,
-            channel: i2cChannel,
+            hId: this.id,
+            c: i2cChannel,
         });
 
         return speedCode == 1
@@ -172,7 +197,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         functionNumber: number,
     ): Promise<number> {
         return await this.sendCommand("getInterfacePacketId", {
-            id: this.id,
+            hId: this.id,
             interfaceName: interfaceName,
             functionNumber: functionNumber,
         });
@@ -182,8 +207,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         let result: { r: number; g: number; b: number } = await this.sendCommand(
             "getLedColor",
             {
-                serialNumber: this.serialNumber,
-                moduleAddress: this.moduleAddress,
+                hId: this.id,
             },
         );
 
@@ -198,29 +222,30 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         throw new Error("not implemented");
     }
 
-    async getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus> {
+    async getModuleStatus(_: boolean): Promise<ModuleStatus> {
         return await this.sendCommand("getModuleStatus", {
-            id: this.id,
+            hId: this.id,
         });
     }
 
     async getMotorAtTarget(motorChannel: number): Promise<boolean> {
         return await this.sendCommand("getIsMotorAtTarget", {
-            id: this.id,
+            hId: this.id,
+            c: motorChannel,
         });
     }
 
     async getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<number> {
         return await this.sendCommand("getMotorAlertLevel", {
-            id: this.id,
-            motorChannel: motorChannel,
+            hId: this.id,
+            c: motorChannel,
         });
     }
 
     async getMotorChannelEnable(motorChannel: number): Promise<boolean> {
         return await this.sendCommand("getMotorChannelEnable", {
-            id: this.id,
-            motorChannel: motorChannel,
+            hId: this.id,
+            c: motorChannel,
         });
     }
 
@@ -228,22 +253,22 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         motorChannel: number,
     ): Promise<{ motorMode: number; floatAtZero: boolean }> {
         return await this.sendCommand("getMotorMode", {
-            id: this.id,
-            motorChannel: motorChannel,
+            hId: this.id,
+            c: motorChannel,
         });
     }
 
     async getMotorConstantPower(motorChannel: number): Promise<number> {
         return await this.sendCommand("getMotorConstantPower", {
-            id: this.id,
-            motorChannel: motorChannel,
+            hId: this.id,
+            c: motorChannel,
         });
     }
 
     async getMotorEncoderPosition(motorChannel: number): Promise<number> {
         return await this.sendCommand("getMotorEncoderPosition", {
-            id: this.id,
-            motorChannel: motorChannel,
+            hId: this.id,
+            c: motorChannel,
         });
     }
 
@@ -254,9 +279,9 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         let result: { p: number; i: number; d: number } = await this.sendCommand(
             "getMotorPidCoefficients",
             {
-                serialNumber: this.serialNumber,
-                moduleAddress: this.moduleAddress,
-                motorChannel: motorChannel,
+                hId: this.id,
+                c: motorChannel,
+                m: motorMode,
             },
         );
 
@@ -270,56 +295,57 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     async getMotorTargetPosition(
         motorChannel: number,
     ): Promise<{ targetPosition: number; targetTolerance: number }> {
-        let result: { targetPositionCounts: number; targetToleranceCounts: number } =
-            await this.sendCommand("getMotorTargetPosition", {
-                serialNumber: this.serialNumber,
-                moduleAddress: this.moduleAddress,
-                motorChannel: motorChannel,
-            });
+        let result: { tpc: number; ttc: number } = await this.sendCommand(
+            "getMotorTargetPosition",
+            {
+                hId: this.id,
+                c: motorChannel,
+            },
+        );
 
         return {
-            targetPosition: result.targetPositionCounts,
-            targetTolerance: result.targetToleranceCounts,
+            targetPosition: result.tpc,
+            targetTolerance: result.ttc,
         };
     }
 
     async getMotorTargetVelocity(motorChannel: number): Promise<number> {
         return await this.sendCommand("getMotorTargetVelocity", {
-            id: this.id,
-            motorChannel: motorChannel,
+            hId: this.id,
+            c: motorChannel,
         });
     }
 
     async getPhoneChargeControl(): Promise<boolean> {
         return await this.sendCommand("getPhoneChargeControl", {
-            id: this.id,
+            hId: this.id,
         });
     }
 
     async getServoConfiguration(servoChannel: number): Promise<number> {
         return await this.sendCommand("getServoConfiguration", {
-            id: this.id,
-            servoChannel: servoChannel,
+            hId: this.id,
+            c: servoChannel,
         });
     }
 
     async getServoEnable(servoChannel: number): Promise<boolean> {
         return await this.sendCommand("getServoEnable", {
-            id: this.id,
-            servoChannel: servoChannel,
+            hId: this.id,
+            c: servoChannel,
         });
     }
 
     async getServoPulseWidth(servoChannel: number): Promise<number> {
         return await this.sendCommand("getServoPulseWidth", {
-            id: this.id,
-            servoChannel: servoChannel,
+            hId: this.id,
+            c: servoChannel,
         });
     }
 
     async injectDataLogHint(hintText: string): Promise<void> {
         await this.sendCommand("injectDebugLogHint", {
-            id: this.id,
+            hId: this.id,
             hint: hintText,
         });
     }
@@ -333,15 +359,18 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         return false;
     }
 
-    on(eventName: "error", listener: (error: Error) => void): RevHub {
-        throw new Error("not implemented");
+    on(
+        eventName: "error" | "statusChanged" | "addressChanged" | "sessionEnded",
+        listener: (...param: any) => void,
+    ): this {
+        this.emitter.on(eventName, listener);
+        return this;
     }
 
     async queryInterface(interfaceName: string): Promise<ModuleInterface> {
         let result: { name: string; firstPacketId: number; numberIds: number } =
             await this.sendCommand("queryInterface", {
-                serialNumber: this.serialNumber,
-                moduleAddress: this.moduleAddress,
+                hId: this.id,
                 interfaceName: interfaceName,
             });
 
@@ -366,26 +395,36 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
 
     async readVersion(): Promise<Version> {
         let versionString = await this.readVersionString();
-        //ToDo(landry) parse version string
-        throw new Error("not implemented");
+        let parts = versionString.split(".");
+        if (parts.length != 3) {
+            throw new Error(`Version ${versionString} does not have 3 parts`);
+        }
+        return {
+            majorVersion: Number(parts[0]),
+            minorVersion: Number(parts[1]),
+            engineeringRevision: Number(parts[2]),
+            minorHwRevision: 0, //hardcoded in RHSPlib_device_control.c
+            majorHwRevision: 2, //hardcoded in RHSPlib_device_control.c
+            hwType: 0x311153, //hardcoded in RHSPlib_device_control.c
+        };
     }
 
     async readVersionString(): Promise<string> {
         return await this.sendCommand("readVersionString", {
-            id: this.id,
+            hId: this.id,
         });
     }
 
     async resetMotorEncoder(motorChannel: number): Promise<void> {
         await this.sendCommand("resetMotorEncoder", {
-            id: this.id,
-            motorChannel: motorChannel,
+            hId: this.id,
+            c: motorChannel,
         });
     }
 
     async sendFailSafe(): Promise<void> {
         await this.sendCommand("readVersionString", {
-            id: this.id,
+            hId: this.id,
         });
     }
 
@@ -404,7 +443,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         verbosityLevel: VerbosityLevel,
     ): Promise<void> {
         await this.sendCommand("readVersionString", {
-            id: this.id,
+            hId: this.id,
             debugGroup: debugGroup,
             verbosityLevel: verbosityLevel,
         });
@@ -412,8 +451,8 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
 
     async setAllDigitalOutputs(bitPackedField: number): Promise<void> {
         await this.sendCommand("readVersionString", {
-            id: this.id,
-            bitField: bitPackedField,
+            hId: this.id,
+            bf: bitPackedField,
         });
     }
 
@@ -422,40 +461,36 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         direction: DigitalChannelDirection,
     ): Promise<void> {
         await this.sendCommand("readVersionString", {
-            id: this.id,
-            pin: dioPin,
-            isOutput: direction == DigitalChannelDirection.Output,
+            hId: this.id,
+            c: dioPin,
+            o: direction == DigitalChannelDirection.Output,
         });
     }
 
     async setDigitalOutput(dioPin: number, value: DigitalState): Promise<void> {
         await this.sendCommand("readVersionString", {
-            id: this.id,
-            pin: dioPin,
-            value: value.isHigh(),
+            hId: this.id,
+            c: dioPin,
+            v: value.isHigh(),
         });
     }
 
-    async setFTDIResetControl(ftdiResetControl: boolean): Promise<void> {
-        await this.sendCommand("setFtdiResetControl", {
-            id: this.id,
-        });
-    }
+    async setFTDIResetControl(_: boolean): Promise<void> {}
 
     async setI2CChannelConfiguration(
         i2cChannel: number,
         speedCode: I2CSpeedCode,
     ): Promise<void> {
         await this.sendCommand("setI2CChannelConfiguration", {
-            id: this.id,
-            i2cChannel: i2cChannel,
-            speedCode: speedCode,
+            hId: this.id,
+            c: i2cChannel,
+            sc: speedCode,
         });
     }
 
     async setModuleLedColor(red: number, green: number, blue: number): Promise<void> {
         await this.sendCommand("setLedColor", {
-            id: this.id,
+            hId: this.id,
             r: red,
             g: green,
             b: blue,
@@ -464,23 +499,23 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
 
     async setModuleLedPattern(ledPattern: LedPattern): Promise<void> {
         await this.sendCommand("setLedPattern", {
-            id: this.id,
-            rgbtPatternStep0: ledPattern.rgbtPatternStep0,
-            rgbtPatternStep1: ledPattern.rgbtPatternStep1,
-            rgbtPatternStep2: ledPattern.rgbtPatternStep2,
-            rgbtPatternStep3: ledPattern.rgbtPatternStep3,
-            rgbtPatternStep4: ledPattern.rgbtPatternStep4,
-            rgbtPatternStep5: ledPattern.rgbtPatternStep5,
-            rgbtPatternStep6: ledPattern.rgbtPatternStep6,
-            rgbtPatternStep7: ledPattern.rgbtPatternStep7,
-            rgbtPatternStep8: ledPattern.rgbtPatternStep8,
-            rgbtPatternStep9: ledPattern.rgbtPatternStep9,
-            rgbtPatternStep10: ledPattern.rgbtPatternStep10,
-            rgbtPatternStep11: ledPattern.rgbtPatternStep11,
-            rgbtPatternStep12: ledPattern.rgbtPatternStep12,
-            rgbtPatternStep13: ledPattern.rgbtPatternStep13,
-            rgbtPatternStep14: ledPattern.rgbtPatternStep14,
-            rgbtPatternStep15: ledPattern.rgbtPatternStep15,
+            hId: this.id,
+            s0: ledPattern.rgbtPatternStep0,
+            s1: ledPattern.rgbtPatternStep1,
+            s2: ledPattern.rgbtPatternStep2,
+            s3: ledPattern.rgbtPatternStep3,
+            s4: ledPattern.rgbtPatternStep4,
+            s5: ledPattern.rgbtPatternStep5,
+            s6: ledPattern.rgbtPatternStep6,
+            s7: ledPattern.rgbtPatternStep7,
+            s8: ledPattern.rgbtPatternStep8,
+            s9: ledPattern.rgbtPatternStep9,
+            s10: ledPattern.rgbtPatternStep10,
+            s11: ledPattern.rgbtPatternStep11,
+            s12: ledPattern.rgbtPatternStep12,
+            s13: ledPattern.rgbtPatternStep13,
+            s14: ledPattern.rgbtPatternStep14,
+            s15: ledPattern.rgbtPatternStep15,
         });
     }
 
@@ -489,16 +524,16 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         currentLimit_mA: number,
     ): Promise<void> {
         await this.sendCommand("setMotorAlertLevel", {
-            id: this.id,
-            motorChannel: motorChannel,
-            currentLimit_mA: currentLimit_mA,
+            hId: this.id,
+            c: motorChannel,
+            cl: currentLimit_mA,
         });
     }
 
     async setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void> {
         await this.sendCommand("setMotorEnabled", {
-            id: this.id,
-            motorChannel: motorChannel,
+            hId: this.id,
+            c: motorChannel,
             enable: enable,
         });
     }
@@ -509,17 +544,17 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         floatAtZero: boolean,
     ): Promise<void> {
         await this.sendCommand("setMotorChannelMode", {
-            id: this.id,
-            motorChannel: motorChannel,
-            motorMode: motorMode,
-            floatAtZero: floatAtZero,
+            hId: this.id,
+            c: motorChannel,
+            m: motorMode,
+            faz: floatAtZero,
         });
     }
 
     async setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
         await this.sendCommand("setMotorConstantPower", {
-            id: this.id,
-            motorChannel: motorChannel,
+            hId: this.id,
+            c: motorChannel,
             motorPower: powerLevel,
         });
     }
@@ -530,8 +565,8 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         pid: PidCoefficients,
     ): Promise<void> {
         await this.sendCommand("setMotorPidCoefficients", {
-            id: this.id,
-            motorChannel: motorChannel,
+            hId: this.id,
+            c: motorChannel,
             motorMode: motorMode,
             p: pid.p,
             i: pid.i,
@@ -545,8 +580,8 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         targetTolerance_counts: number,
     ): Promise<void> {
         await this.sendCommand("setMotorTargetPosition", {
-            id: this.id,
-            motorChannel: motorChannel,
+            hId: this.id,
+            c: motorChannel,
             targetPositionCounts: targetPosition_counts,
             targetToleranceCounts: targetTolerance_counts,
         });
@@ -557,22 +592,22 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         velocity_cps: number,
     ): Promise<void> {
         await this.sendCommand("setMotorTargetVelocity", {
-            id: this.id,
-            motorChannel: motorChannel,
+            hId: this.id,
+            c: motorChannel,
             velocityCps: velocity_cps,
         });
     }
 
     async setNewModuleAddress(newModuleAddress: number): Promise<void> {
         await this.sendCommand("setNewModuleAddress", {
-            id: this.id,
+            hId: this.id,
             address: newModuleAddress,
         });
     }
 
     async setPhoneChargeControl(chargeEnable: boolean): Promise<void> {
         await this.sendCommand("setPhoneChargeControl", {
-            id: this.id,
+            hId: this.id,
             enabled: chargeEnable,
         });
     }
@@ -582,24 +617,24 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         framePeriod: number,
     ): Promise<void> {
         await this.sendCommand("setServoConfiguration", {
-            id: this.id,
-            servoChannel: servoChannel,
+            hId: this.id,
+            c: servoChannel,
             framePeriod: framePeriod,
         });
     }
 
     async setServoEnable(servoChannel: number, enable: boolean): Promise<void> {
         await this.sendCommand("setServoEnable", {
-            id: this.id,
-            servoChannel: servoChannel,
+            hId: this.id,
+            c: servoChannel,
             enabled: enable,
         });
     }
 
     async setServoPulseWidth(servoChannel: number, pulseWidth: number): Promise<void> {
         await this.sendCommand("setServoPulseWidth", {
-            id: this.id,
-            servoChannel: servoChannel,
+            hId: this.id,
+            c: servoChannel,
             pulseWidth: pulseWidth,
         });
     }
