@@ -181,7 +181,7 @@ export class ControlHubInternal implements ControlHub {
 
     close() {
         this.embedded.close();
-        this.webSocketConnection.close();
+        this.sendCommand("stop", {}).then(() => this.webSocketConnection.close());
     }
 
     async getAnalogInput(channel: number): Promise<number> {
