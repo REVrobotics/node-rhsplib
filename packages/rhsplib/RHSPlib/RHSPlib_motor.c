@@ -245,7 +245,7 @@ int RHSPlib_motor_resetEncoder(RHSPlib_Module_T *obj,
 
 int RHSPlib_motor_setConstantPower(RHSPlib_Module_T *obj,
                                 	uint8_t motorChannel,
-									int16_t powerLevel, uint8_t *nackReasonCode)
+									double powerLevel, uint8_t *nackReasonCode)
 {
 	uint16_t packetID;
 
@@ -268,15 +268,17 @@ int RHSPlib_motor_setConstantPower(RHSPlib_Module_T *obj,
 
     uint8_t cmdPayload[3];
 
+    int16_t adjustedPowerLevel = (int16_t)(powerLevel*32767);
+
     RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 0, motorChannel);
-    RHSPLIB_ARRAY_SET_WORD(cmdPayload, 1, powerLevel);
+    RHSPLIB_ARRAY_SET_WORD(cmdPayload, 1, adjustedPowerLevel);
 
     return RHSPlib_sendWriteCommandInternal(obj, packetID, cmdPayload, sizeof(cmdPayload), nackReasonCode);
 }
 
 int RHSPlib_motor_getConstantPower(RHSPlib_Module_T *obj,
                                     uint8_t motorChannel,
-                                    int16_t *powerLevel, uint8_t *nackReasonCode)
+                                    double *powerLevel, uint8_t *nackReasonCode)
 {
 	uint16_t packetID;
 
@@ -305,7 +307,8 @@ int RHSPlib_motor_getConstantPower(RHSPlib_Module_T *obj,
 
     if (powerLevel)
     {
-        *powerLevel = RHSPLIB_ARRAY_WORD(int16_t, RHSPLIB_PACKET_PAYLOAD_PTR(obj->rxBuffer), 0);
+        int16_t rawPowerLevel = RHSPLIB_ARRAY_WORD(int16_t, RHSPLIB_PACKET_PAYLOAD_PTR(obj->rxBuffer), 0);
+        *powerLevel = (rawPowerLevel/32767.0);
     }
 
     return RHSPLIB_RESULT_OK;

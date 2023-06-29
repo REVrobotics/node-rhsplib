@@ -133,7 +133,7 @@ int RHSPlib_motor_resetEncoder(RHSPlib_Module_T *obj,
  * */
 int RHSPlib_motor_setConstantPower(RHSPlib_Module_T *obj,
                                 	uint8_t motorChannel,
-									int16_t powerLevel, uint8_t *nackReasonCode);
+									double powerLevel, uint8_t *nackReasonCode);
 
 /**
  * @brief Retrieves the constant power configuration of the specified motor
@@ -148,7 +148,7 @@ int RHSPlib_motor_setConstantPower(RHSPlib_Module_T *obj,
  * */
 int RHSPlib_motor_getConstantPower(RHSPlib_Module_T *obj,
                                     uint8_t motorChannel,
-                                    int16_t *powerLevel, uint8_t *nackReasonCode);
+                                    double *powerLevel, uint8_t *nackReasonCode);
 
 /**
  * @brief Sets the target velocity when motor is in Constant Velocity mode

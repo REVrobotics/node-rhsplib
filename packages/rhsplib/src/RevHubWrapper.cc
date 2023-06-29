@@ -1112,7 +1112,7 @@ Napi::Value RevHub::setMotorConstantPower(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
-  int16_t powerLevel = info[1].As<Napi::Number>().Int32Value();
+  double powerLevel = info[1].As<Napi::Number>().DoubleValue();
 
   CREATE_VOID_WORKER(worker, env, {
     _code = RHSPlib_motor_setConstantPower(&this->obj, motorChannel, powerLevel,
@@ -1127,7 +1127,7 @@ Napi::Value RevHub::getMotorConstantPower(const Napi::CallbackInfo &info) {
 
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
 
-  using retType = int16_t;
+  using retType = double;
   CREATE_WORKER(worker, env, retType, {
     _code = RHSPlib_motor_getConstantPower(&this->obj, motorChannel, &_data,
                                            &_nackCode);

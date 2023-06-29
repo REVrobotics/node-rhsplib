@@ -524,10 +524,7 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setMotorConstantPower(
-                motorChannel,
-                powerLevel * 32_767,
-            );
+            return this.nativeRevHub.setMotorConstantPower(motorChannel, powerLevel);
         });
     }
 
