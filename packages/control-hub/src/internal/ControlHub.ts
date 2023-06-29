@@ -22,6 +22,7 @@ import {
     TimeoutError,
     VerbosityLevel,
     Version,
+    ParentExpansionHub,
 } from "@rev-robotics/rev-hub-core";
 import { openUsbControlHubs } from "rev-hub-cli/dist/adb-setup.js";
 import { clearTimeout } from "timers";
@@ -541,18 +542,30 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
     }
 
-    async addChild(hub: RevHub): Promise<void> {
-        throw new Error("not implemented");
-    }
-
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {
-        return this.addHubBySerialNumberAndAddress(this.serialNumber, moduleAddress);
+        let id = await this.openHub("(embedded)", this.moduleAddress, moduleAddress);
+
+        let newHub = new ControlHubConnectedExpansionHub(
+            false,
+            RevHubType.ExpansionHub,
+            this.sendCommand.bind(this),
+            "(embedded)",
+            moduleAddress,
+            id,
+        );
+
+        this.children.push(newHub);
+
+        if (newHub.isParentHub) {
+            throw new Error("A child hub without a serial number must not be a parent.");
+        }
+        return newHub;
     }
 
-    async addHubBySerialNumberAndAddress(
+    async addUsbConnectedHub(
         serialNumber: string,
         moduleAddress: number,
-    ): Promise<ParentRevHub> {
+    ): Promise<ParentExpansionHub> {
         let id = await this.openHub(serialNumber, moduleAddress, moduleAddress);
 
         let newHub = new ControlHubConnectedExpansionHub(
@@ -633,7 +646,7 @@ export async function openUsbControlHubsAndChildren(): Promise<ControlHub[]> {
             if (serialNumber === "(embedded)") continue;
 
             let parentHubInfo = addresses[serialNumber];
-            let parentHub = await controlHub.addHubBySerialNumberAndAddress(
+            let parentHub = await controlHub.addUsbConnectedHub(
                 serialNumber,
                 parentHubInfo.parentHubAddress,
             );
