@@ -2,7 +2,7 @@
 //numerical value matching.
 export enum MotorMode {
     /**
-     * This mode controls the motor's speed by setting the pwm duty cycle.
+     * This mode controls the motor's speed by setting the PWM duty cycle.
      * It does not require an encoder.
      */
     OPEN_LOOP,

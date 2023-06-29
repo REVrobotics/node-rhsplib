@@ -1,3 +1,4 @@
+import { ParentRevHub, RevHub } from "./RevHub.js";
 import { ModuleStatus } from "./ModuleStatus.js";
 import { ModuleInterface } from "./ModuleInterface.js";
 import { Rgb } from "./Rgb.js";
@@ -6,11 +7,10 @@ import { DebugGroup } from "./DebugGroup.js";
 import { VerbosityLevel } from "./VerbosityLevel.js";
 import { BulkInputData } from "./BulkInputData.js";
 import { Version } from "./Version.js";
-import { DioDirection } from "./DioDirection.js";
+import { DigitalState } from "./DigitalState.js";
 import { I2CSpeedCode } from "./I2CSpeedCode.js";
 import { PidCoefficients } from "./PidCoefficients.js";
-import { ParentRevHub, RevHub } from "./RevHub.js";
-import { DigitalState } from "./digital-state.js";
+import { DigitalChannelDirection } from "./DigitalChannelDirection.js";
 import { MotorMode } from "./MotorMode.js";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
@@ -35,6 +35,13 @@ export interface ExpansionHub extends RevHub {
     getModuleLedColor(): Promise<Rgb>;
     setModuleLedPattern(ledPattern: LedPattern): Promise<void>;
     getModuleLedPattern(): Promise<LedPattern>;
+
+    /**
+     * Set the log level for a specific DebugGroup.
+     *
+     * @param debugGroup
+     * @param verbosityLevel
+     */
     setDebugLogLevel(
         debugGroup: DebugGroup,
         verbosityLevel: VerbosityLevel,
@@ -98,6 +105,11 @@ export interface ExpansionHub extends RevHub {
 
     setPhoneChargeControl(chargeEnable: boolean): Promise<void>;
     getPhoneChargeControl(): Promise<boolean>;
+
+    /**
+     * Inject log value. Useful for debugging. The text gets printed over UART (and Logcat for Control Hubs).
+     * @param hintText
+     */
     injectDataLogHint(hintText: string): Promise<void>;
 
     /**
@@ -109,7 +121,18 @@ export interface ExpansionHub extends RevHub {
     getFTDIResetControl(): Promise<boolean>;
 
     // DIO
-    setDigitalOutput(dioPin: number, value: DigitalState): Promise<void>;
+    /**
+     * Set the output state of a digital pin.
+     * @param digitalChannel
+     * @param value whether the pin should be High or Low
+     */
+    setDigitalOutput(digitalChannel: number, value: DigitalState): Promise<void>;
+
+    /**
+     * Set the output state of all digital pins.
+     *
+     * @param bitPackedField a bit-field indicating the output states
+     */
     setAllDigitalOutputs(bitPackedField: number): Promise<void>;
 
     /**
@@ -117,13 +140,16 @@ export interface ExpansionHub extends RevHub {
      * @param digitalChannel
      * @param direction
      */
-    setDigitalDirection(digitalChannel: number, direction: DioDirection): Promise<void>;
+    setDigitalDirection(
+        digitalChannel: number,
+        direction: DigitalChannelDirection,
+    ): Promise<void>;
 
     /**
      * Get the Input/Output direction of a digital channel
      * @param digitalChannel
      */
-    getDigitalDirection(digitalChannel: number): Promise<DioDirection>;
+    getDigitalDirection(digitalChannel: number): Promise<DigitalChannelDirection>;
 
     /**
      * Read the state of a given digital pin.
@@ -200,7 +226,7 @@ export interface ExpansionHub extends RevHub {
      */
     setMotorChannelMode(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
         floatAtZero: boolean,
     ): Promise<void>;
 
@@ -320,7 +346,7 @@ export interface ExpansionHub extends RevHub {
      */
     setMotorPIDCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
         pid: PidCoefficients,
     ): Promise<void>;
 
@@ -331,7 +357,7 @@ export interface ExpansionHub extends RevHub {
      */
     getMotorPIDCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
     ): Promise<PidCoefficients>;
 
     // Servo

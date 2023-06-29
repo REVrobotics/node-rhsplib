@@ -6,11 +6,9 @@ import {
     ControlHub,
     DebugGroup,
     DigitalState,
-    DioDirection,
+    DigitalChannelDirection,
     ExpansionHub,
-    I2CReadStatus,
     I2CSpeedCode,
-    I2CWriteStatus,
     LedPattern,
     ModuleInterface,
     ModuleStatus,
@@ -72,6 +70,10 @@ export class ControlHubInternal implements ControlHub {
     }
 
     isParent(): this is ParentRevHub {
+        return true;
+    }
+
+    isControlHub(): this is ControlHub {
         return true;
     }
 
@@ -271,7 +273,7 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.getAllDigitalInputs();
     }
 
-    async getDigitalDirection(dioPin: number): Promise<DioDirection> {
+    async getDigitalDirection(dioPin: number): Promise<DigitalChannelDirection> {
         return this.embedded.getDigitalDirection(dioPin);
     }
 
@@ -454,7 +456,10 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.setAllDigitalOutputs(bitPackedField);
     }
 
-    async setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void> {
+    async setDigitalDirection(
+        dioPin: number,
+        direction: DigitalChannelDirection,
+    ): Promise<void> {
         return this.embedded.setDigitalDirection(dioPin, direction);
     }
 
@@ -593,9 +598,6 @@ export class ControlHubInternal implements ControlHub {
     }
 
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {
-        // Note from Noah: This should not just call addHubBySerialNumberAndAddress(), because that
-        //                 will add the hub to usbChildren.
-        // ToDo(landry): Extract the embedded constant somewhere
         let id = await this.openHub("(embedded)", this.moduleAddress, moduleAddress);
 
         let newHub = new ControlHubConnectedExpansionHub(
@@ -615,8 +617,7 @@ export class ControlHubInternal implements ControlHub {
         return newHub;
     }
 
-    // ToDo(landry): Rename this addUsbConnectedHub (I'm not sure we need all these byX suffixes)
-    async addHubBySerialNumberAndAddress(
+    async addUsbConnectedHub(
         serialNumber: string,
         moduleAddress: number,
     ): Promise<ParentExpansionHub> {

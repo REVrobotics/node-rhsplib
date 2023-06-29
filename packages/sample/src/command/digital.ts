@@ -1,14 +1,14 @@
-import { DigitalState, DioDirection, ExpansionHub } from "@rev-robotics/rev-hub-core";
+import {
+    DigitalState,
+    DigitalChannelDirection,
+    ExpansionHub,
+} from "@rev-robotics/rev-hub-core";
 
 export async function digitalRead(
     hub: ExpansionHub,
     channel: number,
     continuous: boolean,
 ): Promise<void> {
-    await hub.setDigitalDirection(channel, DioDirection.Input);
-    console.log(
-        `Channel ${channel} direction is ${await hub.getDigitalDirection(channel)}`,
-    );
     while (true) {
         let state = await hub.getDigitalInput(channel);
         console.log(`${state}`);
@@ -21,10 +21,7 @@ export async function digitalWrite(
     channel: number,
     state: DigitalState,
 ): Promise<void> {
-    await hub.setDigitalDirection(channel, DioDirection.Output);
-    console.log(
-        `Channel ${channel} direction is ${await hub.getDigitalDirection(channel)}`,
-    );
+    await hub.setDigitalDirection(channel, DigitalChannelDirection.Output);
     await hub.setDigitalOutput(channel, state);
 }
 
@@ -43,9 +40,9 @@ export async function digitalWriteAll(
 ) {
     for (let i = 0; i < 8; i++) {
         if (((bitmask >> i) & 1) == 1) {
-            await hub.setDigitalDirection(i, DioDirection.Output);
+            await hub.setDigitalDirection(i, DigitalChannelDirection.Output);
         } else {
-            await hub.setDigitalDirection(i, DioDirection.Input);
+            await hub.setDigitalDirection(i, DigitalChannelDirection.Input);
         }
     }
     await hub.setAllDigitalOutputs(bitfield);

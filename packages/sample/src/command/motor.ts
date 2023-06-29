@@ -51,7 +51,7 @@ export async function runMotorToPosition(
     console.log("Motor reached target");
 }
 
-export async function runEncoder(
+export async function readEncoder(
     hub: ExpansionHub,
     channel: number,
     continuous: boolean,
@@ -82,7 +82,7 @@ export async function getMotorAlertLevel_mA(
     return await hub.getMotorChannelCurrentAlertLevel(channel);
 }
 
-export async function setMotorPid(
+export async function setMotorRegulatedVelocityPid(
     hub: ExpansionHub,
     channel: number,
     p: number,
@@ -95,6 +95,10 @@ export async function setMotorPid(
         d: d,
     });
 
+    await getMotorRegulatedVelocityPid(hub, channel);
+}
+
+export async function getMotorRegulatedVelocityPid(hub: ExpansionHub, channel: number) {
     let pid: PidCoefficients = await hub.getMotorPIDCoefficients(
         channel,
         MotorMode.REGULATED_VELOCITY,

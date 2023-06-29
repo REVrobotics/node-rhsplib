@@ -7,7 +7,7 @@ import {
 import {
     BulkInputData,
     DebugGroup,
-    DioDirection,
+    DigitalChannelDirection,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
@@ -194,20 +194,17 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    getDigitalDirection(digitalChannel: number): Promise<DioDirection> {
-        return this.convertErrorPromise(async () => {
-            return (await this.nativeRevHub.getDigitalDirection(digitalChannel)) ==
-                DioDirection.Input
-                ? DioDirection.Input
-                : DioDirection.Output;
+    async getDigitalDirection(digitalChannel: number): Promise<DigitalChannelDirection> {
+        return await this.convertErrorPromise(() => {
+            return this.nativeRevHub.getDigitalDirection(digitalChannel);
         });
     }
 
     async getDigitalInput(digitalChannel: number): Promise<DigitalState> {
         return this.convertErrorPromise(async () => {
             return (await this.nativeRevHub.getDigitalSingleInput(digitalChannel))
-                ? DigitalState.High
-                : DigitalState.Low;
+                ? DigitalState.HIGH
+                : DigitalState.LOW;
         });
     }
 
@@ -302,6 +299,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         motorMode: MotorMode,
     ): Promise<PidCoefficients> {
         return this.convertErrorPromise(() => {
+            //ToDo (landry): convert the PID coefficients in C code
             return this.nativeRevHub.getMotorPIDCoefficients(motorChannel, motorMode);
         });
     }
@@ -470,7 +468,9 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     setDestAddress(destAddress: number): void {
-        this.nativeRevHub.setDestAddress(destAddress);
+        this.convertErrorSync(() => {
+            this.nativeRevHub.setDestAddress(destAddress);
+        });
     }
 
     setAllDigitalOutputs(bitPackedField: number): Promise<void> {
@@ -479,14 +479,12 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    setDigitalDirection(digitalChannel: number, direction: DioDirection): Promise<void> {
+    setDigitalDirection(
+        digitalChannel: number,
+        direction: DigitalChannelDirection,
+    ): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setDigitalDirection(
-                digitalChannel,
-                direction == DioDirection.Input
-                    ? DioDirection.Input
-                    : DioDirection.Output,
-            );
+            return this.nativeRevHub.setDigitalDirection(digitalChannel, direction);
         });
     }
 
@@ -573,6 +571,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         pid: PidCoefficients,
     ): Promise<void> {
         return this.convertErrorPromise(() => {
+            //ToDo (landry): convert the PID coefficients in C code
             return this.nativeRevHub.setMotorPIDCoefficients(
                 motorChannel,
                 motorMode,

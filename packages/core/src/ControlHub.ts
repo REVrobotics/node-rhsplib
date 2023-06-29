@@ -11,7 +11,7 @@ export interface ControlHub extends ExpansionHub, ParentRevHub {
     ): this;
     on(eventName: "sessionEnded", listener: () => void): this;
 
-    addHubBySerialNumberAndAddress(
+    addUsbConnectedHub(
         serialNumber: string,
         moduleAddress: number,
     ): Promise<ParentExpansionHub>;

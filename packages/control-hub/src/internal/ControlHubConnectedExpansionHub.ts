@@ -1,9 +1,8 @@
 import {
     BulkInputData,
-    ControlHub,
     DebugGroup,
     DigitalState,
-    DioDirection,
+    DigitalChannelDirection,
     ExpansionHub,
     I2CSpeedCode,
     LedPattern,
@@ -17,6 +16,7 @@ import {
     Rgb,
     VerbosityLevel,
     Version,
+    ControlHub,
 } from "@rev-robotics/rev-hub-core";
 import { EventEmitter } from "events";
 
@@ -33,7 +33,6 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     responseTimeoutMs = 1000;
 
     readonly children: RevHub[] = [];
-
     private emitter = new EventEmitter();
 
     constructor(
@@ -54,6 +53,12 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
 
     isParent(): this is ParentRevHub {
         return this.isParentHub;
+    }
+
+    isControlHub(): this is ControlHub {
+        // this class represents an Expansion Hub connected via a Control Hub,
+        // not a Control Hub itself.
+        return false;
     }
 
     close(): void {
@@ -95,7 +100,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     }
 
     async getI2CCurrent(): Promise<number> {
-        return await this.sendCommand("getI2cCurrent", {
+        return await this.sendCommand("getI2CCurrent", {
             hId: this.id,
         });
     }
@@ -148,13 +153,13 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         });
     }
 
-    async getDigitalDirection(dioPin: number): Promise<DioDirection> {
-        let isOutput: boolean = await this.sendCommand("isDigitalOutput", {
+    async getDigitalDirection(dioPin: number): Promise<DigitalChannelDirection> {
+        let isOutput = await this.sendCommand("getDigitalDirection", {
             hId: this.id,
-            c: dioPin,
+            channel: dioPin,
         });
 
-        return isOutput ? DioDirection.Output : DioDirection.Input;
+        return isOutput ? DigitalChannelDirection.Output : DigitalChannelDirection.Input;
     }
 
     async getDigitalInput(dioPin: number): Promise<DigitalState> {
@@ -163,7 +168,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
             c: dioPin,
         });
 
-        return result ? DigitalState.High : DigitalState.Low;
+        return result ? DigitalState.HIGH : DigitalState.LOW;
     }
 
     async getFTDIResetControl(): Promise<boolean> {
@@ -483,11 +488,14 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         });
     }
 
-    async setDigitalDirection(dioPin: number, direction: DioDirection): Promise<void> {
-        await this.sendCommand("setDigitalDirection", {
+    async setDigitalDirection(
+        dioPin: number,
+        direction: DigitalChannelDirection,
+    ): Promise<void> {
+        await this.sendCommand("readVersionString", {
             hId: this.id,
             c: dioPin,
-            o: direction == DioDirection.Output,
+            o: direction == DigitalChannelDirection.Output,
         });
     }
 
@@ -499,13 +507,13 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         });
     }
 
-    async setFTDIResetControl(_ftdiResetControl: boolean): Promise<void> {}
+    async setFTDIResetControl(_: boolean): Promise<void> {}
 
     async setI2CChannelConfiguration(
         i2cChannel: number,
         speedCode: I2CSpeedCode,
     ): Promise<void> {
-        await this.sendCommand("setI2cChannelConfiguration", {
+        await this.sendCommand("setI2CChannelConfiguration", {
             hId: this.id,
             c: i2cChannel,
             sc: speedCode,
@@ -629,7 +637,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
                 hId: this.id,
                 newAddress: newModuleAddress,
             },
-            100000,
+            1000,
         );
     }
 

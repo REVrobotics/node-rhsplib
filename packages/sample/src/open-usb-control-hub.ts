@@ -1,4 +1,4 @@
-import {ControlHub, ParentRevHub} from "@rev-robotics/rev-hub-core";
+import { ControlHub, ParentRevHub } from "@rev-robotics/rev-hub-core";
 import { ControlHubInternal } from "@rev-robotics/control-hub/dist/internal/ControlHub.js";
 import { openUsbControlHubs } from "./adb-setup.js";
 
@@ -25,7 +25,7 @@ export async function openUsbControlHubsAndChildren(): Promise<ControlHub[]> {
                 parentHub = controlHub;
             } else {
                 let parentHubInfo = addresses[serialNumber];
-                parentHub = await controlHub.addHubBySerialNumberAndAddress(
+                parentHub = await controlHub.addUsbConnectedHub(
                     serialNumber,
                     parentHubInfo.parentHubAddress,
                 );
