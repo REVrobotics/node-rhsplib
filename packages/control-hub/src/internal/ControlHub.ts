@@ -245,10 +245,6 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.getDigitalDirection(dioPin);
     }
 
-    async getDigitalSingleInput(dioPin: number): Promise<boolean> {
-        return this.embedded.getDigitalSingleInput(dioPin);
-    }
-
     async getFTDIResetControl(): Promise<boolean> {
         return this.embedded.getFTDIResetControl();
     }
@@ -422,7 +418,7 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.setDigitalDirection(dioPin, direction);
     }
 
-    async setDigitalSingleOutput(dioPin: number, value?: boolean): Promise<void> {
+    async setDigitalSingleOutput(dioPin: number, value: DigitalState): Promise<void> {
         return this.embedded.setDigitalSingleOutput(dioPin, value);
     }
 
