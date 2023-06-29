@@ -21,6 +21,9 @@ import {
     TimeoutError,
     VerbosityLevel,
     Version,
+    ImuData,
+    Quaternion,
+    AngularVelocity,
 } from "@rev-robotics/rev-hub-core";
 import { clearTimeout } from "timers";
 import { ControlHubConnectedExpansionHub } from "./ControlHubConnectedExpansionHub.js";
@@ -576,6 +579,14 @@ export class ControlHubInternal implements ControlHub {
         byte: number,
     ): Promise<void> {
         return this.embedded.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
+    }
+
+    async initializeImu() {
+        return await this.embedded.initializeImu();
+    }
+
+    async getImuData(): Promise<ImuData> {
+        return await this.embedded.getImuData();
     }
 
     /**

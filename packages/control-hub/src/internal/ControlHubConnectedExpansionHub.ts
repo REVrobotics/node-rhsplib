@@ -17,6 +17,9 @@ import {
     VerbosityLevel,
     Version,
     ControlHub,
+    ImuData,
+    Quaternion,
+    AngularVelocity,
 } from "@rev-robotics/rev-hub-core";
 import { EventEmitter } from "events";
 
@@ -694,6 +697,24 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         byte: number,
     ): Promise<void> {
         await this.writeI2CMultipleBytes(i2cChannel, targetAddress, [byte]);
+    }
+
+    async initializeImu() {
+        await this.sendCommand("initializeImu", {
+            logoFacing: "UP",
+            usbFacing: "BACKWARD",
+        });
+    }
+
+    async getImuData(): Promise<ImuData> {
+        let imuData: any = await this.sendCommand("getImuData", {
+            u: "degrees",
+        });
+
+        return {
+            quaternion: new Quaternion(imuData.w, imuData.x, imuData.y, imuData.z),
+            angularVelocity: new AngularVelocity(imuData.xr, imuData.yr, imuData.zr),
+        };
     }
 
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {

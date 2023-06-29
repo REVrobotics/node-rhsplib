@@ -53,6 +53,7 @@ import { openUsbControlHubsAndChildren } from "./open-usb-control-hub.js";
 import { status } from "./command/status.js";
 import { openUsbControlHubs } from "./adb-setup.js";
 import { distance } from "./command/distance.js";
+import { imu } from "./command/imu.js";
 
 function runOnSigint(block: () => void) {
     process.on("SIGINT", () => {
@@ -730,6 +731,26 @@ program
         runOnSigint(() => {
             close();
         });
+    });
+
+program
+    .command("imu")
+    .option("--continuous", "run continuously")
+    .description("Get IMU data. Specify --continuous to run continuously.")
+    .action(async (options) => {
+        let isContinuous = options.continuous !== undefined;
+        let [hub, close] = await getExpansionHubOrThrow();
+
+        runOnSigint(() => {
+            close();
+        });
+
+        if (hub.isControlHub()) {
+            await imu(hub, isContinuous);
+        } else {
+            throw new Error("Hub is not a control hub.");
+        }
+        close();
     });
 
 program.parse(process.argv);
