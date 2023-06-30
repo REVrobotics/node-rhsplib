@@ -36,6 +36,7 @@ import {
     digitalWrite,
     digitalWriteAll,
 } from "./commands/digital.js";
+import { sendFailSafe } from "./command/failsafe.js";
 
 function runOnSigint(block: () => void) {
     process.on("SIGINT", () => {
@@ -94,6 +95,25 @@ program
 
         await getBulkInputData(hub, isContinuous);
         hub.close();
+    });
+
+program
+    .command("failsafe")
+    .description(
+        "Start servo 0 for 2 seconds, then send failsafe. Wait 2 more seconds to close. The servo should stop after 2 seconds.",
+    )
+    .action(async () => {
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        function close() {
+            hub.close();
+        }
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await sendFailSafe(hub, close);
     });
 
 program
