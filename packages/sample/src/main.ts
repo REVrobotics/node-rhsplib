@@ -23,7 +23,7 @@ import {
 } from "./command/analog.js";
 import { error } from "./command/error.js";
 import { list } from "./command/list.js";
-import { led } from "./command/led.js";
+import { getLed, getLedPattern, led, ledPattern } from "./command/led.js";
 import { runServo } from "./command/servo.js";
 import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
 import { injectLog, setDebugLogLevel } from "./command/log.js";
@@ -66,17 +66,61 @@ program
     });
 
 program
-    .command("led")
-    .description("Run LED steps")
+    .command("pattern <steps...>")
+    .description(
+        "Run LED pattern. Provide steps as a space-separated list in the " +
+            "format <time><colorHexString>, where time is in seconds, and " +
+            "colorHexString is a hex color code. Example: 100FF00 for 1 second " +
+            "green, 0.5FF0000 for half-second red.",
+    )
+    .action(async (steps) => {
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        await ledPattern(hub, steps);
+
+        await getLedPattern(hub);
+        process.on("SIGINT", () => {
+            hub.close();
+        });
+    });
+
+program
+    .command("get-pattern")
+    .description("Get LED Pattern steps")
     .action(async () => {
         let hubs = await openConnectedExpansionHubs();
         let hub = hubs[0];
 
-        runOnSigint(() => {
+        await getLedPattern(hub);
+        hub.close();
+    });
+
+program
+    .command("led <r> <g> <b>")
+    .description("Set LED color")
+    .action(async (r, g, b) => {
+        console.log("Running led color. Values are [0, 255]");
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        let rValue = Number(r);
+        let gValue = Number(g);
+        let bValue = Number(b);
+        await led(hub, rValue, gValue, bValue);
+
+        process.on("SIGINT", () => {
             hub.close();
         });
+    });
 
-        await led(hub);
+program
+    .command("get-led")
+    .description("Get LED color. Values are [0,255]")
+    .action(async () => {
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        await getLed(hub);
+
+        hub.close();
     });
 
 program
