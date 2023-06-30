@@ -1250,9 +1250,9 @@ Napi::Value RevHub::setMotorPIDCoefficients(const Napi::CallbackInfo &info) {
   uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
   uint8_t motorMode = info[1].As<Napi::Number>().Uint32Value();
   Napi::Object pid = info[2].As<Napi::Object>();
-  int32_t proportionalCoeff = pid.Get("P").As<Napi::Number>().Int32Value();
-  int32_t integralCoeff = pid.Get("I").As<Napi::Number>().Int32Value();
-  int32_t derivativeCoeff = pid.Get("D").As<Napi::Number>().Int32Value();
+  double proportionalCoeff = pid.Get("p").As<Napi::Number>().DoubleValue();
+  double integralCoeff = pid.Get("i").As<Napi::Number>().DoubleValue();
+  double derivativeCoeff = pid.Get("d").As<Napi::Number>().DoubleValue();
 
   CREATE_VOID_WORKER(worker, env, {
     _code = RHSPlib_motor_setPIDControlLoopCoefficients(
@@ -1270,9 +1270,9 @@ Napi::Value RevHub::getMotorPIDCoefficients(const Napi::CallbackInfo &info) {
   uint8_t motorMode = info[1].As<Napi::Number>().Uint32Value();
 
   using retType = struct {
-    int32_t proportionalCoeff;
-    int32_t integralCoeff;
-    int32_t derivativeCoeff;
+    double proportionalCoeff;
+    double integralCoeff;
+    double derivativeCoeff;
   };
   CREATE_WORKER(worker, env, retType, {
     _code = RHSPlib_motor_getPIDControlLoopCoefficients(

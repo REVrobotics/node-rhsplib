@@ -260,8 +260,8 @@ int RHSPlib_motor_getEncoderPosition(RHSPlib_Module_T *obj,
  * */
 int RHSPlib_motor_setPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
                                                  uint8_t motorChannel,
-                                                 uint8_t mode, int32_t proportionalCoeff,
-                                                 int32_t integralCoeff, int32_t derivativeCoeff, uint8_t *nackReasonCode);
+                                                 uint8_t mode, double proportionalCoeff,
+                                                 double integralCoeff, double derivativeCoeff, uint8_t *nackReasonCode);
 
 /**
  * @brief Retrieves the control loop coefficients of the specified motor channel and mode
@@ -278,8 +278,8 @@ int RHSPlib_motor_setPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
  * */
 int RHSPlib_motor_getPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
                                 				 uint8_t motorChannel,
-												 uint8_t mode, int32_t *proportionalCoeff,
-												 int32_t *integralCoeff, int32_t *derivativeCoeff, uint8_t *nackReasonCode);
+												 uint8_t mode, double *proportionalCoeff,
+												 double *integralCoeff, double *derivativeCoeff, uint8_t *nackReasonCode);
 
 #ifdef __cplusplus
 }

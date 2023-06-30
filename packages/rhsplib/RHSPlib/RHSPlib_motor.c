@@ -5,6 +5,7 @@
  *      Author: user
  */
 #include "RHSPlib_motor.h"
+#include <math.h>
 
 int RHSPlib_motor_setChannelMode(RHSPlib_Module_T *obj,
                                   uint8_t motorChannel, uint8_t motorMode, uint8_t floatAtZero,
@@ -536,8 +537,8 @@ int RHSPlib_motor_getEncoderPosition(RHSPlib_Module_T *obj,
 
 int RHSPlib_motor_setPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
                                 				 uint8_t motorChannel,
-												 uint8_t mode, int32_t proportionalCoeff,
-												 int32_t integralCoeff, int32_t derivativeCoeff, uint8_t *nackReasonCode)
+												 uint8_t mode, double proportionalCoeff,
+												 double integralCoeff, double derivativeCoeff, uint8_t *nackReasonCode)
 {
 	uint16_t packetID;
 
@@ -564,19 +565,23 @@ int RHSPlib_motor_setPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
 
     uint8_t cmdPayload[14];
 
+    int32_t p = (int)round(proportionalCoeff*65536.0);
+    int32_t i = (int)round(integralCoeff*65536.0);
+    int32_t d = (int)round(derivativeCoeff*65536.0);
+
     RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 0, motorChannel);
     RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 1, mode);
-    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 2, proportionalCoeff);
-    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 6, integralCoeff);
-    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 10, derivativeCoeff);
+    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 2, p);
+    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 6, i);
+    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 10, d);
 
     return RHSPlib_sendWriteCommandInternal(obj, packetID, cmdPayload, sizeof(cmdPayload), nackReasonCode);
 }
 
 int RHSPlib_motor_getPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
                                 				 uint8_t motorChannel,
-												 uint8_t mode, int32_t *proportionalCoeff,
-												 int32_t *integralCoeff, int32_t *derivativeCoeff, uint8_t *nackReasonCode)
+												 uint8_t mode, double *proportionalCoeff,
+												 double *integralCoeff, double *derivativeCoeff, uint8_t *nackReasonCode)
 {
 	uint16_t packetID;
 
@@ -613,18 +618,19 @@ int RHSPlib_motor_getPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
 
     if (proportionalCoeff)
     {
-        *proportionalCoeff = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 0);
+        int32_t p = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 0);
+        *proportionalCoeff = p/65536.0;
     }
     if (integralCoeff)
     {
-        *integralCoeff = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 4);
+        int32_t i = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 4);
+        *integralCoeff = i/65536.0;
     }
     if (derivativeCoeff)
     {
-        *derivativeCoeff = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 8);
+        int32_t d = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 8);
+        *derivativeCoeff = d/65536.0;
     }
 
     return RHSPLIB_RESULT_OK;
 }
-
-
