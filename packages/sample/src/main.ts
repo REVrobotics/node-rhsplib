@@ -35,7 +35,7 @@ import {
     digitalReadAll,
     digitalWrite,
     digitalWriteAll,
-} from "./commands/digital.js";
+} from "./command/digital.js";
 
 function runOnSigint(block: () => void) {
     process.on("SIGINT", () => {
