@@ -96,7 +96,7 @@ export async function setMotorRegulatedVelocityPid(
         d: d,
     });
 
-    await getMotorRegulatedVelocityPid(hub, channel);
+    await getMotorRegulatedVelocityPidf(hub, channel);
 }
 
 export async function setMotorRegulatedVelocityPidf(
@@ -115,15 +115,6 @@ export async function setMotorRegulatedVelocityPidf(
     });
 
     await getMotorRegulatedVelocityPidf(hub, channel);
-}
-
-export async function getMotorRegulatedVelocityPid(hub: ExpansionHub, channel: number) {
-    let pid: PidCoefficients = await hub.getMotorPIDCoefficients(
-        channel,
-        MotorMode.REGULATED_VELOCITY,
-    );
-
-    console.log(JSON.stringify(pid));
 }
 
 export async function getMotorRegulatedVelocityPidf(hub: ExpansionHub, channel: number) {

@@ -14,6 +14,7 @@ import {
     ModuleInterface,
     ModuleStatus,
     PidCoefficients,
+    PidfCoefficients,
     Rgb,
     SerialFlowControl,
     VerbosityLevel,
@@ -187,6 +188,15 @@ export declare class RevHub {
         motorChannel: number,
         motorMode: number,
     ): Promise<PidCoefficients>;
+    setMotorPIDFCoefficients(
+        motorChannel: number,
+        motorMode: number,
+        pidf: PidfCoefficients,
+    ): Promise<void>;
+    getMotorPIDFCoefficients(
+        motorChannel: number,
+        motorMode: number,
+    ): Promise<PidfCoefficients>;
 
     // PWM
     setPWMConfiguration(pwmChannel: number, framePeriod: number): Promise<void>;

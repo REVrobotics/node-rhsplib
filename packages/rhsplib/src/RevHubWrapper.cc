@@ -123,8 +123,10 @@ Napi::Object RevHub::Init(Napi::Env env, Napi::Object exports) {
                                  &RevHub::getMotorEncoderPosition),
           RevHub::InstanceMethod("setMotorPIDCoefficients",
                                  &RevHub::setMotorPIDCoefficients),
-          RevHub::InstanceMethod("getMotorPIDCoefficients",
-                                 &RevHub::getMotorPIDCoefficients),
+          RevHub::InstanceMethod("setMotorPIDFCoefficients",
+                                 &RevHub::setMotorPIDFCoefficients),
+          RevHub::InstanceMethod("getMotorPIDFCoefficients",
+                                 &RevHub::getMotorPIDFCoefficients),
           RevHub::InstanceMethod("setPWMConfiguration",
                                  &RevHub::setPWMConfiguration),
           RevHub::InstanceMethod("getPWMConfiguration",
@@ -1278,34 +1280,6 @@ Napi::Value RevHub::setMotorPIDFCoefficients(const Napi::CallbackInfo &info) {
     _code = RHSPlib_motor_setPIDFControlLoopCoefficients(
         &this->obj, motorChannel, motorMode, proportionalCoeff, integralCoeff,
         derivativeCoeff, feedForwardCoeff, &_nackCode);
-  });
-
-  QUEUE_WORKER(worker);
-}
-
-Napi::Value RevHub::getMotorPIDCoefficients(const Napi::CallbackInfo &info) {
-  Napi::Env env = info.Env();
-
-  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
-  uint8_t motorMode = info[1].As<Napi::Number>().Uint32Value();
-
-  using retType = struct {
-    double proportionalCoeff;
-    double integralCoeff;
-    double derivativeCoeff;
-  };
-  CREATE_WORKER(worker, env, retType, {
-    _code = RHSPlib_motor_getPIDControlLoopCoefficients(
-        &this->obj, motorChannel, motorMode, &_data.proportionalCoeff,
-        &_data.integralCoeff, &_data.derivativeCoeff, &_nackCode);
-  });
-
-  SET_WORKER_CALLBACK(worker, retType, {
-    Napi::Object pidCoeffObj = Napi::Object::New(_env);
-    pidCoeffObj.Set("p", _data.proportionalCoeff);
-    pidCoeffObj.Set("i", _data.integralCoeff);
-    pidCoeffObj.Set("d", _data.derivativeCoeff);
-    return pidCoeffObj;
   });
 
   QUEUE_WORKER(worker);

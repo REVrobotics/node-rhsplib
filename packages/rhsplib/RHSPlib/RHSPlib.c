@@ -485,6 +485,7 @@ int RHSPlib_sendWriteCommandInternal(RHSPlib_Module_T *obj, uint16_t packetTypeI
     {
         return retval;
     }
+
     return validateWriteCommand(obj, nackReasonCode);
 }
 
@@ -864,7 +865,6 @@ static int validateWriteCommand(RHSPlib_Module_T *obj, uint8_t *nackReasonCode)
     bool isAttentionRequired = false;
     if (isAckReceived(obj, &isAttentionRequired))
     {
-
         return (isAttentionRequired == true )? RHSPLIB_RESULT_ATTENTION_REQUIRED : RHSPLIB_RESULT_OK;
     }
     else if (isNackReceived(obj, nackReasonCode))

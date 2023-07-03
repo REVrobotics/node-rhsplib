@@ -8,7 +8,6 @@ import {
     setMotorRegulatedVelocityPid,
     setMotorAlertLevel,
     getMotorAlertLevel_mA,
-    getMotorRegulatedVelocityPid,
     setMotorRegulatedVelocityPidf,
     getMotorRegulatedVelocityPidf,
 } from "./command/motor.js";
@@ -273,7 +272,7 @@ pidCommand
             hub.close();
         });
 
-        await getMotorRegulatedVelocityPid(hub, channelNumber);
+        await getMotorRegulatedVelocityPidf(hub, channelNumber);
         hub.close();
     });
 
