@@ -578,6 +578,52 @@ int RHSPlib_motor_setPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
     return RHSPlib_sendWriteCommandInternal(obj, packetID, cmdPayload, sizeof(cmdPayload), nackReasonCode);
 }
 
+int RHSPlib_motor_setPIDFControlLoopCoefficients(RHSPlib_Module_T *obj,
+                                                uint8_t motorChannel,
+                                                uint8_t mode, double proportionalCoeff,
+                                                double integralCoeff, double derivativeCoeff, double feedForwardCoeff, uint8_t *nackReasonCode)
+{
+  uint16_t packetID;
+
+  RHSPLIB_ASSERT(obj);
+
+  if (!obj)
+    {
+    return RHSPLIB_ERROR;
+  }
+  if (motorChannel >= RHSPLIB_MAX_NUMBER_OF_MOTOR_CHANNELS)
+	{
+    return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+  }
+    else if (mode != 1 && mode != 2)
+    {
+    return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
+  }
+
+  int result = RHSPlib_getInterfacePacketID(obj, "DEKA", 23, &packetID, nackReasonCode);
+  if (result < 0)
+    {
+    return result;
+  }
+
+  uint8_t cmdPayload[19];
+
+  int32_t p = (int)round(proportionalCoeff*65536.0);
+  int32_t i = (int)round(integralCoeff*65536.0);
+  int32_t d = (int)round(derivativeCoeff*65536.0);
+  int32_t f = (int)round(feedForwardCoeff*65536.0);
+
+  RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 0, motorChannel);
+  RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 1, mode);
+  RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 2, p);
+  RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 6, i);
+  RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 10, d);
+  RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 14, f);
+  RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 18, 2); //2 is PIDF
+
+  return RHSPlib_sendWriteCommandInternal(obj, packetID, cmdPayload, sizeof(cmdPayload), nackReasonCode);
+}
+
 int RHSPlib_motor_getPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
                                 				 uint8_t motorChannel,
 												 uint8_t mode, double *proportionalCoeff,
@@ -633,4 +679,66 @@ int RHSPlib_motor_getPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
     }
 
     return RHSPLIB_RESULT_OK;
+}
+
+int RHSPlib_motor_getPIDFControlLoopCoefficients(RHSPlib_Module_T *obj,
+                                                uint8_t motorChannel,
+                                                uint8_t mode, double *proportionalCoeff,
+                                                double *integralCoeff, double *derivativeCoeff, double *feedForwardCoeff, uint8_t *nackReasonCode)
+{
+  uint16_t packetID;
+
+  RHSPLIB_ASSERT(obj);
+
+  if (!obj)
+    {
+    return RHSPLIB_ERROR;
+  }
+  if (motorChannel >= RHSPLIB_MAX_NUMBER_OF_MOTOR_CHANNELS)
+	{
+    return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+  }
+    else if (mode != 1 && mode != 2)
+    {
+    return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
+  }
+
+  int result = RHSPlib_getInterfacePacketID(obj, "DEKA", 24, &packetID, nackReasonCode);
+  if (result < 0)
+    {
+    return result;
+  }
+
+  uint8_t cmdPayload[2] = {motorChannel, mode};
+
+  result = RHSPlib_sendReadCommandInternal(obj, packetID, cmdPayload, sizeof(cmdPayload), nackReasonCode);
+  if (result < 0)
+    {
+    return result;
+  }
+
+  const uint8_t *rspPayload = RHSPLIB_PACKET_PAYLOAD_PTR(obj->rxBuffer);
+
+  if (proportionalCoeff)
+    {
+    int32_t p = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 0);
+    *proportionalCoeff = p/65536.0;
+  }
+  if (integralCoeff)
+    {
+    int32_t i = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 4);
+    *integralCoeff = i/65536.0;
+  }
+  if (derivativeCoeff)
+    {
+    int32_t d = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 8);
+    *derivativeCoeff = d/65536.0;
+  }
+  if (feedForwardCoeff)
+    {
+    int32_t f = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 12);
+    *feedForwardCoeff = f/65536.0;
+  }
+
+  return RHSPLIB_RESULT_OK;
 }

@@ -264,6 +264,26 @@ int RHSPlib_motor_setPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
                                                  double integralCoeff, double derivativeCoeff, uint8_t *nackReasonCode);
 
 /**
+* @brief Sets the control loop coefficients for the specified motor channel and mode
+*
+* @param[in] obj               module instance
+* @param[in] motorChannel      motor channel number
+* @param[in] motorMode         motor mode, PID control is active for Target Velocity and Target Position modes only
+* @param[in] proportionalCoeff proportional coefficient
+* @param[in] integralCoeff     integral coefficient
+* @param[in] derivativeCoeff   derivative coefficient
+* @param[in] feedForwardCoeff  feed forward coefficient
+* @param[out] nackReasonCode nack reason code if the function returns RHSPLIB_ERROR_NACK_RECEIVED
+*
+* @return RHSPLIB_RESULT_OK or RHSPLIB_RESULT_ATTENTION_REQUIRED in case success
+*
+* */
+int RHSPlib_motor_setPIDFControlLoopCoefficients(RHSPlib_Module_T *obj,
+                                                 uint8_t motorChannel,
+                                                uint8_t mode, double proportionalCoeff,
+                                                double integralCoeff, double derivativeCoeff, double feedForwardCoeff, uint8_t *nackReasonCode);
+
+/**
  * @brief Retrieves the control loop coefficients of the specified motor channel and mode
  *
  * @param[in] obj                module instance
@@ -280,6 +300,26 @@ int RHSPlib_motor_getPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
                                 				 uint8_t motorChannel,
 												 uint8_t mode, double *proportionalCoeff,
 												 double *integralCoeff, double *derivativeCoeff, uint8_t *nackReasonCode);
+
+/**
+* @brief Retrieves the control loop coefficients of the specified motor channel and mode
+*
+* @param[in] obj                module instance
+* @param[in] motorChannel       motor channel number
+* @param[in] motorMode          motor mode, PID control is active for Target Velocity and Target Position modes only
+* @param[out] proportionalCoeff proportional coefficient
+* @param[out] integralCoeff     integral coefficient
+* @param[out] derivativeCoeff   derivative coefficient
+* @param[out] feedForwardCoeff  feed forward coefficient
+*
+* @return RHSPLIB_RESULT_OK in case success
+*
+* */
+int RHSPlib_motor_getPIDFControlLoopCoefficients(RHSPlib_Module_T *obj,
+                                                 uint8_t motorChannel,
+                                                 uint8_t mode, double *proportionalCoeff,
+                                                 double *integralCoeff, double *derivativeCoeff, double *feedForwardCoeff, uint8_t *nackReasonCode);
+
 
 #ifdef __cplusplus
 }

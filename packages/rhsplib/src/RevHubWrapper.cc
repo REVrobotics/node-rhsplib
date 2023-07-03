@@ -1263,6 +1263,26 @@ Napi::Value RevHub::setMotorPIDCoefficients(const Napi::CallbackInfo &info) {
   QUEUE_WORKER(worker);
 }
 
+Napi::Value RevHub::setMotorPIDFCoefficients(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t motorMode = info[1].As<Napi::Number>().Uint32Value();
+  Napi::Object pidf = info[2].As<Napi::Object>();
+  double proportionalCoeff = pidf.Get("p").As<Napi::Number>().DoubleValue();
+  double integralCoeff = pidf.Get("i").As<Napi::Number>().DoubleValue();
+  double derivativeCoeff = pidf.Get("d").As<Napi::Number>().DoubleValue();
+  double feedForwardCoeff = pidf.Get("f").As<Napi::Number>().DoubleValue();
+
+  CREATE_VOID_WORKER(worker, env, {
+    _code = RHSPlib_motor_setPIDFControlLoopCoefficients(
+        &this->obj, motorChannel, motorMode, proportionalCoeff, integralCoeff,
+        derivativeCoeff, feedForwardCoeff, &_nackCode);
+  });
+
+  QUEUE_WORKER(worker);
+}
+
 Napi::Value RevHub::getMotorPIDCoefficients(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
@@ -1282,9 +1302,39 @@ Napi::Value RevHub::getMotorPIDCoefficients(const Napi::CallbackInfo &info) {
 
   SET_WORKER_CALLBACK(worker, retType, {
     Napi::Object pidCoeffObj = Napi::Object::New(_env);
-    pidCoeffObj.Set("P", _data.proportionalCoeff);
-    pidCoeffObj.Set("I", _data.integralCoeff);
-    pidCoeffObj.Set("D", _data.derivativeCoeff);
+    pidCoeffObj.Set("p", _data.proportionalCoeff);
+    pidCoeffObj.Set("i", _data.integralCoeff);
+    pidCoeffObj.Set("d", _data.derivativeCoeff);
+    return pidCoeffObj;
+  });
+
+  QUEUE_WORKER(worker);
+}
+
+Napi::Value RevHub::getMotorPIDFCoefficients(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+
+  uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
+  uint8_t motorMode = info[1].As<Napi::Number>().Uint32Value();
+
+  using retType = struct {
+    double proportionalCoeff;
+    double integralCoeff;
+    double derivativeCoeff;
+    double feedForwardCoeff;
+  };
+  CREATE_WORKER(worker, env, retType, {
+    _code = RHSPlib_motor_getPIDFControlLoopCoefficients(
+        &this->obj, motorChannel, motorMode, &_data.proportionalCoeff,
+        &_data.integralCoeff, &_data.derivativeCoeff, &_data.feedForwardCoeff, &_nackCode);
+  });
+
+  SET_WORKER_CALLBACK(worker, retType, {
+    Napi::Object pidCoeffObj = Napi::Object::New(_env);
+    pidCoeffObj.Set("p", _data.proportionalCoeff);
+    pidCoeffObj.Set("i", _data.integralCoeff);
+    pidCoeffObj.Set("d", _data.derivativeCoeff);
+    pidCoeffObj.Set("f", _data.feedForwardCoeff);
     return pidCoeffObj;
   });
 
