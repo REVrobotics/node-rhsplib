@@ -14,6 +14,7 @@ import { I2CReadStatus } from "./I2CReadStatus.js";
 import { PidCoefficients } from "./PidCoefficients.js";
 import { DigitalChannelDirection } from "./DigitalChannelDirection.js";
 import { MotorMode } from "./MotorMode.js";
+import { PidfCoefficients } from "./PidfCoefficients.js";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
 
@@ -334,6 +335,18 @@ export interface ExpansionHub extends RevHub {
     ): Promise<void>;
 
     /**
+     * Set the current PIDF coefficients for a motor
+     * @param motorChannel
+     * @param motorMode
+     * @param pidf
+     */
+    setMotorPIDFCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        pidf: PidfCoefficients,
+    ): Promise<void>;
+
+    /**
      * Get the current PID coefficients for a motor
      * @param motorChannel
      * @param motorMode
@@ -342,6 +355,16 @@ export interface ExpansionHub extends RevHub {
         motorChannel: number,
         motorMode: MotorMode,
     ): Promise<PidCoefficients>;
+
+    /**
+     * Get the current PIDF coefficients for a motor
+     * @param motorChannel
+     * @param motorMode
+     */
+    getMotorPIDFCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+    ): Promise<PidfCoefficients>;
 
     // Servo
     /**

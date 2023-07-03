@@ -1,5 +1,5 @@
 import { PidCoefficients } from "@rev-robotics/expansion-hub";
-import { ExpansionHub, MotorMode } from "@rev-robotics/rev-hub-core";
+import { ExpansionHub, MotorMode, PidfCoefficients } from "@rev-robotics/rev-hub-core";
 
 export async function runMotorConstantPower(
     hub: ExpansionHub,
@@ -99,6 +99,24 @@ export async function setMotorRegulatedVelocityPid(
     await getMotorRegulatedVelocityPid(hub, channel);
 }
 
+export async function setMotorRegulatedVelocityPidf(
+    hub: ExpansionHub,
+    channel: number,
+    p: number,
+    i: number,
+    d: number,
+    f: number,
+) {
+    await hub.setMotorPIDFCoefficients(channel, MotorMode.REGULATED_VELOCITY, {
+        p: p,
+        i: i,
+        d: d,
+        f: f,
+    });
+
+    await getMotorRegulatedVelocityPidf(hub, channel);
+}
+
 export async function getMotorRegulatedVelocityPid(hub: ExpansionHub, channel: number) {
     let pid: PidCoefficients = await hub.getMotorPIDCoefficients(
         channel,
@@ -106,4 +124,13 @@ export async function getMotorRegulatedVelocityPid(hub: ExpansionHub, channel: n
     );
 
     console.log(JSON.stringify(pid));
+}
+
+export async function getMotorRegulatedVelocityPidf(hub: ExpansionHub, channel: number) {
+    let pidf: PidfCoefficients = await hub.getMotorPIDFCoefficients(
+        channel,
+        MotorMode.REGULATED_VELOCITY,
+    );
+
+    console.log(JSON.stringify(pidf));
 }

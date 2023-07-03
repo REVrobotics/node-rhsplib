@@ -15,6 +15,7 @@ import {
     ModuleInterface,
     ModuleStatus,
     PidCoefficients,
+    PidfCoefficients,
     Rgb,
     VerbosityLevel,
     Version,
@@ -293,6 +294,15 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
+    getMotorPIDFCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+    ): Promise<PidfCoefficients> {
+        return this.convertErrorPromise(() => {
+            return this.nativeRevHub.getMotorPIDFCoefficients(motorChannel, motorMode);
+        });
+    }
+
     getMotorTargetPosition(
         motorChannel: number,
     ): Promise<{ targetPosition: number; targetTolerance: number }> {
@@ -537,6 +547,20 @@ export class ExpansionHubInternal implements ExpansionHub {
                 motorChannel,
                 motorMode,
                 pid,
+            );
+        });
+    }
+
+    setMotorPIDFCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        pidf: PidfCoefficients,
+    ): Promise<void> {
+        return this.convertErrorPromise(() => {
+            return this.nativeRevHub.setMotorPIDFCoefficients(
+                motorChannel,
+                motorMode,
+                pidf,
             );
         });
     }

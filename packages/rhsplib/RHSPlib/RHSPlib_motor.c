@@ -600,7 +600,7 @@ int RHSPlib_motor_setPIDFControlLoopCoefficients(RHSPlib_Module_T *obj,
     return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
   }
 
-  int result = RHSPlib_getInterfacePacketID(obj, "DEKA", 23, &packetID, nackReasonCode);
+  int result = RHSPlib_getInterfacePacketID(obj, "DEKA", 51, &packetID, nackReasonCode);
   if (result < 0)
     {
     return result;
@@ -703,7 +703,7 @@ int RHSPlib_motor_getPIDFControlLoopCoefficients(RHSPlib_Module_T *obj,
     return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
   }
 
-  int result = RHSPlib_getInterfacePacketID(obj, "DEKA", 24, &packetID, nackReasonCode);
+  int result = RHSPlib_getInterfacePacketID(obj, "DEKA", 53, &packetID, nackReasonCode);
   if (result < 0)
     {
     return result;

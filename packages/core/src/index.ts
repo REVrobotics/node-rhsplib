@@ -16,6 +16,7 @@ export * from "./LedPattern.js";
 export * from "./ModuleInterface.js";
 export * from "./ModuleStatus.js";
 export * from "./PidCoefficients.js";
+export * from "./PidfCoefficients.js";
 export * from "./Rgb.js";
 export * from "./MotorMode.js";
 export * from "./SerialFlowControl.js";

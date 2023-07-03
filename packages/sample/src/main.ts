@@ -9,6 +9,8 @@ import {
     setMotorAlertLevel,
     getMotorAlertLevel_mA,
     getMotorRegulatedVelocityPid,
+    setMotorRegulatedVelocityPidf,
+    getMotorRegulatedVelocityPidf,
 } from "./command/motor.js";
 import {
     analog,
@@ -272,6 +274,53 @@ pidCommand
         });
 
         await getMotorRegulatedVelocityPid(hub, channelNumber);
+        hub.close();
+    });
+
+let pidfCommand = motorCommand
+    .command("pidf")
+    .description("Get or set PIDF coefficients");
+
+pidfCommand
+    .command("set <channel> <p> <i> <d> <f>")
+    .description("Set PIDF coefficients for regulated velocity mode for a motor")
+    .action(async (channel, p, i, d, f) => {
+        let channelNumber = Number(channel);
+        let pValue = Number(p);
+        let iValue = Number(i);
+        let dValue = Number(d);
+        let fValue = Number(f);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await setMotorRegulatedVelocityPidf(
+            hub,
+            channelNumber,
+            pValue,
+            iValue,
+            dValue,
+            fValue,
+        );
+        hub.close();
+    });
+
+pidfCommand
+    .command("get <channel>")
+    .description("Get PIDF coefficients for regulated velocity mode for a motor")
+    .action(async (channel) => {
+        let channelNumber = Number(channel);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await getMotorRegulatedVelocityPidf(hub, channelNumber);
         hub.close();
     });
 
