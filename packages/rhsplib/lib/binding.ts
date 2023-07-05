@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 import {
     BulkInputData,
+    ClosedLoopControlAlgorithm,
     DebugGroup,
     DigitalChannelDirection,
     DiscoveredAddresses,
@@ -179,24 +180,28 @@ export declare class RevHub {
     ): Promise<{ targetPosition: number; targetTolerance: number }>;
     getMotorAtTarget(motorChannel: number): Promise<boolean>;
     getMotorEncoderPosition(motorChannel: number): Promise<number>;
-    setMotorPIDCoefficients(
+    setMotorClosedLoopControlCoefficients(
         motorChannel: number,
         motorMode: number,
+        algorithm: ClosedLoopControlAlgorithm.LegacyPid,
         pid: PidCoefficients,
     ): Promise<void>;
-    getMotorPIDCoefficients(
+    setMotorClosedLoopControlCoefficients(
         motorChannel: number,
         motorMode: number,
-    ): Promise<PidCoefficients>;
-    setMotorPIDFCoefficients(
-        motorChannel: number,
-        motorMode: number,
+        algorithm: ClosedLoopControlAlgorithm.Pidf,
         pidf: PidfCoefficients,
     ): Promise<void>;
-    getMotorPIDFCoefficients(
+    setMotorClosedLoopControlCoefficients(
         motorChannel: number,
         motorMode: number,
-    ): Promise<PidfCoefficients>;
+        algorithm: ClosedLoopControlAlgorithm,
+        pidf: any,
+    ): Promise<void>;
+    getMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: number,
+    ): Promise<PidfCoefficients | PidCoefficients>;
 
     // PWM
     setPWMConfiguration(pwmChannel: number, framePeriod: number): Promise<void>;

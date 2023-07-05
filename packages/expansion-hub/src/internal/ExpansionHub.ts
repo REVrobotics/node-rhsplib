@@ -1,36 +1,39 @@
 import {
-    NativeRevHub,
-    Serial as SerialPort,
-    RhspLibErrorCode,
     NackCode,
+    NativeRevHub,
+    RhspLibErrorCode,
+    Serial as SerialPort,
 } from "@rev-robotics/rhsplib";
 import {
     BulkInputData,
+    ClosedLoopControlAlgorithm,
+    CommandNotSupportedError,
     DebugGroup,
     DigitalChannelDirection,
+    DigitalState,
+    ExpansionHub,
+    GeneralSerialError,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
     LedPattern,
     ModuleInterface,
     ModuleStatus,
-    PidCoefficients,
-    PidfCoefficients,
-    Rgb,
-    VerbosityLevel,
-    Version,
-    TimeoutError,
+    MotorMode,
     nackCodeToError,
     NoExpansionHubWithAddressError,
     ParameterOutOfRangeError,
-    GeneralSerialError,
-    CommandNotSupportedError,
-    ExpansionHub,
-    DigitalState,
-    MotorMode,
+    ParentRevHub,
+    PidCoefficients,
+    PidfCoefficients,
+    RevHub,
+    RevHubType,
+    Rgb,
+    TimeoutError,
+    VerbosityLevel,
+    Version,
 } from "@rev-robotics/rev-hub-core";
 import { closeSerialPort } from "../open-rev-hub.js";
-import { ParentRevHub, RevHub, RevHubType } from "@rev-robotics/rev-hub-core";
 import { EventEmitter } from "events";
 import { RhspLibError } from "../errors/RhspLibError.js";
 
@@ -285,22 +288,45 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    getMotorPIDCoefficients(
+    async setMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: MotorMode,
-    ): Promise<PidCoefficients> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.getMotorPIDCoefficients(motorChannel, motorMode);
+        motorMode: number,
+        algorithm: ClosedLoopControlAlgorithm,
+        pid: any,
+    ): Promise<void> {
+        await this.convertErrorPromise(async () => {
+            await this.nativeRevHub.setMotorClosedLoopControlCoefficients(
+                motorChannel,
+                motorMode,
+                algorithm,
+                pid,
+            );
         });
     }
 
-    getMotorPIDFCoefficients(
+    async getMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: MotorMode,
-    ): Promise<PidfCoefficients> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.getMotorPIDFCoefficients(motorChannel, motorMode);
-        });
+        motorMode: number,
+    ): Promise<PidfCoefficients | PidCoefficients> {
+        let pid: any = await this.nativeRevHub.getMotorClosedLoopControlCoefficients(
+            motorChannel,
+            motorMode,
+        );
+
+        if (pid.mode === ClosedLoopControlAlgorithm.LegacyPid) {
+            return {
+                p: pid.p,
+                i: pid.i,
+                d: pid.d,
+            };
+        } else {
+            return {
+                p: pid.p,
+                i: pid.i,
+                d: pid.d,
+                f: pid.f,
+            };
+        }
     }
 
     getMotorTargetPosition(

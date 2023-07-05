@@ -15,6 +15,7 @@ import { PidCoefficients } from "./PidCoefficients.js";
 import { DigitalChannelDirection } from "./DigitalChannelDirection.js";
 import { MotorMode } from "./MotorMode.js";
 import { PidfCoefficients } from "./PidfCoefficients.js";
+import { ClosedLoopControlAlgorithm } from "./ClosedLoopControlAlgorithm.js";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
 
@@ -323,48 +324,62 @@ export interface ExpansionHub extends RevHub {
     getMotorEncoderPosition(motorChannel: number): Promise<number>;
 
     /**
-     * Set the current PID coefficients for a motor
+     * Set the Closed Loop Control Coefficients for Legacy PID mode.
+     *
      * @param motorChannel
      * @param motorMode
-     * @param pid
+     * @param algorithm Legacy PID algorithm
+     * @param pid Legacy PID coefficients
      */
-    setMotorPIDCoefficients(
+    setMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: MotorMode,
+        motorMode: number,
+        algorithm: ClosedLoopControlAlgorithm.LegacyPid,
         pid: PidCoefficients,
     ): Promise<void>;
 
     /**
-     * Set the current PIDF coefficients for a motor
+     * Set the Closed Loop Control Coefficients for PIDF mode
+     *
      * @param motorChannel
      * @param motorMode
-     * @param pidf
+     * @param algorithm PIDF algorithm
+     * @param pidf PIDF coefficients
      */
-    setMotorPIDFCoefficients(
+    setMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: MotorMode,
+        motorMode: number,
+        algorithm: ClosedLoopControlAlgorithm.Pidf,
         pidf: PidfCoefficients,
     ): Promise<void>;
 
     /**
-     * Get the current PID coefficients for a motor
+     * Set Motor Closed Loop Coefficients using either Legacy PID algorithm or
+     * PIDF algorithm.
+     *
      * @param motorChannel
      * @param motorMode
+     * @param algorithm either Legacy PID or PIDF algorithm.
+     * @param pidf either PidCoefficients or PidfCoefficients depending on algorithm.
      */
-    getMotorPIDCoefficients(
+    setMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: MotorMode,
-    ): Promise<PidCoefficients>;
+        motorMode: number,
+        algorithm: ClosedLoopControlAlgorithm,
+        pidf: any,
+    ): Promise<void>;
 
     /**
-     * Get the current PIDF coefficients for a motor
+     * Get motor closed loop control coefficients.
+     * Will return either PidCoefficients or PidfCoefficients depending on which
+     * algorithm is active.
      * @param motorChannel
      * @param motorMode
      */
-    getMotorPIDFCoefficients(
+    getMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: MotorMode,
-    ): Promise<PidfCoefficients>;
+        motorMode: number,
+    ): Promise<PidfCoefficients | PidCoefficients>;
 
     // Servo
     /**
