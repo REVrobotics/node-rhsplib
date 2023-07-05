@@ -333,8 +333,8 @@ export interface ExpansionHub extends RevHub {
      */
     setMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: number,
-        algorithm: ClosedLoopControlAlgorithm.LegacyPid,
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm.Pid,
         pid: PidCoefficients,
     ): Promise<void>;
 
@@ -348,7 +348,7 @@ export interface ExpansionHub extends RevHub {
      */
     setMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
         algorithm: ClosedLoopControlAlgorithm.Pidf,
         pidf: PidfCoefficients,
     ): Promise<void>;
@@ -364,7 +364,7 @@ export interface ExpansionHub extends RevHub {
      */
     setMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
         algorithm: ClosedLoopControlAlgorithm,
         pid: PidCoefficients | PidfCoefficients,
     ): Promise<void>;
@@ -378,7 +378,7 @@ export interface ExpansionHub extends RevHub {
      */
     getMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
     ): Promise<PidfCoefficients | PidCoefficients>;
 
     // Servo

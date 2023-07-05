@@ -1,4 +1,4 @@
 export enum ClosedLoopControlAlgorithm {
-    LegacyPid,
+    Pid,
     Pidf,
 }

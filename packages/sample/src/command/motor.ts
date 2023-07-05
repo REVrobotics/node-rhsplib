@@ -96,12 +96,12 @@ export async function setMotorRegulatedVelocityPid(
     await hub.setMotorClosedLoopControlCoefficients(
         channel,
         MotorMode.REGULATED_VELOCITY,
-        ClosedLoopControlAlgorithm.LegacyPid,
+        ClosedLoopControlAlgorithm.Pid,
         {
             p: p,
             i: i,
             d: d,
-            algorithm: ClosedLoopControlAlgorithm.LegacyPid,
+            algorithm: ClosedLoopControlAlgorithm.Pid,
         },
     );
 

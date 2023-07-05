@@ -14,6 +14,7 @@ import {
     LedPattern,
     ModuleInterface,
     ModuleStatus,
+    MotorMode,
     PidCoefficients,
     PidfCoefficients,
     Rgb,
@@ -152,12 +153,12 @@ export declare class RevHub {
     // Motor
     setMotorChannelMode(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
         floatAtZero: boolean,
     ): Promise<void>;
     getMotorChannelMode(
         motorChannel: number,
-    ): Promise<{ motorMode: number; floatAtZero: boolean }>;
+    ): Promise<{ motorMode: MotorMode; floatAtZero: boolean }>;
     setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void>;
     getMotorChannelEnable(motorChannel: number): Promise<boolean>;
     setMotorChannelCurrentAlertLevel(
@@ -182,25 +183,25 @@ export declare class RevHub {
     getMotorEncoderPosition(motorChannel: number): Promise<number>;
     setMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: number,
-        algorithm: ClosedLoopControlAlgorithm.LegacyPid,
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm.Pid,
         pid: PidCoefficients,
     ): Promise<void>;
     setMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
         algorithm: ClosedLoopControlAlgorithm.Pidf,
         pidf: PidfCoefficients,
     ): Promise<void>;
     setMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
         algorithm: ClosedLoopControlAlgorithm,
         pid: PidCoefficients | PidfCoefficients,
     ): Promise<void>;
     getMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
     ): Promise<PidfCoefficients | PidCoefficients>;
 
     // PWM

@@ -5,5 +5,5 @@ export interface PidCoefficients {
     i: number;
     d: number;
 
-    algorithm: ClosedLoopControlAlgorithm.LegacyPid;
+    algorithm: ClosedLoopControlAlgorithm.Pid;
 }

@@ -290,7 +290,7 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     async setMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
         algorithm: ClosedLoopControlAlgorithm,
         pid: PidCoefficients | PidfCoefficients,
     ): Promise<void> {
@@ -306,19 +306,19 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     async getMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
     ): Promise<PidfCoefficients | PidCoefficients> {
         let pid: any = await this.nativeRevHub.getMotorClosedLoopControlCoefficients(
             motorChannel,
             motorMode,
         );
 
-        if (pid.algorithm === ClosedLoopControlAlgorithm.LegacyPid) {
+        if (pid.algorithm === ClosedLoopControlAlgorithm.Pid) {
             return {
                 p: pid.p,
                 i: pid.i,
                 d: pid.d,
-                algorithm: ClosedLoopControlAlgorithm.LegacyPid,
+                algorithm: ClosedLoopControlAlgorithm.Pid,
             };
         } else {
             return {
