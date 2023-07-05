@@ -35,7 +35,7 @@ import {
     digitalReadAll,
     digitalWrite,
     digitalWriteAll,
-} from "./commands/digital.js";
+} from "./command/digital.js";
 import { sendFailSafe } from "./command/failsafe.js";
 
 function runOnSigint(block: () => void) {
