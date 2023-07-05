@@ -292,7 +292,7 @@ export class ExpansionHubInternal implements ExpansionHub {
         motorChannel: number,
         motorMode: number,
         algorithm: ClosedLoopControlAlgorithm,
-        pid: any,
+        pid: PidCoefficients | PidfCoefficients,
     ): Promise<void> {
         await this.convertErrorPromise(async () => {
             await this.nativeRevHub.setMotorClosedLoopControlCoefficients(

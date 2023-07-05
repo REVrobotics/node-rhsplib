@@ -360,13 +360,13 @@ export interface ExpansionHub extends RevHub {
      * @param motorChannel
      * @param motorMode
      * @param algorithm either Legacy PID or PIDF algorithm.
-     * @param pidf either PidCoefficients or PidfCoefficients depending on algorithm.
+     * @param pid either PidCoefficients or PidfCoefficients depending on algorithm.
      */
     setMotorClosedLoopControlCoefficients(
         motorChannel: number,
         motorMode: number,
         algorithm: ClosedLoopControlAlgorithm,
-        pidf: any,
+        pid: PidCoefficients | PidfCoefficients,
     ): Promise<void>;
 
     /**

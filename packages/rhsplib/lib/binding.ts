@@ -196,7 +196,7 @@ export declare class RevHub {
         motorChannel: number,
         motorMode: number,
         algorithm: ClosedLoopControlAlgorithm,
-        pidf: any,
+        pid: PidCoefficients | PidfCoefficients,
     ): Promise<void>;
     getMotorClosedLoopControlCoefficients(
         motorChannel: number,
