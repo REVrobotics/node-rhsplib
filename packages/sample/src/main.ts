@@ -89,14 +89,14 @@ program
             "green, 0.5FF0000 for half-second red.",
     )
     .action(async (steps) => {
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getExpansionHubOrThrow();
+
+        runOnSigint(() => {
+            close();
+        });
         await ledPattern(hub, steps);
 
         await getLedPattern(hub);
-        process.on("SIGINT", () => {
-            hub.close();
-        });
     });
 
 program
@@ -131,8 +131,11 @@ program
     .command("get-led")
     .description("Get LED color. Values are [0,255]")
     .action(async () => {
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getExpansionHubOrThrow();
+
+        runOnSigint(() => {
+            close();
+        });
         await getLed(hub);
 
         hub.close();
@@ -160,14 +163,10 @@ program
         "Start servo 0 for 2 seconds, then send failsafe. Wait 2 more seconds to close. The servo should stop after 2 seconds.",
     )
     .action(async () => {
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
-        function close() {
-            hub.close();
-        }
+        let [hub, close] = await getExpansionHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await sendFailSafe(hub, close);
@@ -200,15 +199,14 @@ digitalCommand
         }
         let digitalState = stateBoolean ? DigitalState.HIGH : DigitalState.LOW;
 
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getExpansionHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await digitalWrite(hub, channelNumber, digitalState);
-        hub.close();
+        close();
     });
 
 digitalCommand
@@ -219,15 +217,14 @@ digitalCommand
         let isContinuous = options.continuous !== undefined;
         let channelNumber = Number(channel);
 
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getExpansionHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await digitalRead(hub, channelNumber, isContinuous);
-        hub.close();
+        close();
     });
 
 digitalCommand
@@ -237,15 +234,14 @@ digitalCommand
     .action(async (options) => {
         let isContinuous = options.continuous !== undefined;
 
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getExpansionHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await digitalReadAll(hub, isContinuous);
-        hub.close();
+        close();
     });
 
 digitalCommand
@@ -258,15 +254,14 @@ digitalCommand
         let bitfieldValue = parseInt(bitfield, 2);
         let bitmaskValue = parseInt(bitmask, 2);
 
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getExpansionHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await digitalWriteAll(hub, bitfieldValue, bitmaskValue);
-        hub.close();
+        close();
     });
 
 let motorCommand = program.command("motor");
@@ -278,17 +273,16 @@ motorCommand
         "Read the current through a motor. Specify --continuous to run continuously",
     )
     .action(async (channel, options) => {
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
         let isContinuous = options.continuous !== undefined;
         let channelNumber = Number(channel);
+        let [hub, close] = await getExpansionHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await motorCurrent(hub, channelNumber, isContinuous);
-        hub.close();
+        close();
     });
 
 motorCommand
@@ -298,11 +292,10 @@ motorCommand
     .description("Get the current encoder position of a motor")
     .action(async (channel, options) => {
         let channelNumber = Number(channel);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getExpansionHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         if (options.reset) {
@@ -311,7 +304,7 @@ motorCommand
             let isContinuous = options.continuous !== undefined;
             await readEncoder(hub, channelNumber, isContinuous);
         }
-        hub.close();
+        close();
     });
 
 let pidCommand = motorCommand.command("pid").description("Get or set PID coefficients");
@@ -324,15 +317,14 @@ pidCommand
         let pValue = Number(p);
         let iValue = Number(i);
         let dValue = Number(d);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getExpansionHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await setMotorRegulatedVelocityPid(hub, channelNumber, pValue, iValue, dValue);
-        hub.close();
+        close();
     });
 
 pidCommand
@@ -340,15 +332,14 @@ pidCommand
     .description("Get PID coefficients for regulated velocity mode for a motor")
     .action(async (channel) => {
         let channelNumber = Number(channel);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getExpansionHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await getMotorRegulatedVelocityPid(hub, channelNumber);
-        hub.close();
+        close();
     });
 
 let alertCommand = motorCommand
@@ -360,17 +351,16 @@ alertCommand
     .description("Get motor alert current (mA)")
     .action(async (channel) => {
         let channelNumber = Number(channel);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getExpansionHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         let current = await getMotorAlertLevel_mA(hub, channelNumber);
 
         console.log(`Motor alert for channel ${channelNumber} is ${current} mA`);
-        hub.close();
+        close();
     });
 
 alertCommand
@@ -379,15 +369,14 @@ alertCommand
     .action(async (channel, current) => {
         let channelNumber = Number(channel);
         let currentValue = Number(current);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getExpansionHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await setMotorAlertLevel(hub, channelNumber, currentValue);
-        hub.close();
+        close();
     });
 
 motorCommand
@@ -398,12 +387,11 @@ motorCommand
     .action(async (channel, power) => {
         let channelNumber = Number(channel);
         let powerNumber = Number(power);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getExpansionHubOrThrow();
 
         runOnSigint(() => {
             hub.setMotorChannelEnable(channelNumber, false);
-            hub.close();
+            close();
         });
 
         await runMotorConstantPower(hub, channelNumber, powerNumber);
@@ -415,12 +403,11 @@ motorCommand
     .action(async (channel, speed) => {
         let channelNumber = Number(channel);
         let speedNumber = Number(speed);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getExpansionHubOrThrow();
 
         runOnSigint(() => {
             hub.setMotorChannelEnable(channelNumber, false);
-            hub.close();
+            close();
         });
 
         await runMotorConstantVelocity(hub, channelNumber, speedNumber);
@@ -434,12 +421,11 @@ motorCommand
         let positionNumber = Number(position);
         let toleranceNumber = Number(tolerance);
         let velocityNumber = Number(velocity);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getExpansionHubOrThrow();
 
         runOnSigint(() => {
             hub.setMotorChannelEnable(channelNumber, false);
-            hub.close();
+            close();
         });
 
         await runMotorToPosition(
@@ -600,11 +586,10 @@ program
     .command("log <text>")
     .description("Inject a log hint")
     .action(async (text) => {
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getExpansionHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await injectLog(hub, text);
@@ -619,11 +604,10 @@ program
             "DigitalIO, I2C, Motor0, Motor1, Motor2, or Motor3. Valid values for level are [0,3]",
     )
     .action(async (group, level) => {
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getExpansionHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         let levelNumber = Number(level);
