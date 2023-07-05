@@ -37,6 +37,7 @@ import {
     digitalWriteAll,
 } from "./command/digital.js";
 import { sendFailSafe } from "./command/failsafe.js";
+import { queryInterface } from "./command/query.js";
 
 function runOnSigint(block: () => void) {
     process.on("SIGINT", () => {
@@ -120,6 +121,17 @@ program
         let hubs = await openConnectedExpansionHubs();
         let hub = hubs[0];
         await getLed(hub);
+
+        hub.close();
+    });
+
+program
+    .command("query <name>")
+    .description("Query interface information")
+    .action(async (name) => {
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        await queryInterface(hub, name);
 
         hub.close();
     });
