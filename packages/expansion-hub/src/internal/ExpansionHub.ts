@@ -313,11 +313,12 @@ export class ExpansionHubInternal implements ExpansionHub {
             motorMode,
         );
 
-        if (pid.mode === ClosedLoopControlAlgorithm.LegacyPid) {
+        if (pid.algorithm === ClosedLoopControlAlgorithm.LegacyPid) {
             return {
                 p: pid.p,
                 i: pid.i,
                 d: pid.d,
+                algorithm: ClosedLoopControlAlgorithm.LegacyPid,
             };
         } else {
             return {
@@ -325,6 +326,7 @@ export class ExpansionHubInternal implements ExpansionHub {
                 i: pid.i,
                 d: pid.d,
                 f: pid.f,
+                algorithm: ClosedLoopControlAlgorithm.Pidf,
             };
         }
     }

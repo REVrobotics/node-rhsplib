@@ -1316,7 +1316,7 @@ Napi::Value RevHub::getMotorClosedLoopControlCoefficients(const Napi::CallbackIn
       pidCoeffObj.Set("d", _data.params.pidf.d);
       pidCoeffObj.Set("f", _data.params.pidf.f);
     }
-    pidCoeffObj.Set("type", _data.params.type);
+    pidCoeffObj.Set("algorithm", _data.params.type);
     return pidCoeffObj;
   });
 

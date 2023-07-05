@@ -2,7 +2,6 @@ import {
     ClosedLoopControlAlgorithm,
     ExpansionHub,
     MotorMode,
-    PidfCoefficients,
 } from "@rev-robotics/rev-hub-core";
 
 export async function runMotorConstantPower(
@@ -102,6 +101,7 @@ export async function setMotorRegulatedVelocityPid(
             p: p,
             i: i,
             d: d,
+            algorithm: ClosedLoopControlAlgorithm.LegacyPid,
         },
     );
 
@@ -125,6 +125,7 @@ export async function setMotorRegulatedVelocityPidf(
             i: i,
             d: d,
             f: f,
+            algorithm: ClosedLoopControlAlgorithm.Pidf,
         },
     );
 
@@ -136,6 +137,8 @@ export async function getMotorRegulatedVelocityPidf(hub: ExpansionHub, channel: 
         channel,
         MotorMode.REGULATED_VELOCITY,
     );
+
+    console.log(pidf.algorithm);
 
     console.log(JSON.stringify(pidf));
 }
