@@ -324,12 +324,12 @@ export interface ExpansionHub extends RevHub {
     getMotorEncoderPosition(motorChannel: number): Promise<number>;
 
     /**
-     * Set the Closed Loop Control Coefficients for Legacy PID mode.
+     * Set the Closed Loop Control Coefficients for PID mode.
      *
      * @param motorChannel
      * @param motorMode
-     * @param algorithm Legacy PID algorithm
-     * @param pid Legacy PID coefficients
+     * @param algorithm PID algorithm
+     * @param pid PID coefficients
      */
     setMotorClosedLoopControlCoefficients(
         motorChannel: number,
@@ -354,12 +354,12 @@ export interface ExpansionHub extends RevHub {
     ): Promise<void>;
 
     /**
-     * Set Motor Closed Loop Coefficients using either Legacy PID algorithm or
+     * Set Motor Closed Loop Coefficients using either PID algorithm or
      * PIDF algorithm.
      *
      * @param motorChannel
      * @param motorMode
-     * @param algorithm either Legacy PID or PIDF algorithm.
+     * @param algorithm either PID or PIDF algorithm.
      * @param pid either PidCoefficients or PidfCoefficients depending on algorithm.
      */
     setMotorClosedLoopControlCoefficients(
