@@ -23,12 +23,12 @@ import {
 } from "./command/analog.js";
 import { error } from "./command/error.js";
 import { list } from "./command/list.js";
-import { led } from "./command/led.js";
 import {
     getPossibleExpansionHubSerialNumbers,
     openConnectedExpansionHubs,
     openParentExpansionHub,
 } from "@rev-robotics/expansion-hub";
+import { getLed, getLedPattern, led, ledPattern } from "./command/led.js";
 import { runServo } from "./command/servo.js";
 import { ExpansionHub, ParentExpansionHub, RevHub } from "@rev-robotics/rev-hub-core";
 import { injectLog, setDebugLogLevel } from "./command/log.js";
@@ -40,7 +40,8 @@ import {
     digitalReadAll,
     digitalWrite,
     digitalWriteAll,
-} from "./commands/digital.js";
+} from "./command/digital.js";
+import { sendFailSafe } from "./command/failsafe.js";
 
 function runOnSigint(block: () => void) {
     process.on("SIGINT", () => {
@@ -80,15 +81,61 @@ program
     });
 
 program
-    .command("led")
-    .description("Run LED steps")
+    .command("pattern <steps...>")
+    .description(
+        "Run LED pattern. Provide steps as a space-separated list in the " +
+            "format <time><colorHexString>, where time is in seconds, and " +
+            "colorHexString is a hex color code. Example: 100FF00 for 1 second " +
+            "green, 0.5FF0000 for half-second red.",
+    )
+    .action(async (steps) => {
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        await ledPattern(hub, steps);
+
+        await getLedPattern(hub);
+        process.on("SIGINT", () => {
+            hub.close();
+        });
+    });
+
+program
+    .command("get-pattern")
+    .description("Get LED Pattern steps")
     .action(async () => {
         let [hub, close] = await getExpansionHubOrThrow();
         runOnSigint(() => {
             close();
         });
 
-        await led(hub);
+        await getLedPattern(hub);
+        close();
+    });
+
+program
+    .command("led <r> <g> <b>")
+    .description("Set LED color")
+    .action(async (r, g, b) => {
+        let [hub, close] = await getExpansionHubOrThrow();
+        runOnSigint(() => {
+            close();
+        });
+
+        let rValue = Number(r);
+        let gValue = Number(g);
+        let bValue = Number(b);
+        await led(hub, rValue, gValue, bValue);
+    });
+
+program
+    .command("get-led")
+    .description("Get LED color. Values are [0,255]")
+    .action(async () => {
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        await getLed(hub);
+
+        hub.close();
     });
 
 program
@@ -105,6 +152,25 @@ program
 
         await getBulkInputData(hub, isContinuous);
         close();
+    });
+
+program
+    .command("failsafe")
+    .description(
+        "Start servo 0 for 2 seconds, then send failsafe. Wait 2 more seconds to close. The servo should stop after 2 seconds.",
+    )
+    .action(async () => {
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+        function close() {
+            hub.close();
+        }
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await sendFailSafe(hub, close);
     });
 
 program
