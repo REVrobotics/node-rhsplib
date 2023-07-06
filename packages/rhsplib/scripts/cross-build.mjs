@@ -26,7 +26,9 @@ await runCmakeWithArgs([...commonConfigureOptions, ...linuxX64Args], "build-linu
 await runCmakeWithArgs([...commonConfigureOptions, ...linuxArm64Args], "build-linuxArm64");
 await runCmakeWithArgs([...commonConfigureOptions, ...windowsArgs], "build-windows");
 
-await prebuildify("linuxX64");
+await prebuildify("--napi", "--target=linux-x64");
+await prebuildify("--napi", "--target=linux-arm64");
+await prebuildify("--napi", "--target=win-x64");
 
 async function runCmakeWithArgs(args, cwd) {
   const cmake = spawn("cmake", args, {
@@ -48,6 +50,10 @@ async function runCmakeWithArgs(args, cwd) {
   });
 }
 
-async function prebuildify(target) {
-
+async function prebuildify(args) {
+  const prebuildify = spawn(`prebuildify`, args, {
+    cwd: cwd,
+  });
+  prebuildify.stderr.pipe(process.stderr);
+  prebuildify.stdout.pipe(process.stdout);
 }
