@@ -25,7 +25,7 @@ jobs:
         run: npm install
 
       - name: debug print
-        run: ls packages/rhsplib; cat packages/rhsplib/RHSPlib/build/CMakeFiles/RHSPlib.dir/compiler_depend.ts
+        run: cat packages/rhsplib/RHSPlib/build/CMakeFiles/RHSPlib.dir/compiler_depend.ts
 
       - name: Build project
         run: lerna run build
