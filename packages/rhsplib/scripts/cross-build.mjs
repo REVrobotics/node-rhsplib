@@ -20,7 +20,7 @@ let commonConfigureOptions = ["-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_C_COMPILER=
 
 let linuxArm64Args = [ "-DCMAKE_SYSTEM_NAME=Linux", "-DCMAKE_SYSTEM_PROCESSOR=aarch64" ];
 let linuxX64Args = [ "-DCMAKE_SYSTEM_NAME=Linux", "-DCMAKE_SYSTEM_PROCESSOR=x86_64" ];
-let windowsArgs = [  ];
+let windowsArgs = [ "-DCMAKE_SYSTEM_NAME=Windows", "-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_C_COMPILER=gcc" ];
 
 let baseBuildPath = path.join(rhsplibPath, "build-");
 
@@ -29,7 +29,7 @@ await runCmakeWithArgs([...commonConfigureOptions, ...linuxX64Args, ".."], `${ba
 console.log("Building Linux Arm64");
 await runCmakeWithArgs([...commonConfigureOptions, ...linuxArm64Args, ".."], `${baseBuildPath}linuxArm64`);
 console.log("Building Windows");
-await runCmakeWithArgs([...commonConfigureOptions, ...windowsArgs, ".."], `${baseBuildPath}windows`);
+await runCmakeWithArgs([...windowsArgs, ".."], `${baseBuildPath}windows`);
 console.log("Build RHSPlib");
 
 console.log("Prebuilding Linux X64");

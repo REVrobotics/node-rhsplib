@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.7)
 
-set(CMAKE_SYSTEM_NAME Generic)
-
 message(STATUS "requested c-compiler:'${CMAKE_C_COMPILER}'")
 project(RHSPlib VERSION 1.0 LANGUAGES C)
 
