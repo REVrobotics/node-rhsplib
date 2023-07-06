@@ -22,9 +22,11 @@ let linuxArm64Args = [ "-DCMAKE_SYSTEM_NAME=Linux", "-DCMAKE_SYSTEM_PROCESSOR=aa
 let linuxX64Args = [ "-DCMAKE_SYSTEM_NAME=Linux", "-DCMAKE_SYSTEM_PROCESSOR=x86_64" ];
 let windowsArgs = [ "-DCMAKE_SYSTEM_NAME=Windows", "-DCMAKE_SYSTEM_PROCESSOR=x86_64" ];
 
-await runCmakeWithArgs([...commonConfigureOptions, ...linuxX64Args, ".."], "build-linuxX64");
-await runCmakeWithArgs([...commonConfigureOptions, ...linuxArm64Args, ".."], "build-linuxArm64");
-await runCmakeWithArgs([...commonConfigureOptions, ...windowsArgs, ".."], "build-windows");
+let baseBuildPath = path.join(rhsplibPath, "build-");
+
+await runCmakeWithArgs([...commonConfigureOptions, ...linuxX64Args, ".."], `${baseBuildPath}linuxX64`);
+await runCmakeWithArgs([...commonConfigureOptions, ...linuxArm64Args, ".."], `${baseBuildPath}linuxArm64`);
+await runCmakeWithArgs([...commonConfigureOptions, ...windowsArgs, ".."], `${baseBuildPath}windows`);
 
 await prebuildify("--napi", "--target=linux-x64");
 await prebuildify("--napi", "--target=linux-arm64");
