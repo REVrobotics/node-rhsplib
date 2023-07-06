@@ -8,22 +8,23 @@ import { fileURLToPath } from "url";
 
 const scriptDirPath = path.dirname(fileURLToPath(import.meta.url));
 const rhsplibPath = path.join(scriptDirPath, "..", "RHSPlib");
-const buildPath = path.join(rhsplibPath, "build-windows");
-
-fs.mkdirSync(buildPath, { recursive: true });
 
 let configureOptions = [];
 let buildOptions = [];
 
-if(process.env.CI === "true") {
-    process.exit(0);
-}
+let hostSuffix = "";
 
 if (platform() === "win32") {
+    hostSuffix = "windows"
     buildOptions = ["--config", "Release"];
 } else if (platform() === "linux") {
+    hostSuffix = "linuxX64" //handle arm64 host later
     configureOptions = ["-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_C_COMPILER=clang", "-DCMAKE_CXX_COMPILER=clang++"];
 }
+
+const buildPath = path.join(rhsplibPath, `build-${hostSuffix}`);
+
+fs.mkdirSync(buildPath, { recursive: true });
 
 console.log("Configuring CMake\n");
 await runCmakeWithArgs([...configureOptions, ".."]);
