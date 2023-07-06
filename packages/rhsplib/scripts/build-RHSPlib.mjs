@@ -8,7 +8,7 @@ import { fileURLToPath } from "url";
 
 const scriptDirPath = path.dirname(fileURLToPath(import.meta.url));
 const rhsplibPath = path.join(scriptDirPath, "..", "RHSPlib");
-const buildPath = path.join(rhsplibPath, "build");
+const buildPath = path.join(rhsplibPath, "build-windows");
 
 fs.mkdirSync(buildPath, { recursive: true });
 

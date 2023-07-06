@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\RHSPlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\RHSPlib_device_control.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\RHSPlib_i2c.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\RHSPlib_dio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\RHSPlib_motor.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\RHSPlib_pwm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\RHSPlib_servo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\arch\win\RHSPlib_time.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\arch\win\RHSPlib_serial.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\RHSPlib_compiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\RHSPlib_device_control.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\RHSPlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\RHSPlib_i2c.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\RHSPlib_dio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\RHSPlib_motor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\RHSPlib_pwm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\RHSPlib_servo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\arch\includes\RHSPlib_serial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\arch\includes\RHSPlib_time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{AA91A8ED-9705-39C1-AE9D-6C6BA7285EE8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{6EF85C9A-E67C-3CFF-876A-6791C8983BFE}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

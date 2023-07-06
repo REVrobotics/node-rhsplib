@@ -1,0 +1,9 @@
+C:/Users/Cheeseburger/TypeScriptProjects/node-rhsplib/packages/rhsplib/RHSPlib/build-windows/RHSPlib.dir/Debug/RHSPlib.obj
+C:/Users/Cheeseburger/TypeScriptProjects/node-rhsplib/packages/rhsplib/RHSPlib/build-windows/RHSPlib.dir/Debug/RHSPlib_device_control.obj
+C:/Users/Cheeseburger/TypeScriptProjects/node-rhsplib/packages/rhsplib/RHSPlib/build-windows/RHSPlib.dir/Debug/RHSPlib_i2c.obj
+C:/Users/Cheeseburger/TypeScriptProjects/node-rhsplib/packages/rhsplib/RHSPlib/build-windows/RHSPlib.dir/Debug/RHSPlib_dio.obj
+C:/Users/Cheeseburger/TypeScriptProjects/node-rhsplib/packages/rhsplib/RHSPlib/build-windows/RHSPlib.dir/Debug/RHSPlib_motor.obj
+C:/Users/Cheeseburger/TypeScriptProjects/node-rhsplib/packages/rhsplib/RHSPlib/build-windows/RHSPlib.dir/Debug/RHSPlib_pwm.obj
+C:/Users/Cheeseburger/TypeScriptProjects/node-rhsplib/packages/rhsplib/RHSPlib/build-windows/RHSPlib.dir/Debug/RHSPlib_servo.obj
+C:/Users/Cheeseburger/TypeScriptProjects/node-rhsplib/packages/rhsplib/RHSPlib/build-windows/RHSPlib.dir/Debug/RHSPlib_time.obj
+C:/Users/Cheeseburger/TypeScriptProjects/node-rhsplib/packages/rhsplib/RHSPlib/build-windows/RHSPlib.dir/Debug/RHSPlib_serial.obj

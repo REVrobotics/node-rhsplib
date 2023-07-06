@@ -1,7 +1,6 @@
 import path from "node:path";
 import * as fs from "fs";
 import { spawn } from "child_process";
-import { platform } from "os";
 import { fileURLToPath } from "url";
 
 // This file should be kept in sync with the latest build instructions from the RHSPlib README file.
@@ -19,13 +18,15 @@ fs.mkdirSync(windowsBuildPath, { recursive: true });
 
 let commonConfigureOptions = ["-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_C_COMPILER=clang", "-DCMAKE_CXX_COMPILER=clang++"];
 
-let linuxArm64Args = [ "-DCMAKE_SYSTEM_NAME=Linux", "-DCMAKE_SYSTEM_PROCESSOR=aarch64" ]
-let linuxX64Args = [ "-DCMAKE_SYSTEM_NAME=Linux", "-DCMAKE_SYSTEM_PROCESSOR=x86_64" ]
-let windowsArgs = [ "-DCMAKE_SYSTEM_NAME=WINDOWS", "-DCMAKE_SYSTEM_PROCESSOR=x86_64" ]
+let linuxArm64Args = [ "-DCMAKE_SYSTEM_NAME=Linux", "-DCMAKE_SYSTEM_PROCESSOR=aarch64" ];
+let linuxX64Args = [ "-DCMAKE_SYSTEM_NAME=Linux", "-DCMAKE_SYSTEM_PROCESSOR=x86_64" ];
+let windowsArgs = [ "-DCMAKE_SYSTEM_NAME=Windows", "-DCMAKE_SYSTEM_PROCESSOR=x86_64" ];
 
 await runCmakeWithArgs([...commonConfigureOptions, ...linuxX64Args], "build-linuxX64");
 await runCmakeWithArgs([...commonConfigureOptions, ...linuxArm64Args], "build-linuxArm64");
 await runCmakeWithArgs([...commonConfigureOptions, ...windowsArgs], "build-windows");
+
+await prebuildify("linuxX64");
 
 async function runCmakeWithArgs(args, cwd) {
   const cmake = spawn("cmake", args, {
@@ -45,4 +46,8 @@ async function runCmakeWithArgs(args, cwd) {
       }
     });
   });
+}
+
+async function prebuildify(target) {
+
 }

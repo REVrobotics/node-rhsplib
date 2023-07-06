@@ -1,0 +1,10 @@
+^C:\USERS\CHEESEBURGER\TYPESCRIPTPROJECTS\NODE-RHSPLIB\PACKAGES\RHSPLIB\RHSPLIB\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Cheeseburger/TypeScriptProjects/node-rhsplib/packages/rhsplib/RHSPlib -BC:/Users/Cheeseburger/TypeScriptProjects/node-rhsplib/packages/rhsplib/RHSPlib/build-windows --check-stamp-file C:/Users/Cheeseburger/TypeScriptProjects/node-rhsplib/packages/rhsplib/RHSPlib/build-windows/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

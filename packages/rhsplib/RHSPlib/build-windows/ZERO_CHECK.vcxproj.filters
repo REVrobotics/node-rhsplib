@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Cheeseburger\TypeScriptProjects\node-rhsplib\packages\rhsplib\RHSPlib\build-windows\CMakeFiles\018fa822070db5bd0450197692b34186\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{32F3505A-910D-384C-B136-B14D5D18EAA3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
