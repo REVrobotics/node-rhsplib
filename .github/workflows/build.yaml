@@ -1,0 +1,43 @@
+name: Build
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Set up MinGW
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: lerna run build
+
+      - name: Make prebuilds
+        run: lerna run makePrebuildsOnLinux
+
+      - name: Create Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: MyArtifacts
+          path: |
+            ./packages/rhsplib/prebuilds
