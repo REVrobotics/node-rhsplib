@@ -43,7 +43,7 @@
          }
         ],
         [
-          'OS=="linux" and target_arch=="x64"'', {
+          'OS=="linux" and target_arch=="x64"', {
             'link_settings': {
               'libraries': [
                   '-L<(module_root_dir)/RHSPlib/build-linuxX64/',
@@ -64,7 +64,7 @@
           }
         ],
         [
-          'OS=="linux" and target_arch=="arm64"'', {
+          'OS=="linux" and target_arch=="arm64"', {
             'link_settings': {
               'libraries': [
                   '-L<(module_root_dir)/RHSPlib/build-linuxArm64/',
