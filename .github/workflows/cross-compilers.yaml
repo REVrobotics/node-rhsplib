@@ -1,0 +1,17 @@
+name: Cross Compile
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  cross-compile:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check available cross-compilers
+        run: dpkg --list | grep cross-build
