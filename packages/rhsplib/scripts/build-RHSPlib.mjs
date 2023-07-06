@@ -15,6 +15,10 @@ fs.mkdirSync(buildPath, { recursive: true });
 let configureOptions = [];
 let buildOptions = [];
 
+if(process.env.CI === "true") {
+    process.exit(0);
+}
+
 if (platform() === "win32") {
     buildOptions = ["--config", "Release"];
 } else if (platform() === "linux") {
