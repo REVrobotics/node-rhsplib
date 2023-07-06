@@ -32,6 +32,21 @@ console.log("Building Windows");
 await runCmakeWithArgs([...windowsArgs, ".."], `${baseBuildPath}windows`);
 console.log("Build RHSPlib");
 
+console.log("LinuxX64");
+fs.readdirSync(`${baseBuildPath}linuxX64`).forEach(file => {
+  console.log(file);
+});
+
+console.log("LinuxArm64");
+fs.readdirSync(`${baseBuildPath}linuxArm64`).forEach(file => {
+  console.log(file);
+});
+
+console.log("Windows");
+fs.readdirSync(`${baseBuildPath}windows`).forEach(file => {
+  console.log(file);
+});
+
 console.log("Prebuilding Linux X64");
 await prebuildify(["--napi", "--platform=linux", "--arch=x86_64"], `${baseBuildPath}linuxX64`);
 console.log("Prebuilding Linux Arm64");
