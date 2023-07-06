@@ -24,8 +24,5 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: remove timestamp file confused for TypeScript file
-        run: rm packages/rhsplib/RHSPlib/build/CMakeFiles/RHSPlib.dir/compiler_depend.ts
-
       - name: Build project
         run: lerna run build
