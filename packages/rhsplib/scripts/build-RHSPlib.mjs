@@ -18,7 +18,7 @@ let buildOptions = [];
 if (platform() === "win32") {
     buildOptions = ["--config", "Release"];
 } else if (platform() === "linux") {
-    configureOptions = ["-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_C_COMPILER=gcc"];
+    configureOptions = ["-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_C_COMPILER=clang", "-DCMAKE_CXX_COMPILER=clang++"];
 }
 
 console.log("Configuring CMake\n");
