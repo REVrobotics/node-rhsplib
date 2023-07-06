@@ -1,6 +1,7 @@
 name: Cross Compile
 
 on:
+  push:
   workflow_dispatch:
 
 jobs:
