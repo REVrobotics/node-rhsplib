@@ -35,9 +35,6 @@ jobs:
       - name: Make prebuilds
         run: lerna run makePrebuildsOnLinux
 
-      - name: prebuildify
-        run: lerna run prepublishOnly
-
       - name: Create Artifacts
         uses: actions/upload-artifact@v2
         with:
