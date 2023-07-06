@@ -26,3 +26,6 @@ jobs:
 
       - name: Build project
         run: lerna run build
+
+      - name: prebuildify
+        run: lerna run prepublishOnly
