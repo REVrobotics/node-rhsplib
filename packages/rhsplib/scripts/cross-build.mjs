@@ -60,9 +60,7 @@ async function runCmakeWithArgs(args, cwd) {
 }
 
 async function prebuildify(args) {
-  const prebuildify = spawn(`prebuildify`, args, {
-    cwd: cwd,
-  });
+  const prebuildify = spawn(`prebuildify`, args);
   prebuildify.stderr.pipe(process.stderr);
   prebuildify.stdout.pipe(process.stdout);
 }
