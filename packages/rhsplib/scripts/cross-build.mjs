@@ -33,11 +33,11 @@ await runCmakeWithArgs([...windowsArgs, ".."], `${baseBuildPath}windows`);
 console.log("Build RHSPlib");
 
 console.log("Prebuilding Linux X64");
-await prebuildify("--napi", "--target=linux-x64");
+await prebuildify(["--napi", "--target=linux-x64"]);
 console.log("Prebuilding Linux Arm64");
-await prebuildify("--napi", "--target=linux-arm64");
+await prebuildify(["--napi", "--target=linux-arm64"]);
 console.log("Prebuilding Windows");
-await prebuildify("--napi", "--target=win-x64");
+await prebuildify(["--napi", "--target=win-x64"]);
 
 async function runCmakeWithArgs(args, cwd) {
   const cmake = spawn("cmake", args, {
