@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.7)
 
+set(CMAKE_SYSTEM_NAME Generic)
+
 message(STATUS "requested c-compiler:'${CMAKE_C_COMPILER}'")
+project(RHSPlib VERSION 1.0 LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -9,8 +12,6 @@ set(CMAKE_C_EXTENSIONS ON)
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
-
-project(RHSPlib VERSION 1.0 LANGUAGES C)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING
