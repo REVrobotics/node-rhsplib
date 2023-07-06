@@ -26,26 +26,33 @@ let baseBuildPath = path.join(rhsplibPath, "build-");
 
 console.log("Building Linux X64");
 await runCmakeWithArgs([...commonConfigureOptions, ...linuxX64Args, ".."], `${baseBuildPath}linuxX64`);
+await runCmakeWithArgs(["--build", "."], `${baseBuildPath}linuxX64`);
 console.log("Building Linux Arm64");
 await runCmakeWithArgs([...commonConfigureOptions, ...linuxArm64Args, ".."], `${baseBuildPath}linuxArm64`);
+await runCmakeWithArgs(["--build", "."], `${baseBuildPath}linuxArm64`);
 console.log("Building Windows");
 await runCmakeWithArgs([...windowsArgs, ".."], `${baseBuildPath}windows`);
+await runCmakeWithArgs(["--build", "."], `${baseBuildPath}windows`);
 console.log("Build RHSPlib");
+console.log();
 
 console.log("LinuxX64");
 fs.readdirSync(`${baseBuildPath}linuxX64`).forEach(file => {
   console.log(file);
 });
+console.log();
 
 console.log("LinuxArm64");
 fs.readdirSync(`${baseBuildPath}linuxArm64`).forEach(file => {
   console.log(file);
 });
+console.log();
 
 console.log("Windows");
 fs.readdirSync(`${baseBuildPath}windows`).forEach(file => {
   console.log(file);
 });
+console.log();
 
 console.log("Prebuilding Linux X64");
 await prebuildify(["--napi", "--platform=linux", "--arch=x86_64"], `${baseBuildPath}linuxX64`);
