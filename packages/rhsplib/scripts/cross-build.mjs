@@ -24,12 +24,19 @@ let windowsArgs = [ "-DCMAKE_SYSTEM_NAME=Windows", "-DCMAKE_SYSTEM_PROCESSOR=x86
 
 let baseBuildPath = path.join(rhsplibPath, "build-");
 
+console.log("Building Linux X64");
 await runCmakeWithArgs([...commonConfigureOptions, ...linuxX64Args, ".."], `${baseBuildPath}linuxX64`);
+console.log("Building Linux Arm64");
 await runCmakeWithArgs([...commonConfigureOptions, ...linuxArm64Args, ".."], `${baseBuildPath}linuxArm64`);
+console.log("Building Windows");
 await runCmakeWithArgs([...commonConfigureOptions, ...windowsArgs, ".."], `${baseBuildPath}windows`);
+console.log("Build RHSPlib");
 
+console.log("Prebuilding Linux X64");
 await prebuildify("--napi", "--target=linux-x64");
+console.log("Prebuilding Linux Arm64");
 await prebuildify("--napi", "--target=linux-arm64");
+console.log("Prebuilding Windows");
 await prebuildify("--napi", "--target=win-x64");
 
 async function runCmakeWithArgs(args, cwd) {
