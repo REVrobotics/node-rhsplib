@@ -1,3 +1,0 @@
-C:/Users/Cheeseburger/TypeScriptProjects/node-rhsplib/packages/rhsplib/RHSPlib/build-windows/CMakeFiles/RHSPlib.dir
-C:/Users/Cheeseburger/TypeScriptProjects/node-rhsplib/packages/rhsplib/RHSPlib/build-windows/CMakeFiles/ALL_BUILD.dir
-C:/Users/Cheeseburger/TypeScriptProjects/node-rhsplib/packages/rhsplib/RHSPlib/build-windows/CMakeFiles/ZERO_CHECK.dir
