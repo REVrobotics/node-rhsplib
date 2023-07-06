@@ -33,11 +33,11 @@ await runCmakeWithArgs([...windowsArgs, ".."], `${baseBuildPath}windows`);
 console.log("Build RHSPlib");
 
 console.log("Prebuilding Linux X64");
-await prebuildify(["--napi", "--platform=linux", "--arch=x86_64"]);
+await prebuildify(["--napi", "--platform=linux", "--arch=x86_64"], `${baseBuildPath}linuxX64`);
 console.log("Prebuilding Linux Arm64");
-await prebuildify(["--napi", "--platform=linux", "--arch=arm64"]);
+await prebuildify(["--napi", "--platform=linux", "--arch=arm64"], `${baseBuildPath}linuxArm64`);
 console.log("Prebuilding Windows");
-await prebuildify(["--napi", "--platform=win32", "--arch=x64"]);
+await prebuildify(["--napi", "--platform=win32", "--arch=x64"], `${baseBuildPath}windows`);
 
 async function runCmakeWithArgs(args, cwd) {
   const cmake = spawn("cmake", args, {
@@ -59,8 +59,10 @@ async function runCmakeWithArgs(args, cwd) {
   });
 }
 
-async function prebuildify(args) {
-  const prebuildify = spawn(`prebuildify`, args);
+async function prebuildify(args, cwd) {
+  const prebuildify = spawn(`prebuildify`, args, {
+    cwd: cwd,
+  });
   prebuildify.stderr.pipe(process.stderr);
   prebuildify.stdout.pipe(process.stdout);
 
