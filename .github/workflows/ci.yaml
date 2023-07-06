@@ -32,6 +32,9 @@ jobs:
       - name: Build project
         run: lerna run build
 
+      - name: List build folders
+        run: ls packages/rhsplib/RHSPlib
+
       - name: Make prebuilds
         run: lerna run makePrebuildsOnLinux
 
