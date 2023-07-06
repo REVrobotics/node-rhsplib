@@ -25,7 +25,9 @@
     "scripts": {
         "build": "tsc",
         "install": "node-gyp-build \"node scripts/build-RHSPlib.mjs\"",
-        "prepublishOnly": "prebuildify --napi && tsc"
+        "makePrebuildsOnLinux": "node scripts/cross-build.mjs",
+        "prepublishOnly": "prebuildify --napi && tsc",
+        "cross-build": "node-gyp-build \"node scripts/cross-build-RHSPlib.mjs\""
     },
     "gypfile": true
 }

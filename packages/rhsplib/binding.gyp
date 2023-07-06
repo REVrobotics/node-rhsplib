@@ -24,7 +24,7 @@
         [
           'OS=="win"', {
             'libraries': [
-              '<(module_root_dir)/RHSPlib/build/Release/RHSPlib.lib',
+              '<(module_root_dir)/RHSPlib/build-windows/Release/RHSPlib.lib',
             ],
             'copies':[
               {
@@ -43,21 +43,42 @@
          }
         ],
         [
-          'OS=="linux"', {
+          'OS=="linux" and target_arch=="x64"', {
             'link_settings': {
               'libraries': [
-                  '-L<(module_root_dir)/RHSPlib/build/',
+                  '-L<(module_root_dir)/RHSPlib/build-linuxX64/',
                   '-lRHSPlib'
               ],
               'ldflags': [
-                '-Wl,-rpath,<(module_root_dir)/RHSPlib/build/',
+                '-Wl,-rpath,<(module_root_dir)/RHSPlib/build-linuxX64/',
               ]
             },
             'copies':[
               {
                 'destination': '<(PRODUCT_DIR)',
                 'files':[
-                  '<(module_root_dir)/RHSPlib/build/libRHSPlib.so',
+                  '<(module_root_dir)/RHSPlib/build-linuxX64/libRHSPlib.so',
+                ],
+              }
+            ],
+          }
+        ],
+        [
+          'OS=="linux" and target_arch=="arm64"', {
+            'link_settings': {
+              'libraries': [
+                  '-L<(module_root_dir)/RHSPlib/build-linuxArm64/',
+                  '-lRHSPlib'
+              ],
+              'ldflags': [
+                '-Wl,-rpath,<(module_root_dir)/RHSPlib/build-linuxArm64/',
+              ]
+            },
+            'copies':[
+              {
+                'destination': '<(PRODUCT_DIR)',
+                'files':[
+                  '<(module_root_dir)/RHSPlib/build-linuxArm64/libRHSPlib.so',
                 ],
               }
             ],
