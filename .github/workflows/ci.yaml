@@ -24,5 +24,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: debug print
+        run: ls packages/rhsplib && ls packages/rhsplib/prebuilds && cat packages/rhsplib/RHSPlib/build/CMakeFiles/RHSPlib.dir/compiler_depend.ts
+
       - name: Build project
         run: lerna run build
