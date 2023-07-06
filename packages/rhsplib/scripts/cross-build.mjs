@@ -20,7 +20,7 @@ let commonConfigureOptions = ["-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_C_COMPILER=
 
 let linuxArm64Args = [ "-DCMAKE_SYSTEM_NAME=Linux", "-DCMAKE_SYSTEM_PROCESSOR=aarch64" ];
 let linuxX64Args = [ "-DCMAKE_SYSTEM_NAME=Linux", "-DCMAKE_SYSTEM_PROCESSOR=x86_64" ];
-let windowsArgs = [ "-DCMAKE_SYSTEM_NAME=Windows", "-DCMAKE_SYSTEM_PROCESSOR=x86_64" ];
+let windowsArgs = [ "-DCMAKE_SYSTEM_NAME=Generic", "-DCMAKE_SYSTEM_PROCESSOR=x86_64" ];
 
 let baseBuildPath = path.join(rhsplibPath, "build-");
 
