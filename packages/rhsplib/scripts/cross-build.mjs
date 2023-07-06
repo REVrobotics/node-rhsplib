@@ -16,15 +16,15 @@ fs.mkdirSync(linuxX64BuildPath, { recursive: true });
 fs.mkdirSync(linuxArm64BuildPath, { recursive: true });
 fs.mkdirSync(windowsBuildPath, { recursive: true });
 
-let commonConfigureOptions = ["-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_C_COMPILER=clang", "-DCMAKE_CXX_COMPILER=clang++"];
+let commonConfigureOptions = ["-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_C_COMPILER=clang", "-DCMAKE_CXX_COMPILER=clang++" ];
 
 let linuxArm64Args = [ "-DCMAKE_SYSTEM_NAME=Linux", "-DCMAKE_SYSTEM_PROCESSOR=aarch64" ];
 let linuxX64Args = [ "-DCMAKE_SYSTEM_NAME=Linux", "-DCMAKE_SYSTEM_PROCESSOR=x86_64" ];
 let windowsArgs = [ "-DCMAKE_SYSTEM_NAME=Windows", "-DCMAKE_SYSTEM_PROCESSOR=x86_64" ];
 
-await runCmakeWithArgs([...commonConfigureOptions, ...linuxX64Args], "build-linuxX64");
-await runCmakeWithArgs([...commonConfigureOptions, ...linuxArm64Args], "build-linuxArm64");
-await runCmakeWithArgs([...commonConfigureOptions, ...windowsArgs], "build-windows");
+await runCmakeWithArgs([...commonConfigureOptions, ...linuxX64Args, ".."], "build-linuxX64");
+await runCmakeWithArgs([...commonConfigureOptions, ...linuxArm64Args, ".."], "build-linuxArm64");
+await runCmakeWithArgs([...commonConfigureOptions, ...windowsArgs, ".."], "build-windows");
 
 await prebuildify("--napi", "--target=linux-x64");
 await prebuildify("--napi", "--target=linux-arm64");
