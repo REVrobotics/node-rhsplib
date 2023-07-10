@@ -24,12 +24,15 @@ const darwinArm64Options = ["-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_C_COMPILER=cl
 
 let baseBuildPath = path.join(rhsplibPath, "build-");
 
+console.log("Building Darwin X64")
 await runCmakeWithArgs([...darwinX64Options, ".."], `${baseBuildPath}darwinX64`);
 await runCmakeWithArgs(["--build", "."], `${baseBuildPath}darwinX64`);
 
+console.log("Building Darwin Arm64")
 await runCmakeWithArgs([...darwinArm64Options, ".."], `${baseBuildPath}darwinArm64`);
 await runCmakeWithArgs(["--build", "."], `${baseBuildPath}darwinArm64`);
 
+console.log("Prebuildifying")
 await prebuildify(["--napi", "--platform=darwin", "--arch=x86_64"]);
 await prebuildify(["--napi", "--platform=darwin", "--arch=arm64"]);
 
