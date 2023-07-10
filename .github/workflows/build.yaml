@@ -8,9 +8,16 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
 
+    env:
+      V: 1
+
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            mingw: true
+            linux: true
 
     steps:
       - name: Checkout repository
@@ -22,12 +29,16 @@ jobs:
           node-version: '16'
 
       - name: Set up MinGW
+        if: ${{ matrix.mingw }}
         uses: egor-tensin/setup-mingw@v2
         with:
           platform: x64
 
       - name: Install dependencies
         run: npm install
+
+      - name: Install lerna
+        run: npm install -g lerna
 
       - name: Build project
         run: lerna run build

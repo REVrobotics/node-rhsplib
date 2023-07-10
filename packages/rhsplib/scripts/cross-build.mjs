@@ -3,6 +3,11 @@ import * as fs from "fs";
 import { spawn } from "child_process";
 import { fileURLToPath } from "url";
 
+if(process.platform !== "linux") {
+  console.log("Skipping cross build. This is not Linux");
+  process.exit(0);
+}
+
 // This file should be kept in sync with the latest build instructions from the RHSPlib README file.
 
 const scriptDirPath = path.dirname(fileURLToPath(import.meta.url));

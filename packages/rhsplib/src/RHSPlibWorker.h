@@ -6,6 +6,7 @@
 
 #include <map>
 #include <mutex>
+#include <thread>
 
 /* Macros for writing lambda functions */
 
@@ -147,9 +148,9 @@ class RHSPlibWorker : public Napi::AsyncWorker, public RHSPlibWorkerBase {
   void OnError(const Napi::Error &e) override { deferred.Reject(e.Value()); }
 
  private:
+  Napi::Promise::Deferred deferred;
   std::function<void(int &, TReturn &, uint8_t &)> workFunction;
   std::function<Napi::Value(Napi::Env, int &, TReturn &)> callbackFunction;
-  Napi::Promise::Deferred deferred;
   TReturn returnData;
   int resultCode;
   uint8_t nackCode;
@@ -222,8 +223,8 @@ class RHSPlibWorker<void> : public Napi::AsyncWorker, public RHSPlibWorkerBase {
   void OnError(const Napi::Error &e) override { deferred.Reject(e.Value()); }
 
  private:
-  std::function<void(int &, uint8_t &)> workFunction;
   Napi::Promise::Deferred deferred;
+  std::function<void(int &, uint8_t &)> workFunction;
   int resultCode;
   uint8_t nackCode;
 };

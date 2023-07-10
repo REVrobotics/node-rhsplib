@@ -15,7 +15,9 @@
         "<!@(node -p \"require('node-addon-api').include\")"
       ],
       'defines': [
-        'NAPI_VERSION=<(napi_build_version)'
+        'NAPI_VERSION=<(napi_build_version)',
+        'NAPI_DISABLE_CPP_EXCEPTIONS',
+        'CMAKE_C_STANDARD=c++17'
       ],
       'dependencies': [
         "<!(node -p \"require('node-addon-api').gyp\")"
@@ -83,7 +85,35 @@
               }
             ],
           }
-        ]
+        ],
+        [
+          'OS=="mac" and target_arch=="x64"', {
+            'cflags+': ['-fvisibility=hidden', "-std=c++17"],
+            'xcode_settings': {
+                'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES', # -fvisibility=hidden
+                'CLANG_CXX_LANGUAGE_STANDARD': 'c++17',
+                'CLANG_CXX_LIBRARY': 'libc++',
+                'MACOSX_DEPLOYMENT_TARGET': '10.15'
+            },
+            'link_settings': {
+              'libraries': [
+                  '-L<(module_root_dir)/RHSPlib/build-darwinX64/',
+                  '-lRHSPlib'
+              ],
+              'ldflags': [
+                '-Wl,-rpath,<(module_root_dir)/RHSPlib/build-darwinX64/',
+              ]
+            },
+            'copies':[
+              {
+                'destination': '<(PRODUCT_DIR)',
+                'files':[
+                  '<(module_root_dir)/RHSPlib/build-darwinX64/libRHSPlib.dylib',
+                ],
+              }
+            ],
+          }
+        ],
       ],
       'msvs_settings': {
         'VCCLCompilerTool': {
