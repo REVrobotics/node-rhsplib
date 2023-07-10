@@ -18,6 +18,8 @@ jobs:
           - os: ubuntu-latest
             mingw: true
             linux: true
+          - os: macos-latest
+            darwin: true
 
     steps:
       - name: Checkout repository
@@ -44,7 +46,12 @@ jobs:
         run: lerna run build
 
       - name: Make prebuilds
+        if: ${{ matrix.linux }}
         run: lerna run makePrebuildsOnLinux
+
+      - name: Make prebuilds
+        if: ${{ matrix.darwin }}
+        run: lerna run makePrebuildsOnDarwin
 
       - name: Create Artifacts
         uses: actions/upload-artifact@v2

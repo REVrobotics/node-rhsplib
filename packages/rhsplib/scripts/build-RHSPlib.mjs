@@ -36,29 +36,6 @@ await runCmakeWithArgs(["--build", ".", ...buildOptions]);
 
 console.log("\nSuccessfully built RHSPlib");
 
-if(platform() === "darwin") {
-    await prebuildify(["--napi", "--platform=darwin", "--arch=x64"], buildPath);
-}
-
-async function prebuildify(args, cwd) {
-    const prebuildify = spawn(`prebuildify`, args);
-    prebuildify.stderr.pipe(process.stderr);
-    prebuildify.stdout.pipe(process.stdout);
-
-    await new Promise((resolve, reject) => {
-        prebuildify.on("error", (e) => reject(e));
-        prebuildify.on("exit", (code, signal) => {
-            if (signal != null) {
-                reject(new Error(`CMake execution was terminated by signal ${signal}`));
-            } else if (code === 0) {
-                resolve();
-            } else {
-                reject(`CMake exited with code ${code}`);
-            }
-        });
-    });
-}
-
 async function runCmakeWithArgs(args) {
     const cmake = spawn("cmake", args, {
         cwd: buildPath,
