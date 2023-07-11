@@ -582,134 +582,134 @@ int RHSPlib_motor_setClosedLoopControlCoefficients(RHSPlib_Module_T *obj,
                                                 uint8_t motorChannel,
                                                 uint8_t mode, closed_loop_control_parameters *parameters, uint8_t *nackReasonCode)
 {
-  uint16_t packetID;
+    uint16_t packetID;
 
-  RHSPLIB_ASSERT(obj);
+    RHSPLIB_ASSERT(obj);
 
-  if (!obj)
+    if (!obj)
     {
-    return RHSPLIB_ERROR;
-  }
-  if (motorChannel >= RHSPLIB_MAX_NUMBER_OF_MOTOR_CHANNELS)
+        return RHSPLIB_ERROR;
+    }
+    if (motorChannel >= RHSPLIB_MAX_NUMBER_OF_MOTOR_CHANNELS)
 	{
-    return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-  }
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     else if (mode != 1 && mode != 2)
     {
-    return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
-  }
+        return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
+    }
 
-  int functionNumber = (parameters->type == LEGACY_PID_TAG) ? 23: 51;
-  int result = RHSPlib_getInterfacePacketID(obj, "DEKA", functionNumber, &packetID, nackReasonCode);
-  if (result < 0)
+    int functionNumber = (parameters->type == LEGACY_PID_TAG) ? 23: 51;
+    int result = RHSPlib_getInterfacePacketID(obj, "DEKA", functionNumber, &packetID, nackReasonCode);
+    if (result < 0)
     {
-    return result;
-  }
+        return result;
+    }
 
-  uint8_t cmdPayload[19];
+    uint8_t cmdPayload[19];
 
-  RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 0, motorChannel);
-  RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 1, mode);
+    RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 0, motorChannel);
+    RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 1, mode);
 
-  if (parameters->type == LEGACY_PID_TAG)
+    if (parameters->type == LEGACY_PID_TAG)
     {
-    int32_t p = (int)round(parameters->pid.p*65536.0);
-    int32_t i = (int)round(parameters->pid.i*65536.0);
-    int32_t d = (int)round(parameters->pid.d*65536.0);
+        int32_t p = (int)round(parameters->pid.p*65536.0);
+        int32_t i = (int)round(parameters->pid.i*65536.0);
+        int32_t d = (int)round(parameters->pid.d*65536.0);
 
-    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 2, p);
-    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 6, i);
-    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 10, d);
-  } else if(parameters->type == PIDF_TAG)
+        RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 2, p);
+        RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 6, i);
+        RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 10, d);
+    } else if(parameters->type == PIDF_TAG)
     {
-    int32_t p = (int)round(parameters->pidf.p*65536.0);
-    int32_t i = (int)round(parameters->pidf.i*65536.0);
-    int32_t d = (int)round(parameters->pidf.d*65536.0);
-    int32_t f = (int)round(parameters->pidf.f*65536.0);
+        int32_t p = (int)round(parameters->pidf.p*65536.0);
+        int32_t i = (int)round(parameters->pidf.i*65536.0);
+        int32_t d = (int)round(parameters->pidf.d*65536.0);
+        int32_t f = (int)round(parameters->pidf.f*65536.0);
 
-    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 2, p);
-    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 6, i);
-    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 10, d);
-    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 14, f);
-    RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 18, 1); //1 is PIDF
-  }
+        RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 2, p);
+        RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 6, i);
+        RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 10, d);
+        RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 14, f);
+        RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 18, 1); //1 is PIDF
+    }
 
-  return RHSPlib_sendWriteCommandInternal(obj, packetID, cmdPayload, sizeof(cmdPayload), nackReasonCode);
+    return RHSPlib_sendWriteCommandInternal(obj, packetID, cmdPayload, sizeof(cmdPayload), nackReasonCode);
 }
 
 int RHSPlib_motor_getClosedLoopControlCoefficients(RHSPlib_Module_T *obj,
                                                 uint8_t motorChannel,
                                                 uint8_t mode, closed_loop_control_parameters *parameters, uint8_t *nackReasonCode)
 {
-  uint16_t packetID;
+    uint16_t packetID;
 
-  RHSPLIB_ASSERT(obj);
+    RHSPLIB_ASSERT(obj);
 
-  if (!obj)
+    if (!obj)
     {
-    return RHSPLIB_ERROR;
-  }
-  if (motorChannel >= RHSPLIB_MAX_NUMBER_OF_MOTOR_CHANNELS)
+        return RHSPLIB_ERROR;
+    }
+    if (motorChannel >= RHSPLIB_MAX_NUMBER_OF_MOTOR_CHANNELS)
 	{
-    return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-  }
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     else if (mode != 1 && mode != 2)
     {
-    return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
-  }
+        return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
+    }
 
-  int supportsPidf = 1;
-  int result = RHSPlib_getInterfacePacketID(obj, "DEKA", 53, &packetID, nackReasonCode);
-  if(result < 0)
+    int supportsPidf = 1;
+    int result = RHSPlib_getInterfacePacketID(obj, "DEKA", 53, &packetID, nackReasonCode);
+    if(result < 0)
     {
-    supportsPidf = 0;
-    result = RHSPlib_getInterfacePacketID(obj, "DEKA", 24, &packetID, nackReasonCode);
+        supportsPidf = 0;
+        result = RHSPlib_getInterfacePacketID(obj, "DEKA", 24, &packetID, nackReasonCode);
+        if (result < 0)
+        {
+        return result;
+        }
+    }
+
+    uint8_t cmdPayload[2] = {motorChannel, mode};
+
+    result = RHSPlib_sendReadCommandInternal(obj, packetID, cmdPayload, sizeof(cmdPayload), nackReasonCode);
     if (result < 0)
     {
-      return result;
-    }
-  }
-
-  uint8_t cmdPayload[2] = {motorChannel, mode};
-
-  result = RHSPlib_sendReadCommandInternal(obj, packetID, cmdPayload, sizeof(cmdPayload), nackReasonCode);
-  if (result < 0)
-    {
-    return result;
-  }
-
-  const uint8_t *rspPayload = RHSPLIB_PACKET_PAYLOAD_PTR(obj->rxBuffer);
-
-  if(parameters) {
-    int32_t p = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 0);
-    int32_t i = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 4);
-    int32_t d = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 8);
-
-    int usingPidf = supportsPidf;
-
-    if(supportsPidf) {
-      uint8_t mode = RHSPLIB_ARRAY_BYTE(uint8_t, rspPayload, 16);
-
-      // we support PIDF, but we're currently using the legacy PID.
-      if(mode == 0) {
-        usingPidf = 0;
-      }
+        return result;
     }
 
-    if(usingPidf) {
-      int32_t f = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 12);
-      parameters->type = PIDF_TAG;
-      parameters->pidf.p = p/65536.0;
-      parameters->pidf.i = i/65536.0;
-      parameters->pidf.d = d/65536.0;
-      parameters->pidf.f = f/65536.0;
-    } else {
-      parameters->type = LEGACY_PID_TAG;
-      parameters->pid.p = p/65536.0;
-      parameters->pid.i = i/65536.0;
-      parameters->pid.d = d/65536.0;
-    }
-  }
+    const uint8_t *rspPayload = RHSPLIB_PACKET_PAYLOAD_PTR(obj->rxBuffer);
 
-  return RHSPLIB_RESULT_OK;
+    if(parameters) {
+        int32_t p = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 0);
+        int32_t i = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 4);
+        int32_t d = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 8);
+
+        int usingPidf = supportsPidf;
+
+        if(supportsPidf) {
+            uint8_t mode = RHSPLIB_ARRAY_BYTE(uint8_t, rspPayload, 16);
+
+            // we support PIDF, but we're currently using the legacy PID.
+            if(mode == 0) {
+                usingPidf = 0;
+            }
+        }
+
+        if(usingPidf) {
+            int32_t f = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 12);
+            parameters->type = PIDF_TAG;
+            parameters->pidf.p = p/65536.0;
+            parameters->pidf.i = i/65536.0;
+            parameters->pidf.d = d/65536.0;
+            parameters->pidf.f = f/65536.0;
+        } else {
+            parameters->type = LEGACY_PID_TAG;
+            parameters->pid.p = p/65536.0;
+            parameters->pid.i = i/65536.0;
+            parameters->pid.d = d/65536.0;
+        }
+    }
+
+    return RHSPLIB_RESULT_OK;
 }
