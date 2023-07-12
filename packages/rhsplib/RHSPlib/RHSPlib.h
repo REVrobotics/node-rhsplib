@@ -119,16 +119,16 @@ typedef enum
 // Packet payload data
 typedef struct
 {
-  uint8_t data[RHSPLIB_MAX_PAYLOAD_SIZE];
-  uint16_t size;
+    uint8_t data[RHSPLIB_MAX_PAYLOAD_SIZE];
+    uint16_t size;
 } RHSPlib_PayloadData_T;
 
 // Query interface command data
 typedef struct
 {
-  char name[RHSPLIB_QUERY_INTERFACE_NAME_SIZE]; // interface name string, zero-terminated, UTF-8 encoded
-  uint16_t firstPacketID;                        // packet ID for first function in queried interface
-  uint16_t numberIDValues;                       // number of ID values allocated to the interface
+    char name[RHSPLIB_QUERY_INTERFACE_NAME_SIZE]; // interface name string, zero-terminated, UTF-8 encoded
+    uint16_t firstPacketID;                        // packet ID for first function in queried interface
+    uint16_t numberIDValues;                       // number of ID values allocated to the interface
 } RHSPlib_Module_Interface_T;
 
 // Module interface list queried by command queryInterface
@@ -277,8 +277,8 @@ uint32_t RHSPlib_responseTimeoutMs(const RHSPlib_Module_T *obj);
  *
  * */
 int RHSPlib_sendWriteCommandInternal(RHSPlib_Module_T *obj, uint16_t packetTypeID,
-                                      const uint8_t *payload, uint16_t payloadSize,
-                                      uint8_t *nackReasonCode);
+                                     const uint8_t *payload, uint16_t payloadSize,
+                                     uint8_t *nackReasonCode);
 
 /**
  * @brief   send write command
@@ -296,8 +296,8 @@ int RHSPlib_sendWriteCommandInternal(RHSPlib_Module_T *obj, uint16_t packetTypeI
  *
  * */
 int RHSPlib_sendWriteCommand(RHSPlib_Module_T *obj, uint16_t packetTypeID,
-                              const uint8_t *payload, uint16_t payloadSize,
-                              RHSPlib_PayloadData_T *responsePayloadData, uint8_t *nackReasonCode);
+                             const uint8_t *payload, uint16_t payloadSize,
+                             RHSPlib_PayloadData_T *responsePayloadData, uint8_t *nackReasonCode);
 
 /**
  * @brief send read command
@@ -314,7 +314,7 @@ int RHSPlib_sendWriteCommand(RHSPlib_Module_T *obj, uint16_t packetTypeID,
  * @note this function is for internal usage
  * */
 int RHSPlib_sendReadCommandInternal(RHSPlib_Module_T *obj, uint16_t packetTypeID,
-                                     const uint8_t *payload, uint16_t payloadSize, uint8_t *nackReasonCode);
+                                    const uint8_t *payload, uint16_t payloadSize, uint8_t *nackReasonCode);
 
 /**
  * @brief send read command
@@ -345,7 +345,7 @@ int RHSPlib_sendReadCommand(RHSPlib_Module_T *obj, uint16_t packetTypeID,
  *
  * */
 int RHSPlib_getModuleStatus(RHSPlib_Module_T *obj, uint8_t clearStatusAfterResponse,
-                             RHSPlib_ModuleStatus_T *status, uint8_t *nackReasonCode);
+                            RHSPlib_ModuleStatus_T *status, uint8_t *nackReasonCode);
 
 /**
  * @brief send keep alive
@@ -381,7 +381,7 @@ int RHSPlib_sendFailSafe(RHSPlib_Module_T *obj, uint8_t *nackReasonCode);
  *
  * */
 int RHSPlib_setNewModuleAddress(RHSPlib_Module_T *obj, uint8_t newModuleAddress,
-                                 uint8_t *nackReasonCode);
+                                uint8_t *nackReasonCode);
 
 /**
  * @brief query interface
@@ -395,7 +395,7 @@ int RHSPlib_setNewModuleAddress(RHSPlib_Module_T *obj, uint8_t newModuleAddress,
  *
  * */
 int RHSPlib_queryInterface(RHSPlib_Module_T *obj, const char *interfaceName, RHSPlib_Module_Interface_T *interfaceList,
-                            uint8_t *nackReasonCode);
+                           uint8_t *nackReasonCode);
 
 
 /**
@@ -462,7 +462,7 @@ int RHSPlib_getModuleLEDPattern(RHSPlib_Module_T *obj, RHSPlib_LEDPattern_T *led
  *
  * */
 int RHSPlib_setDebugLogLevel(RHSPlib_Module_T *obj, RHSPlib_DebugGroupNumber_T debugGroupNumber,
-                                               RHSPlib_VerbosityLevel_T verbosityLevel, uint8_t *nackReasonCode);
+                             RHSPlib_VerbosityLevel_T verbosityLevel, uint8_t *nackReasonCode);
 
 /**
  * @brief discovery
@@ -493,8 +493,8 @@ int RHSPlib_discovery(RHSPlib_Serial_T *serialPort, RHSPlib_DiscoveredAddresses_
  *
  * */
 int RHSPlib_getInterfacePacketID(RHSPlib_Module_T *obj,
-                                  const char* interfaceName,
-                                  uint16_t functionNumber, uint16_t *packetID, uint8_t *nackReasonCode);
+                                 const char* interfaceName,
+                                 uint16_t functionNumber, uint16_t *packetID, uint8_t *nackReasonCode);
 
 
 #ifdef __cplusplus

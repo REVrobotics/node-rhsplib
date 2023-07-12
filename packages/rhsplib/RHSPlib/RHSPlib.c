@@ -167,12 +167,12 @@ int RHSPlib_sendFailSafe(RHSPlib_Module_T *obj, uint8_t *nackReasonCode)
 
 int RHSPlib_setNewModuleAddress(RHSPlib_Module_T *obj, uint8_t newModuleAddress, uint8_t *nackReasonCode)
 {
-	if (newModuleAddress == 0 || newModuleAddress == 0xFF)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    if (newModuleAddress == 0 || newModuleAddress == 0xFF)
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     return RHSPlib_sendWriteCommandInternal(obj, 0x7F06, &newModuleAddress, sizeof(newModuleAddress),
-                                     nackReasonCode);
+                                            nackReasonCode);
 }
 
 int RHSPlib_queryInterface(RHSPlib_Module_T *obj, const char *interfaceName, RHSPlib_Module_Interface_T *intf, uint8_t *nackReasonCode)
@@ -188,7 +188,7 @@ int RHSPlib_queryInterface(RHSPlib_Module_T *obj, const char *interfaceName, RHS
     }
 
     int result = RHSPlib_sendReadCommandInternal(obj, 0x7F07, (const uint8_t*)interfaceName,
-                                                  (uint16_t)interfaceNameLength, nackReasonCode);
+                                                 (uint16_t)interfaceNameLength, nackReasonCode);
     if (result < 0)
     {
         return result;
@@ -408,11 +408,11 @@ static uint16_t getInterfacePacketID(const RHSPlib_Module_InterfaceList_T *inter
 	const RHSPlib_Module_Interface_T *intf = getInterfaceByName(interfaceList, interfaceName);
 	if (intf == NULL)
 	{
-		return RHSPLIB_INTERFACE_INVALID_PACKET_ID;
+            return RHSPLIB_INTERFACE_INVALID_PACKET_ID;
 	}
 	if (functionNumber < intf->numberIDValues)
 	{
-		return intf->firstPacketID + functionNumber;
+            return intf->firstPacketID + functionNumber;
 	}
 	return RHSPLIB_INTERFACE_INVALID_PACKET_ID;
 }
@@ -433,7 +433,7 @@ int RHSPlib_getInterfacePacketID(RHSPlib_Module_T *obj,
     {
     	if (packetID)
     	{
-    		*packetID = packet_id;
+            *packetID = packet_id;
     	}
     	return RHSPLIB_RESULT_OK;
     }
@@ -446,11 +446,11 @@ int RHSPlib_getInterfacePacketID(RHSPlib_Module_T *obj,
     packet_id = getInterfacePacketID(&obj->interfaceList, interfaceName, functionNumber);
 	if (packet_id == RHSPLIB_INTERFACE_INVALID_PACKET_ID)
 	{
-		return RHSPLIB_ERROR_COMMAND_NOT_SUPPORTED;
+            return RHSPLIB_ERROR_COMMAND_NOT_SUPPORTED;
 	}
 	if (packetID)
 	{
-		*packetID = packet_id;
+            *packetID = packet_id;
 	}
 	return RHSPLIB_RESULT_OK;
 }

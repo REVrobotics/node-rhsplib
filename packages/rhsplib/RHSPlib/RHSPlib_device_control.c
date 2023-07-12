@@ -15,38 +15,38 @@ static void fillBulkInputData(const RHSPlib_Module_T *obj, RHSPlib_BulkInputData
 
 static void fillBulkInputData(const RHSPlib_Module_T *obj, RHSPlib_BulkInputData_T *data)
 {
-	if (!data)
-	{
-		return;
-	}
+    if (!data)
+    {
+        return;
+    }
 
-	const uint8_t *payload   = RHSPLIB_PACKET_PAYLOAD_PTR(obj->rxBuffer);
-	data->digitalInputs      = RHSPLIB_ARRAY_BYTE(uint8_t, payload, 0);
+    const uint8_t *payload   = RHSPLIB_PACKET_PAYLOAD_PTR(obj->rxBuffer);
+    data->digitalInputs      = RHSPLIB_ARRAY_BYTE(uint8_t, payload, 0);
 
-	data->motor0position_enc = RHSPLIB_ARRAY_DWORD(int32_t, payload, 1);
-	data->motor1position_enc = RHSPLIB_ARRAY_DWORD(int32_t, payload, 5);
-	data->motor2position_enc = RHSPLIB_ARRAY_DWORD(int32_t, payload, 9);
-	data->motor3position_enc = RHSPLIB_ARRAY_DWORD(int32_t, payload, 13);
+    data->motor0position_enc = RHSPLIB_ARRAY_DWORD(int32_t, payload, 1);
+    data->motor1position_enc = RHSPLIB_ARRAY_DWORD(int32_t, payload, 5);
+    data->motor2position_enc = RHSPLIB_ARRAY_DWORD(int32_t, payload, 9);
+    data->motor3position_enc = RHSPLIB_ARRAY_DWORD(int32_t, payload, 13);
 
-	data->motorStatus = RHSPLIB_ARRAY_BYTE(uint8_t, payload, 17);
+    data->motorStatus = RHSPLIB_ARRAY_BYTE(uint8_t, payload, 17);
 
-	data->motor0velocity_cps = RHSPLIB_ARRAY_WORD(int16_t, payload, 18);
-	data->motor0velocity_cps = RHSPLIB_ARRAY_WORD(int16_t, payload, 20);
-	data->motor0velocity_cps = RHSPLIB_ARRAY_WORD(int16_t, payload, 22);
-	data->motor0velocity_cps = RHSPLIB_ARRAY_WORD(int16_t, payload, 24);
+    data->motor0velocity_cps = RHSPLIB_ARRAY_WORD(int16_t, payload, 18);
+    data->motor0velocity_cps = RHSPLIB_ARRAY_WORD(int16_t, payload, 20);
+    data->motor0velocity_cps = RHSPLIB_ARRAY_WORD(int16_t, payload, 22);
+    data->motor0velocity_cps = RHSPLIB_ARRAY_WORD(int16_t, payload, 24);
 
-	data->analog0_mV = RHSPLIB_ARRAY_WORD(int16_t, payload, 26);
-	data->analog1_mV = RHSPLIB_ARRAY_WORD(int16_t, payload, 28);
-	data->analog2_mV = RHSPLIB_ARRAY_WORD(int16_t, payload, 30);
-	data->analog3_mV = RHSPLIB_ARRAY_WORD(int16_t, payload, 32);
+    data->analog0_mV = RHSPLIB_ARRAY_WORD(int16_t, payload, 26);
+    data->analog1_mV = RHSPLIB_ARRAY_WORD(int16_t, payload, 28);
+    data->analog2_mV = RHSPLIB_ARRAY_WORD(int16_t, payload, 30);
+    data->analog3_mV = RHSPLIB_ARRAY_WORD(int16_t, payload, 32);
 
-	data->attentionRequired = RHSPLIB_ARRAY_BYTE(uint8_t, payload, 34);
+    data->attentionRequired = RHSPLIB_ARRAY_BYTE(uint8_t, payload, 34);
 }
 
 int RHSPlib_deviceControl_getBulkInputData(RHSPlib_Module_T *obj,
-                                            RHSPlib_BulkInputData_T *response, uint8_t *nackReasonCode)
+                                           RHSPlib_BulkInputData_T *response, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
     RHSPLIB_ASSERT(obj);
 
     if (!obj)
@@ -71,9 +71,9 @@ int RHSPlib_deviceControl_getBulkInputData(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_deviceControl_getADC(RHSPlib_Module_T *obj,
-                                  uint8_t adcChannelToRead, uint8_t rawMode, int16_t *adcValue, uint8_t *nackReasonCode)
+                                 uint8_t adcChannelToRead, uint8_t rawMode, int16_t *adcValue, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -82,9 +82,9 @@ int RHSPlib_deviceControl_getADC(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (adcChannelToRead >= RHSPLIB_MAX_NUMBER_OF_ADC_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     else if (rawMode > 1)
     {
     	return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
@@ -111,9 +111,9 @@ int RHSPlib_deviceControl_getADC(RHSPlib_Module_T *obj,
 
 
 int RHSPlib_deviceControl_phoneChargeControl(RHSPlib_Module_T *obj,
-                                              uint8_t chargeEnable, uint8_t *nackReasonCode)
+                                             uint8_t chargeEnable, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -135,9 +135,9 @@ int RHSPlib_deviceControl_phoneChargeControl(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_deviceControl_phoneChargeQuery(RHSPlib_Module_T *obj,
-                                            uint8_t *chargeEnabled, uint8_t *nackReasonCode)
+                                           uint8_t *chargeEnabled, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -168,7 +168,7 @@ int RHSPlib_deviceControl_phoneChargeQuery(RHSPlib_Module_T *obj,
 int RHSPlib_deviceControl_injectDataLogHint(RHSPlib_Module_T *obj,
                                              const char *hintText, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
     RHSPLIB_ASSERT(hintText);
@@ -200,7 +200,7 @@ int RHSPlib_deviceControl_injectDataLogHint(RHSPlib_Module_T *obj,
 
 int RHSPlib_deviceControl_readVersion(RHSPlib_Module_T *obj, RHSPlib_Version_T *version, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -347,7 +347,7 @@ int RHSPlib_deviceControl_readVersionString(RHSPlib_Module_T *obj,
 int RHSPlib_deviceControl_ftdiResetControl(RHSPlib_Module_T *obj,
                                             uint8_t ftdiResetControl, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -371,7 +371,7 @@ int RHSPlib_deviceControl_ftdiResetControl(RHSPlib_Module_T *obj,
 int RHSPlib_deviceControl_ftdiResetQuery(RHSPlib_Module_T *obj,
                                           uint8_t *ftdiResetControl, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
