@@ -24,7 +24,7 @@ extern "C" {
  * @return RHSPLIB_RESULT_OK or RHSPLIB_RESULT_ATTENTION_REQUIRED in case success
  * */
 int RHSPlib_dio_setSingleOutput(RHSPlib_Module_T *obj,
-                                 uint8_t dioPin, uint8_t value, uint8_t *nackReasonCode);
+                                uint8_t dioPin, uint8_t value, uint8_t *nackReasonCode);
 
 /**
  * @brief set all DIO outputs
@@ -36,7 +36,7 @@ int RHSPlib_dio_setSingleOutput(RHSPlib_Module_T *obj,
  * @return RHSPLIB_RESULT_OK or RHSPLIB_RESULT_ATTENTION_REQUIRED in case success
  * */
 int RHSPlib_dio_setAllOutputs(RHSPlib_Module_T *obj,
-                               uint8_t bitPacketField, uint8_t *nackReasonCode);
+                              uint8_t bitPacketField, uint8_t *nackReasonCode);
 
 /**
  * @brief set DIO direction
@@ -49,7 +49,7 @@ int RHSPlib_dio_setAllOutputs(RHSPlib_Module_T *obj,
  * @return RHSPLIB_RESULT_OK or RHSPLIB_RESULT_ATTENTION_REQUIRED in case success
  * */
 int RHSPlib_dio_setDirection(RHSPlib_Module_T *obj,
-                              uint8_t dioPin, uint8_t directionOutput, uint8_t *nackReasonCode);
+                             uint8_t dioPin, uint8_t directionOutput, uint8_t *nackReasonCode);
 
 
 /**
@@ -63,7 +63,7 @@ int RHSPlib_dio_setDirection(RHSPlib_Module_T *obj,
  * @return RHSPLIB_RESULT_OK in case success
  * */
 int RHSPlib_dio_getDirection(RHSPlib_Module_T *obj,
-                              uint8_t dioPin, uint8_t *directionOutput, uint8_t *nackReasonCode);
+                             uint8_t dioPin, uint8_t *directionOutput, uint8_t *nackReasonCode);
 
 /**
  * @brief get single DIO input
@@ -77,7 +77,7 @@ int RHSPlib_dio_getDirection(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_dio_getSingleInput(RHSPlib_Module_T *obj,
-                                             uint8_t dioPin, uint8_t *inputValue, uint8_t *nackReasonCode);
+                               uint8_t dioPin, uint8_t *inputValue, uint8_t *nackReasonCode);
 
 /**
  * @brief get all DIO inputs
@@ -90,7 +90,7 @@ int RHSPlib_dio_getSingleInput(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_dio_getAllInputs(RHSPlib_Module_T *obj,
-                                           uint8_t *bitPacketField, uint8_t *nackReasonCode);
+                             uint8_t *bitPacketField, uint8_t *nackReasonCode);
 
 #ifdef __cplusplus
 }

@@ -7,10 +7,10 @@
 #include "RHSPlib_motor.h"
 
 int RHSPlib_motor_setChannelMode(RHSPlib_Module_T *obj,
-                                  uint8_t motorChannel, uint8_t motorMode, uint8_t floatAtZero,
-                                  uint8_t *nackReasonCode)
+                                 uint8_t motorChannel, uint8_t motorMode, uint8_t floatAtZero,
+                                 uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -43,10 +43,10 @@ int RHSPlib_motor_setChannelMode(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_motor_getChannelMode(RHSPlib_Module_T *obj,
-                                  uint8_t motorChannel, uint8_t *motorMode, uint8_t *floatAtZero,
-                                  uint8_t *nackReasonCode)
+                                 uint8_t motorChannel, uint8_t *motorMode, uint8_t *floatAtZero,
+                                 uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -83,10 +83,10 @@ int RHSPlib_motor_getChannelMode(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_motor_setChannelEnable(RHSPlib_Module_T *obj,
-                                	uint8_t motorChannel,
-									uint8_t enabled, uint8_t *nackReasonCode)
+                                   uint8_t motorChannel,
+                                   uint8_t enabled, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -115,10 +115,10 @@ int RHSPlib_motor_setChannelEnable(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_motor_getChannelEnable(RHSPlib_Module_T *obj,
-                                	uint8_t motorChannel,
-									uint8_t *enabled, uint8_t *nackReasonCode)
+                                   uint8_t motorChannel,
+                                   uint8_t *enabled, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -152,10 +152,10 @@ int RHSPlib_motor_getChannelEnable(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_motor_setChannelCurrentAlertLevel(RHSPlib_Module_T *obj,
-                                			   uint8_t motorChannel,
-											   uint16_t currentLimit, uint8_t *nackReasonCode)
+                                              uint8_t motorChannel,
+                                              uint16_t currentLimit, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -182,10 +182,10 @@ int RHSPlib_motor_setChannelCurrentAlertLevel(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_motor_getChannelCurrentAlertLevel(RHSPlib_Module_T *obj,
-                                			   uint8_t motorChannel,
-											   uint16_t *currentLimit, uint8_t *nackReasonCode)
+                                              uint8_t motorChannel,
+                                              uint16_t *currentLimit, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -219,9 +219,9 @@ int RHSPlib_motor_getChannelCurrentAlertLevel(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_motor_resetEncoder(RHSPlib_Module_T *obj,
-                                uint8_t motorChannel, uint8_t *nackReasonCode)
+                               uint8_t motorChannel, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -244,10 +244,10 @@ int RHSPlib_motor_resetEncoder(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_motor_setConstantPower(RHSPlib_Module_T *obj,
-                                	uint8_t motorChannel,
-									int16_t powerLevel, uint8_t *nackReasonCode)
+                                   uint8_t motorChannel,
+                                   int16_t powerLevel, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -275,10 +275,10 @@ int RHSPlib_motor_setConstantPower(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_motor_getConstantPower(RHSPlib_Module_T *obj,
-                                    uint8_t motorChannel,
-                                    int16_t *powerLevel, uint8_t *nackReasonCode)
+                                   uint8_t motorChannel,
+                                   int16_t *powerLevel, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -287,9 +287,9 @@ int RHSPlib_motor_getConstantPower(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (motorChannel >= RHSPLIB_MAX_NUMBER_OF_MOTOR_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
 
     int result = RHSPlib_getInterfacePacketID(obj, "DEKA", 16, &packetID, nackReasonCode);
     if (result < 0)
@@ -312,10 +312,10 @@ int RHSPlib_motor_getConstantPower(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_motor_setTargetVelocity(RHSPlib_Module_T *obj,
-                                     uint8_t motorChannel,
-                                     int16_t velocity, uint8_t *nackReasonCode)
+                                    uint8_t motorChannel,
+                                    int16_t velocity, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -324,9 +324,9 @@ int RHSPlib_motor_setTargetVelocity(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (motorChannel >= RHSPLIB_MAX_NUMBER_OF_MOTOR_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
 
     int result = RHSPlib_getInterfacePacketID(obj, "DEKA", 17, &packetID, nackReasonCode);
     if (result < 0)
@@ -343,10 +343,10 @@ int RHSPlib_motor_setTargetVelocity(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_motor_getTargetVelocity(RHSPlib_Module_T *obj,
-                                	 uint8_t motorChannel,
-									 int16_t *velocity, uint8_t *nackReasonCode)
+                                    uint8_t motorChannel,
+                                    int16_t *velocity, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -355,9 +355,9 @@ int RHSPlib_motor_getTargetVelocity(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (motorChannel >= RHSPLIB_MAX_NUMBER_OF_MOTOR_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
 
     int result = RHSPlib_getInterfacePacketID(obj, "DEKA", 18, &packetID, nackReasonCode);
     if (result < 0)
@@ -380,11 +380,11 @@ int RHSPlib_motor_getTargetVelocity(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_motor_setTargetPosition(RHSPlib_Module_T *obj,
-                                	 uint8_t motorChannel,
-									 int32_t targetPosition,
-									 uint16_t targetTolerance, uint8_t *nackReasonCode)
+                                    uint8_t motorChannel,
+                                    int32_t targetPosition,
+                                    uint16_t targetTolerance, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -393,9 +393,9 @@ int RHSPlib_motor_setTargetPosition(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (motorChannel >= RHSPLIB_MAX_NUMBER_OF_MOTOR_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
 
     int result = RHSPlib_getInterfacePacketID(obj, "DEKA", 19, &packetID, nackReasonCode);
     if (result < 0)
@@ -413,11 +413,11 @@ int RHSPlib_motor_setTargetPosition(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_motor_getTargetPosition(RHSPlib_Module_T *obj,
-                                	 uint8_t motorChannel,
-									 int32_t *targetPosition,
-									 uint16_t *targetTolerance, uint8_t *nackReasonCode)
+                                    uint8_t motorChannel,
+                                    int32_t *targetPosition,
+                                    uint16_t *targetTolerance, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -426,9 +426,9 @@ int RHSPlib_motor_getTargetPosition(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (motorChannel >= RHSPLIB_MAX_NUMBER_OF_MOTOR_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
 
     int result = RHSPlib_getInterfacePacketID(obj, "DEKA", 20, &packetID, nackReasonCode);
     if (result < 0)
@@ -457,10 +457,10 @@ int RHSPlib_motor_getTargetPosition(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_motor_getMotorAtTarget(RHSPlib_Module_T *obj,
-									uint8_t motorChannel,
-									uint8_t *atTarget, uint8_t *nackReasonCode)
+                                   uint8_t motorChannel,
+                                   uint8_t *atTarget, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -469,9 +469,9 @@ int RHSPlib_motor_getMotorAtTarget(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (motorChannel >= RHSPLIB_MAX_NUMBER_OF_MOTOR_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     int result = RHSPlib_getInterfacePacketID(obj, "DEKA", 21, &packetID, nackReasonCode);
     if (result < 0)
     {
@@ -495,10 +495,10 @@ int RHSPlib_motor_getMotorAtTarget(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_motor_getEncoderPosition(RHSPlib_Module_T *obj,
-									  uint8_t motorChannel,
-									  int32_t *currentPosition, uint8_t *nackReasonCode)
+                                     uint8_t motorChannel,
+                                     int32_t *currentPosition, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -507,9 +507,9 @@ int RHSPlib_motor_getEncoderPosition(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (motorChannel >= RHSPLIB_MAX_NUMBER_OF_MOTOR_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
 
     int result = RHSPlib_getInterfacePacketID(obj, "DEKA", 22, &packetID, nackReasonCode);
     if (result < 0)
@@ -532,11 +532,11 @@ int RHSPlib_motor_getEncoderPosition(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_motor_setPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
-                                				 uint8_t motorChannel,
-												 uint8_t mode, int32_t proportionalCoeff,
-												 int32_t integralCoeff, int32_t derivativeCoeff, uint8_t *nackReasonCode)
+                                                uint8_t motorChannel,
+                                                uint8_t mode, int32_t proportionalCoeff,
+                                                int32_t integralCoeff, int32_t derivativeCoeff, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -545,9 +545,9 @@ int RHSPlib_motor_setPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (motorChannel >= RHSPLIB_MAX_NUMBER_OF_MOTOR_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     else if (mode != 1 && mode != 2)
     {
     	return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
@@ -571,11 +571,11 @@ int RHSPlib_motor_setPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_motor_getPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
-                                				 uint8_t motorChannel,
-												 uint8_t mode, int32_t *proportionalCoeff,
-												 int32_t *integralCoeff, int32_t *derivativeCoeff, uint8_t *nackReasonCode)
+                                                uint8_t motorChannel,
+                                                uint8_t mode, int32_t *proportionalCoeff,
+                                                int32_t *integralCoeff, int32_t *derivativeCoeff, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -584,9 +584,9 @@ int RHSPlib_motor_getPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (motorChannel >= RHSPLIB_MAX_NUMBER_OF_MOTOR_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     else if (mode != 1 && mode != 2)
     {
     	return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
