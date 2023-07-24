@@ -35,6 +35,8 @@ import { closeSerialPort } from "../open-rev-hub.js";
 import { EventEmitter } from "events";
 import { RevHubType } from "@rev-robotics/rev-hub-core";
 import { RhspLibError } from "../errors/RhspLibError.js";
+import { startKeepAlive } from "../start-keep-alive.js";
+import { performance } from "perf_hooks";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -699,13 +701,30 @@ export class ExpansionHubInternal implements ExpansionHub {
 
         try {
             await childHub.open(moduleAddress);
+            // If discovery has not occurred on the hub, then we will
+            // need to send keep-alive signals until the hub responds.
+            // If we don't do this, the hub will be stuck waiting to
+            // find out if it's a parent or child and won't respond.
+            let startTime = performance.now();
+            while (true) {
+                try {
+                    if (performance.now() - startTime >= 1000) break;
+                    await childHub.sendKeepAlive();
+                    break;
+                } catch (e) {}
+            }
             await childHub.queryInterface("DEKA");
         } catch (e: any) {
+            console.log(e);
             if (e instanceof TimeoutError)
                 throw new NoExpansionHubWithAddressError(
                     this.serialNumber!, //Can only call this method on parent, so serialNumber is not undefined.
                     moduleAddress,
                 );
+        }
+
+        if (childHub.isExpansionHub()) {
+            startKeepAlive(childHub as ExpansionHubInternal, 1000);
         }
 
         this.addChild(childHub);

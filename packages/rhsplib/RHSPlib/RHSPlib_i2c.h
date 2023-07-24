@@ -26,7 +26,7 @@ extern "C" {
  *
  * */
 int RHSPlib_i2c_configureChannel(RHSPlib_Module_T *obj,
-                                  uint8_t i2cChannel, uint8_t speedCode, uint8_t *nackReasonCode);
+                                 uint8_t i2cChannel, uint8_t speedCode, uint8_t *nackReasonCode);
 
 /**
  * @brief get i2c channel configuration
@@ -40,7 +40,7 @@ int RHSPlib_i2c_configureChannel(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_i2c_configureQuery(RHSPlib_Module_T *obj,
-                                uint8_t i2cChannel, uint8_t *speedCode, uint8_t *nackReasonCode);
+                               uint8_t i2cChannel, uint8_t *speedCode, uint8_t *nackReasonCode);
 
 /**
  * @brief write single byte to i2c channel
@@ -55,8 +55,8 @@ int RHSPlib_i2c_configureQuery(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_i2c_writeSingleByte(RHSPlib_Module_T *obj,
-                                 uint8_t i2cChannel, uint8_t slaveAddress, uint8_t byteToWrite,
-                                 uint8_t *nackReasonCode);
+                                uint8_t i2cChannel, uint8_t slaveAddress, uint8_t byteToWrite,
+                                uint8_t *nackReasonCode);
 
 /**
  * @brief write multiple bytes to i2c channel
@@ -72,8 +72,8 @@ int RHSPlib_i2c_writeSingleByte(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_i2c_writeMultipleBytes(RHSPlib_Module_T *obj,
-                                    uint8_t i2cChannel, uint8_t slaveAddress,
-                                    uint8_t bytesToWrite, const uint8_t *payload, uint8_t *nackReasonCode);
+                                   uint8_t i2cChannel, uint8_t slaveAddress,
+                                   uint8_t bytesToWrite, const uint8_t *payload, uint8_t *nackReasonCode);
 
 /**
  * @brief check for completion i2c write operation
@@ -88,8 +88,8 @@ int RHSPlib_i2c_writeMultipleBytes(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_i2c_writeStatusQuery(RHSPlib_Module_T *obj,
-                                  uint8_t i2cChannel, uint8_t *i2cTransactionStatus,
-                                  uint8_t *writtenBytes, uint8_t *nackReasonCode);
+                                 uint8_t i2cChannel, uint8_t *i2cTransactionStatus,
+                                 uint8_t *writtenBytes, uint8_t *nackReasonCode);
 
 /**
  * @brief read single byte from i2c channel
@@ -103,7 +103,7 @@ int RHSPlib_i2c_writeStatusQuery(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_i2c_readSingleByte(RHSPlib_Module_T *obj,
-                                uint8_t i2cChannel, uint8_t slaveAddress, uint8_t *nackReasonCode);
+                               uint8_t i2cChannel, uint8_t slaveAddress, uint8_t *nackReasonCode);
 
 /**
  * @brief read multiple bytes from i2c channel
@@ -118,8 +118,8 @@ int RHSPlib_i2c_readSingleByte(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_i2c_readMultipleBytes(RHSPlib_Module_T *obj,
-                                   uint8_t i2cChannel, uint8_t slaveAddress, uint8_t bytesToRead,
-                                   uint8_t *nackReasonCode);
+                                  uint8_t i2cChannel, uint8_t slaveAddress, uint8_t bytesToRead,
+                                  uint8_t *nackReasonCode);
 
 /**
  * @brief write a starting address then read multiple bytes from specified address
@@ -135,8 +135,8 @@ int RHSPlib_i2c_readMultipleBytes(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_i2c_writeReadMultipleBytes(RHSPlib_Module_T *obj,
-                                        uint8_t i2cChannel, uint8_t slaveAddress, uint8_t bytesToRead,
-                                        uint8_t startAddress, uint8_t *nackReasonCode);
+                                       uint8_t i2cChannel, uint8_t slaveAddress, uint8_t bytesToRead,
+                                       uint8_t startAddress, uint8_t *nackReasonCode);
 /**
  * @brief check for compeltion of i2c read operation
  *
@@ -151,8 +151,8 @@ int RHSPlib_i2c_writeReadMultipleBytes(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_i2c_readStatusQuery(RHSPlib_Module_T *obj,
-                                 uint8_t i2cChannel, uint8_t *i2cTransactionStatusByte,
-                                 uint8_t *bytesRead, uint8_t *payload, uint8_t *nackReasonCode);
+                                uint8_t i2cChannel, uint8_t *i2cTransactionStatusByte,
+                                uint8_t *bytesRead, uint8_t *payload, uint8_t *nackReasonCode);
 
 #ifdef __cplusplus
 }

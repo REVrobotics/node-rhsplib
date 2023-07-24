@@ -17,7 +17,7 @@ extern "C" {
 // bulk read data
 typedef struct
 {
-	uint8_t digitalInputs;
+    uint8_t digitalInputs;
     int32_t motor0position_enc;
     int32_t motor1position_enc;
     int32_t motor2position_enc;
@@ -31,7 +31,7 @@ typedef struct
     int16_t analog1_mV;
     int16_t analog2_mV;
     int16_t analog3_mV;
-    uint8_t	attentionRequired; // @TODO make sure this field is at right position. This field is undefined in version 1.8.2 and earlier
+    uint8_t attentionRequired; // @TODO make sure this field is at right position. This field is undefined in version 1.8.2 and earlier
 } RHSPlib_BulkInputData_T;
 
 
@@ -57,7 +57,7 @@ typedef struct
  *
  * */
 int RHSPlib_deviceControl_getBulkInputData(RHSPlib_Module_T *obj,
-                                            RHSPlib_BulkInputData_T *response, uint8_t *nackReasonCode);
+                                           RHSPlib_BulkInputData_T *response, uint8_t *nackReasonCode);
 
 /**
  * @brief get ADC value
@@ -72,7 +72,7 @@ int RHSPlib_deviceControl_getBulkInputData(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_deviceControl_getADC(RHSPlib_Module_T *obj,
-                                  uint8_t adcChannelToRead, uint8_t rawMode, int16_t *adcValue, uint8_t *nackReasonCode);
+                                 uint8_t adcChannelToRead, uint8_t rawMode, int16_t *adcValue, uint8_t *nackReasonCode);
 
 
 /**
@@ -86,7 +86,7 @@ int RHSPlib_deviceControl_getADC(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_deviceControl_phoneChargeControl(RHSPlib_Module_T *obj,
-                                              uint8_t chargeEnable, uint8_t *nackReasonCode);
+                                             uint8_t chargeEnable, uint8_t *nackReasonCode);
 
 /**
  * @brief reports status of charging voltage on USB port of Hardware Interface Board
@@ -99,7 +99,7 @@ int RHSPlib_deviceControl_phoneChargeControl(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_deviceControl_phoneChargeQuery(RHSPlib_Module_T *obj,
-                                            uint8_t *chargeEnabled, uint8_t *nackReasonCode);
+                                           uint8_t *chargeEnabled, uint8_t *nackReasonCode);
 
 /**
  * @brief Inserts text into UART2 data log stream
@@ -115,7 +115,7 @@ int RHSPlib_deviceControl_phoneChargeQuery(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_deviceControl_injectDataLogHint(RHSPlib_Module_T *obj,
-                                             const char *hintText, uint8_t *nackReasonCode);
+                                            const char *hintText, uint8_t *nackReasonCode);
 
 /**
  * @brief returns the Hardware and Software versions in a human-readable string
@@ -140,7 +140,7 @@ int RHSPlib_deviceControl_injectDataLogHint(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_deviceControl_readVersionString(RHSPlib_Module_T *obj,
-                                             uint8_t *textLength, char *text, uint8_t *nackReasonCode);
+                                            uint8_t *textLength, char *text, uint8_t *nackReasonCode);
 
 /**
  * @brief returns the Hardware and Software versions in bin format
@@ -166,7 +166,7 @@ int RHSPlib_deviceControl_readVersion(RHSPlib_Module_T *obj, RHSPlib_Version_T *
  *
  * */
 int RHSPlib_deviceControl_ftdiResetControl(RHSPlib_Module_T *obj,
-                                            uint8_t ftdiResetControl, uint8_t *nackReasonCode);
+                                           uint8_t ftdiResetControl, uint8_t *nackReasonCode);
 
 /**
  * @brief reports status of whether the FTDI chip will be reset on keep alive timeout
@@ -179,7 +179,7 @@ int RHSPlib_deviceControl_ftdiResetControl(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_deviceControl_ftdiResetQuery(RHSPlib_Module_T *obj,
-                                          uint8_t *ftdiResetControl, uint8_t *nackReasonCode);
+                                         uint8_t *ftdiResetControl, uint8_t *nackReasonCode);
 
 #ifdef __cplusplus
 }

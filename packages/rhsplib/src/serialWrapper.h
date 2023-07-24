@@ -5,20 +5,20 @@
 #include <napi.h>
 
 class Serial : public Napi::ObjectWrap<Serial> {
- public:
-  static Napi::Object Init(Napi::Env env, Napi::Object exports);
+  public:
+    static Napi::Object Init(Napi::Env env, Napi::Object exports);
 
-  Serial(const Napi::CallbackInfo &info);
+    Serial(const Napi::CallbackInfo &info);
 
-  Napi::Value open(const Napi::CallbackInfo &info);
-  void close(const Napi::CallbackInfo &info);
-  Napi::Value read(const Napi::CallbackInfo &info);
-  Napi::Value write(const Napi::CallbackInfo &info);
+    Napi::Value open(const Napi::CallbackInfo &info);
+    void close(const Napi::CallbackInfo &info);
+    Napi::Value read(const Napi::CallbackInfo &info);
+    Napi::Value write(const Napi::CallbackInfo &info);
 
-  RHSPlib_Serial_T *getSerialObj() { return &serialPort; };
+    RHSPlib_Serial_T *getSerialObj() { return &serialPort; };
 
- private:
-  RHSPlib_Serial_T serialPort;
+  private:
+    RHSPlib_Serial_T serialPort;
 };
 
 #endif

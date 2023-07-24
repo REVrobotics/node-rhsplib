@@ -25,7 +25,7 @@ extern "C" {
  * @return RHSPLIB_RESULT_OK or RHSPLIB_RESULT_ATTENTION_REQUIRED in case success
  * */
 int RHSPlib_servo_setConfiguration(RHSPlib_Module_T *obj,
-                                    uint8_t servoChannel, uint16_t framePeriod, uint8_t *nackReasonCode);
+                                   uint8_t servoChannel, uint16_t framePeriod, uint8_t *nackReasonCode);
 
 /**
  * @brief get servo configuration
@@ -38,7 +38,7 @@ int RHSPlib_servo_setConfiguration(RHSPlib_Module_T *obj,
  * @return RHSPLIB_RESULT_OK in case success
  * */
 int RHSPlib_servo_getConfiguration(RHSPlib_Module_T *obj,
-                                    uint8_t servoChannel, uint16_t *framePeriod, uint8_t *nackReasonCode);
+                                   uint8_t servoChannel, uint16_t *framePeriod, uint8_t *nackReasonCode);
 
 /**
  * @brief set servo pulse width
@@ -52,7 +52,7 @@ int RHSPlib_servo_getConfiguration(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_servo_setPulseWidth(RHSPlib_Module_T *obj,
-                                 uint8_t servoChannel, uint16_t pulseWidth, uint8_t *nackReasonCode);
+                                uint8_t servoChannel, uint16_t pulseWidth, uint8_t *nackReasonCode);
 
 /**
  * @brief get servo pulse width
@@ -66,7 +66,7 @@ int RHSPlib_servo_setPulseWidth(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_servo_getPulseWidth(RHSPlib_Module_T *obj,
-                                 uint8_t servoChannel, uint16_t *pulseWidth, uint8_t *nackReasonCode);
+                                uint8_t servoChannel, uint16_t *pulseWidth, uint8_t *nackReasonCode);
 
 /**
  * @brief set servo enable
@@ -80,7 +80,7 @@ int RHSPlib_servo_getPulseWidth(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_servo_setEnable(RHSPlib_Module_T *obj,
-                             uint8_t servoChannel, uint8_t enable, uint8_t *nackReasonCode);
+                            uint8_t servoChannel, uint8_t enable, uint8_t *nackReasonCode);
 
 /**
  * @brief get servo enable
@@ -94,7 +94,7 @@ int RHSPlib_servo_setEnable(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_servo_getEnable(RHSPlib_Module_T *obj,
-                             uint8_t servoChannel, uint8_t *enable, uint8_t *nackReasonCode);
+                            uint8_t servoChannel, uint8_t *enable, uint8_t *nackReasonCode);
 
 #ifdef __cplusplus
 }

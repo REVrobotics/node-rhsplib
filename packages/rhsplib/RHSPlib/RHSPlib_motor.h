@@ -27,8 +27,8 @@ extern "C" {
  *
  * */
 int RHSPlib_motor_setChannelMode(RHSPlib_Module_T *obj,
-                                  uint8_t motorChannel,
-                                  uint8_t motorMode, uint8_t floatAtZero, uint8_t *nackReasonCode);
+                                 uint8_t motorChannel,
+                                 uint8_t motorMode, uint8_t floatAtZero, uint8_t *nackReasonCode);
 
 /**
  * @brief Retrieves the run mode of the motor on the specified channel
@@ -43,8 +43,8 @@ int RHSPlib_motor_setChannelMode(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_motor_getChannelMode(RHSPlib_Module_T *obj,
-                                  uint8_t motorChannel, uint8_t *motorMode, uint8_t *floatAtZero,
-                                  uint8_t *nackReasonCode);
+                                 uint8_t motorChannel, uint8_t *motorMode, uint8_t *floatAtZero,
+                                 uint8_t *nackReasonCode);
 
 
 /**
@@ -59,8 +59,8 @@ int RHSPlib_motor_getChannelMode(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_motor_setChannelEnable(RHSPlib_Module_T *obj,
-                                    uint8_t motorChannel,
-                                    uint8_t enabled, uint8_t *nackReasonCode);
+                                   uint8_t motorChannel,
+                                   uint8_t enabled, uint8_t *nackReasonCode);
 
 /**
  * @brief Retrieves the enable state of the specified motor channel
@@ -74,8 +74,8 @@ int RHSPlib_motor_setChannelEnable(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_motor_getChannelEnable(RHSPlib_Module_T *obj,
-                                    uint8_t motorChannel,
-                                    uint8_t *enabled, uint8_t *nackReasonCode);
+                                   uint8_t motorChannel,
+                                   uint8_t *enabled, uint8_t *nackReasonCode);
 
 /**
  * @brief Sets an alert level for the motor current
@@ -89,8 +89,8 @@ int RHSPlib_motor_getChannelEnable(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_motor_setChannelCurrentAlertLevel(RHSPlib_Module_T *obj,
-                                			   uint8_t motorChannel,
-											   uint16_t currentLimit, uint8_t *nackReasonCode);
+                                              uint8_t motorChannel,
+                                              uint16_t currentLimit, uint8_t *nackReasonCode);
 
 /**
  * @brief Retrieves the current limit alert level for the specified motor channel
@@ -104,8 +104,8 @@ int RHSPlib_motor_setChannelCurrentAlertLevel(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_motor_getChannelCurrentAlertLevel(RHSPlib_Module_T *obj,
-                                		       uint8_t motorChannel,
-											   uint16_t *currentLimit, uint8_t *nackReasonCode);
+                                              uint8_t motorChannel,
+                                              uint16_t *currentLimit, uint8_t *nackReasonCode);
 
 /**
  * @brief Clears encoder to zero for the specified motor channel
@@ -132,8 +132,8 @@ int RHSPlib_motor_resetEncoder(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_motor_setConstantPower(RHSPlib_Module_T *obj,
-                                	uint8_t motorChannel,
-									int16_t powerLevel, uint8_t *nackReasonCode);
+                                   uint8_t motorChannel,
+                                   int16_t powerLevel, uint8_t *nackReasonCode);
 
 /**
  * @brief Retrieves the constant power configuration of the specified motor
@@ -147,8 +147,8 @@ int RHSPlib_motor_setConstantPower(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_motor_getConstantPower(RHSPlib_Module_T *obj,
-                                    uint8_t motorChannel,
-                                    int16_t *powerLevel, uint8_t *nackReasonCode);
+                                   uint8_t motorChannel,
+                                   int16_t *powerLevel, uint8_t *nackReasonCode);
 
 /**
  * @brief Sets the target velocity when motor is in Constant Velocity mode
@@ -162,8 +162,8 @@ int RHSPlib_motor_getConstantPower(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_motor_setTargetVelocity(RHSPlib_Module_T *obj,
-                                     uint8_t motorChannel,
-                                     int16_t velocity, uint8_t *nackReasonCode);
+                                    uint8_t motorChannel,
+                                    int16_t velocity, uint8_t *nackReasonCode);
 
 /**
  * @brief Retrives the configured target velocity
@@ -177,8 +177,8 @@ int RHSPlib_motor_setTargetVelocity(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_motor_getTargetVelocity(RHSPlib_Module_T *obj,
-                                     uint8_t motorChannel,
-                                     int16_t *velocity, uint8_t *nackReasonCode);
+                                    uint8_t motorChannel,
+                                    int16_t *velocity, uint8_t *nackReasonCode);
 
 /**
  * @brief Sets the specified motor’s target position (in encoder counts) for Position Target mode
@@ -193,9 +193,9 @@ int RHSPlib_motor_getTargetVelocity(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_motor_setTargetPosition(RHSPlib_Module_T *obj,
-                                     uint8_t motorChannel,
-                                     int32_t targetPosition,
-                                     uint16_t targetTolerance, uint8_t *nackReasonCode);
+                                    uint8_t motorChannel,
+                                    int32_t targetPosition,
+                                    uint16_t targetTolerance, uint8_t *nackReasonCode);
 
 /**
  * @brief Retrieves the specified motor’s target position
@@ -210,9 +210,9 @@ int RHSPlib_motor_setTargetPosition(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_motor_getTargetPosition(RHSPlib_Module_T *obj,
-                                     uint8_t motorChannel,
-                                     int32_t *targetPosition,
-                                     uint16_t *targetTolerance, uint8_t *nackReasonCode);
+                                    uint8_t motorChannel,
+                                    int32_t *targetPosition,
+                                    uint16_t *targetTolerance, uint8_t *nackReasonCode);
 
 /**
  * @brief Checks if the motor is at the target position (with specified tolerance), valid only in Position Target mode
@@ -226,8 +226,8 @@ int RHSPlib_motor_getTargetPosition(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_motor_getMotorAtTarget(RHSPlib_Module_T *obj,
-                                    uint8_t motorChannel,
-                                    uint8_t *atTarget, uint8_t *nackReasonCode);
+                                   uint8_t motorChannel,
+                                   uint8_t *atTarget, uint8_t *nackReasonCode);
 
 /**
  * @brief Retrieves the specified motor’s current encoder position
@@ -241,8 +241,8 @@ int RHSPlib_motor_getMotorAtTarget(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_motor_getEncoderPosition(RHSPlib_Module_T *obj,
-                                      uint8_t motorChannel,
-                                      int32_t *currentPosition, uint8_t *nackReasonCode);
+                                     uint8_t motorChannel,
+                                     int32_t *currentPosition, uint8_t *nackReasonCode);
 
 /**
  * @brief Sets the control loop coefficients for the specified motor channel and mode
@@ -259,9 +259,9 @@ int RHSPlib_motor_getEncoderPosition(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_motor_setPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
-                                                 uint8_t motorChannel,
-                                                 uint8_t mode, int32_t proportionalCoeff,
-                                                 int32_t integralCoeff, int32_t derivativeCoeff, uint8_t *nackReasonCode);
+                                                uint8_t motorChannel,
+                                                uint8_t mode, int32_t proportionalCoeff,
+                                                int32_t integralCoeff, int32_t derivativeCoeff, uint8_t *nackReasonCode);
 
 /**
  * @brief Retrieves the control loop coefficients of the specified motor channel and mode
@@ -277,9 +277,9 @@ int RHSPlib_motor_setPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_motor_getPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
-                                				 uint8_t motorChannel,
-												 uint8_t mode, int32_t *proportionalCoeff,
-												 int32_t *integralCoeff, int32_t *derivativeCoeff, uint8_t *nackReasonCode);
+                                                uint8_t motorChannel,
+                                                uint8_t mode, int32_t *proportionalCoeff,
+                                                int32_t *integralCoeff, int32_t *derivativeCoeff, uint8_t *nackReasonCode);
 
 #ifdef __cplusplus
 }
