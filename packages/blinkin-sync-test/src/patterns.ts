@@ -1,0 +1,36 @@
+import {ExpansionHub} from "@rev-robotics/rev-hub-core";
+
+export const RAINBOW_RAINBOW_PULSE_WIDTH = 1005;
+export const BLACK_PULSE_WIDTH = 1995;
+export const YELLOW_PULSE_WIDTH = 1845;
+export const WHITE_PULSE_WIDTH = 1965;
+export const PURPLE_PULSE_WIDTH = 1955;
+export const GREEN_PULSE_WIDTH = 1885;
+export const RED_PULSE_WIDTH = 1805;
+export const RAINBOW_PULSE_WIDTH = 1275;
+export const FIRE_PULSE_WIDTH = 1215;
+export const FULL_STRIP_PWM_PULSE_WIDTH = 990;
+export const LED_COLOR_1_HB_SLOW_PULSE_WIDTH = 1515;
+export const LED_COLOR_1_HB_MED_PULSE_WIDTH = 1525;
+export const LED_COLOR_1_HB_FAST_PULSE_WIDTH = 1535;
+export const LED_COLOR_2_HB_SLOW_PULSE_WIDTH = 1615;
+export const LED_COLOR_2_HB_MED_PULSE_WIDTH = 1625;
+export const LED_COLOR_2_HB_FAST_PULSE_WIDTH = 1635;
+
+export const PINK_PULSE_WIDTH = 1785;
+export const DARK_RED_PULSE_WIDTH = 1795;
+export const RED_ORANGE_PULSE_WIDTH = 1815;
+export const ORANGE_PULSE_WIDTH = 1825;
+export const GOLD_PULSE_WIDTH = 1835;
+export const LAWN_GREEN_PULSE_WIDTH = 1855;
+export const LIME_PULSE_WIDTH = 1865;
+export const DARK_GREEN_PULSE_WIDTH = 1875;
+export const BLUE_GREEN_PULSE_WIDTH = 1895;
+export const AQUA_PULSE_WIDTH = 1905;
+export const SKY_BLUE_PULSE_WIDTH = 1915;
+export const DARK_BLUE_PULSE_WIDTH = 1925;
+export const BLUE_PULSE_WIDTH = 1935;
+export const BLUE_VIOLET_PULSE_WIDTH = 1945;
+export const VIOLET_PULSE_WIDTH = 1955;
+export const GRAY_PULSE_WIDTH = 1975;
+export const DARK_GRAY_PULSE_WIDTH = 1985;
