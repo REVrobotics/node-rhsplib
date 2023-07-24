@@ -1,11 +1,11 @@
 import { RevHub } from "@rev-robotics/rev-hub-core";
 
 export function hubHierarchyToString(hub: RevHub): string {
-    let result = `RevHub: ${hub.moduleAddress}\n`;
-
-    if (hub.isExpansionHub()) {
-        console.log(`Is open? ${hub.isOpen}`);
+    let serialNumberText: string = "";
+    if (hub.isParent()) {
+        serialNumberText = `(${hub.serialNumber})`;
     }
+    let result = `RevHub ${serialNumberText}: ${hub.moduleAddress}\n`;
 
     if (hub.isParent()) {
         for (const child of hub.children) {
