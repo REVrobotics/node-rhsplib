@@ -759,11 +759,10 @@ async function openExpansionHubWithAddress(
     let parent = await openParentExpansionHub(serialNumbers[0], parentAddress);
     let hub: RevHub;
 
-    if (parentAddress == childAddress) {
+    if (parentAddress == childAddress || childAddress == undefined) {
         hub = parent;
     } else {
-        let realModuleAddress = childAddress !== undefined ? childAddress : parentAddress;
-        hub = await parent.addChildByAddress(realModuleAddress);
+        hub = await parent.addChildByAddress(childAddress);
     }
 
     if (hub.isExpansionHub()) {
