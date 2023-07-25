@@ -1,8 +1,6 @@
 import { ControlHubInternal } from "./internal/ControlHub.js";
 import { ControlHub } from "@rev-robotics/rev-hub-core";
 
-export { openUsbControlHubsAndChildren } from "./internal/ControlHub.js";
-
 export async function openControlHub(
     serialNumber: string,
     moduleAddress: number,
