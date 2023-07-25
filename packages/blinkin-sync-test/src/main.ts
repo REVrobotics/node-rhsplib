@@ -1,31 +1,37 @@
-import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
-import {ExpansionHub} from "@rev-robotics/rev-hub-core";
-import { input } from '@inquirer/prompts';
+import {openConnectedExpansionHubs} from "@rev-robotics/expansion-hub";
+import {ControlHub, ExpansionHub} from "@rev-robotics/rev-hub-core";
+import {input} from '@inquirer/prompts';
+import {openControlHub} from "@rev-robotics/control-hub";
 
-enum RevHub { CONTROL_HUB, EXPANSION_HUB}
+let expansionHub: ExpansionHub = (await openConnectedExpansionHubs())[0];
+let controlHub: ControlHub = await openControlHub("android-686b9c447250bcad", 8080);
 
 interface LightFixture {
-    revHub: RevHub;
+    revHub: ExpansionHub;
     blinkinPort: number;
 }
 
 const RED_OXYGEN_GOAL: LightFixture = {
-    revHub: RevHub.EXPANSION_HUB,
+    revHub: expansionHub,
     blinkinPort: 0,
 }
 
 const BLUE_OXYGEN_GOAL: LightFixture = {
-    revHub: RevHub.EXPANSION_HUB,
+    revHub: expansionHub,
     blinkinPort: 1,
 }
 
-const allLightFixtures = [RED_OXYGEN_GOAL, BLUE_OXYGEN_GOAL];
+const BLUE_HYDROGEN_GOAL: LightFixture = {
+    revHub: controlHub,
+    blinkinPort: 0
+}
 
-let expansionHub: ExpansionHub = (await openConnectedExpansionHubs())[0];
+const allLightFixtures = [RED_OXYGEN_GOAL, BLUE_OXYGEN_GOAL, BLUE_HYDROGEN_GOAL];
 
 process.on("SIGINT", () => {
     console.log("Exiting");
     expansionHub.close();
+    controlHub.close();
     process.exit();
 });
 
@@ -36,6 +42,8 @@ for (const lightFixture of allLightFixtures) {
 // noinspection InfiniteLoopJS
 while (true) {
     try {
+        console.log(`Control Hub battery: ${await controlHub.getBatteryVoltage() * 1000}V`);
+
         const commandString = await input({ message: "<pulse width> [goal]:"});
         const commandElements = commandString.split(' ');
 
@@ -65,6 +73,8 @@ while (true) {
                 console.error("Invalid oxygen goal");
                 continue;
             }
+        } else if (goal.startsWith("hy")) {
+            lightFixtures = [BLUE_HYDROGEN_GOAL];
         } else {
             console.error("Invalid goal");
             continue;
@@ -73,6 +83,7 @@ while (true) {
         let promises: Promise<void>[] = [];
         for (let lightFixture of lightFixtures) {
             promises.push(setPulseWidth(lightFixture, pulseWidth));
+            // await setPulseWidth(lightFixture, pulseWidth);
         }
         await Promise.all(promises);
     } catch (e) {
@@ -82,19 +93,11 @@ while (true) {
 }
 
 async function init(lightFixture: LightFixture): Promise<void> {
-    if (lightFixture.revHub !== RevHub.EXPANSION_HUB) {
-        throw new Error("init() does not yet support Control Hubs");
-    }
-
-    await expansionHub.setServoConfiguration(lightFixture.blinkinPort, 20000);
-    await expansionHub.setServoPulseWidth(lightFixture.blinkinPort, 1995);
-    await expansionHub.setServoEnable(lightFixture.blinkinPort, true);
+    await lightFixture.revHub.setServoConfiguration(lightFixture.blinkinPort, 20000);
+    await lightFixture.revHub.setServoPulseWidth(lightFixture.blinkinPort, 1995);
+    await lightFixture.revHub.setServoEnable(lightFixture.blinkinPort, true);
 }
 
 function setPulseWidth(lightFixture: LightFixture, pulseWidth_uS: number): Promise<void> {
-    if (lightFixture.revHub !== RevHub.EXPANSION_HUB) {
-        throw new Error("setPulseWidth() does not yet support Control Hubs");
-    }
-
-    return expansionHub.setServoPulseWidth(lightFixture.blinkinPort, pulseWidth_uS);
+    return lightFixture.revHub.setServoPulseWidth(lightFixture.blinkinPort, pulseWidth_uS);
 }
