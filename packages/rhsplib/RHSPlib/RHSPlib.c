@@ -167,12 +167,12 @@ int RHSPlib_sendFailSafe(RHSPlib_Module_T *obj, uint8_t *nackReasonCode)
 
 int RHSPlib_setNewModuleAddress(RHSPlib_Module_T *obj, uint8_t newModuleAddress, uint8_t *nackReasonCode)
 {
-	if (newModuleAddress == 0 || newModuleAddress == 0xFF)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    if (newModuleAddress == 0 || newModuleAddress == 0xFF)
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     return RHSPlib_sendWriteCommandInternal(obj, 0x7F06, &newModuleAddress, sizeof(newModuleAddress),
-                                     nackReasonCode);
+                                            nackReasonCode);
 }
 
 int RHSPlib_queryInterface(RHSPlib_Module_T *obj, const char *interfaceName, RHSPlib_Module_Interface_T *intf, uint8_t *nackReasonCode)
@@ -188,7 +188,7 @@ int RHSPlib_queryInterface(RHSPlib_Module_T *obj, const char *interfaceName, RHS
     }
 
     int result = RHSPlib_sendReadCommandInternal(obj, 0x7F07, (const uint8_t*)interfaceName,
-                                                  (uint16_t)interfaceNameLength, nackReasonCode);
+                                                 (uint16_t)interfaceNameLength, nackReasonCode);
     if (result < 0)
     {
         return result;
@@ -405,16 +405,16 @@ int RHSPlib_discovery(RHSPlib_Serial_T *serialPort, RHSPlib_DiscoveredAddresses_
 static uint16_t getInterfacePacketID(const RHSPlib_Module_InterfaceList_T *interfaceList,
         							 const char* interfaceName, uint16_t functionNumber)
 {
-	const RHSPlib_Module_Interface_T *intf = getInterfaceByName(interfaceList, interfaceName);
-	if (intf == NULL)
-	{
-		return RHSPLIB_INTERFACE_INVALID_PACKET_ID;
-	}
-	if (functionNumber < intf->numberIDValues)
-	{
-		return intf->firstPacketID + functionNumber;
-	}
-	return RHSPLIB_INTERFACE_INVALID_PACKET_ID;
+    const RHSPlib_Module_Interface_T *intf = getInterfaceByName(interfaceList, interfaceName);
+    if (intf == NULL)
+    {
+        return RHSPLIB_INTERFACE_INVALID_PACKET_ID;
+    }
+    if (functionNumber < intf->numberIDValues)
+    {
+        return intf->firstPacketID + functionNumber;
+    }
+    return RHSPLIB_INTERFACE_INVALID_PACKET_ID;
 }
 
 int RHSPlib_getInterfacePacketID(RHSPlib_Module_T *obj,
@@ -433,7 +433,7 @@ int RHSPlib_getInterfacePacketID(RHSPlib_Module_T *obj,
     {
     	if (packetID)
     	{
-    		*packetID = packet_id;
+            *packetID = packet_id;
     	}
     	return RHSPLIB_RESULT_OK;
     }
@@ -444,15 +444,15 @@ int RHSPlib_getInterfacePacketID(RHSPlib_Module_T *obj,
     }
 
     packet_id = getInterfacePacketID(&obj->interfaceList, interfaceName, functionNumber);
-	if (packet_id == RHSPLIB_INTERFACE_INVALID_PACKET_ID)
-	{
-		return RHSPLIB_ERROR_COMMAND_NOT_SUPPORTED;
-	}
-	if (packetID)
-	{
-		*packetID = packet_id;
-	}
-	return RHSPLIB_RESULT_OK;
+    if (packet_id == RHSPLIB_INTERFACE_INVALID_PACKET_ID)
+    {
+        return RHSPLIB_ERROR_COMMAND_NOT_SUPPORTED;
+    }
+    if (packetID)
+    {
+        *packetID = packet_id;
+    }
+    return RHSPLIB_RESULT_OK;
 }
 
 
@@ -556,16 +556,16 @@ int RHSPlib_sendReadCommand(RHSPlib_Module_T *obj, uint16_t packetTypeID,
 
 static void fillPayloadData(const RHSPlib_Module_T *obj, RHSPlib_PayloadData_T *payload)
 {
-	// we've checked buffer overflow in receive logic hence an assert is enough
-	RHSPLIB_ASSERT(RHSPLIB_PACKET_SIZE(obj->rxBuffer) >= (RHSPLIB_PACKET_HEADER_SIZE + RHSPLIB_PACKET_CRC_SIZE));
-	size_t size = RHSPLIB_PACKET_SIZE(obj->rxBuffer) - RHSPLIB_PACKET_HEADER_SIZE - RHSPLIB_PACKET_CRC_SIZE;
-	RHSPLIB_ASSERT(size <= RHSPLIB_MAX_PAYLOAD_SIZE);
+    // we've checked buffer overflow in receive logic hence an assert is enough
+    RHSPLIB_ASSERT(RHSPLIB_PACKET_SIZE(obj->rxBuffer) >= (RHSPLIB_PACKET_HEADER_SIZE + RHSPLIB_PACKET_CRC_SIZE));
+    size_t size = RHSPLIB_PACKET_SIZE(obj->rxBuffer) - RHSPLIB_PACKET_HEADER_SIZE - RHSPLIB_PACKET_CRC_SIZE;
+    RHSPLIB_ASSERT(size <= RHSPLIB_MAX_PAYLOAD_SIZE);
 
-	if (payload)
-	{
-		memcpy(payload->data, RHSPLIB_PACKET_PAYLOAD_PTR(obj->rxBuffer), size);
-		payload->size = (uint16_t)size;
-	}
+    if (payload)
+    {
+        memcpy(payload->data, RHSPLIB_PACKET_PAYLOAD_PTR(obj->rxBuffer), size);
+        payload->size = (uint16_t)size;
+    }
 }
 
 
@@ -603,8 +603,8 @@ static const RHSPlib_Module_Interface_T *getInterfaceByName(const RHSPlib_Module
 static int sendCommand(RHSPlib_Module_T *obj, uint8_t destAddr, uint16_t packetTypeID,
                          const uint8_t *payload, uint16_t payloadSize)
 {
-	// Purge receive buffers to avoid unexpected responses from previous commands
-	serialPurgeRxBuffer(obj->serialPort);
+    // Purge receive buffers to avoid unexpected responses from previous commands
+    serialPurgeRxBuffer(obj->serialPort);
 
     // send command and wait for response
     int result = sendPacket(obj, destAddr, obj->messageNumber, 0, packetTypeID, payload, payloadSize);
@@ -615,10 +615,10 @@ static int sendCommand(RHSPlib_Module_T *obj, uint8_t destAddr, uint16_t packetT
     // we should increment message number upon successful data transfer
     // otherwise we may get unexpected response when we send a new message with the same messageNumber
     obj->messageNumber++;
-	if (obj->messageNumber == 0)
-	{
-		obj->messageNumber = 1;
-	}
+    if (obj->messageNumber == 0)
+    {
+        obj->messageNumber = 1;
+    }
     result = receivePacket(obj);
     if (result < 0)
     {
@@ -931,11 +931,11 @@ static int serialRead(RHSPlib_Serial_T *serialPort, uint8_t *buffer, size_t byte
 
 static void serialPurgeRxBuffer(RHSPlib_Serial_T *serialPort)
 {
-	uint8_t buffer[64];
-	int retval;
+    uint8_t buffer[64];
+    int retval;
 
-	// read out rx buffer until becomes empty
-	while ((retval = serialRead(serialPort, buffer, sizeof(buffer))) > 0)
-	{
-	}
+    // read out rx buffer until becomes empty
+    while ((retval = serialRead(serialPort, buffer, sizeof(buffer))) > 0)
+    {
+    }
 }

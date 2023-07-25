@@ -24,6 +24,7 @@ export * from "./SerialFlowControl.js";
 export * from "./SerialParity.js";
 export * from "./VerbosityLevel.js";
 export * from "./Version.js";
+export * from "./serial-errors.js";
 export * from "./nack-errors/NackError.js";
 export * from "./nack-errors/BatteryTooLowError.js";
 export * from "./nack-errors/diagnostic-errors.js";

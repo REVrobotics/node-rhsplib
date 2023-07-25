@@ -11,13 +11,13 @@
 #define I2C_MAX_PAYLOAD_SIZE              100 //max payload for i2c data transfers
 
 static int writeReadMultipleBytesFallback(RHSPlib_Module_T *obj,
-                              	  	      uint8_t i2cChannel, uint8_t slaveAddress, uint8_t bytesToRead,
-										  uint8_t startAddress, uint8_t *nackReasonCode);
+                                          uint8_t i2cChannel, uint8_t slaveAddress, uint8_t bytesToRead,
+                                          uint8_t startAddress, uint8_t *nackReasonCode);
 
 int RHSPlib_i2c_configureChannel(RHSPlib_Module_T *obj,
-                                  uint8_t i2cChannel, uint8_t speedCode, uint8_t *nackReasonCode)
+                                 uint8_t i2cChannel, uint8_t speedCode, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -46,9 +46,9 @@ int RHSPlib_i2c_configureChannel(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_i2c_configureQuery(RHSPlib_Module_T *obj,
-                                uint8_t i2cChannel, uint8_t *speedCode, uint8_t *nackReasonCode)
+                               uint8_t i2cChannel, uint8_t *speedCode, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -57,9 +57,9 @@ int RHSPlib_i2c_configureQuery(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (i2cChannel >= RHSPLIB_MAX_NUMBER_OF_I2C_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     int retval = RHSPlib_getInterfacePacketID(obj, "DEKA", 47, &packetID, nackReasonCode);
     if (retval < 0)
     {
@@ -79,10 +79,10 @@ int RHSPlib_i2c_configureQuery(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_i2c_writeSingleByte(RHSPlib_Module_T *obj,
-                                 uint8_t i2cChannel, uint8_t slaveAddress,
-                                 uint8_t byteToWrite, uint8_t *nackReasonCode)
+                                uint8_t i2cChannel, uint8_t slaveAddress,
+                                uint8_t byteToWrite, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -91,9 +91,9 @@ int RHSPlib_i2c_writeSingleByte(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (i2cChannel >= RHSPLIB_MAX_NUMBER_OF_I2C_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     else if (slaveAddress > 127)
     {
     	return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
@@ -112,10 +112,10 @@ int RHSPlib_i2c_writeSingleByte(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_i2c_writeMultipleBytes(RHSPlib_Module_T *obj,
-                                    uint8_t i2cChannel, uint8_t slaveAddress,
-                                    uint8_t bytesToWrite, const uint8_t *payload, uint8_t *nackReasonCode)
+                                   uint8_t i2cChannel, uint8_t slaveAddress,
+                                   uint8_t bytesToWrite, const uint8_t *payload, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
     RHSPLIB_ASSERT(payload);
@@ -127,9 +127,9 @@ int RHSPlib_i2c_writeMultipleBytes(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (i2cChannel >= RHSPLIB_MAX_NUMBER_OF_I2C_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     else if (slaveAddress > 127)
     {
     	return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
@@ -152,10 +152,10 @@ int RHSPlib_i2c_writeMultipleBytes(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_i2c_writeStatusQuery(RHSPlib_Module_T *obj,
-                                  uint8_t i2cChannel, uint8_t *i2cTransactionStatus,
-								  uint8_t *writtenBytes, uint8_t *nackReasonCode)
+                                 uint8_t i2cChannel, uint8_t *i2cTransactionStatus,
+                                 uint8_t *writtenBytes, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -164,9 +164,9 @@ int RHSPlib_i2c_writeStatusQuery(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (i2cChannel >= RHSPLIB_MAX_NUMBER_OF_I2C_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     int retval = RHSPlib_getInterfacePacketID(obj, "DEKA", 42, &packetID, nackReasonCode);
     if (retval < 0)
     {
@@ -190,9 +190,9 @@ int RHSPlib_i2c_writeStatusQuery(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_i2c_readSingleByte(RHSPlib_Module_T *obj,
-                                uint8_t i2cChannel, uint8_t slaveAddress, uint8_t *nackReasonCode)
+                               uint8_t i2cChannel, uint8_t slaveAddress, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -201,9 +201,9 @@ int RHSPlib_i2c_readSingleByte(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (i2cChannel >= RHSPLIB_MAX_NUMBER_OF_I2C_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     else if (slaveAddress > 127)
     {
     	return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
@@ -221,10 +221,10 @@ int RHSPlib_i2c_readSingleByte(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_i2c_readMultipleBytes(RHSPlib_Module_T *obj,
-                                   uint8_t i2cChannel, uint8_t slaveAddress,
-                                   uint8_t bytesToRead, uint8_t *nackReasonCode)
+                                  uint8_t i2cChannel, uint8_t slaveAddress,
+                                  uint8_t bytesToRead, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -234,9 +234,9 @@ int RHSPlib_i2c_readMultipleBytes(RHSPlib_Module_T *obj,
     }
 
     if (i2cChannel >= RHSPLIB_MAX_NUMBER_OF_I2C_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     else if (slaveAddress > 127)
     {
     	return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
@@ -259,8 +259,8 @@ int RHSPlib_i2c_readMultipleBytes(RHSPlib_Module_T *obj,
 
 
 static int writeReadMultipleBytesFallback(RHSPlib_Module_T *obj,
-                              	  	  	  uint8_t i2cChannel, uint8_t slaveAddress, uint8_t bytesToRead,
-										  uint8_t startAddress, uint8_t *nackReasonCode)
+                                          uint8_t i2cChannel, uint8_t slaveAddress, uint8_t bytesToRead,
+                                          uint8_t startAddress, uint8_t *nackReasonCode)
 {
     int result = RHSPlib_i2c_writeSingleByte(obj, i2cChannel, slaveAddress, startAddress, nackReasonCode);
     if (result < 0)
@@ -280,10 +280,10 @@ static int writeReadMultipleBytesFallback(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_i2c_writeReadMultipleBytes(RHSPlib_Module_T *obj,
-                                        uint8_t i2cChannel, uint8_t slaveAddress, uint8_t bytesToRead,
-                                        uint8_t startAddress, uint8_t *nackReasonCode)
+                                       uint8_t i2cChannel, uint8_t slaveAddress, uint8_t bytesToRead,
+                                       uint8_t startAddress, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -292,9 +292,9 @@ int RHSPlib_i2c_writeReadMultipleBytes(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (i2cChannel >= RHSPLIB_MAX_NUMBER_OF_I2C_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     else if (slaveAddress > 127)
     {
     	return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
@@ -323,10 +323,10 @@ int RHSPlib_i2c_writeReadMultipleBytes(RHSPlib_Module_T *obj,
 
 
 int RHSPlib_i2c_readStatusQuery(RHSPlib_Module_T *obj,
-                                 uint8_t i2cChannel, uint8_t *i2cTransactionStatusByte,
-                                 uint8_t *bytesRead, uint8_t *payload, uint8_t *nackReasonCode)
+                                uint8_t i2cChannel, uint8_t *i2cTransactionStatusByte,
+                                uint8_t *bytesRead, uint8_t *payload, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
     RHSPLIB_ASSERT(obj);
 
     if (!obj)
