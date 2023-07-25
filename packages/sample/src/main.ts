@@ -682,10 +682,8 @@ async function getExpansionHubOrThrow(): Promise<[hub: ExpansionHub, close: () =
     if (connectedHubs.length == 0) {
         throw new Error("No hubs are connected");
     }
-    if (connectedHubs.length > 1 || connectedHubs[0].children.length > 0) {
-        throw new Error(
-            "Multiple hubs connected. You must specify a serialNumber and/or address.",
-        );
+    if (connectedHubs.length > 1) {
+        throw new Error("Multiple hubs connected. You must specify a serialNumber.");
     }
 
     // Open the only Hub that is connected
