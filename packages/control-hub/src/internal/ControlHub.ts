@@ -76,7 +76,7 @@ export class ControlHubInternal implements ControlHub {
         return true;
     }
 
-    async open(ip: string = "192.168.43.1", port: string = "8081"): Promise<void> {
+    async open(ip: string, port: number): Promise<void> {
         this.webSocketConnection = new WebSocket(`ws://${ip}:${port}`);
 
         this.webSocketConnection.on("message", (data) => {
