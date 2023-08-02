@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 import {
     BulkInputData,
+    ClosedLoopControlAlgorithm,
     DebugGroup,
     DigitalChannelDirection,
     DiscoveredAddresses,
@@ -13,7 +14,9 @@ import {
     LedPattern,
     ModuleInterface,
     ModuleStatus,
+    MotorMode,
     PidCoefficients,
+    PidfCoefficients,
     Rgb,
     SerialFlowControl,
     VerbosityLevel,
@@ -150,12 +153,12 @@ export declare class RevHub {
     // Motor
     setMotorChannelMode(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
         floatAtZero: boolean,
     ): Promise<void>;
     getMotorChannelMode(
         motorChannel: number,
-    ): Promise<{ motorMode: number; floatAtZero: boolean }>;
+    ): Promise<{ motorMode: MotorMode; floatAtZero: boolean }>;
     setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void>;
     getMotorChannelEnable(motorChannel: number): Promise<boolean>;
     setMotorChannelCurrentAlertLevel(
@@ -178,15 +181,28 @@ export declare class RevHub {
     ): Promise<{ targetPosition: number; targetTolerance: number }>;
     getMotorAtTarget(motorChannel: number): Promise<boolean>;
     getMotorEncoderPosition(motorChannel: number): Promise<number>;
-    setMotorPIDCoefficients(
+    setMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm.Pid,
         pid: PidCoefficients,
     ): Promise<void>;
-    getMotorPIDCoefficients(
+    setMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: number,
-    ): Promise<PidCoefficients>;
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm.Pidf,
+        pidf: PidfCoefficients,
+    ): Promise<void>;
+    setMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm,
+        pid: PidCoefficients | PidfCoefficients,
+    ): Promise<void>;
+    getMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+    ): Promise<PidfCoefficients | PidCoefficients>;
 
     // PWM
     setPWMConfiguration(pwmChannel: number, framePeriod: number): Promise<void>;

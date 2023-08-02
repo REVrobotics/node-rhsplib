@@ -6,8 +6,10 @@
 #include <RHSPlib_motor.h>
 #include <RHSPlib_pwm.h>
 #include <RHSPlib_servo.h>
+#include <RHSPlib_motor.h>
 
 #include "RHSPlibWorker.h"
+#include "napi.h"
 #include "serialWrapper.h"
 
 // See https://github.com/nodejs/node-addon-api/blob/main/doc/object_wrap.md
@@ -121,10 +123,10 @@ Napi::Object RevHub::Init(Napi::Env env, Napi::Object exports) {
           RevHub::InstanceMethod("getMotorAtTarget", &RevHub::getMotorAtTarget),
           RevHub::InstanceMethod("getMotorEncoderPosition",
                                  &RevHub::getMotorEncoderPosition),
-          RevHub::InstanceMethod("setMotorPIDCoefficients",
-                                 &RevHub::setMotorPIDCoefficients),
-          RevHub::InstanceMethod("getMotorPIDCoefficients",
-                                 &RevHub::getMotorPIDCoefficients),
+          RevHub::InstanceMethod("setMotorClosedLoopControlCoefficients",
+                                 &RevHub::setMotorClosedLoopControlCoefficients),
+          RevHub::InstanceMethod("getMotorClosedLoopControlCoefficients",
+                                 &RevHub::getMotorClosedLoopControlCoefficients),
           RevHub::InstanceMethod("setPWMConfiguration",
                                  &RevHub::setPWMConfiguration),
           RevHub::InstanceMethod("getPWMConfiguration",
@@ -1112,7 +1114,7 @@ Napi::Value RevHub::setMotorConstantPower(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
 
     uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
-    int16_t powerLevel = info[1].As<Napi::Number>().Int32Value();
+    double powerLevel = info[1].As<Napi::Number>().DoubleValue();
 
     CREATE_VOID_WORKER(worker, env, {
         _code = RHSPlib_motor_setConstantPower(&this->obj, motorChannel, powerLevel,
@@ -1127,7 +1129,7 @@ Napi::Value RevHub::getMotorConstantPower(const Napi::CallbackInfo &info) {
 
     uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
 
-    using retType = int16_t;
+    using retType = double;
     CREATE_WORKER(worker, env, retType, {
         _code = RHSPlib_motor_getConstantPower(&this->obj, motorChannel, &_data,
                                                &_nackCode);
@@ -1244,47 +1246,77 @@ Napi::Value RevHub::getMotorEncoderPosition(const Napi::CallbackInfo &info) {
     QUEUE_WORKER(worker);
 }
 
-Napi::Value RevHub::setMotorPIDCoefficients(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::setMotorClosedLoopControlCoefficients(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
 
     uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
     uint8_t motorMode = info[1].As<Napi::Number>().Uint32Value();
-    Napi::Object pid = info[2].As<Napi::Object>();
-    int32_t proportionalCoeff = pid.Get("P").As<Napi::Number>().Int32Value();
-    int32_t integralCoeff = pid.Get("I").As<Napi::Number>().Int32Value();
-    int32_t derivativeCoeff = pid.Get("D").As<Napi::Number>().Int32Value();
+    uint8_t algorithm = info[2].As<Napi::Number>().Uint32Value();
+    Napi::Object pid = info[3].As<Napi::Object>();
+    double proportionalCoeff = pid.Get("p").As<Napi::Number>().DoubleValue();
+    double integralCoeff = pid.Get("i").As<Napi::Number>().DoubleValue();
+    double derivativeCoeff = pid.Get("d").As<Napi::Number>().DoubleValue();
+
+    double feedForwardCoeff = 0.0;
+    if(algorithm == 1) {
+        Napi::Value fValue = pid.Get("f");
+        if(fValue.IsEmpty() || fValue.IsUndefined()) {
+            //throw error
+            printf("feedforward was not provided for PIDF algorithm.");
+        }
+        feedForwardCoeff = fValue.As<Napi::Number>().DoubleValue();
+    }
 
     CREATE_VOID_WORKER(worker, env, {
-        _code = RHSPlib_motor_setPIDControlLoopCoefficients(
-            &this->obj, motorChannel, motorMode, proportionalCoeff, integralCoeff,
-            derivativeCoeff, &_nackCode);
+        closed_loop_control_parameters p;
+        p.type = algorithm;
+
+        if(algorithm == 0) {
+            p.pid.p = proportionalCoeff;
+            p.pid.i = integralCoeff;
+            p.pid.d = derivativeCoeff;
+        } else {
+            p.pidf.p = proportionalCoeff;
+            p.pidf.i = integralCoeff;
+            p.pidf.d = derivativeCoeff;
+            p.pidf.f = feedForwardCoeff;
+        }
+
+        _code = RHSPlib_motor_setClosedLoopControlCoefficients(
+            &this->obj, motorChannel, motorMode, &p, &_nackCode);
     });
 
     QUEUE_WORKER(worker);
 }
 
-Napi::Value RevHub::getMotorPIDCoefficients(const Napi::CallbackInfo &info) {
+Napi::Value RevHub::getMotorClosedLoopControlCoefficients(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
 
     uint8_t motorChannel = info[0].As<Napi::Number>().Uint32Value();
     uint8_t motorMode = info[1].As<Napi::Number>().Uint32Value();
 
     using retType = struct {
-        int32_t proportionalCoeff;
-        int32_t integralCoeff;
-        int32_t derivativeCoeff;
+        closed_loop_control_parameters params;
     };
     CREATE_WORKER(worker, env, retType, {
-        _code = RHSPlib_motor_getPIDControlLoopCoefficients(
-            &this->obj, motorChannel, motorMode, &_data.proportionalCoeff,
-            &_data.integralCoeff, &_data.derivativeCoeff, &_nackCode);
+        _code = RHSPlib_motor_getClosedLoopControlCoefficients(
+            &this->obj, motorChannel, motorMode, &_data.params, &_nackCode);
     });
 
     SET_WORKER_CALLBACK(worker, retType, {
         Napi::Object pidCoeffObj = Napi::Object::New(_env);
-        pidCoeffObj.Set("P", _data.proportionalCoeff);
-        pidCoeffObj.Set("I", _data.integralCoeff);
-        pidCoeffObj.Set("D", _data.derivativeCoeff);
+
+        if(_data.params.type == 0) {
+            pidCoeffObj.Set("p", _data.params.pid.p);
+            pidCoeffObj.Set("i", _data.params.pid.i);
+            pidCoeffObj.Set("d", _data.params.pid.d);
+        } else if(_data.params.type == 1) {
+            pidCoeffObj.Set("p", _data.params.pidf.p);
+            pidCoeffObj.Set("i", _data.params.pidf.i);
+            pidCoeffObj.Set("d", _data.params.pidf.d);
+            pidCoeffObj.Set("f", _data.params.pidf.f);
+        }
+        pidCoeffObj.Set("algorithm", _data.params.type);
         return pidCoeffObj;
     });
 

@@ -5,6 +5,7 @@
  *      Author: user
  */
 #include "RHSPlib_motor.h"
+#include <math.h>
 
 int RHSPlib_motor_setChannelMode(RHSPlib_Module_T *obj,
                                  uint8_t motorChannel, uint8_t motorMode, uint8_t floatAtZero,
@@ -245,7 +246,7 @@ int RHSPlib_motor_resetEncoder(RHSPlib_Module_T *obj,
 
 int RHSPlib_motor_setConstantPower(RHSPlib_Module_T *obj,
                                    uint8_t motorChannel,
-                                   int16_t powerLevel, uint8_t *nackReasonCode)
+								   double powerLevel, uint8_t *nackReasonCode)
 {
     uint16_t packetID;
 
@@ -268,15 +269,17 @@ int RHSPlib_motor_setConstantPower(RHSPlib_Module_T *obj,
 
     uint8_t cmdPayload[3];
 
+    int16_t adjustedPowerLevel = (int16_t)(powerLevel*32767);
+
     RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 0, motorChannel);
-    RHSPLIB_ARRAY_SET_WORD(cmdPayload, 1, powerLevel);
+    RHSPLIB_ARRAY_SET_WORD(cmdPayload, 1, adjustedPowerLevel);
 
     return RHSPlib_sendWriteCommandInternal(obj, packetID, cmdPayload, sizeof(cmdPayload), nackReasonCode);
 }
 
 int RHSPlib_motor_getConstantPower(RHSPlib_Module_T *obj,
                                    uint8_t motorChannel,
-                                   int16_t *powerLevel, uint8_t *nackReasonCode)
+                                   double *powerLevel, uint8_t *nackReasonCode)
 {
     uint16_t packetID;
 
@@ -305,7 +308,8 @@ int RHSPlib_motor_getConstantPower(RHSPlib_Module_T *obj,
 
     if (powerLevel)
     {
-        *powerLevel = RHSPLIB_ARRAY_WORD(int16_t, RHSPLIB_PACKET_PAYLOAD_PTR(obj->rxBuffer), 0);
+        int16_t rawPowerLevel = RHSPLIB_ARRAY_WORD(int16_t, RHSPLIB_PACKET_PAYLOAD_PTR(obj->rxBuffer), 0);
+        *powerLevel = (rawPowerLevel/32767.0);
     }
 
     return RHSPLIB_RESULT_OK;
@@ -532,9 +536,9 @@ int RHSPlib_motor_getEncoderPosition(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_motor_setPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
-                                                uint8_t motorChannel,
-                                                uint8_t mode, int32_t proportionalCoeff,
-                                                int32_t integralCoeff, int32_t derivativeCoeff, uint8_t *nackReasonCode)
+                                				uint8_t motorChannel,
+											    uint8_t mode, double proportionalCoeff,
+												double integralCoeff, double derivativeCoeff, uint8_t *nackReasonCode)
 {
     uint16_t packetID;
 
@@ -561,19 +565,22 @@ int RHSPlib_motor_setPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
 
     uint8_t cmdPayload[14];
 
+    int32_t p = (int)round(proportionalCoeff*65536.0);
+    int32_t i = (int)round(integralCoeff*65536.0);
+    int32_t d = (int)round(derivativeCoeff*65536.0);
+
     RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 0, motorChannel);
     RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 1, mode);
-    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 2, proportionalCoeff);
-    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 6, integralCoeff);
-    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 10, derivativeCoeff);
+    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 2, p);
+    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 6, i);
+    RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 10, d);
 
     return RHSPlib_sendWriteCommandInternal(obj, packetID, cmdPayload, sizeof(cmdPayload), nackReasonCode);
 }
 
-int RHSPlib_motor_getPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
-                                                uint8_t motorChannel,
-                                                uint8_t mode, int32_t *proportionalCoeff,
-                                                int32_t *integralCoeff, int32_t *derivativeCoeff, uint8_t *nackReasonCode)
+int RHSPlib_motor_setClosedLoopControlCoefficients(RHSPlib_Module_T *obj,
+                                                   uint8_t motorChannel,
+                                                   uint8_t mode, closed_loop_control_parameters *parameters, uint8_t *nackReasonCode)
 {
     uint16_t packetID;
 
@@ -584,18 +591,83 @@ int RHSPlib_motor_getPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (motorChannel >= RHSPLIB_MAX_NUMBER_OF_MOTOR_CHANNELS)
-    {
+	{
         return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
     }
     else if (mode != 1 && mode != 2)
     {
-    	return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
+        return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
     }
 
-    int result = RHSPlib_getInterfacePacketID(obj, "DEKA", 24, &packetID, nackReasonCode);
+    int functionNumber = (parameters->type == LEGACY_PID_TAG) ? 23: 51;
+    int result = RHSPlib_getInterfacePacketID(obj, "DEKA", functionNumber, &packetID, nackReasonCode);
     if (result < 0)
     {
-    	return result;
+        return result;
+    }
+
+    uint8_t cmdPayload[19];
+
+    RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 0, motorChannel);
+    RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 1, mode);
+
+    if (parameters->type == LEGACY_PID_TAG)
+    {
+        int32_t p = (int)round(parameters->pid.p*65536.0);
+        int32_t i = (int)round(parameters->pid.i*65536.0);
+        int32_t d = (int)round(parameters->pid.d*65536.0);
+
+        RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 2, p);
+        RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 6, i);
+        RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 10, d);
+    } else if(parameters->type == PIDF_TAG)
+    {
+        int32_t p = (int)round(parameters->pidf.p*65536.0);
+        int32_t i = (int)round(parameters->pidf.i*65536.0);
+        int32_t d = (int)round(parameters->pidf.d*65536.0);
+        int32_t f = (int)round(parameters->pidf.f*65536.0);
+
+        RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 2, p);
+        RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 6, i);
+        RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 10, d);
+        RHSPLIB_ARRAY_SET_DWORD(cmdPayload, 14, f);
+        RHSPLIB_ARRAY_SET_BYTE(cmdPayload, 18, 1); //1 is PIDF
+    }
+
+    return RHSPlib_sendWriteCommandInternal(obj, packetID, cmdPayload, sizeof(cmdPayload), nackReasonCode);
+}
+
+int RHSPlib_motor_getClosedLoopControlCoefficients(RHSPlib_Module_T *obj,
+                                                uint8_t motorChannel,
+                                                uint8_t mode, closed_loop_control_parameters *parameters, uint8_t *nackReasonCode)
+{
+    uint16_t packetID;
+
+    RHSPLIB_ASSERT(obj);
+
+    if (!obj)
+    {
+        return RHSPLIB_ERROR;
+    }
+    if (motorChannel >= RHSPLIB_MAX_NUMBER_OF_MOTOR_CHANNELS)
+	{
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
+    else if (mode != 1 && mode != 2)
+    {
+        return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
+    }
+
+    int supportsPidf = 1;
+    int result = RHSPlib_getInterfacePacketID(obj, "DEKA", 53, &packetID, nackReasonCode);
+    if(result < 0)
+    {
+        supportsPidf = 0;
+        result = RHSPlib_getInterfacePacketID(obj, "DEKA", 24, &packetID, nackReasonCode);
+        if (result < 0)
+        {
+        return result;
+        }
     }
 
     uint8_t cmdPayload[2] = {motorChannel, mode};
@@ -608,20 +680,36 @@ int RHSPlib_motor_getPIDControlLoopCoefficients(RHSPlib_Module_T *obj,
 
     const uint8_t *rspPayload = RHSPLIB_PACKET_PAYLOAD_PTR(obj->rxBuffer);
 
-    if (proportionalCoeff)
-    {
-        *proportionalCoeff = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 0);
-    }
-    if (integralCoeff)
-    {
-        *integralCoeff = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 4);
-    }
-    if (derivativeCoeff)
-    {
-        *derivativeCoeff = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 8);
+    if(parameters) {
+        int32_t p = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 0);
+        int32_t i = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 4);
+        int32_t d = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 8);
+
+        int usingPidf = supportsPidf;
+
+        if(supportsPidf) {
+            uint8_t mode = RHSPLIB_ARRAY_BYTE(uint8_t, rspPayload, 16);
+
+            // we support PIDF, but we're currently using the legacy PID.
+            if(mode == 0) {
+                usingPidf = 0;
+            }
+        }
+
+        if(usingPidf) {
+            int32_t f = RHSPLIB_ARRAY_DWORD(int32_t, rspPayload, 12);
+            parameters->type = PIDF_TAG;
+            parameters->pidf.p = p/65536.0;
+            parameters->pidf.i = i/65536.0;
+            parameters->pidf.d = d/65536.0;
+            parameters->pidf.f = f/65536.0;
+        } else {
+            parameters->type = LEGACY_PID_TAG;
+            parameters->pid.p = p/65536.0;
+            parameters->pid.i = i/65536.0;
+            parameters->pid.d = d/65536.0;
+        }
     }
 
     return RHSPLIB_RESULT_OK;
 }
-
-
