@@ -24,16 +24,16 @@ import {
     Version,
     ParentExpansionHub,
 } from "@rev-robotics/rev-hub-core";
-import { openUsbControlHubs } from "rev-hub-cli/dist/adb-setup.js";
 import { clearTimeout } from "timers";
 import { ControlHubConnectedExpansionHub } from "./ControlHubConnectedExpansionHub.js";
+import {RcInfo} from "./RcInfo.js";
 
 export class ControlHubInternal implements ControlHub {
     readonly isOpen: boolean = true;
     readonly moduleAddress: number = 173;
     responseTimeoutMs: number = 0;
     type: RevHubType = RevHubType.ControlHub;
-    readonly serialNumber: string;
+    readonly serialNumber: string = "(unknown)";
 
     /**
      * All children connected over USB, as well as the one embedded hub.
@@ -68,16 +68,32 @@ export class ControlHubInternal implements ControlHub {
         (response: any | undefined, error: any | undefined) => void
     >();
 
-    constructor(serialNumber: string) {
-        this.serialNumber = serialNumber;
-    }
+    constructor() {}
 
     isParent(): this is ParentRevHub {
         return true;
     }
 
-    async open(ip: string, port: number): Promise<void> {
-        this.webSocketConnection = new WebSocket(`ws://${ip}:${port}`);
+    async open(ipAddressOrHostname: string, httpPort: number): Promise<void> {
+        // noinspection HttpUrlsUsage
+        let rcInfo: RcInfo = (
+            await axios.get(`http://${ipAddressOrHostname}:${httpPort}/js/rcInfo.json`, {
+                timeout: 1000,
+            })
+        ).data;
+
+        if (rcInfo === undefined) {
+            // TODO(Noah): Throw more specific error
+            throw new Error("Communication failure");
+        }
+        if (rcInfo.sdkVersion === undefined || !semver.gte(rcInfo.sdkVersion, "8.2")) {
+            // TODO(Noah): Throw more specific error
+            throw new Error("Control Hub is not running Robot Controller app version 8.2 or later");
+        }
+
+        this.webSocketConnection = new WebSocket(
+            `ws://${ipAddressOrHostname}:${httpPort + 1}`,
+        );
 
         this.webSocketConnection.on("message", (data) => {
             let rawMessage = JSON.parse(data.toString());
@@ -142,22 +158,6 @@ export class ControlHubInternal implements ControlHub {
         });
     }
 
-    async isWiFiConnected(): Promise<boolean> {
-        try {
-            let response = await axios.get("http://192.168.43.1:8080/js/rcInfo.json", {
-                timeout: 1000,
-            });
-            if (response.data) {
-                let rcVersion: string = response.data.rcVersion;
-                return semver.satisfies(rcVersion, ">=8.2");
-            }
-
-            return false;
-        } catch (e) {
-            return false;
-        }
-    }
-
     async subscribe(): Promise<void> {
         let payload = {
             namespace: "system",
@@ -167,6 +167,7 @@ export class ControlHubInternal implements ControlHub {
         this.webSocketConnection.send(JSON.stringify(payload));
     }
 
+    // TODO(Noah): Rename to getHubHandle()
     async openHub(
         serialNumber: string,
         parentAddress: number,
@@ -542,6 +543,7 @@ export class ControlHubInternal implements ControlHub {
     }
 
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {
+        // TODO(Noah): Extract the embedded constant somewhere
         let id = await this.openHub("(embedded)", this.moduleAddress, moduleAddress);
 
         let newHub = new ControlHubConnectedExpansionHub(
@@ -626,6 +628,7 @@ export class ControlHubInternal implements ControlHub {
     }
 }
 
+// TODO(Noah): Delete method
 export async function openUsbControlHubsAndChildren(): Promise<ControlHub[]> {
     let hubs = await openUsbControlHubs();
     let result: ControlHub[] = [];

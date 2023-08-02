@@ -4,11 +4,14 @@ import { ControlHub } from "@rev-robotics/rev-hub-core";
 export { openUsbControlHubsAndChildren } from "./internal/ControlHub.js";
 
 export async function openControlHub(
-    serialNumber: string,
-    moduleAddress: number,
+    ipAddressOrHostname: string,
     port: number,
 ): Promise<ControlHub> {
-    let hub = new ControlHubInternal(serialNumber);
-    await hub.open("127.0.0.1", port + 1);
+    let hub = new ControlHubInternal();
+    await hub.open(ipAddressOrHostname, port);
     return hub;
 }
+
+// export async function openControlHubAndAllChildren(hostname: string, port: number): Promise<ControlHub> {
+//
+// }
