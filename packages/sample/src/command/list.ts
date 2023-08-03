@@ -1,22 +1,14 @@
 import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
 import { controlHubHierarchyToString } from "../HubStringify.js";
-import {
-    openConnectedControlHub, openUsbControlHubsAndChildren,
-} from "@rev-robotics/control-hub";
-import { ExpansionHub } from "@rev-robotics/rev-hub-core";
+import {ControlHub, ExpansionHub} from "@rev-robotics/rev-hub-core";
+import {openUsbControlHubs} from "../adb-setup.js";
 
 export async function list() {
-    let usbControlHubs = await openUsbControlHubsAndChildren();
+    let usbControlHubs = await openUsbControlHubs();
     for (const hub of usbControlHubs) {
         let hierarchy = controlHubHierarchyToString(hub);
         console.log(hierarchy);
         hub.close();
-    }
-
-    const controlHub = await openConnectedControlHub();
-    if (controlHub) {
-        console.log(`WiFi Control Hub: ${controlHub.moduleAddress}\n\n`);
-        controlHub.close();
     }
 
     const hubs: ExpansionHub[] = await openConnectedExpansionHubs();

@@ -236,7 +236,7 @@ export class ControlHubInternal implements ControlHub {
     }
 
     async getDigitalAllInputs(): Promise<number> {
-        return this.embedded.getDigitalAllInputs();
+        return this.embedded.getAllDigitalInputs();
     }
 
     async getDigitalDirection(dioPin: number): Promise<DigitalChannelDirection> {
@@ -409,7 +409,7 @@ export class ControlHubInternal implements ControlHub {
     }
 
     async setDigitalAllOutputs(bitPackedField: number): Promise<void> {
-        return this.embedded.setDigitalAllOutputs(bitPackedField);
+        return this.embedded.setAllDigitalOutputs(bitPackedField);
     }
 
     async setDigitalDirection(dioPin: number, direction: DigitalChannelDirection): Promise<void> {
@@ -417,7 +417,7 @@ export class ControlHubInternal implements ControlHub {
     }
 
     async setDigitalSingleOutput(dioPin: number, value: DigitalState): Promise<void> {
-        return this.embedded.setDigitalSingleOutput(dioPin, value);
+        return this.embedded.setDigitalOutput(dioPin, value);
     }
 
     async setFTDIResetControl(ftdiResetControl: boolean): Promise<void> {

@@ -9,10 +9,10 @@ import {
     I2CWriteStatus,
     LedPattern,
     ModuleInterface,
-    ModuleStatus,
+    ModuleStatus, MotorMode,
     ParentExpansionHub,
     ParentRevHub,
-    PidCoefficients,
+    PidCoefficients, PidfCoefficients,
     RevHub,
     RevHubType,
     Rgb,
@@ -142,7 +142,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         };
     }
 
-    async getDigitalAllInputs(): Promise<number> {
+    async getAllDigitalInputs(): Promise<number> {
         return await this.sendCommand("getAllDigitalInputs", {
             hId: this.id,
         });
@@ -449,7 +449,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         });
     }
 
-    async setDigitalAllOutputs(bitPackedField: number): Promise<void> {
+    async setAllDigitalOutputs(bitPackedField: number): Promise<void> {
         await this.sendCommand("readVersionString", {
             hId: this.id,
             bf: bitPackedField,
@@ -464,7 +464,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         });
     }
 
-    async setDigitalSingleOutput(dioPin: number, value: DigitalState): Promise<void> {
+    async setDigitalOutput(dioPin: number, value: DigitalState): Promise<void> {
         await this.sendCommand("readVersionString", {
             hId: this.id,
             c: dioPin,
@@ -679,5 +679,20 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         this.children.push(newHub);
 
         return newHub;
+    }
+
+    getMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode): Promise<PidfCoefficients | PidCoefficients> {
+        return this.getMotorPIDCoefficients(motorChannel, motorMode);
+    }
+
+
+    async setMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm,
+        pid: PidCoefficients | PidfCoefficients,
+    ): Promise<void> {
+        //Todo(landry): handle pidf
+        await this.setMotorPIDCoefficients(motorChannel, motorMode, pid as PidCoefficients);
     }
 }
