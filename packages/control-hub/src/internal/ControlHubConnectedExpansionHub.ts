@@ -564,7 +564,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         await this.sendCommand("setMotorPidCoefficients", {
             hId: this.id,
             c: motorChannel,
-            motorMode: motorMode,
+            m: motorMode,
             p: pid.p,
             i: pid.i,
             d: pid.d,
@@ -684,7 +684,6 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     getMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode): Promise<PidfCoefficients | PidCoefficients> {
         return this.getMotorPIDCoefficients(motorChannel, motorMode);
     }
-
 
     async setMotorClosedLoopControlCoefficients(
         motorChannel: number,
