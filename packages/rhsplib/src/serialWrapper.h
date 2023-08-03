@@ -1,7 +1,7 @@
 #ifndef SERIAL_WRAPPER_H_
 #define SERIAL_WRAPPER_H_
 
-#include <RHSPlib_serial.h>
+#include "rhsp/serial.h"
 #include <napi.h>
 
 class Serial : public Napi::ObjectWrap<Serial> {
@@ -15,10 +15,10 @@ class Serial : public Napi::ObjectWrap<Serial> {
     Napi::Value read(const Napi::CallbackInfo &info);
     Napi::Value write(const Napi::CallbackInfo &info);
 
-    RHSPlib_Serial_T *getSerialObj() { return &serialPort; };
+    RhspSerial *getSerialObj() { return &serialPort; };
 
   private:
-    RHSPlib_Serial_T serialPort;
+    RhspSerial serialPort;
 };
 
 #endif

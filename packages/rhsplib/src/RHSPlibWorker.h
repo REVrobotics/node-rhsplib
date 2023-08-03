@@ -2,7 +2,7 @@
 #define RHSPLIBWORKER_H_
 
 #include <napi.h>
-#include <RHSPlib_errors.h>
+#include "rhsp/rhsp.h"
 
 #include <map>
 #include <mutex>
@@ -132,7 +132,7 @@ class RHSPlibWorker : public Napi::AsyncWorker, public RHSPlibWorkerBase {
         } else {
             Napi::Object errorObj = Napi::Object::New(Env());
             errorObj.Set("errorCode", resultCode);
-            if (resultCode == RHSPLIB_ERROR_NACK_RECEIVED) {
+            if (resultCode == RHSP_ERROR_NACK_RECEIVED) {
                 errorObj.Set("nackCode", nackCode);
             }
             deferred.Reject(errorObj);
@@ -207,7 +207,7 @@ class RHSPlibWorker<void> : public Napi::AsyncWorker, public RHSPlibWorkerBase {
         } else {
             Napi::Object errorObj = Napi::Object::New(Env());
             errorObj.Set("errorCode", resultCode);
-            if (resultCode == RHSPLIB_ERROR_NACK_RECEIVED) {
+            if (resultCode == RHSP_ERROR_NACK_RECEIVED) {
                 errorObj.Set("nackCode", nackCode);
             }
             deferred.Reject(errorObj);

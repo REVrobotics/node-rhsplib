@@ -2,7 +2,7 @@
 #define REVHUB_WRAPPER_H_
 
 #include <napi.h>
-#include <RHSPlib.h>
+#include "rhsp/rhsp.h"
 
 class RevHub : public Napi::ObjectWrap<RevHub> {
   public:
@@ -101,7 +101,7 @@ class RevHub : public Napi::ObjectWrap<RevHub> {
     Napi::Value getServoEnable(const Napi::CallbackInfo &info);
 
   private:
-    RHSPlib_Module_T obj;
+    RhspRevHub* obj;
 };
 
 #endif

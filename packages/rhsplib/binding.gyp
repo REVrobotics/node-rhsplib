@@ -10,8 +10,7 @@
       ],
       'include_dirs': [
         'src/',
-        'RHSPlib/',
-        'RHSPlib/arch/includes/',
+        'RHSPlib/include',
         "<!@(node -p \"require('node-addon-api').include\")"
       ],
       'defines': [
@@ -47,7 +46,7 @@
             'link_settings': {
               'libraries': [
                   '-L<(module_root_dir)/RHSPlib/build/',
-                  '-lRHSPlib'
+                  '-lrhsp'
               ],
               'ldflags': [
                 '-Wl,-rpath,<(module_root_dir)/RHSPlib/build/',
@@ -57,7 +56,7 @@
               {
                 'destination': '<(PRODUCT_DIR)',
                 'files':[
-                  '<(module_root_dir)/RHSPlib/build/libRHSPlib.so',
+                  '<(module_root_dir)/RHSPlib/build/librhsp.so',
                 ],
               }
             ],
