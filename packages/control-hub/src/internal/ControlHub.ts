@@ -159,7 +159,10 @@ export class ControlHubInternal implements ControlHub {
                 timeout: 1000,
             });
             if (response.data) {
-                let rcVersion: string = response.data.rcVersion;
+                let rcVersion: string | undefined = response.data.sdkVersion;
+                if(rcVersion === undefined) {
+                    return false;
+                }
                 return semver.satisfies(rcVersion, ">=8.2");
             }
 
