@@ -44,6 +44,7 @@ import {
 } from "./command/digital.js";
 import { sendFailSafe } from "./command/failsafe.js";
 import { queryInterface } from "./command/query.js";
+import {openUsbControlHubs} from "./adb-setup.js";
 
 function runOnSigint(block: () => void) {
     process.on("SIGINT", () => {
@@ -68,6 +69,9 @@ program
     .option(
         "-c --child <address>",
         "communicate with the specified child Expansion Hub instead of its parent; requires parent address to be specified when the parent is an Expansion Hub",
+    ).option(
+        "--control",
+    "Specify that this hub is a control hub"
     );
 
 program
@@ -699,7 +703,7 @@ program
 program.parse(process.argv);
 
 /**
- * Returns the expansion hub referred to by the options provided to the program.
+ * Returns the rev hub referred to by the options provided to the program.
  * This method also returns a close method. Other hubs may need to be opened, so
  * prefer calling the returned close method over closing the hub directly.
  */
@@ -709,6 +713,7 @@ async function getRevHubOrThrow(): Promise<[hub: ExpansionHub, close: () => void
     // options.child and options.parent are strings, so a specified address of "0" will be treated as truthy, and will not be ignored.
     let childAddress = options.child ? Number(options.child) : undefined;
     let parentAddress = options.parent ? Number(options.parent) : undefined;
+    let isControlHub = options.control ?? false;
     if (childAddress !== undefined && (childAddress < 1 || childAddress > 255)) {
         throw new Error(`${childAddress} is not a valid child address`);
     } else if (
@@ -728,31 +733,51 @@ async function getRevHubOrThrow(): Promise<[hub: ExpansionHub, close: () => void
                 "parent address must be specified if serial number is specified.",
             );
         }
-        return openExpansionHubWithSerialNumber(
-            serialNumber,
-            parentAddress,
-            childAddress,
-        );
-    } else if (parentAddress !== undefined) {
-        return openExpansionHubWithAddress(parentAddress, childAddress);
-    }
-
-    let connectedHubs: ParentExpansionHub[] = await openConnectedExpansionHubs();
-    if (connectedHubs.length == 0) {
-        throw new Error("No hubs are connected");
-    }
-    if (connectedHubs.length > 1) {
-        throw new Error("Multiple hubs connected. You must specify a serialNumber.");
-    }
-
-    // Open the only Hub that is connected
-
-    let closeHubs = () => {
-        for (let hub of connectedHubs) {
-            hub.close();
+        if(isControlHub) {
+            let hubs = await openUsbControlHubs();
+            return [hubs[0], () => { hubs.forEach((hub) => hub.close()) }];
+        } else {
+            return openExpansionHubWithSerialNumber(
+                serialNumber,
+                parentAddress,
+                childAddress,
+            );
         }
-    };
-    return [connectedHubs[0], closeHubs];
+    } else if (parentAddress !== undefined) {
+        if(isControlHub) {
+            let hubs = await openUsbControlHubs();
+            return [hubs[0], () => { hubs.forEach((hub) => hub.close()) }];
+        } else {
+            return openExpansionHubWithAddress(parentAddress, childAddress);
+        }
+    }
+
+    if(isControlHub) {
+        let hubs = await openUsbControlHubs();
+        if (hubs.length == 0) {
+            throw new Error("No hubs are connected");
+        }
+        if (hubs.length > 1) {
+            throw new Error("Multiple hubs connected. You must specify a serialNumber.");
+        }
+        return [hubs[0], () => { hubs.forEach((hub) => hub.close()) }];
+    } else {
+        let connectedHubs: ParentExpansionHub[] = await openConnectedExpansionHubs();
+        if (connectedHubs.length == 0) {
+            throw new Error("No hubs are connected");
+        }
+        if (connectedHubs.length > 1) {
+            throw new Error("Multiple hubs connected. You must specify a serialNumber.");
+        }
+
+        // Open the only Hub that is connected
+        let closeHubs = () => {
+            for (let hub of connectedHubs) {
+                hub.close();
+            }
+        };
+        return [connectedHubs[0], closeHubs];
+    }
 }
 
 /**
