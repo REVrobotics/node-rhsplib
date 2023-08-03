@@ -1,25 +1,29 @@
 import {
     BulkInputData,
-    ClosedLoopControlAlgorithm, ControlHub,
+    ClosedLoopControlAlgorithm,
+    ControlHub,
     DebugGroup,
-    DigitalChannelDirection, DigitalState,
+    DigitalChannelDirection,
+    DigitalState,
     ExpansionHub,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
     LedPattern,
     ModuleInterface,
-    ModuleStatus, MotorMode,
+    ModuleStatus,
+    MotorMode,
     ParentExpansionHub,
     ParentRevHub,
-    PidCoefficients, PidfCoefficients,
+    PidCoefficients,
+    PidfCoefficients,
     RevHub,
     RevHubType,
     Rgb,
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rev-hub-core";
-import { EventEmitter } from "events";
+import {EventEmitter} from "events";
 
 export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     isParentHub: boolean;
@@ -289,6 +293,29 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
             i: result.i,
             d: result.d,
             algorithm: ClosedLoopControlAlgorithm.Pid,
+        };
+    }
+
+
+    async getMotorPIDFCoefficients(
+        motorChannel: number,
+        motorMode: number,
+    ): Promise<PidfCoefficients> {
+        let result: { p: number; i: number; d: number, f: number } = await this.sendCommand(
+            "getMotorPidCoefficients",
+            {
+                hId: this.id,
+                c: motorChannel,
+                m: motorMode,
+            },
+        );
+
+        return {
+            p: result.p,
+            i: result.i,
+            d: result.d,
+            f: result.f,
+            algorithm: ClosedLoopControlAlgorithm.Pidf,
         };
     }
 
@@ -571,6 +598,23 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         });
     }
 
+
+    async setMotorPIDFCoefficients(
+        motorChannel: number,
+        motorMode: number,
+        pid: PidfCoefficients,
+    ): Promise<void> {
+        await this.sendCommand("setMotorPidfCoefficients", {
+            hId: this.id,
+            c: motorChannel,
+            m: motorMode,
+            p: pid.p,
+            i: pid.i,
+            d: pid.d,
+            f: pid.f
+        });
+    }
+
     async setMotorTargetPosition(
         motorChannel: number,
         targetPosition_counts: number,
@@ -682,7 +726,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     }
 
     getMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode): Promise<PidfCoefficients | PidCoefficients> {
-        return this.getMotorPIDCoefficients(motorChannel, motorMode);
+        return this.getMotorPIDFCoefficients(motorChannel, motorMode);
     }
 
     async setMotorClosedLoopControlCoefficients(
@@ -691,7 +735,10 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         algorithm: ClosedLoopControlAlgorithm,
         pid: PidCoefficients | PidfCoefficients,
     ): Promise<void> {
-        //Todo(landry): handle pidf
-        await this.setMotorPIDCoefficients(motorChannel, motorMode, pid as PidCoefficients);
+        if(algorithm === ClosedLoopControlAlgorithm.Pidf) {
+            await this.setMotorPIDFCoefficients(motorChannel, motorMode, pid as PidfCoefficients);
+        } else {
+            await this.setMotorPIDCoefficients(motorChannel, motorMode, pid as PidCoefficients);
+        }
     }
 }

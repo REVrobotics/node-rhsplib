@@ -310,8 +310,8 @@ export class ControlHubInternal implements ControlHub {
     async getMotorPIDCoefficients(
         motorChannel: number,
         motorMode: number,
-    ): Promise<PidCoefficients> {
-        return this.embedded.getMotorPIDCoefficients(motorChannel, motorMode);
+    ): Promise<PidCoefficients | PidfCoefficients> {
+        return this.embedded.getMotorPIDFCoefficients(motorChannel, motorMode);
     }
 
     async getMotorTargetPosition(
