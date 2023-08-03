@@ -73,14 +73,19 @@ export class ControlHubInternal implements ControlHub {
         this.serialNumber = serialNumber;
     }
 
-    setDigitalOutput(digitalChannel: number, value: DigitalState): Promise<void> {
-        throw new Error("Method not implemented.");
+    async setDigitalOutput(digitalChannel: number, value: DigitalState): Promise<void> {
+        await this.embedded.setDigitalOutput(digitalChannel, value);
     }
-    setAllDigitalOutputs(bitPackedField: number): Promise<void> {
-        throw new Error("Method not implemented.");
+    async setAllDigitalOutputs(bitPackedField: number): Promise<void> {
+        await this.embedded.setAllDigitalOutputs(bitPackedField);
     }
-    getDigitalInput(digitalChannel: number): Promise<DigitalState> {
-        throw new Error("Method not implemented.");
+
+    getAllDigitalInputs(): Promise<number> {
+        return this.embedded.getAllDigitalInputs();
+    }
+
+    async getDigitalInput(digitalChannel: number): Promise<DigitalState> {
+        return await this.embedded.getDigitalInput(digitalChannel);
     }
 
     isParent(): this is ParentRevHub {
@@ -495,6 +500,17 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.setMotorTargetVelocity(motorChannel, velocity_cps);
     }
 
+    getMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode): Promise<PidfCoefficients | PidCoefficients> {
+        return this.getMotorPIDCoefficients(motorChannel, motorMode);
+    }
+
+    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pid, pid: PidCoefficients): Promise<void>;
+    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pidf, pidf: PidfCoefficients): Promise<void>;
+    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm, pid: PidCoefficients | PidfCoefficients): Promise<void>;
+    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pid | ClosedLoopControlAlgorithm.Pidf | ClosedLoopControlAlgorithm, pid: PidCoefficients | PidfCoefficients): Promise<void> {
+        return this.setMotorPIDCoefficients(motorChannel, motorMode, pid as PidCoefficients);
+    }
+
     async setNewModuleAddress(newModuleAddress: number): Promise<void> {
         return this.embedded.setNewModuleAddress(newModuleAddress);
     }
@@ -630,20 +646,5 @@ export class ControlHubInternal implements ControlHub {
         return await Promise.race([callbackPromise, timeoutPromise]).finally(() => {
             clearTimeout(timer);
         });
-    }
-
-    getAllDigitalInputs(): Promise<number> {
-        return Promise.resolve(0);
-    }
-
-    getMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode): Promise<PidfCoefficients | PidCoefficients> {
-        return this.getMotorPIDCoefficients(motorChannel, motorMode);
-    }
-
-    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pid, pid: PidCoefficients): Promise<void>;
-    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pidf, pidf: PidfCoefficients): Promise<void>;
-    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm, pid: PidCoefficients | PidfCoefficients): Promise<void>;
-    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pid | ClosedLoopControlAlgorithm.Pidf | ClosedLoopControlAlgorithm, pid: PidCoefficients | PidfCoefficients): Promise<void> {
-        return this.setMotorPIDCoefficients(motorChannel, motorMode, pid as PidCoefficients);
     }
 }

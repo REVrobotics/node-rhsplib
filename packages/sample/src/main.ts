@@ -149,18 +149,17 @@ program
         });
         await getLed(hub);
 
-        hub.close();
+        close();
     });
 
 program
     .command("query <name>")
     .description("Query interface information")
     .action(async (name) => {
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getRevHubOrThrow();
         await queryInterface(hub, name);
 
-        hub.close();
+        close();
     });
 
 program
@@ -361,7 +360,7 @@ pidCommand
         });
 
         await getMotorRegulatedVelocityPidf(hub, channelNumber);
-        hub.close();
+        close();
     });
 
 let pidfCommand = motorCommand
@@ -377,11 +376,11 @@ pidfCommand
         let iValue = Number(i);
         let dValue = Number(d);
         let fValue = Number(f);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getRevHubOrThrow();
+
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await setMotorRegulatedVelocityPidf(
@@ -392,7 +391,7 @@ pidfCommand
             dValue,
             fValue,
         );
-        hub.close();
+        close();
     });
 
 pidfCommand
@@ -400,15 +399,14 @@ pidfCommand
     .description("Get PIDF coefficients for regulated velocity mode for a motor")
     .action(async (channel) => {
         let channelNumber = Number(channel);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await getMotorRegulatedVelocityPidf(hub, channelNumber);
-        hub.close();
+        close();
     });
 
 let alertCommand = motorCommand
@@ -662,7 +660,7 @@ program
         });
 
         await injectLog(hub, text);
-        hub.close();
+        close();
     });
 
 program
@@ -681,7 +679,7 @@ program
 
         let levelNumber = Number(level);
         await setDebugLogLevel(hub, group, levelNumber);
-        hub.close();
+        close();
     });
 
 program

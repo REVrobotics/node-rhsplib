@@ -296,13 +296,12 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         };
     }
 
-
     async getMotorPIDFCoefficients(
         motorChannel: number,
         motorMode: number,
     ): Promise<PidfCoefficients> {
         let result: { p: number; i: number; d: number, f: number } = await this.sendCommand(
-            "getMotorPidCoefficients",
+            "getMotorPidfCoefficients",
             {
                 hId: this.id,
                 c: motorChannel,
