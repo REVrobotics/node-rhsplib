@@ -8,7 +8,7 @@
     "isomorphic-ws": "^5.0.0",
     "axios": "^1.4.0",
     "semver": "^7.5.1",
-    "@rev-robotics/rev-hub-core": "*"
+    "@rev-robotics/rev-hub-core": "^1.0.0"
   },
   "peerDependencies": {
     "get-port": "6.x"
