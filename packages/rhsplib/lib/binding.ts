@@ -204,14 +204,6 @@ export declare class RevHub {
         motorMode: MotorMode,
     ): Promise<PidfCoefficients | PidCoefficients>;
 
-    // PWM
-    setPWMConfiguration(pwmChannel: number, framePeriod: number): Promise<void>;
-    getPWMConfiguration(pwmChannel: number): Promise<number>;
-    setPWMPulseWidth(pwmChannel: number, pulseWidth: number): Promise<void>;
-    getPWMPulseWidth(pwmChannel: number): Promise<number>;
-    setPWMEnable(pwmChannel: number, enable: boolean): Promise<void>;
-    getPWMEnable(pwmChannel: number): Promise<boolean>;
-
     // Servo
     setServoConfiguration(servoChannel: number, framePeriod: number): Promise<void>;
     getServoConfiguration(servoChannel: number): Promise<number>;

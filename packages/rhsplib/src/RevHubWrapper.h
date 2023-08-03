@@ -84,14 +84,6 @@ class RevHub : public Napi::ObjectWrap<RevHub> {
     Napi::Value setMotorClosedLoopControlCoefficients(const Napi::CallbackInfo &info);
     Napi::Value getMotorClosedLoopControlCoefficients(const Napi::CallbackInfo &info);
 
-    /* PWM */
-    Napi::Value setPWMConfiguration(const Napi::CallbackInfo &info);
-    Napi::Value getPWMConfiguration(const Napi::CallbackInfo &info);
-    Napi::Value setPWMPulseWidth(const Napi::CallbackInfo &info);
-    Napi::Value getPWMPulseWidth(const Napi::CallbackInfo &info);
-    Napi::Value setPWMEnable(const Napi::CallbackInfo &info);
-    Napi::Value getPWMEnable(const Napi::CallbackInfo &info);
-
     /* Servo */
     Napi::Value setServoConfiguration(const Napi::CallbackInfo &info);
     Napi::Value getServoConfiguration(const Napi::CallbackInfo &info);

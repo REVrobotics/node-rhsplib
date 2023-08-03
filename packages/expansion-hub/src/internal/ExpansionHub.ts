@@ -347,24 +347,6 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    getPWMConfiguration(pwmChannel: number): Promise<number> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.getPWMConfiguration(pwmChannel);
-        });
-    }
-
-    getPWMEnable(pwmChannel: number): Promise<boolean> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.getPWMEnable(pwmChannel);
-        });
-    }
-
-    getPWMPulseWidth(pwmChannel: number): Promise<number> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.getPWMPulseWidth(pwmChannel);
-        });
-    }
-
     getPhoneChargeControl(): Promise<boolean> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.getPhoneChargeControl();
