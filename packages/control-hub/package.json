@@ -1,0 +1,18 @@
+{
+  "name": "@rev-robotics/control-hub",
+  "version": "0.1.0",
+  "description": "High level library for REV control hub",
+  "main": "dist/index.js",
+  "dependencies": {
+    "serialport": "^10.5.0",
+    "isomorphic-ws": "^5.0.0",
+    "@rev-robotics/rhsplib": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^16.18.18",
+    "typescript": "^5.0.2"
+  },
+  "scripts": {
+    "build": "tsc"
+  }
+}
