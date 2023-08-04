@@ -39,19 +39,16 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install lerna
-        run: npm install -g lerna
-
       - name: Build project
-        run: lerna run build
+        run: npx lerna run build
 
       - name: Make prebuilds
         if: ${{ matrix.linux }}
-        run: lerna run makePrebuildsOnLinux
+        run: npx lerna run makePrebuildsOnLinux
 
       - name: Make prebuilds
         if: ${{ matrix.darwin }}
-        run: lerna run makePrebuildsOnDarwin
+        run: npx lerna run makePrebuildsOnDarwin
 
       - name: Create Artifacts
         uses: actions/upload-artifact@v2
