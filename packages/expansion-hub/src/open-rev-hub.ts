@@ -13,12 +13,14 @@ import {
     InvalidSerialArguments,
     NoExpansionHubWithAddressError,
     ParentExpansionHub,
+    RevHub,
     SerialConfigurationError,
     SerialIoError,
     SerialParity,
     TimeoutError,
     UnableToOpenSerialError,
 } from "@rev-robotics/rev-hub-core";
+import { performance } from "perf_hooks";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
@@ -59,6 +61,18 @@ export async function openParentExpansionHub(
 
     try {
         await parentHub.open(moduleAddress);
+        // If discovery has not occurred on the hub, then we will
+        // need to send keep-alive signals until the hub responds.
+        // If we don't do this, the hub will be stuck waiting to
+        // find out if it's a parent or child and won't respond.
+        let startTime = performance.now();
+        while (true) {
+            try {
+                if (performance.now() - startTime >= 500) break;
+                await parentHub.sendKeepAlive();
+                break;
+            } catch (e) {}
+        }
         await parentHub.queryInterface("DEKA");
     } catch (e: any) {
         if (e instanceof TimeoutError)
@@ -94,16 +108,10 @@ export async function openExpansionHubAndAllChildren(
 
     let discoveredModules = await NativeRevHub.discoverRevHubs(serialPort);
     let parentAddress = discoveredModules.parentAddress;
-    let parentHub = (await openParentExpansionHub(
-        serialNumber,
-        parentAddress,
-    )) as ParentExpansionHub & ExpansionHubInternal;
+    let parentHub = await openParentExpansionHub(serialNumber, parentAddress);
 
     for (let address of discoveredModules.childAddresses) {
-        let hub = await parentHub.addChildByAddress(address);
-        if (hub.isExpansionHub()) {
-            startKeepAlive(hub as ExpansionHubInternal, 1000);
-        }
+        await parentHub.addChildByAddress(address);
     }
 
     return parentHub;

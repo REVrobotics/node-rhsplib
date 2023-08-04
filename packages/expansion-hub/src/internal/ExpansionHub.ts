@@ -1,37 +1,43 @@
 import {
-    NativeRevHub,
-    Serial as SerialPort,
-    RhspLibErrorCode,
     NackCode,
+    NativeRevHub,
+    RhspLibErrorCode,
+    Serial as SerialPort,
 } from "@rev-robotics/rhsplib";
 import {
     BulkInputData,
+    ClosedLoopControlAlgorithm,
+    CommandNotSupportedError,
     DebugGroup,
     DigitalChannelDirection,
+    DigitalState,
+    ExpansionHub,
+    GeneralSerialError,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
     LedPattern,
     ModuleInterface,
     ModuleStatus,
-    PidCoefficients,
-    Rgb,
-    VerbosityLevel,
-    Version,
-    TimeoutError,
+    MotorMode,
     nackCodeToError,
     NoExpansionHubWithAddressError,
     ParameterOutOfRangeError,
-    GeneralSerialError,
-    CommandNotSupportedError,
-    ExpansionHub,
-    DigitalState,
-    MotorMode,
+    ParentRevHub,
+    PidCoefficients,
+    PidfCoefficients,
+    RevHub,
+    RevHubType,
+    Rgb,
+    TimeoutError,
+    VerbosityLevel,
+    Version,
 } from "@rev-robotics/rev-hub-core";
 import { closeSerialPort } from "../open-rev-hub.js";
-import { ParentRevHub, RevHub, RevHubType } from "@rev-robotics/rev-hub-core";
 import { EventEmitter } from "events";
 import { RhspLibError } from "../errors/RhspLibError.js";
+import { startKeepAlive } from "../start-keep-alive.js";
+import { performance } from "perf_hooks";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -284,14 +290,47 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    getMotorPIDCoefficients(
+    async setMotorClosedLoopControlCoefficients(
         motorChannel: number,
         motorMode: MotorMode,
-    ): Promise<PidCoefficients> {
-        return this.convertErrorPromise(() => {
-            //ToDo (landry): convert the PID coefficients in C code
-            return this.nativeRevHub.getMotorPIDCoefficients(motorChannel, motorMode);
+        algorithm: ClosedLoopControlAlgorithm,
+        pid: PidCoefficients | PidfCoefficients,
+    ): Promise<void> {
+        await this.convertErrorPromise(async () => {
+            await this.nativeRevHub.setMotorClosedLoopControlCoefficients(
+                motorChannel,
+                motorMode,
+                algorithm,
+                pid,
+            );
         });
+    }
+
+    async getMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+    ): Promise<PidfCoefficients | PidCoefficients> {
+        let pid: any = await this.nativeRevHub.getMotorClosedLoopControlCoefficients(
+            motorChannel,
+            motorMode,
+        );
+
+        if (pid.algorithm === ClosedLoopControlAlgorithm.Pid) {
+            return {
+                p: pid.p,
+                i: pid.i,
+                d: pid.d,
+                algorithm: ClosedLoopControlAlgorithm.Pid,
+            };
+        } else {
+            return {
+                p: pid.p,
+                i: pid.i,
+                d: pid.d,
+                f: pid.f,
+                algorithm: ClosedLoopControlAlgorithm.Pidf,
+            };
+        }
     }
 
     getMotorTargetPosition(
@@ -524,10 +563,7 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setMotorConstantPower(
-                motorChannel,
-                powerLevel * 32_767,
-            );
+            return this.nativeRevHub.setMotorConstantPower(motorChannel, powerLevel);
         });
     }
 
@@ -537,11 +573,24 @@ export class ExpansionHubInternal implements ExpansionHub {
         pid: PidCoefficients,
     ): Promise<void> {
         return this.convertErrorPromise(() => {
-            //ToDo (landry): convert the PID coefficients in C code
             return this.nativeRevHub.setMotorPIDCoefficients(
                 motorChannel,
                 motorMode,
                 pid,
+            );
+        });
+    }
+
+    setMotorPIDFCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        pidf: PidfCoefficients,
+    ): Promise<void> {
+        return this.convertErrorPromise(() => {
+            return this.nativeRevHub.setMotorPIDFCoefficients(
+                motorChannel,
+                motorMode,
+                pidf,
             );
         });
     }
@@ -692,13 +741,30 @@ export class ExpansionHubInternal implements ExpansionHub {
 
         try {
             await childHub.open(moduleAddress);
+            // If discovery has not occurred on the hub, then we will
+            // need to send keep-alive signals until the hub responds.
+            // If we don't do this, the hub will be stuck waiting to
+            // find out if it's a parent or child and won't respond.
+            let startTime = performance.now();
+            while (true) {
+                try {
+                    if (performance.now() - startTime >= 1000) break;
+                    await childHub.sendKeepAlive();
+                    break;
+                } catch (e) {}
+            }
             await childHub.queryInterface("DEKA");
         } catch (e: any) {
+            console.log(e);
             if (e instanceof TimeoutError)
                 throw new NoExpansionHubWithAddressError(
                     this.serialNumber!, //Can only call this method on parent, so serialNumber is not undefined.
                     moduleAddress,
                 );
+        }
+
+        if (childHub.isExpansionHub()) {
+            startKeepAlive(childHub as ExpansionHubInternal, 1000);
         }
 
         this.addChild(childHub);

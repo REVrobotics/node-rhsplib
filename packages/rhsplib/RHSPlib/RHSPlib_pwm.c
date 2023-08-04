@@ -7,9 +7,9 @@
 #include "RHSPlib_pwm.h"
 
 int RHSPlib_pwm_setConfiguration(RHSPlib_Module_T *obj,
-                                  uint8_t pwmChannel, uint16_t framePeriod, uint8_t *nackReasonCode)
+                                 uint8_t pwmChannel, uint16_t framePeriod, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -35,9 +35,9 @@ int RHSPlib_pwm_setConfiguration(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_pwm_getConfiguration(RHSPlib_Module_T *obj,
-                                  uint8_t pwmChannel, uint16_t *framePeriod, uint8_t *nackReasonCode)
+                                 uint8_t pwmChannel, uint16_t *framePeriod, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -46,9 +46,9 @@ int RHSPlib_pwm_getConfiguration(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (pwmChannel >= RHSPLIB_MAX_NUMBER_OF_PWM_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
 
     int retval = RHSPlib_getInterfacePacketID(obj, "DEKA", 26, &packetID, nackReasonCode);
     if (retval < 0)
@@ -69,9 +69,9 @@ int RHSPlib_pwm_getConfiguration(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_pwm_setPulseWidth(RHSPlib_Module_T *obj,
-                               uint8_t pwmChannel, uint16_t pulseWidth, uint8_t *nackReasonCode)
+                              uint8_t pwmChannel, uint16_t pulseWidth, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -80,9 +80,9 @@ int RHSPlib_pwm_setPulseWidth(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (pwmChannel >= RHSPLIB_MAX_NUMBER_OF_PWM_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     int retval = RHSPlib_getInterfacePacketID(obj, "DEKA", 27, &packetID, nackReasonCode);
     if (retval < 0)
     {
@@ -97,9 +97,9 @@ int RHSPlib_pwm_setPulseWidth(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_pwm_getPulseWidth(RHSPlib_Module_T *obj,
-                               uint8_t pwmChannel, uint16_t *pulseWidth, uint8_t *nackReasonCode)
+                              uint8_t pwmChannel, uint16_t *pulseWidth, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -108,9 +108,9 @@ int RHSPlib_pwm_getPulseWidth(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (pwmChannel >= RHSPLIB_MAX_NUMBER_OF_PWM_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
 
     int retval = RHSPlib_getInterfacePacketID(obj, "DEKA", 28, &packetID, nackReasonCode);
     if (retval < 0)
@@ -131,9 +131,9 @@ int RHSPlib_pwm_getPulseWidth(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_pwm_setEnable(RHSPlib_Module_T *obj,
-                           uint8_t pwmChannel, uint8_t enable, uint8_t *nackReasonCode)
+                          uint8_t pwmChannel, uint8_t enable, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -142,9 +142,9 @@ int RHSPlib_pwm_setEnable(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (pwmChannel >= RHSPLIB_MAX_NUMBER_OF_PWM_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     else if (enable > 1)
     {
     	return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
@@ -163,9 +163,9 @@ int RHSPlib_pwm_setEnable(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_pwm_getEnable(RHSPlib_Module_T *obj,
-                           uint8_t pwmChannel, uint8_t *enable, uint8_t *nackReasonCode)
+                          uint8_t pwmChannel, uint8_t *enable, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -174,9 +174,9 @@ int RHSPlib_pwm_getEnable(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (pwmChannel >= RHSPLIB_MAX_NUMBER_OF_PWM_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
 
     int retval = RHSPlib_getInterfacePacketID(obj, "DEKA", 30, &packetID, nackReasonCode);
     if (retval < 0)
