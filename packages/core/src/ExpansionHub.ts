@@ -1,21 +1,21 @@
 import { ParentRevHub, RevHub } from "./RevHub.js";
-import {DigitalState} from "./DigitalState.js";
-import {ModuleInterface} from "./ModuleInterface.js";
-import {Rgb} from "./Rgb.js";
-import {LedPattern} from "./LedPattern.js";
-import {ModuleStatus} from "./ModuleStatus.js";
-import {DebugGroup} from "./DebugGroup.js";
-import {VerbosityLevel} from "./VerbosityLevel.js";
-import {Version} from "./Version.js";
-import {DigitalChannelDirection} from "./DigitalChannelDirection.js";
-import {I2CSpeedCode} from "./I2CSpeedCode.js";
-import {I2CWriteStatus} from "./I2CWriteStatus.js";
-import {I2CReadStatus} from "./I2CReadStatus.js";
-import {MotorMode} from "./MotorMode.js";
-import {PidCoefficients} from "./PidCoefficients.js";
-import {PidfCoefficients} from "./PidfCoefficients.js";
-import {ClosedLoopControlAlgorithm} from "./ClosedLoopControlAlgorithm.js";
-import {BulkInputData} from "./BulkInputData.js";
+import { DigitalState } from "./DigitalState.js";
+import { ModuleInterface } from "./ModuleInterface.js";
+import { Rgb } from "./Rgb.js";
+import { LedPattern } from "./LedPattern.js";
+import { ModuleStatus } from "./ModuleStatus.js";
+import { DebugGroup } from "./DebugGroup.js";
+import { VerbosityLevel } from "./VerbosityLevel.js";
+import { Version } from "./Version.js";
+import { DigitalChannelDirection } from "./DigitalChannelDirection.js";
+import { I2CSpeedCode } from "./I2CSpeedCode.js";
+import { I2CWriteStatus } from "./I2CWriteStatus.js";
+import { I2CReadStatus } from "./I2CReadStatus.js";
+import { MotorMode } from "./MotorMode.js";
+import { PidCoefficients } from "./PidCoefficients.js";
+import { PidfCoefficients } from "./PidfCoefficients.js";
+import { ClosedLoopControlAlgorithm } from "./ClosedLoopControlAlgorithm.js";
+import { BulkInputData } from "./BulkInputData.js";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
 
