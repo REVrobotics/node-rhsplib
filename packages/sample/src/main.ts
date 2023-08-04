@@ -71,7 +71,7 @@ program
         "communicate with the specified child Expansion Hub instead of its parent; requires parent address to be specified when the parent is an Expansion Hub",
     ).option(
         "--control",
-    "Specify that this hub is a control hub"
+    "Specify that this hub is a control hub. Default is expansion hub"
     );
 
 program
