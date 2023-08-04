@@ -153,11 +153,10 @@ program
     .command("query <name>")
     .description("Query interface information")
     .action(async (name) => {
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getExpansionHubOrThrow();
         await queryInterface(hub, name);
 
-        hub.close();
+        close();
     });
 
 program
