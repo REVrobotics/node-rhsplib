@@ -300,7 +300,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         motorChannel: number,
         motorMode: number,
     ): Promise<PidfCoefficients> {
-        let result: { p: number; i: number; d: number, f: number } = await this.sendCommand(
+        let result: { p: number; i: number; d: number, f: number, algorithm: number } = await this.sendCommand(
             "getMotorPidfCoefficients",
             {
                 hId: this.id,
@@ -314,7 +314,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
             i: result.i,
             d: result.d,
             f: result.f,
-            algorithm: ClosedLoopControlAlgorithm.Pidf,
+            algorithm: result.algorithm,
         };
     }
 

@@ -3,10 +3,11 @@ import semver from "semver";
 import WebSocket from "isomorphic-ws";
 import {
     BulkInputData,
-    ControlHub,
     ClosedLoopControlAlgorithm,
-    DigitalChannelDirection, DigitalState,
+    ControlHub,
     DebugGroup,
+    DigitalChannelDirection,
+    DigitalState,
     ExpansionHub,
     I2CReadStatus,
     I2CSpeedCode,
@@ -14,17 +15,17 @@ import {
     LedPattern,
     ModuleInterface,
     ModuleStatus,
+    MotorMode,
+    ParentExpansionHub,
     ParentRevHub,
     PidCoefficients,
+    PidfCoefficients,
     RevHub,
     RevHubType,
     Rgb,
     TimeoutError,
-    MotorMode,
-    PidfCoefficients,
     VerbosityLevel,
     Version,
-    ParentExpansionHub,
 } from "@rev-robotics/rev-hub-core";
 import { clearTimeout } from "timers";
 import { ControlHubConnectedExpansionHub } from "./ControlHubConnectedExpansionHub.js";
@@ -312,13 +313,6 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.getMotorEncoderPosition(motorChannel);
     }
 
-    async getMotorPIDCoefficients(
-        motorChannel: number,
-        motorMode: number,
-    ): Promise<PidCoefficients | PidfCoefficients> {
-        return this.embedded.getMotorPIDFCoefficients(motorChannel, motorMode);
-    }
-
     async getMotorTargetPosition(
         motorChannel: number,
     ): Promise<{ targetPosition: number; targetTolerance: number }> {
@@ -473,14 +467,6 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.setMotorConstantPower(motorChannel, powerLevel);
     }
 
-    async setMotorPIDCoefficients(
-        motorChannel: number,
-        motorMode: number,
-        pid: PidCoefficients,
-    ): Promise<void> {
-        return this.embedded.setMotorPIDCoefficients(motorChannel, motorMode, pid);
-    }
-
     async setMotorTargetPosition(
         motorChannel: number,
         targetPosition_counts: number,
@@ -500,15 +486,15 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.setMotorTargetVelocity(motorChannel, velocity_cps);
     }
 
-    getMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode): Promise<PidfCoefficients | PidCoefficients> {
-        return this.getMotorPIDCoefficients(motorChannel, motorMode);
+    async getMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode): Promise<PidfCoefficients | PidCoefficients> {
+        return await this.embedded.getMotorClosedLoopControlCoefficients(motorChannel, motorMode);
     }
 
     setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pid, pid: PidCoefficients): Promise<void>;
     setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pidf, pidf: PidfCoefficients): Promise<void>;
     setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm, pid: PidCoefficients | PidfCoefficients): Promise<void>;
-    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pid | ClosedLoopControlAlgorithm.Pidf | ClosedLoopControlAlgorithm, pid: PidCoefficients | PidfCoefficients): Promise<void> {
-        return this.setMotorPIDCoefficients(motorChannel, motorMode, pid as PidCoefficients);
+    async setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pid | ClosedLoopControlAlgorithm.Pidf | ClosedLoopControlAlgorithm, pid: PidCoefficients | PidfCoefficients): Promise<void> {
+        return await this.embedded.setMotorClosedLoopControlCoefficients(motorChannel, motorMode, algorithm, pid);
     }
 
     async setNewModuleAddress(newModuleAddress: number): Promise<void> {
