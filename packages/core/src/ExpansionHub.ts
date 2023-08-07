@@ -237,11 +237,11 @@ export interface ExpansionHub extends RevHub {
     ): Promise<number[]>;
 
     /**
-     * Send a write command to a given target requesting data at a given register.
+     * Read data at a given register.
      * @param i2cChannel
      * @param targetAddress the address of the target device
      * @param numBytesToRead size of data to read
-     * @param register a byte to send at the start of the payload, typically a register address.
+     * @param register a register address.
      */
     readI2CRegister(
         i2cChannel: number,
