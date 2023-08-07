@@ -79,7 +79,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     async getAnalogInput(channel: number): Promise<number> {
         return await this.sendCommand("getAnalogInput", {
             hId: this.id,
-            channel: channel,
+            c: channel,
         });
     }
 
@@ -121,7 +121,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     }
 
     async getServoCurrent(): Promise<number> {
-        return await this.sendCommand("getMotorCurrent", {
+        return await this.sendCommand("getServoCurrent", {
             hId: this.id,
         });
     }
@@ -180,14 +180,14 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     }
 
     async setAllDigitalOutputs(bitPackedField: number): Promise<void> {
-        await this.sendCommand("readVersionString", {
+        await this.sendCommand("setAllDigitalOutputs", {
             hId: this.id,
             bf: bitPackedField,
         });
     }
 
     async setDigitalDirection(dioPin: number, direction: DigitalChannelDirection): Promise<void> {
-        await this.sendCommand("readVersionString", {
+        await this.sendCommand("setDigitalDirection", {
             hId: this.id,
             c: dioPin,
             o: direction == DigitalChannelDirection.Output,
@@ -195,7 +195,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     }
 
     async setDigitalOutput(dioPin: number, value: DigitalState): Promise<void> {
-        await this.sendCommand("readVersionString", {
+        await this.sendCommand("setDigitalOutput", {
             hId: this.id,
             c: dioPin,
             v: value.isHigh(),
@@ -203,9 +203,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     }
 
     async getFTDIResetControl(): Promise<boolean> {
-        return await this.sendCommand("getFtdiResetControl", {
-            hId: this.id,
-        });
+        return false;
     }
 
     async setFTDIResetControl(_: boolean): Promise<void> {
@@ -311,7 +309,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     }
 
     async getMotorChannelEnable(motorChannel: number): Promise<boolean> {
-        return await this.sendCommand("getMotorChannelEnable", {
+        return await this.sendCommand("getMotorEnable", {
             hId: this.id,
             c: motorChannel,
         });
@@ -334,7 +332,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     }
 
     async getMotorEncoderPosition(motorChannel: number): Promise<number> {
-        return await this.sendCommand("getMotorEncoderPosition", {
+        return await this.sendCommand("getMotorEncoder", {
             hId: this.id,
             c: motorChannel,
         });
@@ -438,7 +436,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         motorMode: number,
         floatAtZero: boolean,
     ): Promise<void> {
-        await this.sendCommand("setMotorChannelMode", {
+        await this.sendCommand("setMotorMode", {
             hId: this.id,
             c: motorChannel,
             m: motorMode,
@@ -626,33 +624,24 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     }
 
     async readVersionString(): Promise<string> {
-        return await this.sendCommand("readVersionString", {
+        return await this.sendCommand("getHubFwVersionString", {
             hId: this.id,
         });
     }
 
     async sendFailSafe(): Promise<void> {
-        await this.sendCommand("readVersionString", {
+        await this.sendCommand("sendFailSafe", {
             hId: this.id,
         });
     }
 
-    async sendKeepAlive(): Promise<void> {
-    }
-
-    async sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
-        return Promise.resolve([]);
-    }
-
-    sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
-        return Promise.resolve([]);
-    }
+    async sendKeepAlive(): Promise<void> {}
 
     async setDebugLogLevel(
         debugGroup: DebugGroup,
         verbosityLevel: VerbosityLevel,
     ): Promise<void> {
-        await this.sendCommand("readVersionString", {
+        await this.sendCommand("setDebugLogLevel", {
             hId: this.id,
             debugGroup: debugGroup,
             verbosityLevel: verbosityLevel,
@@ -705,8 +694,29 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         };
     }
 
-    getModuleLedPattern(): Promise<LedPattern> {
-        throw new Error("not implemented");
+    async getModuleLedPattern(): Promise<LedPattern> {
+        let pattern: any = await this.sendCommand("getLedPattern", {
+            hId: this.id,
+        });
+
+        return {
+            rgbtPatternStep0: pattern.s0,
+            rgbtPatternStep1: pattern.s1,
+            rgbtPatternStep2: pattern.s2,
+            rgbtPatternStep3: pattern.s3,
+            rgbtPatternStep4: pattern.s4,
+            rgbtPatternStep5: pattern.s5,
+            rgbtPatternStep6: pattern.s6,
+            rgbtPatternStep7: pattern.s7,
+            rgbtPatternStep8: pattern.s8,
+            rgbtPatternStep9: pattern.s9,
+            rgbtPatternStep10: pattern.s10,
+            rgbtPatternStep11: pattern.s11,
+            rgbtPatternStep12: pattern.s12,
+            rgbtPatternStep13: pattern.s13,
+            rgbtPatternStep14: pattern.s14,
+            rgbtPatternStep15: pattern.s15,
+        };
     }
 
     async setNewModuleAddress(newModuleAddress: number): Promise<void> {
@@ -742,5 +752,13 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     ): this {
         this.emitter.on(eventName, listener);
         return this;
+    }
+
+    sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
+        return Promise.resolve([]);
+    }
+
+    sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
+        return Promise.resolve([]);
     }
 }
