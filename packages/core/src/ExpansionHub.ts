@@ -212,12 +212,6 @@ export interface ExpansionHub extends RevHub {
     ): Promise<void>;
 
     /**
-     * Get the status of a write operation.
-     * @param i2cChannel
-     */
-    getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus>;
-
-    /**
      * Read a single byte from a target device.
      * @param i2cChannel
      * @param targetAddress the address of the target device
@@ -249,13 +243,6 @@ export interface ExpansionHub extends RevHub {
         numBytesToRead: number,
         register: number,
     ): Promise<number[]>;
-
-    /**
-     * Get the read status, indicating whether a read was successful and how
-     * much data was read.
-     * @param i2cChannel
-     */
-    getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus>;
 
     // Motor
     /**
