@@ -574,7 +574,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         await this.sendCommand("setServoEnable", {
             hId: this.id,
             c: servoChannel,
-            enabled: enable,
+            enable: enable,
         });
     }
 
@@ -582,7 +582,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         await this.sendCommand("setServoPulseWidth", {
             hId: this.id,
             c: servoChannel,
-            pulseWidth: pulseWidth,
+            pw: pulseWidth,
         });
     }
 
