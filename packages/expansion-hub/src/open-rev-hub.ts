@@ -1,36 +1,25 @@
 import {
     DiscoveredAddresses,
+    NativeRevHub,
+    NativeSerial,
+} from "@rev-robotics/rhsplib";
+import { SerialPort as SerialLister } from "serialport";
+import { ExpansionHubInternal } from "./internal/ExpansionHub.js";
+import { startKeepAlive } from "./start-keep-alive.js";
+import {
     NoExpansionHubWithAddressError,
     ParentExpansionHub,
-    RevHub,
     TimeoutError,
 } from "@rev-robotics/rev-hub-core";
-import { getSerial } from "./serial.js";
-import { ExpansionHubInternal } from "./internal/ExpansionHub.js";
-import { NativeRevHub } from "@rev-robotics/rhsplib";
 import { performance } from "perf_hooks";
-import { startKeepAlive } from "./start-keep-alive.js";
-import { SerialPort as SerialLister } from "serialport";
+import { getSerial } from "./serial.js";
 
 /**
- *
- * @param parentSerialNumber the parent's serial number
- * @param parentAddress the parent to open
- * @param moduleAddress the exact hub to open
+ * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
+ * Serial object at that path. The {@link SerialPort} object should be removed from
+ * the map upon closing.
  */
-export async function openHubWithAddress(
-    parentSerialNumber: string,
-    parentAddress: number,
-    moduleAddress: number = parentAddress,
-): Promise<RevHub> {
-    let parentHub = await openParentExpansionHub(parentSerialNumber, parentAddress);
-
-    if (parentAddress == moduleAddress) {
-        return parentHub;
-    }
-
-    return await parentHub.addChildByAddress(moduleAddress);
-}
+const openSerialMap = new Map<string, typeof NativeSerial>();
 
 /**
  * Opens a parent Expansion Hub. Does not open any child hubs.

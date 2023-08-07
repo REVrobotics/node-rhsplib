@@ -1,4 +1,8 @@
-import { ExpansionHub, MotorMode, PidCoefficients } from "@rev-robotics/rev-hub-core";
+import {
+    ClosedLoopControlAlgorithm,
+    ExpansionHub,
+    MotorMode,
+} from "@rev-robotics/rev-hub-core";
 
 export async function runMotorConstantPower(
     hub: ExpansionHub,
@@ -89,20 +93,52 @@ export async function setMotorRegulatedVelocityPid(
     i: number,
     d: number,
 ) {
-    await hub.setMotorPIDCoefficients(channel, MotorMode.REGULATED_VELOCITY, {
-        p: p,
-        i: i,
-        d: d,
-    });
+    await hub.setMotorClosedLoopControlCoefficients(
+        channel,
+        MotorMode.REGULATED_VELOCITY,
+        ClosedLoopControlAlgorithm.Pid,
+        {
+            p: p,
+            i: i,
+            d: d,
+            algorithm: ClosedLoopControlAlgorithm.Pid,
+        },
+    );
 
-    await getMotorRegulatedVelocityPid(hub, channel);
+    await getMotorRegulatedVelocityPidf(hub, channel);
 }
 
-export async function getMotorRegulatedVelocityPid(hub: ExpansionHub, channel: number) {
-    let pid: PidCoefficients = await hub.getMotorPIDCoefficients(
+export async function setMotorRegulatedVelocityPidf(
+    hub: ExpansionHub,
+    channel: number,
+    p: number,
+    i: number,
+    d: number,
+    f: number,
+) {
+    await hub.setMotorClosedLoopControlCoefficients(
+        channel,
+        MotorMode.REGULATED_VELOCITY,
+        ClosedLoopControlAlgorithm.Pidf,
+        {
+            p: p,
+            i: i,
+            d: d,
+            f: f,
+            algorithm: ClosedLoopControlAlgorithm.Pidf,
+        },
+    );
+
+    await getMotorRegulatedVelocityPidf(hub, channel);
+}
+
+export async function getMotorRegulatedVelocityPidf(hub: ExpansionHub, channel: number) {
+    let pidf = await hub.getMotorClosedLoopControlCoefficients(
         channel,
         MotorMode.REGULATED_VELOCITY,
     );
 
-    console.log(JSON.stringify(pid));
+    console.log(pidf.algorithm);
+
+    console.log(JSON.stringify(pidf));
 }

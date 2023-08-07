@@ -13,6 +13,7 @@ export function controlHubHierarchyToString(hub: ControlHub): string {
             result += `\tRS-485 Hub: ${child.moduleAddress}\n`;
         }
     }
+
     return result;
 }
 

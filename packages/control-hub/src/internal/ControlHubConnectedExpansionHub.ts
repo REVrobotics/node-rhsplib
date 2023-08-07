@@ -1,22 +1,27 @@
 import {
     BulkInputData,
+    ClosedLoopControlAlgorithm,
+    ControlHub,
     DebugGroup,
-    DigitalState,
     DigitalChannelDirection,
+    DigitalState,
     ExpansionHub,
+    I2CReadStatus,
     I2CSpeedCode,
+    I2CWriteStatus,
     LedPattern,
     ModuleInterface,
     ModuleStatus,
+    MotorMode,
     ParentExpansionHub,
     ParentRevHub,
     PidCoefficients,
+    PidfCoefficients,
     RevHub,
     RevHubType,
     Rgb,
     VerbosityLevel,
     Version,
-    ControlHub,
     ImuData,
     Quaternion,
     AngularVelocity,
@@ -179,7 +184,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     }
 
     async getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode> {
-        let speedCode = await this.sendCommand("getI2cChannelConfiguration", {
+        let speedCode = await this.sendCommand("getI2CChannelConfiguration", {
             hId: this.id,
             c: i2cChannel,
         });
@@ -240,10 +245,9 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         };
     }
 
-    async getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus> {
-        return await this.sendCommand("getHubStatus", {
+    async getModuleStatus(_: boolean): Promise<ModuleStatus> {
+        return await this.sendCommand("getModuleStatus", {
             hId: this.id,
-            clr: clearStatusAfterResponse,
         });
     }
 
@@ -289,26 +293,6 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
             hId: this.id,
             c: motorChannel,
         });
-    }
-
-    async getMotorPIDCoefficients(
-        motorChannel: number,
-        motorMode: number,
-    ): Promise<PidCoefficients> {
-        let result: { p: number; i: number; d: number } = await this.sendCommand(
-            "getMotorPidCoefficients",
-            {
-                hId: this.id,
-                c: motorChannel,
-                m: motorMode,
-            },
-        );
-
-        return {
-            p: result.p,
-            i: result.i,
-            d: result.d,
-        };
     }
 
     async getMotorTargetPosition(
@@ -379,15 +363,6 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     ): this {
         this.emitter.on(eventName, listener);
         return this;
-    }
-
-    emit(eventName: "error", error: Error): void;
-    emit(eventName: "statusChanged", status: ModuleStatus): void;
-    emit(eventName: "addressChanged", oldAddress: number, newAddress: number): void;
-    emit(eventName: "sessionEnded"): void;
-
-    emit(eventName: string, ...args: any): void {
-        this.emitter.emit(eventName, ...args);
     }
 
     async queryInterface(interfaceName: string): Promise<ModuleInterface> {
@@ -586,6 +561,23 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         });
     }
 
+    getMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode): Promise<PidfCoefficients | PidCoefficients> {
+        return this.getMotorPIDFCoefficients(motorChannel, motorMode);
+    }
+
+    async setMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm,
+        pid: PidCoefficients | PidfCoefficients,
+    ): Promise<void> {
+        if (algorithm === ClosedLoopControlAlgorithm.Pidf) {
+            await this.setMotorPIDFCoefficients(motorChannel, motorMode, pid as PidfCoefficients);
+        } else {
+            await this.setMotorPIDCoefficients(motorChannel, motorMode, pid as PidCoefficients);
+        }
+    }
+
     async setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
         await this.sendCommand("setMotorConstantPower", {
             hId: this.id,
@@ -606,6 +598,23 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
             p: pid.p,
             i: pid.i,
             d: pid.d,
+        });
+    }
+
+
+    async setMotorPIDFCoefficients(
+        motorChannel: number,
+        motorMode: number,
+        pid: PidfCoefficients,
+    ): Promise<void> {
+        await this.sendCommand("setMotorPidfCoefficients", {
+            hId: this.id,
+            c: motorChannel,
+            m: motorMode,
+            p: pid.p,
+            i: pid.i,
+            d: pid.d,
+            f: pid.f
         });
     }
 
@@ -640,7 +649,6 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
                 hId: this.id,
                 newAddress: newModuleAddress,
             },
-            1000,
         );
     }
 

@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 import {
     BulkInputData,
+    ClosedLoopControlAlgorithm,
     DebugGroup,
     DigitalChannelDirection,
     DiscoveredAddresses,
@@ -13,7 +14,9 @@ import {
     LedPattern,
     ModuleInterface,
     ModuleStatus,
+    MotorMode,
     PidCoefficients,
+    PidfCoefficients,
     Rgb,
     SerialFlowControl,
     VerbosityLevel,
@@ -121,24 +124,24 @@ export declare class RevHub {
     getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode>;
     writeI2CSingleByte(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         byte: number,
     ): Promise<void>;
     writeI2CMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         bytes: number[],
     ): Promise<void>;
     getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus>;
-    readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void>;
+    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<void>;
     readI2CMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         numBytesToRead: number,
     ): Promise<void>;
     writeI2CReadMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         numBytesToRead: number,
         startAddress: number,
     ): Promise<void>;
@@ -147,12 +150,12 @@ export declare class RevHub {
     // Motor
     setMotorChannelMode(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
         floatAtZero: boolean,
     ): Promise<void>;
     getMotorChannelMode(
         motorChannel: number,
-    ): Promise<{ motorMode: number; floatAtZero: boolean }>;
+    ): Promise<{ motorMode: MotorMode; floatAtZero: boolean }>;
     setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void>;
     getMotorChannelEnable(motorChannel: number): Promise<boolean>;
     setMotorChannelCurrentAlertLevel(
@@ -175,15 +178,28 @@ export declare class RevHub {
     ): Promise<{ targetPosition: number; targetTolerance: number }>;
     getMotorAtTarget(motorChannel: number): Promise<boolean>;
     getMotorEncoderPosition(motorChannel: number): Promise<number>;
-    setMotorPIDCoefficients(
+    setMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: number,
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm.Pid,
         pid: PidCoefficients,
     ): Promise<void>;
-    getMotorPIDCoefficients(
+    setMotorClosedLoopControlCoefficients(
         motorChannel: number,
-        motorMode: number,
-    ): Promise<PidCoefficients>;
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm.Pidf,
+        pidf: PidfCoefficients,
+    ): Promise<void>;
+    setMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm,
+        pid: PidCoefficients | PidfCoefficients,
+    ): Promise<void>;
+    getMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+    ): Promise<PidfCoefficients | PidCoefficients>;
 
     // PWM
     setPWMConfiguration(pwmChannel: number, framePeriod: number): Promise<void>;

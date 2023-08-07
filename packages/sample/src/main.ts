@@ -8,7 +8,8 @@ import {
     setMotorRegulatedVelocityPid,
     setMotorAlertLevel,
     getMotorAlertLevel_mA,
-    getMotorRegulatedVelocityPid,
+    setMotorRegulatedVelocityPidf,
+    getMotorRegulatedVelocityPidf,
 } from "./command/motor.js";
 import {
     analog,
@@ -23,23 +24,17 @@ import {
 } from "./command/analog.js";
 import { error } from "./command/error.js";
 import { list } from "./command/list.js";
-import { getLed, getLedPattern, led, ledPattern } from "./command/led.js";
-import { runServo } from "./command/servo.js";
 import {
     getPossibleExpansionHubSerialNumbers,
     openConnectedExpansionHubs,
-    openHubWithAddress,
-    openParentExpansionHub,
+    openParentExpansionHub, RevHub,
 } from "@rev-robotics/expansion-hub";
+import { getLed, getLedPattern, led, ledPattern } from "./command/led.js";
+import { runServo } from "./command/servo.js";
+import { ControlHub, DigitalState,ExpansionHub, ParentExpansionHub } from "@rev-robotics/rev-hub-core";
 import { injectLog, setDebugLogLevel } from "./command/log.js";
 import { firmwareVersion } from "./command/firmware-version.js";
 import { getBulkInputData } from "./command/bulkinput.js";
-import {
-    ControlHub,
-    DigitalState,
-    ExpansionHub,
-    ParentExpansionHub,
-} from "@rev-robotics/rev-hub-core";
 import {
     digitalRead,
     digitalReadAll,
@@ -69,10 +64,21 @@ program.name("ch");
 program.version("1.0.0");
 
 program
-    // .option("--control", "specify that you are connecting via control hub")
-    // .option("-s --serial <serial>", "serial number")
-    // .option("-p --parent <address>", "parent address")
-    .option("-a --address <address>", "address of Expansion Hub connected via RS-485");
+    .option(
+        "-s --serial <serial>",
+        "serial number of the parent Control Hub or Expansion Hub",
+    )
+    .option(
+        "-p --parent <address>",
+        "address of the parent Expansion Hub (ignored when the parent is a Control Hub)",
+    )
+    .option(
+        "-c --child <address>",
+        "communicate with the specified child Expansion Hub instead of its parent; requires parent address to be specified when the parent is an Expansion Hub",
+    ).option(
+        "--control",
+    "Specify that this hub is a control hub. Default is expansion hub"
+    );
 
 program
     .command("testErrorHandling")
@@ -100,31 +106,35 @@ program
             "green, 0.5FF0000 for half-second red.",
     )
     .action(async (steps) => {
-        let [hub, close] = await getExpansionHubOrThrow();
+        let [hub, close] = await getRevHubOrThrow();
+
+        runOnSigint(() => {
+            close();
+        });
         await ledPattern(hub, steps);
 
         await getLedPattern(hub);
-        process.on("SIGINT", () => {
-            close();
-        });
     });
 
 program
     .command("get-pattern")
     .description("Get LED Pattern steps")
     .action(async () => {
-        let [hub, close] = await getExpansionHubOrThrow();
-
-        await getLedPattern(hub);
-        close();
+        let [hub, close] = await getRevHubOrThrow();
+        runOnSigint(() => {
+            close();
+        });
     });
 
 program
     .command("led <r> <g> <b>")
     .description("Set LED color")
     .action(async (r, g, b) => {
-        console.log("Running led color. Values are [0, 255]");
-        let [hub, close] = await getExpansionHubOrThrow();
+        let [hub, close] = await getRevHubOrThrow();
+        runOnSigint(() => {
+            close();
+        });
+
         let rValue = Number(r);
         let gValue = Number(g);
         let bValue = Number(b);
@@ -139,8 +149,17 @@ program
     .command("get-led")
     .description("Get LED color. Values are [0,255]")
     .action(async () => {
-        let [hub, close] = await getExpansionHubOrThrow();
+        let [hub, close] = await getRevHubOrThrow();
         await getLed(hub);
+        close();
+    });
+
+program
+    .command("query <name>")
+    .description("Query interface information")
+    .action(async (name) => {
+        let [hub, close] = await getRevHubOrThrow();
+        await queryInterface(hub, name);
 
         close();
     });
@@ -151,7 +170,8 @@ program
     .option("--continuous", "run continuously")
     .action(async (options) => {
         let isContinuous = options.continuous !== undefined;
-        let [hub, close] = await getExpansionHubOrThrow();
+        let [hub, close] = await getRevHubOrThrow();
+
         await getBulkInputData(hub, isContinuous);
         close();
     });
@@ -160,7 +180,7 @@ program
     .command("log <text>")
     .description("Inject a log hint")
     .action(async (text) => {
-        let [hub, close] = await getExpansionHubOrThrow();
+        let [hub, close] = await getRevHubOrThrow();
         await injectLog(hub, text);
         close();
     });
@@ -173,7 +193,7 @@ program
             "DigitalIO, I2C, Motor0, Motor1, Motor2, or Motor3. Valid values for level are [0,3]",
     )
     .action(async (group, level) => {
-        let [hub, close] = await getExpansionHubOrThrow();
+        let [hub, close] = await getRevHubOrThrow();
         let levelNumber = Number(level);
         await setDebugLogLevel(hub, group, levelNumber);
         close();
@@ -185,7 +205,12 @@ program
         "Start servo 0 for 2 seconds, then send failsafe. Wait 2 more seconds to close. The servo should stop after 2 seconds.",
     )
     .action(async () => {
-        let [hub, close] = await getExpansionHubOrThrow();
+        let [hub, close] = await getRevHubOrThrow();
+
+        runOnSigint(() => {
+            close();
+        });
+
         await sendFailSafe(hub, close);
     });
 
@@ -193,17 +218,8 @@ program
     .command("version")
     .description("Get firmware version")
     .action(async () => {
-        let [hub, close] = await getExpansionHubOrThrow();
+        let [hub, close] = await getRevHubOrThrow();
         await firmwareVersion(hub);
-        close();
-    });
-
-program
-    .command("query <name>")
-    .description("Query interface information")
-    .action(async (name) => {
-        let [hub, close] = await getExpansionHubOrThrow();
-        await queryInterface(hub, name);
         close();
     });
 
@@ -212,7 +228,7 @@ program
     .description("Set Module Address")
     .action(async (address) => {
         let addressNumber = Number(address);
-        let [hub, close] = await getExpansionHubOrThrow();
+        let [hub, close] = await getRevHubOrThrow();
         await setHubAddress(hub as ControlHub, addressNumber);
         close();
     });
@@ -239,7 +255,7 @@ program
     .description("Get the current encoder position of a motor")
     .action(async (channel, options) => {
         let channelNumber = Number(channel);
-        let [hub, close] = await getExpansionHubOrThrow();
+        let [hub, close] = await getRevHubOrThrow();
         if (options.reset) {
             await resetEncoder(hub, channelNumber);
             close();
@@ -267,15 +283,14 @@ digitalCommand
         }
         let digitalState = stateBoolean ? DigitalState.HIGH : DigitalState.LOW;
 
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await digitalWrite(hub, channelNumber, digitalState);
-        hub.close();
+        close();
     });
 
 digitalCommand
@@ -286,15 +301,14 @@ digitalCommand
         let isContinuous = options.continuous !== undefined;
         let channelNumber = Number(channel);
 
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await digitalRead(hub, channelNumber, isContinuous);
-        hub.close();
+        close();
     });
 
 digitalCommand
@@ -304,15 +318,14 @@ digitalCommand
     .action(async (options) => {
         let isContinuous = options.continuous !== undefined;
 
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await digitalReadAll(hub, isContinuous);
-        hub.close();
+        close();
     });
 
 digitalCommand
@@ -325,15 +338,14 @@ digitalCommand
         let bitfieldValue = parseInt(bitfield, 2);
         let bitmaskValue = parseInt(bitmask, 2);
 
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await digitalWriteAll(hub, bitfieldValue, bitmaskValue);
-        hub.close();
+        close();
     });
 
 let motorCommand = program.command("motor");
@@ -345,17 +357,16 @@ motorCommand
         "Read the current through a motor. Specify --continuous to run continuously",
     )
     .action(async (channel, options) => {
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
         let isContinuous = options.continuous !== undefined;
         let channelNumber = Number(channel);
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await motorCurrent(hub, channelNumber, isContinuous);
-        hub.close();
+        close();
     });
 
 motorCommand
@@ -365,11 +376,10 @@ motorCommand
     .description("Get the current encoder position of a motor")
     .action(async (channel, options) => {
         let channelNumber = Number(channel);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         if (options.reset) {
@@ -378,7 +388,7 @@ motorCommand
             let isContinuous = options.continuous !== undefined;
             await readEncoder(hub, channelNumber, isContinuous);
         }
-        hub.close();
+        close();
     });
 
 let pidCommand = motorCommand.command("pid").description("Get or set PID coefficients");
@@ -391,15 +401,14 @@ pidCommand
         let pValue = Number(p);
         let iValue = Number(i);
         let dValue = Number(d);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await setMotorRegulatedVelocityPid(hub, channelNumber, pValue, iValue, dValue);
-        hub.close();
+        close();
     });
 
 pidCommand
@@ -407,15 +416,60 @@ pidCommand
     .description("Get PID coefficients for regulated velocity mode for a motor")
     .action(async (channel) => {
         let channelNumber = Number(channel);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
-        await getMotorRegulatedVelocityPid(hub, channelNumber);
-        hub.close();
+        await getMotorRegulatedVelocityPidf(hub, channelNumber);
+        close();
+    });
+
+let pidfCommand = motorCommand
+    .command("pidf")
+    .description("Get or set PIDF coefficients");
+
+pidfCommand
+    .command("set <channel> <p> <i> <d> <f>")
+    .description("Set PIDF coefficients for regulated velocity mode for a motor")
+    .action(async (channel, p, i, d, f) => {
+        let channelNumber = Number(channel);
+        let pValue = Number(p);
+        let iValue = Number(i);
+        let dValue = Number(d);
+        let fValue = Number(f);
+        let [hub, close] = await getRevHubOrThrow();
+
+
+        runOnSigint(() => {
+            close();
+        });
+
+        await setMotorRegulatedVelocityPidf(
+            hub,
+            channelNumber,
+            pValue,
+            iValue,
+            dValue,
+            fValue,
+        );
+        close();
+    });
+
+pidfCommand
+    .command("get <channel>")
+    .description("Get PIDF coefficients for regulated velocity mode for a motor")
+    .action(async (channel) => {
+        let channelNumber = Number(channel);
+        let [hub, close] = await getRevHubOrThrow();
+
+        runOnSigint(() => {
+            close();
+        });
+
+        await getMotorRegulatedVelocityPidf(hub, channelNumber);
+        close();
     });
 
 let alertCommand = motorCommand
@@ -427,17 +481,16 @@ alertCommand
     .description("Get motor alert current (mA)")
     .action(async (channel) => {
         let channelNumber = Number(channel);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         let current = await getMotorAlertLevel_mA(hub, channelNumber);
 
         console.log(`Motor alert for channel ${channelNumber} is ${current} mA`);
-        hub.close();
+        close();
     });
 
 alertCommand
@@ -446,15 +499,14 @@ alertCommand
     .action(async (channel, current) => {
         let channelNumber = Number(channel);
         let currentValue = Number(current);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await setMotorAlertLevel(hub, channelNumber, currentValue);
-        hub.close();
+        close();
     });
 
 motorCommand
@@ -465,12 +517,11 @@ motorCommand
     .action(async (channel, power) => {
         let channelNumber = Number(channel);
         let powerNumber = Number(power);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
             hub.setMotorChannelEnable(channelNumber, false);
-            hub.close();
+            close();
         });
 
         await runMotorConstantPower(hub, channelNumber, powerNumber);
@@ -482,12 +533,11 @@ motorCommand
     .action(async (channel, speed) => {
         let channelNumber = Number(channel);
         let speedNumber = Number(speed);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
             hub.setMotorChannelEnable(channelNumber, false);
-            hub.close();
+            close();
         });
 
         await runMotorConstantVelocity(hub, channelNumber, speedNumber);
@@ -501,12 +551,11 @@ motorCommand
         let positionNumber = Number(position);
         let toleranceNumber = Number(tolerance);
         let velocityNumber = Number(velocity);
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
             hub.setMotorChannelEnable(channelNumber, false);
-            hub.close();
+            close();
         });
 
         await runMotorToPosition(
@@ -526,9 +575,9 @@ program
             "--continuous to run continuously.",
     )
     .action(async (port, options) => {
-        let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
         let portNumber = Number(port);
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
             close();
@@ -546,7 +595,7 @@ program
             "Specify --continuous to run continuously",
     )
     .action(async (options) => {
-        let [hub, close] = await getExpansionHubOrThrow();
+        let [hub, close] = await getRevHubOrThrow();
         let isContinuous = options.continuous !== undefined;
 
         runOnSigint(() => {
@@ -564,8 +613,8 @@ program
         "Read the current 5V rail voltage. Specify --continuous to run continuously",
     )
     .action(async (options) => {
-        let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
             close();
@@ -586,8 +635,8 @@ batteryCommand
         "Read the current battery voltage. Specify --continuous to run continuously",
     )
     .action(async (options) => {
-        let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
             close();
@@ -604,8 +653,8 @@ batteryCommand
         "Read the current battery current (mA). Specify --continuous to run continuously",
     )
     .action(async (options) => {
-        let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
             close();
@@ -622,8 +671,8 @@ program
         "Read the I2C sub-system current. Specify --continuous to run continuously",
     )
     .action(async (options) => {
-        let [hub, close] = await getExpansionHubOrThrow();
         let isContinuous = options.continuous !== undefined;
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
             close();
@@ -638,7 +687,7 @@ program
     .option("--continuous", "Run continuously")
     .description("Read the digital bus current. Specify --continuous to run continuously")
     .action(async (options) => {
-        let [hub, close] = await getExpansionHubOrThrow();
+        let [hub, close] = await getRevHubOrThrow();
         let isContinuous = options.continuous !== undefined;
 
         runOnSigint(() => {
@@ -656,7 +705,7 @@ program
         "Read the total current through all servos. Specify --continuous to run continuously",
     )
     .action(async (options) => {
-        let [hub, close] = await getExpansionHubOrThrow();
+        let [hub, close] = await getRevHubOrThrow();
         let isContinuous = options.continuous !== undefined;
 
         runOnSigint(() => {
@@ -671,15 +720,14 @@ program
     .command("log <text>")
     .description("Inject a log hint")
     .action(async (text) => {
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         await injectLog(hub, text);
-        hub.close();
+        close();
     });
 
 program
@@ -690,26 +738,30 @@ program
             "DigitalIO, I2C, Motor0, Motor1, Motor2, or Motor3. Valid values for level are [0,3]",
     )
     .action(async (group, level) => {
-        let hubs = await openConnectedExpansionHubs();
-        let hub = hubs[0];
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
-            hub.close();
+            close();
         });
 
         let levelNumber = Number(level);
         await setDebugLogLevel(hub, group, levelNumber);
-        hub.close();
+        close();
     });
 
 program
     .command("servo <channel> <pulseWidth> [frameWidth]")
     .description("Run a servo with pulse width and optional frame width")
     .action(async (channel, pulseWidth, frameWidth) => {
+        let [hub, close] = await getRevHubOrThrow();
         let channelValue = Number(channel);
         let pulseWidthValue = Number(pulseWidth);
         let frameWidthValue = frameWidth ? Number(frameWidth) : 4000;
-        let [hub, close] = await getExpansionHubOrThrow();
+
+        runOnSigint(async () => {
+            await hub.setServoEnable(channelValue, false);
+            close();
+        });
 
         await runServo(hub, channelValue, pulseWidthValue, frameWidthValue);
 
@@ -725,7 +777,7 @@ program
     .action(async (channel, options): Promise<void> => {
         let isContinuous = options.continuous !== undefined;
         let channelNumber = Number(channel);
-        let [hub, close] = await getExpansionHubOrThrow();
+        let [hub, close] = await getRevHubOrThrow();
         await distance(hub, channelNumber, isContinuous);
 
         runOnSigint(() => {
@@ -739,7 +791,7 @@ program
     .description("Get IMU data. Specify --continuous to run continuously.")
     .action(async (options) => {
         let isContinuous = options.continuous !== undefined;
-        let [hub, close] = await getExpansionHubOrThrow();
+        let [hub, close] = await getRevHubOrThrow();
 
         runOnSigint(() => {
             close();
@@ -755,114 +807,159 @@ program
 
 program.parse(process.argv);
 
-async function getExpansionHubOrThrow(): Promise<
-    [hub: ExpansionHub, onClose: () => void]
-> {
+/**
+ * Returns the rev hub referred to by the options provided to the program.
+ * This method also returns a close method. Other hubs may need to be opened, so
+ * prefer calling the returned close method over closing the hub directly.
+ */
+async function getRevHubOrThrow(): Promise<[hub: ExpansionHub, close: () => void]> {
     let options = program.opts();
     let serialNumber = options.serial;
-    let isControlHub = true;
-    let moduleAddress = options.address ? Number(options.address) : undefined;
+    // options.child and options.parent are strings, so a specified address of "0" will be treated as truthy, and will not be ignored.
+    let childAddress = options.child ? Number(options.child) : undefined;
     let parentAddress = options.parent ? Number(options.parent) : undefined;
+    let isControlHub = options.control ?? false;
+    if (childAddress !== undefined && (childAddress < 1 || childAddress > 255)) {
+        throw new Error(`${childAddress} is not a valid child address`);
+    } else if (
+        parentAddress !== undefined &&
+        (parentAddress < 1 || parentAddress > 255)
+    ) {
+        throw new Error(`${parentAddress} is not a valid parent address`);
+    }
 
-    if (isControlHub) {
-        let controlHubs = await openUsbControlHubs();
-        let controlHub = controlHubs[0];
-        let onClose = () => {
-            controlHub.close();
-        };
+    if (childAddress !== undefined && parentAddress === undefined) {
+        throw new Error("A module address cannot be specified without a parent address.");
+    }
 
-        if (serialNumber) {
-            if (moduleAddress === undefined) {
-                moduleAddress = parentAddress;
-            }
-            let parent = await controlHub.addUsbConnectedHub(
-                serialNumber,
-                parentAddress!,
+    if (serialNumber !== undefined) {
+        if (parentAddress === undefined) {
+            throw new Error(
+                "parent address must be specified if serial number is specified.",
             );
-            if (parentAddress === moduleAddress) {
-                return [parent, onClose];
-            }
-            if (parent.isParent()) {
-                return [
-                    (await parent.addChildByAddress(moduleAddress!)) as ExpansionHub,
-                    onClose,
-                ];
-            } else {
-                throw new Error();
-            }
+        }
+        if(isControlHub) {
+            let hubs = await openUsbControlHubs();
+            return [hubs[0], () => { hubs.forEach((hub) => hub.close()) }];
         } else {
-            if (moduleAddress !== undefined) {
-                return [
-                    (await controlHub.addChildByAddress(moduleAddress!)) as ExpansionHub,
-                    onClose,
-                ];
-            } else {
-                return [controlHub, onClose];
-            }
-        }
-    } else {
-        if (serialNumber) {
-            let parentHub = await openParentExpansionHub(serialNumber, parentAddress);
-            let onClose = () => {
-                parentHub.close();
-            };
-            if (moduleAddress === undefined || moduleAddress == parentHub.moduleAddress) {
-                return [parentHub, onClose];
-            } else {
-                let childHub = await parentHub.addChildByAddress(moduleAddress);
-                if (childHub.isExpansionHub()) {
-                    return [childHub, onClose];
-                }
-            }
-        } else if (parentAddress !== undefined) {
-            //module address specified, but no serial number
-            //if the user specifies a module address, use that, else use parent address as module address.
-            let realModuleAddress =
-                moduleAddress !== undefined ? moduleAddress : parentAddress;
-            let serialNumbers = await getPossibleExpansionHubSerialNumbers();
-
-            if (serialNumbers.length > 1) {
-                //there are multiple hubs connected. We can't distinguish without a serial number
-                throw new Error(
-                    `There are ${serialNumbers.length} parent hubs. Please specify a serialNumber`,
-                );
-            }
-
-            const hub = await openHubWithAddress(
-                serialNumbers[0],
+            return openExpansionHubWithSerialNumber(
+                serialNumber,
                 parentAddress,
-                realModuleAddress,
+                childAddress,
             );
-
-            if (hub.isExpansionHub()) {
-                return [
-                    hub,
-                    () => {
-                        hub.close();
-                    },
-                ];
-            } else {
-                program.error(
-                    `No expansion hub found with module address ${moduleAddress}`,
-                );
-            }
         }
+    } else if (parentAddress !== undefined) {
+        if(isControlHub) {
+            let hubs = await openUsbControlHubs();
+            return [hubs[0], () => { hubs.forEach((hub) => hub.close()) }];
+        } else {
+            return openExpansionHubWithAddress(parentAddress, childAddress);
+        }
+    }
 
+    if(isControlHub) {
+        let hubs = await openUsbControlHubs();
+        if (hubs.length == 0) {
+            throw new Error("No hubs are connected");
+        }
+        if (hubs.length > 1) {
+            throw new Error("Multiple hubs connected. You must specify a serialNumber.");
+        }
+        return [hubs[0], () => { hubs.forEach((hub) => hub.close()) }];
+    } else {
         let connectedHubs: ParentExpansionHub[] = await openConnectedExpansionHubs();
         if (connectedHubs.length == 0) {
             throw new Error("No hubs are connected");
         }
-        if (connectedHubs.length > 1 || connectedHubs[0].children.length > 0) {
-            throw new Error(
-                "Multiple hubs connected. You must specify a serialNumber and/or address.",
-            );
+        if (connectedHubs.length > 1) {
+            throw new Error("Multiple hubs connected. You must specify a serialNumber.");
         }
 
+        // Open the only Hub that is connected
+        let closeHubs = () => {
+            for (let hub of connectedHubs) {
+                hub.close();
+            }
+        };
+        return [connectedHubs[0], closeHubs];
+    }
+}
+
+/**
+ * Open a REV hub through a parent REV hub with the given serial number and address.
+ * If a child address is provided, the specified child will be returned instead of the parent.
+ * Also returns a close method that will close the module and its parent.
+ * @param serialNumber
+ * @param parentAddress
+ * @param childAddress
+ */
+async function openExpansionHubWithSerialNumber(
+    serialNumber: string,
+    parentAddress: number,
+    childAddress: number | undefined,
+): Promise<[hub: ExpansionHub, close: () => void]> {
+    let parentHub = await openParentExpansionHub(serialNumber, parentAddress);
+    if (childAddress === undefined || childAddress == parentHub.moduleAddress) {
         return [
-            connectedHubs[0],
+            parentHub,
             () => {
-                connectedHubs[0].close();
+                parentHub.close();
             },
         ];
+    } else {
+        let childHub = await parentHub.addChildByAddress(childAddress);
+        if (childHub.isExpansionHub()) {
+            let closeChild = () => {
+                parentHub.close();
+                childHub.close();
+            };
+            return [childHub, closeChild];
+        } else {
+            throw new Error(
+                `Hub (${serialNumber}) ${childAddress} is not an Expansion hub`,
+            );
+        }
+    }
+}
+
+/**
+ * Open a REV hub through a parent REV hub with the given address.
+ * If the child address is provided, the specified child will be returned instead of the parent.
+ * Also returns a close method that will close the module and its parent.
+ *
+ * @param parentAddress
+ * @param childAddress
+ */
+async function openExpansionHubWithAddress(
+    parentAddress: number,
+    childAddress: number | undefined,
+): Promise<[hub: ExpansionHub, close: () => void]> {
+    //parent address specified, but no serial number
+    //if the user specifies a module address, use that, else use parent address as module address.
+    let serialNumbers = await getPossibleExpansionHubSerialNumbers();
+
+    if (serialNumbers.length > 1) {
+        //there are multiple hubs connected. We can't distinguish without a serial number
+        throw new Error(
+            `There are ${serialNumbers.length} parent hubs. Please specify a serialNumber`,
+        );
+    }
+
+    let parent = await openParentExpansionHub(serialNumbers[0], parentAddress);
+    let hub: RevHub;
+
+    if (parentAddress == childAddress || childAddress == undefined) {
+        hub = parent;
+    } else {
+        hub = await parent.addChildByAddress(childAddress);
+    }
+
+    if (hub.isExpansionHub()) {
+        let closeHub = () => {
+            parent.close();
+        };
+        return [hub, closeHub];
+    } else {
+        throw new Error(`No expansion hub found with module address ${childAddress}`);
     }
 }

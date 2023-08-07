@@ -1,13 +1,11 @@
 import {
-    NativeRevHub,
-    Serial as SerialPort,
-    RhspLibErrorCode,
-    NackCode,
-} from "@rev-robotics/rhsplib";
-import {
     BulkInputData,
+    ClosedLoopControlAlgorithm,
+    CommandNotSupportedError, ControlHub,
     DebugGroup,
     DigitalChannelDirection,
+    DigitalState,
+    ExpansionHub, GeneralSerialError,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
@@ -22,15 +20,10 @@ import {
     nackCodeToError,
     NoExpansionHubWithAddressError,
     ParameterOutOfRangeError,
-    GeneralSerialError,
-    CommandNotSupportedError,
-    ExpansionHub,
     ParentRevHub,
     RevHub,
-    DigitalState,
     MotorMode,
-    I2cOperationInProgressError,
-    ControlHub,
+    I2cOperationInProgressError, NackCode, PidfCoefficients,
 } from "@rev-robotics/rev-hub-core";
 import { EventEmitter } from "events";
 import { RevHubType } from "@rev-robotics/rev-hub-core";
@@ -38,6 +31,8 @@ import { RhspLibError } from "../errors/RhspLibError.js";
 import { performance } from "perf_hooks";
 import { startKeepAlive } from "../start-keep-alive.js";
 import { closeSerialPort } from "../serial.js";
+import { NativeRevHub, RhspLibErrorCode } from "@rev-robotics/rhsplib";
+import { SerialPort } from "serialport";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -294,14 +289,47 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    getMotorPIDCoefficients(
+    async setMotorClosedLoopControlCoefficients(
         motorChannel: number,
         motorMode: MotorMode,
-    ): Promise<PidCoefficients> {
-        return this.convertErrorPromise(() => {
-            //ToDo (landry): convert the PID coefficients in C code
-            return this.nativeRevHub.getMotorPIDCoefficients(motorChannel, motorMode);
+        algorithm: ClosedLoopControlAlgorithm,
+        pid: PidCoefficients | PidfCoefficients,
+    ): Promise<void> {
+        await this.convertErrorPromise(async () => {
+            await this.nativeRevHub.setMotorClosedLoopControlCoefficients(
+                motorChannel,
+                motorMode,
+                algorithm,
+                pid,
+            );
         });
+    }
+
+    async getMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+    ): Promise<PidfCoefficients | PidCoefficients> {
+        let pid: any = await this.nativeRevHub.getMotorClosedLoopControlCoefficients(
+            motorChannel,
+            motorMode,
+        );
+
+        if (pid.algorithm === ClosedLoopControlAlgorithm.Pid) {
+            return {
+                p: pid.p,
+                i: pid.i,
+                d: pid.d,
+                algorithm: ClosedLoopControlAlgorithm.Pid,
+            };
+        } else {
+            return {
+                p: pid.p,
+                i: pid.i,
+                d: pid.d,
+                f: pid.f,
+                algorithm: ClosedLoopControlAlgorithm.Pidf,
+            };
+        }
     }
 
     getMotorTargetPosition(
@@ -558,10 +586,7 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setMotorConstantPower(
-                motorChannel,
-                powerLevel * 32_767,
-            );
+            return this.nativeRevHub.setMotorConstantPower(motorChannel, powerLevel);
         });
     }
 
@@ -571,11 +596,24 @@ export class ExpansionHubInternal implements ExpansionHub {
         pid: PidCoefficients,
     ): Promise<void> {
         return this.convertErrorPromise(() => {
-            //ToDo (landry): convert the PID coefficients in C code
             return this.nativeRevHub.setMotorPIDCoefficients(
                 motorChannel,
                 motorMode,
                 pid,
+            );
+        });
+    }
+
+    setMotorPIDFCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        pidf: PidfCoefficients,
+    ): Promise<void> {
+        return this.convertErrorPromise(() => {
+            return this.nativeRevHub.setMotorPIDFCoefficients(
+                motorChannel,
+                motorMode,
+                pidf,
             );
         });
     }

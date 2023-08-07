@@ -1,6 +1,7 @@
 export * from "./ExpansionHub.js";
 export * from "./ControlHub.js";
 export * from "./RevHub.js";
+export * from "./ControlHub.js"
 export * from "./RevHubType.js";
 export * from "./nack-errors/nack-codes.js";
 export * from "./serial-errors.js";
@@ -21,6 +22,8 @@ export * from "./LedPattern.js";
 export * from "./ModuleInterface.js";
 export * from "./ModuleStatus.js";
 export * from "./PidCoefficients.js";
+export * from "./PidfCoefficients.js";
+export * from "./ClosedLoopControlAlgorithm.js";
 export * from "./Rgb.js";
 export * from "./MotorMode.js";
 export * from "./SerialFlowControl.js";

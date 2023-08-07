@@ -3,18 +3,23 @@ import semver from "semver";
 import WebSocket from "isomorphic-ws";
 import {
     BulkInputData,
+    ClosedLoopControlAlgorithm,
     ControlHub,
     DebugGroup,
-    DigitalState,
     DigitalChannelDirection,
+    DigitalState,
     ExpansionHub,
+    I2CReadStatus,
     I2CSpeedCode,
+    I2CWriteStatus,
     LedPattern,
     ModuleInterface,
     ModuleStatus,
+    MotorMode,
     ParentExpansionHub,
     ParentRevHub,
     PidCoefficients,
+    PidfCoefficients,
     RevHub,
     RevHubType,
     Rgb,
@@ -30,13 +35,13 @@ import { ControlHubConnectedExpansionHub } from "./ControlHubConnectedExpansionH
 
 export class ControlHubInternal implements ControlHub {
     readonly isOpen: boolean = true;
-    moduleAddress: number = 173;
+    readonly moduleAddress: number = 173;
     responseTimeoutMs: number = 0;
     type: RevHubType = RevHubType.ControlHub;
     readonly serialNumber: string;
 
     /**
-     * All children connected over USB or RS-485.
+     * All children connected over USB, as well as the one embedded hub.
      */
     readonly children: RevHub[] = [];
 
@@ -80,8 +85,7 @@ export class ControlHubInternal implements ControlHub {
         return true;
     }
 
-    async open(ip: string = "192.168.43.1", port: string = "8081"): Promise<void> {
-        console.log(`Port is ${port}`);
+    async open(ip: string, port: number): Promise<void> {
         this.webSocketConnection = new WebSocket(`ws://${ip}:${port}`);
 
         this.webSocketConnection.on("message", (data) => {
@@ -151,7 +155,7 @@ export class ControlHubInternal implements ControlHub {
 
         this.webSocketConnection.on("error", (_: WebSocket, err: Error) => {
             console.log("Websocket error");
-            console.error(err);
+            console.log(err);
             this.isConnected = false;
         });
 
@@ -195,7 +199,10 @@ export class ControlHubInternal implements ControlHub {
                 timeout: 1000,
             });
             if (response.data) {
-                let rcVersion: string = response.data.rcVersion;
+                let rcVersion: string | undefined = response.data.sdkVersion;
+                if(rcVersion === undefined) {
+                    return false;
+                }
                 return semver.satisfies(rcVersion, ">=8.2");
             }
 
@@ -280,16 +287,20 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.getDigitalDirection(dioPin);
     }
 
-    async getDigitalInput(dioPin: number): Promise<DigitalState> {
-        return this.embedded.getDigitalInput(dioPin);
-    }
-
     async getFTDIResetControl(): Promise<boolean> {
         return this.embedded.getFTDIResetControl();
     }
 
     async getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode> {
         return this.embedded.getI2CChannelConfiguration(i2cChannel);
+    }
+
+    getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus> {
+        return this.embedded.getI2CReadStatus(i2cChannel);
+    }
+
+    getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus> {
+        return this.embedded.getI2CWriteStatus(i2cChannel);
     }
 
     async getInterfacePacketID(
@@ -335,13 +346,6 @@ export class ControlHubInternal implements ControlHub {
 
     async getMotorEncoderPosition(motorChannel: number): Promise<number> {
         return this.embedded.getMotorEncoderPosition(motorChannel);
-    }
-
-    async getMotorPIDCoefficients(
-        motorChannel: number,
-        motorMode: number,
-    ): Promise<PidCoefficients> {
-        return this.embedded.getMotorPIDCoefficients(motorChannel, motorMode);
     }
 
     async getMotorTargetPosition(
@@ -448,6 +452,14 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.sendKeepAlive();
     }
 
+    async sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
+        return this.embedded.sendReadCommand(packetTypeID, payload);
+    }
+
+    sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
+        return this.embedded.sendWriteCommand(packetTypeID, payload);
+    }
+
     async setDebugLogLevel(
         debugGroup: DebugGroup,
         verbosityLevel: VerbosityLevel,
@@ -455,18 +467,15 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.setDebugLogLevel(debugGroup, verbosityLevel);
     }
 
-    async setAllDigitalOutputs(bitPackedField: number): Promise<void> {
+    async setDigitalAllOutputs(bitPackedField: number): Promise<void> {
         return this.embedded.setAllDigitalOutputs(bitPackedField);
     }
 
-    async setDigitalDirection(
-        dioPin: number,
-        direction: DigitalChannelDirection,
-    ): Promise<void> {
+    async setDigitalDirection(dioPin: number, direction: DigitalChannelDirection): Promise<void> {
         return this.embedded.setDigitalDirection(dioPin, direction);
     }
 
-    async setDigitalOutput(dioPin: number, value: DigitalState): Promise<void> {
+    async setDigitalSingleOutput(dioPin: number, value: DigitalState): Promise<void> {
         return this.embedded.setDigitalOutput(dioPin, value);
     }
 
@@ -515,14 +524,6 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.setMotorConstantPower(motorChannel, powerLevel);
     }
 
-    async setMotorPIDCoefficients(
-        motorChannel: number,
-        motorMode: number,
-        pid: PidCoefficients,
-    ): Promise<void> {
-        return this.embedded.setMotorPIDCoefficients(motorChannel, motorMode, pid);
-    }
-
     async setMotorTargetPosition(
         motorChannel: number,
         targetPosition_counts: number,
@@ -540,6 +541,17 @@ export class ControlHubInternal implements ControlHub {
         velocity_cps: number,
     ): Promise<void> {
         return this.embedded.setMotorTargetVelocity(motorChannel, velocity_cps);
+    }
+
+    async getMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode): Promise<PidfCoefficients | PidCoefficients> {
+        return await this.embedded.getMotorClosedLoopControlCoefficients(motorChannel, motorMode);
+    }
+
+    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pid, pid: PidCoefficients): Promise<void>;
+    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pidf, pidf: PidfCoefficients): Promise<void>;
+    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm, pid: PidCoefficients | PidfCoefficients): Promise<void>;
+    async setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pid | ClosedLoopControlAlgorithm.Pidf | ClosedLoopControlAlgorithm, pid: PidCoefficients | PidfCoefficients): Promise<void> {
+        return await this.embedded.setMotorClosedLoopControlCoefficients(motorChannel, motorMode, algorithm, pid);
     }
 
     async setNewModuleAddress(newModuleAddress: number): Promise<void> {
@@ -573,7 +585,21 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.writeI2CMultipleBytes(i2cChannel, slaveAddress, bytes);
     }
 
-    async writeI2CSingleByte(
+    writeI2CReadMultipleBytes(
+        i2cChannel: number,
+        slaveAddress: number,
+        numBytesToRead: number,
+        startAddress: number,
+    ): Promise<void> {
+        return this.embedded.writeI2CReadMultipleBytes(
+            i2cChannel,
+            slaveAddress,
+            numBytesToRead,
+            startAddress,
+        );
+    }
+
+    writeI2CSingleByte(
         i2cChannel: number,
         slaveAddress: number,
         byte: number,
