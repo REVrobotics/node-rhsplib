@@ -1,9 +1,10 @@
 import { ClosedLoopControlAlgorithm } from "./ClosedLoopControlAlgorithm.js";
 
-export interface PidCoefficients {
+export interface PidfCoefficients {
     p: number;
     i: number;
     d: number;
+    f: number;
 
-    algorithm: ClosedLoopControlAlgorithm.Pid;
+    algorithm: ClosedLoopControlAlgorithm.Pidf;
 }

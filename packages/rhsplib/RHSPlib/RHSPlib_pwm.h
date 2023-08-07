@@ -27,7 +27,7 @@ extern "C" {
  *
  * */
 int RHSPlib_pwm_setConfiguration(RHSPlib_Module_T *obj,
-                                  uint8_t pwmChannel, uint16_t framePeriod, uint8_t *nackReasonCode);
+                                 uint8_t pwmChannel, uint16_t framePeriod, uint8_t *nackReasonCode);
 
 /**
  * @brief get pwm configuration
@@ -41,7 +41,7 @@ int RHSPlib_pwm_setConfiguration(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_pwm_getConfiguration(RHSPlib_Module_T *obj,
-                                  uint8_t pwmChannel, uint16_t *framePeriod, uint8_t *nackReasonCode);
+                                 uint8_t pwmChannel, uint16_t *framePeriod, uint8_t *nackReasonCode);
 
 /**
  * @brief set pwm pulse width
@@ -55,7 +55,7 @@ int RHSPlib_pwm_getConfiguration(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_pwm_setPulseWidth(RHSPlib_Module_T *obj,
-                               uint8_t pwmChannel, uint16_t pulseWidth, uint8_t *nackReasonCode);
+                              uint8_t pwmChannel, uint16_t pulseWidth, uint8_t *nackReasonCode);
 
 /**
  * @brief get pwm pulse width
@@ -69,7 +69,7 @@ int RHSPlib_pwm_setPulseWidth(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_pwm_getPulseWidth(RHSPlib_Module_T *obj,
-                               uint8_t pwmChannel, uint16_t *pulseWidth, uint8_t *nackReasonCode);
+                              uint8_t pwmChannel, uint16_t *pulseWidth, uint8_t *nackReasonCode);
 
 /**
  * @brief set pwm enable
@@ -83,7 +83,7 @@ int RHSPlib_pwm_getPulseWidth(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_pwm_setEnable(RHSPlib_Module_T *obj,
-                           uint8_t pwmChannel, uint8_t enable, uint8_t *nackReasonCode);
+                          uint8_t pwmChannel, uint8_t enable, uint8_t *nackReasonCode);
 
 /**
  * @brief get pwm enable
@@ -97,7 +97,7 @@ int RHSPlib_pwm_setEnable(RHSPlib_Module_T *obj,
  *
  * */
 int RHSPlib_pwm_getEnable(RHSPlib_Module_T *obj,
-                           uint8_t pwmChannel, uint8_t *enable, uint8_t *nackReasonCode);
+                          uint8_t pwmChannel, uint8_t *enable, uint8_t *nackReasonCode);
 
 #ifdef __cplusplus
 }

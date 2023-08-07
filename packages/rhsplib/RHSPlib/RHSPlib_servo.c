@@ -7,9 +7,9 @@
 #include "RHSPlib_servo.h"
 
 int RHSPlib_servo_setConfiguration(RHSPlib_Module_T *obj,
-                                    uint8_t servoChannel, uint16_t framePeriod, uint8_t *nackReasonCode)
+                                   uint8_t servoChannel, uint16_t framePeriod, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -40,9 +40,9 @@ int RHSPlib_servo_setConfiguration(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_servo_getConfiguration(RHSPlib_Module_T *obj,
-                                    uint8_t servoChannel, uint16_t *framePeriod, uint8_t *nackReasonCode)
+                                   uint8_t servoChannel, uint16_t *framePeriod, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -51,9 +51,9 @@ int RHSPlib_servo_getConfiguration(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (servoChannel >= RHSPLIB_MAX_NUMBER_OF_SERVO_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
 
     int retval = RHSPlib_getInterfacePacketID(obj, "DEKA", 32, &packetID, nackReasonCode);
     if (retval < 0)
@@ -74,9 +74,9 @@ int RHSPlib_servo_getConfiguration(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_servo_setPulseWidth(RHSPlib_Module_T *obj,
-                                 uint8_t servoChannel, uint16_t pulseWidth, uint8_t *nackReasonCode)
+                                uint8_t servoChannel, uint16_t pulseWidth, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -85,9 +85,9 @@ int RHSPlib_servo_setPulseWidth(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (servoChannel >= RHSPLIB_MAX_NUMBER_OF_SERVO_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     else if (pulseWidth == 0)
     {
     	return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
@@ -107,9 +107,9 @@ int RHSPlib_servo_setPulseWidth(RHSPlib_Module_T *obj,
 }
 
 int RHSPlib_servo_getPulseWidth(RHSPlib_Module_T *obj,
-                                 uint8_t servoChannel, uint16_t *pulseWidth, uint8_t *nackReasonCode)
+                                uint8_t servoChannel, uint16_t *pulseWidth, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -118,9 +118,9 @@ int RHSPlib_servo_getPulseWidth(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (servoChannel >= RHSPLIB_MAX_NUMBER_OF_SERVO_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
 
     int retval = RHSPlib_getInterfacePacketID(obj, "DEKA", 34, &packetID, nackReasonCode);
     if (retval < 0)
@@ -143,7 +143,7 @@ int RHSPlib_servo_getPulseWidth(RHSPlib_Module_T *obj,
 int RHSPlib_servo_setEnable(RHSPlib_Module_T *obj,
                              uint8_t servoChannel, uint8_t enable, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -152,9 +152,9 @@ int RHSPlib_servo_setEnable(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (servoChannel >= RHSPLIB_MAX_NUMBER_OF_SERVO_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
     else if (enable > 1)
     {
     	return RHSPLIB_ERROR_ARG_2_OUT_OF_RANGE;
@@ -174,7 +174,7 @@ int RHSPlib_servo_setEnable(RHSPlib_Module_T *obj,
 int RHSPlib_servo_getEnable(RHSPlib_Module_T *obj,
                              uint8_t servoChannel, uint8_t *enable, uint8_t *nackReasonCode)
 {
-	uint16_t packetID;
+    uint16_t packetID;
 
     RHSPLIB_ASSERT(obj);
 
@@ -183,9 +183,9 @@ int RHSPlib_servo_getEnable(RHSPlib_Module_T *obj,
         return RHSPLIB_ERROR;
     }
     if (servoChannel >= RHSPLIB_MAX_NUMBER_OF_SERVO_CHANNELS)
-	{
-		return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
-	}
+    {
+        return RHSPLIB_ERROR_ARG_1_OUT_OF_RANGE;
+    }
 
     int retval = RHSPlib_getInterfacePacketID(obj, "DEKA", 36, &packetID, nackReasonCode);
     if (retval < 0)
