@@ -318,10 +318,14 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     async getMotorChannelMode(
         motorChannel: number,
     ): Promise<{ motorMode: number; floatAtZero: boolean }> {
-        return await this.sendCommand("getMotorMode", {
+        let result: any = await this.sendCommand("getMotorMode", {
             hId: this.id,
             c: motorChannel,
         });
+        return {
+            motorMode: result.m,
+            floatAtZero: result.faz
+        }
     }
 
     async getMotorConstantPower(motorChannel: number): Promise<number> {
@@ -448,7 +452,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         await this.sendCommand("setMotorConstantPower", {
             hId: this.id,
             c: motorChannel,
-            motorPower: powerLevel,
+            p: powerLevel,
         });
     }
 
@@ -492,8 +496,8 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         await this.sendCommand("setMotorTargetPosition", {
             hId: this.id,
             c: motorChannel,
-            targetPositionCounts: targetPosition_counts,
-            targetToleranceCounts: targetTolerance_counts,
+            tpc: targetPosition_counts,
+            ttc: targetTolerance_counts,
         });
     }
 
@@ -504,7 +508,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         await this.sendCommand("setMotorTargetVelocity", {
             hId: this.id,
             c: motorChannel,
-            velocityCps: velocity_cps,
+            tv: velocity_cps,
         });
     }
 
