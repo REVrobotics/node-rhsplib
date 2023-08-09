@@ -6,7 +6,10 @@
   ],
   "devDependencies": {
     "lerna": "^6.0.1",
-    "prettier": "2.8.8",
-    "nx": "^16.2.1"
+    "nx": "^16.2.1",
+    "prettier": "2.8.8"
+  },
+  "dependencies": {
+    "node-addon-api": "^7.0.0"
   }
 }

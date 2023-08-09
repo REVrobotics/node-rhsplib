@@ -16,7 +16,7 @@ async function createWiFiControlHub(): Promise<ControlHub> {
         throw new Error("Hub is not connected via WiFi");
     }
 
-    await hub.open();
+    await hub.open("192.168.42.1", 8080);
 
     return hub;
 }

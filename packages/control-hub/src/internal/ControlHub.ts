@@ -284,7 +284,11 @@ export class ControlHubInternal implements ControlHub {
     }
 
     async getDigitalDirection(dioPin: number): Promise<DigitalChannelDirection> {
-        return this.embedded.getDigitalDirection(dioPin);
+        return await this.embedded.getDigitalDirection(dioPin);
+    }
+
+    async getDigitalInput(dioPin: number): Promise<DigitalState> {
+        return await this.embedded.getDigitalInput(dioPin);
     }
 
     async getFTDIResetControl(): Promise<boolean> {
@@ -293,14 +297,6 @@ export class ControlHubInternal implements ControlHub {
 
     async getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode> {
         return this.embedded.getI2CChannelConfiguration(i2cChannel);
-    }
-
-    getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus> {
-        return this.embedded.getI2CReadStatus(i2cChannel);
-    }
-
-    getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus> {
-        return this.embedded.getI2CWriteStatus(i2cChannel);
     }
 
     async getInterfacePacketID(
@@ -467,7 +463,7 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.setDebugLogLevel(debugGroup, verbosityLevel);
     }
 
-    async setDigitalAllOutputs(bitPackedField: number): Promise<void> {
+    async setAllDigitalOutputs(bitPackedField: number): Promise<void> {
         return this.embedded.setAllDigitalOutputs(bitPackedField);
     }
 
@@ -475,7 +471,7 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.setDigitalDirection(dioPin, direction);
     }
 
-    async setDigitalSingleOutput(dioPin: number, value: DigitalState): Promise<void> {
+    async setDigitalOutput(dioPin: number, value: DigitalState): Promise<void> {
         return this.embedded.setDigitalOutput(dioPin, value);
     }
 
@@ -583,20 +579,6 @@ export class ControlHubInternal implements ControlHub {
         bytes: number[],
     ): Promise<void> {
         return this.embedded.writeI2CMultipleBytes(i2cChannel, slaveAddress, bytes);
-    }
-
-    writeI2CReadMultipleBytes(
-        i2cChannel: number,
-        slaveAddress: number,
-        numBytesToRead: number,
-        startAddress: number,
-    ): Promise<void> {
-        return this.embedded.writeI2CReadMultipleBytes(
-            i2cChannel,
-            slaveAddress,
-            numBytesToRead,
-            startAddress,
-        );
     }
 
     writeI2CSingleByte(
