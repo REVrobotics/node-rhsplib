@@ -570,7 +570,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         await this.sendCommand("setServoConfiguration", {
             hId: this.id,
             c: servoChannel,
-            framePeriod: framePeriod,
+            fp: framePeriod,
         });
     }
 
