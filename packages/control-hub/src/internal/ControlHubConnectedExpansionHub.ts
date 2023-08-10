@@ -108,7 +108,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     }
 
     async getI2CCurrent(): Promise<number> {
-        return await this.sendCommand("getI2CCurrent", {
+        return await this.sendCommand("getI2cCurrent", {
             hId: this.id,
         });
     }
@@ -140,8 +140,8 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         return {
             analog0_mV: rawData.a0,
             analog1_mV: rawData.a1,
-            analog2_mV: rawData.a3,
-            analog3_mV: rawData.a4,
+            analog2_mV: rawData.a2,
+            analog3_mV: rawData.a3,
             digitalInputs: rawData.diBf,
             motor0position_enc: rawData.m0ep,
             motor1position_enc: rawData.m1ep,
