@@ -44,8 +44,9 @@ import {
 } from "./command/digital.js";
 import { sendFailSafe } from "./command/failsafe.js";
 import { queryInterface } from "./command/query.js";
-import {openUsbControlHubs} from "./adb-setup.js";
+import {openUsbControlHubsAndChildren} from "./adb-setup.js";
 import { status } from "../dist/command/status.js";
+import { setHubAddress } from "../dist/command/set-hub-address.js";
 
 function runOnSigint(block: () => void) {
     process.on("SIGINT", () => {
@@ -699,6 +700,16 @@ program
         await runServo(hub, channelValue, pulseWidthValue, frameWidthValue);
     });
 
+program
+  .command("set-address <address>")
+  .description("Set Module Address")
+  .action(async (address) => {
+    let addressNumber = Number(address);
+    let [hub, close] = await getRevHubOrThrow();
+    await setHubAddress(hub as ControlHub, addressNumber);
+    close();
+  });
+
 program.command("status").action(async () => {
   let [hub, close] = await getRevHubOrThrow();
   await status(hub as ControlHub);
@@ -743,8 +754,22 @@ async function getRevHubOrThrow(): Promise<[hub: ExpansionHub, close: () => void
             );
         }
         if(isControlHub) {
-            let hubs = await openUsbControlHubs();
-            return [hubs[0], () => { hubs.forEach((hub) => hub.close()) }];
+            let hubs = await openUsbControlHubsAndChildren();
+            let onClose = () => { hubs.forEach((hub) => hub.close()) };
+            if(childAddress === undefined) {
+                return [hubs[0], onClose];
+            }
+
+            for(let controlHub of hubs) {
+                if(controlHub.moduleAddress == childAddress) {
+                    return [controlHub as ExpansionHub, onClose];
+                }
+                for(let hub of controlHub.children) {
+                    if(hub.moduleAddress == childAddress) {
+                        return [hub as ExpansionHub, onClose];
+                    }
+                }
+            }
         } else {
             return openExpansionHubWithSerialNumber(
                 serialNumber,
@@ -754,15 +779,26 @@ async function getRevHubOrThrow(): Promise<[hub: ExpansionHub, close: () => void
         }
     } else if (parentAddress !== undefined) {
         if(isControlHub) {
-            let hubs = await openUsbControlHubs();
-            return [hubs[0], () => { hubs.forEach((hub) => hub.close()) }];
+            let hubs = await openUsbControlHubsAndChildren();
+            let onClose = () => { hubs.forEach((hub) => hub.close()) };
+
+            for(let controlHub of hubs) {
+                if(controlHub.moduleAddress == childAddress) {
+                    return [controlHub as ExpansionHub, onClose];
+                }
+                for(let hub of controlHub.children) {
+                    if(hub.moduleAddress == childAddress) {
+                        return [hub as ExpansionHub, onClose];
+                    }
+                }
+            }
         } else {
             return openExpansionHubWithAddress(parentAddress, childAddress);
         }
     }
 
     if(isControlHub) {
-        let hubs = await openUsbControlHubs();
+        let hubs = await openUsbControlHubsAndChildren();
         if (hubs.length == 0) {
             throw new Error("No hubs are connected");
         }
