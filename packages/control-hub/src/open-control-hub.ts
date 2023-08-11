@@ -6,7 +6,7 @@ export async function openControlHub(
     moduleAddress: number,
     port: number,
 ): Promise<ControlHub> {
-    let hub = new ControlHubInternal(serialNumber);
+    let hub = new ControlHubInternal(serialNumber, moduleAddress);
     await hub.open("127.0.0.1", (port + 1));
     return hub;
 }

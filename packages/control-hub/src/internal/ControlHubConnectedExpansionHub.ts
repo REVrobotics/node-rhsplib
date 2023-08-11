@@ -709,9 +709,9 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     }
 
     async setNewModuleAddress(newModuleAddress: number): Promise<void> {
-        await this.sendCommand("setNewModuleAddress", {
+        await this.sendCommand("setHubAddress", {
             hId: this.id,
-            address: newModuleAddress,
+            newAddress: newModuleAddress,
         });
     }
     async initializeImu() {
@@ -752,16 +752,12 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         return newHub;
     }
 
-    flattenChildren(): ControlHubConnectedExpansionHub[] {
-        let result: ControlHubConnectedExpansionHub[] = [];
-        for (let child of this.children) {
-            if (child instanceof ControlHubConnectedExpansionHub) {
-                result.push(child);
-                result.push(...child.flattenChildren());
-            }
-        }
-
-        return result;
+    emit(eventName: "error", e: Error): void;
+    emit(eventName: "statusChanged", status: ModuleStatus): void;
+    emit(eventName: "addressChanged", oldAddress: number, newAddress: number): void;
+    emit(eventName: "sessionEnded"): void;
+    emit(eventName: string, ...args: any): void {
+        this.emitter.emit(eventName, ...args);
     }
 
     on(
@@ -772,19 +768,23 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         return this;
     }
 
-    emit(eventName: "error"): void;
-    emit(eventName: "statusChanged", args: ModuleStatus): void;
-    emit(eventName: "addressChanged", oldAddress: number, newAddress: number): void;
-    emit(eventName: "sessionEnded"): void;
-    emit(eventName: string, ...args: any): void {
-        this.emitter.emit(eventName, ...args);
-    }
-
     sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
         return Promise.resolve([]);
     }
 
     sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
         return Promise.resolve([]);
+    }
+
+    flattenChildren(): ControlHubConnectedExpansionHub[] {
+        let result: ControlHubConnectedExpansionHub[] = [];
+        for (let child of this.children) {
+            if (child instanceof ControlHubConnectedExpansionHub) {
+                result.push(child);
+                result.push(...child.flattenChildren());
+            }
+        }
+
+        return result;
     }
 }

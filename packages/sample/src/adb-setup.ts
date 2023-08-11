@@ -1,7 +1,8 @@
 import { Adb, DeviceClient } from "@u4/adbkit";
 import getPort from "get-port";
-import { ControlHub } from "@rev-robotics/rev-hub-core";
-import { openControlHub } from "@rev-robotics/control-hub";
+import { ControlHub, ParentRevHub } from "@rev-robotics/rev-hub-core";
+import { openWifiControlHub } from "@rev-robotics/control-hub";
+import { ControlHubInternal } from "@rev-robotics/control-hub/dist/internal/ControlHub.js";
 
 export async function openUsbControlHubs(): Promise<ControlHub[]> {
     let adbClient = Adb.createClient();
@@ -15,8 +16,36 @@ export async function openUsbControlHubs(): Promise<ControlHub[]> {
             let port = await configureHubTcp(deviceClient);
             let serialNumber = device.id;
 
-            let hub = await openControlHub(serialNumber, 173, port);
+            let hub = await openWifiControlHub(serialNumber, 173, port) as ControlHubInternal;
             controlHubs.push(hub);
+
+            let addresses: Record<
+              string,
+              {
+                  serialNumber: string;
+                  parentHubAddress: number;
+                  childAddresses: number[];
+              }
+            > = await hub.sendCommand("scanAndDiscover", {}, 20000);
+
+            for (let serialNumber in addresses) {
+                let parentHub: ParentRevHub;
+                let childAddresses = addresses[serialNumber].childAddresses;
+
+                if (serialNumber === "(embedded)") {
+                    parentHub = hub;
+                } else {
+                    let parentHubInfo = addresses[serialNumber];
+                    parentHub = await hub.addUsbConnectedHub(
+                      serialNumber,
+                      parentHubInfo.parentHubAddress,
+                    );
+                }
+
+                for (let childAddress of childAddresses) {
+                    await parentHub.addChildByAddress(childAddress);
+                }
+            }
         }
     }
 

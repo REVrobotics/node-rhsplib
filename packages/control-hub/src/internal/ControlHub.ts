@@ -35,7 +35,7 @@ import { ControlHubConnectedExpansionHub } from "./ControlHubConnectedExpansionH
 
 export class ControlHubInternal implements ControlHub {
     readonly isOpen: boolean = true;
-    readonly moduleAddress: number = 173;
+    readonly moduleAddress: number;
     responseTimeoutMs: number = 0;
     type: RevHubType = RevHubType.ControlHub;
     readonly serialNumber: string;
@@ -73,8 +73,9 @@ export class ControlHubInternal implements ControlHub {
         (response: any | undefined, error: any | undefined) => void
     >();
 
-    constructor(serialNumber: string) {
+    constructor(serialNumber: string, moduleAddress: number) {
         this.serialNumber = serialNumber;
+        this.moduleAddress = moduleAddress;
     }
 
     isParent(): this is ParentRevHub {
@@ -279,18 +280,6 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.getBulkInputData();
     }
 
-    async getAllDigitalInputs(): Promise<number> {
-        return this.embedded.getAllDigitalInputs();
-    }
-
-    async getDigitalDirection(dioPin: number): Promise<DigitalChannelDirection> {
-        return await this.embedded.getDigitalDirection(dioPin);
-    }
-
-    async getDigitalInput(dioPin: number): Promise<DigitalState> {
-        return await this.embedded.getDigitalInput(dioPin);
-    }
-
     async getFTDIResetControl(): Promise<boolean> {
         return this.embedded.getFTDIResetControl();
     }
@@ -463,16 +452,28 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.setDebugLogLevel(debugGroup, verbosityLevel);
     }
 
-    async setAllDigitalOutputs(bitPackedField: number): Promise<void> {
-        return this.embedded.setAllDigitalOutputs(bitPackedField);
+    async getAllDigitalInputs(): Promise<number> {
+        return await this.embedded.getAllDigitalInputs();
+    }
+
+    async getDigitalInput(digitalChannel: number): Promise<DigitalState> {
+        return await this.embedded.getDigitalInput(digitalChannel);
+    }
+
+    async getDigitalDirection(dioPin: number): Promise<DigitalChannelDirection> {
+        return this.embedded.getDigitalDirection(dioPin);
     }
 
     async setDigitalDirection(dioPin: number, direction: DigitalChannelDirection): Promise<void> {
-        return this.embedded.setDigitalDirection(dioPin, direction);
+        return await this.embedded.setDigitalDirection(dioPin, direction);
     }
 
-    async setDigitalOutput(dioPin: number, value: DigitalState): Promise<void> {
-        return this.embedded.setDigitalOutput(dioPin, value);
+    async setDigitalOutput(digitalChannel: number, value: DigitalState): Promise<void> {
+        await this.embedded.setDigitalOutput(digitalChannel, value);
+    }
+
+    async setAllDigitalOutputs(bitPackedField: number): Promise<void> {
+        await this.embedded.setAllDigitalOutputs(bitPackedField);
     }
 
     async setFTDIResetControl(ftdiResetControl: boolean): Promise<void> {
@@ -597,25 +598,6 @@ export class ControlHubInternal implements ControlHub {
         return await this.embedded.getImuData();
     }
 
-    /**
-     * Returns all connected hubs in the hierarchy as a flat list. Intended for
-     * operations that could affect all hubs.
-     * @private
-     */
-    private flattenChildren(): ControlHubConnectedExpansionHub[] {
-        let result: ControlHubConnectedExpansionHub[] = [];
-        result.push(this.embedded);
-
-        for (let child of this.children) {
-            if (child instanceof ControlHubConnectedExpansionHub) {
-                result.push(child);
-                result.push(...child.flattenChildren());
-            }
-        }
-
-        return result;
-    }
-
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {
         let id = await this.openHub("(embedded)", this.moduleAddress, moduleAddress);
 
@@ -698,5 +680,24 @@ export class ControlHubInternal implements ControlHub {
         return await Promise.race([callbackPromise, timeoutPromise]).finally(() => {
             clearTimeout(timer);
         });
+    }
+
+    /**
+     * Returns all connected hubs in the hierarchy as a flat list. Intended for
+     * operations that could affect all hubs.
+     * @private
+     */
+    private flattenChildren(): ControlHubConnectedExpansionHub[] {
+        let result: ControlHubConnectedExpansionHub[] = [];
+        result.push(this.embedded);
+
+        for (let child of this.children) {
+            if (child instanceof ControlHubConnectedExpansionHub) {
+                result.push(child);
+                result.push(...child.flattenChildren());
+            }
+        }
+
+        return result;
     }
 }
