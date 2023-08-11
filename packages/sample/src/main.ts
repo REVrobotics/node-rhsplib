@@ -44,7 +44,7 @@ import {
 } from "./command/digital.js";
 import { sendFailSafe } from "./command/failsafe.js";
 import { queryInterface } from "./command/query.js";
-import {openUsbControlHubsAndChildren} from "./adb-setup.js";
+import {openUsbControlHubsAndChildren} from "./open-control-hub.js";
 import { status } from "../dist/command/status.js";
 import { setHubAddress } from "../dist/command/set-hub-address.js";
 
