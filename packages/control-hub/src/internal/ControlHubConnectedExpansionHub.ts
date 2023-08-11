@@ -724,9 +724,9 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     }
 
     async setNewModuleAddress(newModuleAddress: number): Promise<void> {
-        await this.sendCommand("setNewModuleAddress", {
+        await this.sendCommand("setHubAddress", {
             hId: this.id,
-            address: newModuleAddress,
+            newAddress: newModuleAddress,
         });
     }
 
