@@ -28,6 +28,9 @@
         "temperature": "node dist/main.js temperature --continuous",
         "error": "node dist/main.js testErrorHandling",
         "list": "node dist/main.js list",
-        "led": "node dist/main.js led"
+        "led": "node dist/main.js led",
+        "motor": "node dist/main.js motor power 1 0.60",
+        "motor-position": "node dist/main.js --count 3000",
+        "distance": "node dist/main.js distance 0"
     }
 }

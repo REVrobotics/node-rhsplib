@@ -4,7 +4,7 @@ import { ControlHub, ParentRevHub } from "@rev-robotics/rev-hub-core";
 import { openWifiControlHub } from "@rev-robotics/control-hub";
 import { ControlHubInternal } from "@rev-robotics/control-hub/dist/internal/ControlHub.js";
 
-export async function openUsbControlHubsAndChildren(): Promise<ControlHub[]> {
+export async function openUsbControlHubs(): Promise<ControlHub[]> {
     let adbClient = Adb.createClient();
     let controlHubs: ControlHub[] = [];
 

@@ -24,10 +24,7 @@ import {
 } from "@rev-robotics/rev-hub-core";
 import { SerialParity } from "@rev-robotics/rev-hub-core";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const require = createRequire(import.meta.url);
-const addon = require("node-gyp-build")(path.join(__dirname, ".."));
+const addon: any = {};
 
 export * from "./error-codes.js";
 export * from "./serial-errors.js";
@@ -127,24 +124,24 @@ export declare class RevHub {
     getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode>;
     writeI2CSingleByte(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         byte: number,
     ): Promise<void>;
     writeI2CMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         bytes: number[],
     ): Promise<void>;
     getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus>;
-    readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void>;
+    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<void>;
     readI2CMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         numBytesToRead: number,
     ): Promise<void>;
     writeI2CReadMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         numBytesToRead: number,
         startAddress: number,
     ): Promise<void>;

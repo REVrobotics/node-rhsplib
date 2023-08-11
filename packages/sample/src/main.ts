@@ -31,11 +31,10 @@ import {
 } from "@rev-robotics/expansion-hub";
 import { getLed, getLedPattern, led, ledPattern } from "./command/led.js";
 import { runServo } from "./command/servo.js";
-import { ControlHub, ExpansionHub, ParentExpansionHub, RevHub } from "@rev-robotics/rev-hub-core";
+import { ControlHub, DigitalState, ExpansionHub, ParentExpansionHub, RevHub } from "@rev-robotics/rev-hub-core";
 import { injectLog, setDebugLogLevel } from "./command/log.js";
 import { firmwareVersion } from "./command/firmware-version.js";
 import { getBulkInputData } from "./command/bulkinput.js";
-import { DigitalState } from "@rev-robotics/rev-hub-core";
 import {
     digitalRead,
     digitalReadAll,
@@ -44,9 +43,11 @@ import {
 } from "./command/digital.js";
 import { sendFailSafe } from "./command/failsafe.js";
 import { queryInterface } from "./command/query.js";
-import {openUsbControlHubsAndChildren} from "./adb-setup.js";
-import { status } from "../dist/command/status.js";
-import { setHubAddress } from "../dist/command/set-hub-address.js";
+import {openUsbControlHubsAndChildren} from "./open-usb-control-hub.js";
+import { imu } from "./command/imu.js";
+import { distance } from "./command/distance.js";
+import { status } from "./command/status.js";
+import { setHubAddress } from "./command/set-hub-address.js";
 
 function runOnSigint(block: () => void) {
     process.on("SIGINT", () => {
@@ -56,6 +57,8 @@ function runOnSigint(block: () => void) {
 }
 
 const program = new Command();
+
+program.name("ch");
 
 program.version("1.0.0");
 
@@ -120,9 +123,6 @@ program
         runOnSigint(() => {
             close();
         });
-
-        await getLedPattern(hub);
-        close();
     });
 
 program
@@ -138,6 +138,10 @@ program
         let gValue = Number(g);
         let bValue = Number(b);
         await led(hub, rValue, gValue, bValue);
+
+        process.on("SIGINT", () => {
+            close();
+        });
     });
 
 program
@@ -145,12 +149,7 @@ program
     .description("Get LED color. Values are [0,255]")
     .action(async () => {
         let [hub, close] = await getRevHubOrThrow();
-
-        runOnSigint(() => {
-            close();
-        });
         await getLed(hub);
-
         close();
     });
 
@@ -172,11 +171,30 @@ program
         let isContinuous = options.continuous !== undefined;
         let [hub, close] = await getRevHubOrThrow();
 
-        runOnSigint(() => {
-            close();
-        });
-
         await getBulkInputData(hub, isContinuous);
+        close();
+    });
+
+program
+    .command("log <text>")
+    .description("Inject a log hint")
+    .action(async (text) => {
+        let [hub, close] = await getRevHubOrThrow();
+        await injectLog(hub, text);
+        close();
+    });
+
+program
+    .command("loglevel <group> <level>")
+    .description(
+        "Set log level. Valid values for group are: Main, " +
+            "TransmitterToHost, ReceiverFromHost, ADC, PWMAndServo, ModuleLED, " +
+            "DigitalIO, I2C, Motor0, Motor1, Motor2, or Motor3. Valid values for level are [0,3]",
+    )
+    .action(async (group, level) => {
+        let [hub, close] = await getRevHubOrThrow();
+        let levelNumber = Number(level);
+        await setDebugLogLevel(hub, group, levelNumber);
         close();
     });
 
@@ -200,9 +218,51 @@ program
     .description("Get firmware version")
     .action(async () => {
         let [hub, close] = await getRevHubOrThrow();
-
         await firmwareVersion(hub);
         close();
+    });
+
+program
+    .command("set-address <address>")
+    .description("Set Module Address")
+    .action(async (address) => {
+        let addressNumber = Number(address);
+        let [hub, close] = await getRevHubOrThrow();
+        await setHubAddress(hub as ControlHub, addressNumber);
+        close();
+    });
+
+program.command("status").action(async () => {
+    let hubs = await openUsbControlHubsAndChildren();
+    let allHubs = hubs.flatMap((hub) => [hub, ...hub.children]);
+    for (let hub of allHubs) {
+        await status(hub as ControlHub);
+    }
+
+    process.on("SIGINT", () => {
+        for (let hub of hubs) {
+            hub.close();
+        }
+        process.exit();
+    });
+});
+
+program
+    .command("bulkInput")
+    .description("Get all input data at once. Specify --continuous to run continuously.")
+    .option("--continuous", "run continuously")
+    .description("Get the current encoder position of a motor")
+    .action(async (channel, options) => {
+        let channelNumber = Number(channel);
+        let [hub, close] = await getRevHubOrThrow();
+        if (options.reset) {
+            await resetEncoder(hub, channelNumber);
+            close();
+        } else {
+            let isContinuous = options.continuous !== undefined;
+            await readEncoder(hub, channelNumber, isContinuous);
+            close();
+        }
     });
 
 let digitalCommand = program.command("digital");
@@ -510,7 +570,7 @@ program
     .command("analog <port>")
     .option("--continuous", "Run continuously")
     .description(
-        "Read the analog value of the given port. Specify" +
+        "Read the analog value of the given port. Specify " +
             "--continuous to run continuously.",
     )
     .action(async (port, options) => {
@@ -542,6 +602,7 @@ program
         });
 
         await temperature(hub, isContinuous);
+        close();
     });
 
 program
@@ -553,6 +614,7 @@ program
     .action(async (options) => {
         let isContinuous = options.continuous !== undefined;
         let [hub, close] = await getRevHubOrThrow();
+
         runOnSigint(() => {
             close();
         });
@@ -586,7 +648,9 @@ batteryCommand
 batteryCommand
     .command("current")
     .option("--continuous", "Run continuously")
-    .description("Read the battery current. Specify --continuous to run continuously")
+    .description(
+        "Read the current battery current (mA). Specify --continuous to run continuously",
+    )
     .action(async (options) => {
         let isContinuous = options.continuous !== undefined;
         let [hub, close] = await getRevHubOrThrow();
@@ -692,12 +756,52 @@ program
         let channelValue = Number(channel);
         let pulseWidthValue = Number(pulseWidth);
         let frameWidthValue = frameWidth ? Number(frameWidth) : 4000;
+
         runOnSigint(async () => {
             await hub.setServoEnable(channelValue, false);
             close();
         });
 
         await runServo(hub, channelValue, pulseWidthValue, frameWidthValue);
+
+        runOnSigint(() => {
+            close();
+        });
+    });
+
+program
+    .command("distance <channel>")
+    .option("--continuous", "run continuously")
+    .description("Read distance from a REV 2m distance sensor")
+    .action(async (channel, options): Promise<void> => {
+        let isContinuous = options.continuous !== undefined;
+        let channelNumber = Number(channel);
+        let [hub, close] = await getRevHubOrThrow();
+        await distance(hub, channelNumber, isContinuous);
+
+        runOnSigint(() => {
+            close();
+        });
+    });
+
+program
+    .command("imu")
+    .option("--continuous", "run continuously")
+    .description("Get IMU data. Specify --continuous to run continuously.")
+    .action(async (options) => {
+        let isContinuous = options.continuous !== undefined;
+        let [hub, close] = await getRevHubOrThrow();
+
+        runOnSigint(() => {
+            close();
+        });
+
+        if (hub.isControlHub()) {
+            await imu(hub, isContinuous);
+        } else {
+            throw new Error("Hub is not a control hub.");
+        }
+        close();
     });
 
 program

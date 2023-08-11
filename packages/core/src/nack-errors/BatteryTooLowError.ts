@@ -1,4 +1,5 @@
-import {NackError, setPrototypeOf} from "./NackError.js";
+import { NackError } from "./NackError.js";
+import { setPrototypeOf } from "./set-prototype.js";
 
 export class BatteryTooLowError extends NackError {
     constructor(nackCode: number, message: string) {

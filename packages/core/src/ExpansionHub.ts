@@ -9,8 +9,6 @@ import { VerbosityLevel } from "./VerbosityLevel.js";
 import { Version } from "./Version.js";
 import { DigitalChannelDirection } from "./DigitalChannelDirection.js";
 import { I2CSpeedCode } from "./I2CSpeedCode.js";
-import { I2CWriteStatus } from "./I2CWriteStatus.js";
-import { I2CReadStatus } from "./I2CReadStatus.js";
 import { MotorMode } from "./MotorMode.js";
 import { PidCoefficients } from "./PidCoefficients.js";
 import { PidfCoefficients } from "./PidfCoefficients.js";
@@ -30,8 +28,6 @@ export interface ExpansionHub extends RevHub {
      * it has been closed.
      */
     close(): void;
-    sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
-    sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
     getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus>;
     sendKeepAlive(): Promise<void>;
     sendFailSafe(): Promise<void>;
@@ -186,20 +182,41 @@ export interface ExpansionHub extends RevHub {
         targetAddress: number,
         bytes: number[],
     ): Promise<void>;
-    getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus>;
-    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<void>;
+
+    /**
+     * Read a single byte from a target device. Use {@link getI2CReadStatus} to
+     * get the actual byte.
+     * @param i2cChannel
+     * @param targetAddress the address of the target device
+     */
+    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<number>;
+
+    /**
+     * Read multiple bytes from a target device. Use {@link getI2CReadStatus} to
+     * get the actual data.
+     * @param i2cChannel
+     * @param targetAddress the address of the target device
+     * @param numBytesToRead the size of the payload to read
+     */
     readI2CMultipleBytes(
         i2cChannel: number,
         targetAddress: number,
         numBytesToRead: number,
-    ): Promise<void>;
-    writeI2CReadMultipleBytes(
+    ): Promise<number[]>;
+
+    /**
+     * Send a write command to a given target requesting data at a given register.
+     * @param i2cChannel
+     * @param targetAddress the address of the target device
+     * @param numBytesToRead size of data to read
+     * @param register a byte to send at the start of the payload, typically a register address.
+     */
+    readI2CRegister(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         numBytesToRead: number,
-        startAddress: number,
-    ): Promise<void>;
-    getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus>;
+        register: number,
+    ): Promise<number[]>;
 
     // Motor
     /**

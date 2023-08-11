@@ -12,25 +12,27 @@ import {
     LedPattern,
     ModuleInterface,
     ModuleStatus,
-    MotorMode,
-    NackCode, nackCodeToError, NoExpansionHubWithAddressError,
+    PidCoefficients,
+    Rgb,
+    VerbosityLevel,
+    Version,
+    TimeoutError,
+    nackCodeToError,
+    NoExpansionHubWithAddressError,
     ParameterOutOfRangeError,
     ParentRevHub,
-    PidCoefficients,
-    PidfCoefficients,
     RevHub,
-    RevHubType,
-    Rgb, TimeoutError,
-    VerbosityLevel,
-    Version
+    MotorMode,
+    I2cOperationInProgressError, NackCode, PidfCoefficients,
 } from "@rev-robotics/rev-hub-core";
-import {SerialPort} from "serialport";
-import {NativeRevHub, RhspLibErrorCode} from "@rev-robotics/rhsplib";
-import {EventEmitter} from "events";
-import {closeSerialPort} from "../open-rev-hub.js";
-import {RhspLibError} from "../errors/RhspLibError.js";
-import {performance} from "perf_hooks";
-import {startKeepAlive} from "../start-keep-alive.js";
+import { EventEmitter } from "events";
+import { RevHubType } from "@rev-robotics/rev-hub-core";
+import { RhspLibError } from "../errors/RhspLibError.js";
+import { performance } from "perf_hooks";
+import { startKeepAlive } from "../start-keep-alive.js";
+import { closeSerialPort } from "../serial.js";
+import { NativeRevHub, RhspLibErrorCode } from "@rev-robotics/rhsplib";
+import { SerialPort } from "serialport";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -194,11 +196,11 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     async getDigitalInput(digitalChannel: number): Promise<DigitalState> {
-        return (await this.convertErrorPromise(() => {
-            return this.nativeRevHub.getDigitalSingleInput(digitalChannel);
-        }))
-            ? DigitalState.HIGH
-            : DigitalState.LOW;
+        return this.convertErrorPromise(async () => {
+            return (await this.nativeRevHub.getDigitalSingleInput(digitalChannel))
+                ? DigitalState.HIGH
+                : DigitalState.LOW;
+        });
     }
 
     getFTDIResetControl(): Promise<boolean> {
@@ -402,19 +404,43 @@ export class ExpansionHubInternal implements ExpansionHub {
         i2cChannel: number,
         targetAddress: number,
         numBytesToRead: number,
-    ): Promise<void> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.readI2CMultipleBytes(
+    ): Promise<number[]> {
+        return this.convertErrorPromise(async () => {
+            await this.nativeRevHub.readI2CMultipleBytes(
                 i2cChannel,
                 targetAddress,
                 numBytesToRead,
             );
+            while (true) {
+                try {
+                    let status: I2CReadStatus = await this.nativeRevHub.getI2CReadStatus(
+                        i2cChannel,
+                    );
+                    return status.bytes;
+                } catch (e) {
+                    if (e! instanceof I2cOperationInProgressError) {
+                        throw e;
+                    }
+                }
+            }
         });
     }
 
-    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<void> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.readI2CSingleByte(i2cChannel, targetAddress);
+    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<number> {
+        return this.convertErrorPromise(async () => {
+            await this.nativeRevHub.readI2CSingleByte(i2cChannel, targetAddress);
+            while (true) {
+                try {
+                    let status: I2CReadStatus = await this.nativeRevHub.getI2CReadStatus(
+                        i2cChannel,
+                    );
+                    return status.bytes[0];
+                } catch (e) {
+                    if (e! instanceof I2cOperationInProgressError) {
+                        throw e;
+                    }
+                }
+            }
         });
     }
 
@@ -657,19 +683,31 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    writeI2CReadMultipleBytes(
+    readI2CRegister(
         i2cChannel: number,
         targetAddress: number,
         numBytesToRead: number,
-        startAddress: number,
-    ): Promise<void> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.writeI2CReadMultipleBytes(
+        register: number,
+    ): Promise<number[]> {
+        return this.convertErrorPromise(async () => {
+            await this.nativeRevHub.writeI2CReadMultipleBytes(
                 i2cChannel,
                 targetAddress,
                 numBytesToRead,
-                startAddress,
+                register,
             );
+            while (true) {
+                try {
+                    let status: I2CReadStatus = await this.nativeRevHub.getI2CReadStatus(
+                        i2cChannel,
+                    );
+                    return status.bytes;
+                } catch (e) {
+                    if (e! instanceof I2cOperationInProgressError) {
+                        throw e;
+                    }
+                }
+            }
         });
     }
 

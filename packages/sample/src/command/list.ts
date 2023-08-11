@@ -1,7 +1,7 @@
 import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
 import { controlHubHierarchyToString } from "../HubStringify.js";
-import {ControlHub, ExpansionHub} from "@rev-robotics/rev-hub-core";
-import {openUsbControlHubsAndChildren} from "../adb-setup.js";
+import { ExpansionHub } from "@rev-robotics/rev-hub-core";
+import { openUsbControlHubsAndChildren } from "../open-usb-control-hub.js";
 
 export async function list() {
     let usbControlHubs = await openUsbControlHubsAndChildren();

@@ -26,6 +26,9 @@ import {
     TimeoutError,
     VerbosityLevel,
     Version,
+    ImuData,
+    Quaternion,
+    AngularVelocity,
 } from "@rev-robotics/rev-hub-core";
 import { clearTimeout } from "timers";
 import { ControlHubConnectedExpansionHub } from "./ControlHubConnectedExpansionHub.js";
@@ -79,6 +82,10 @@ export class ControlHubInternal implements ControlHub {
         return true;
     }
 
+    isControlHub(): this is ControlHub {
+        return true;
+    }
+
     async open(ip: string, port: number): Promise<void> {
         this.webSocketConnection = new WebSocket(`ws://${ip}:${port}`);
 
@@ -116,9 +123,9 @@ export class ControlHubInternal implements ControlHub {
                         if (handles.includes(hub.id)) {
                             hub.moduleAddress = addressChangedPayload.na;
                             hub.emit(
-                              "addressChanged",
-                              addressChangedPayload.oa,
-                              addressChangedPayload.na,
+                                "addressChanged",
+                                addressChangedPayload.oa,
+                                addressChangedPayload.na,
                             );
                         }
                     }
@@ -227,6 +234,7 @@ export class ControlHubInternal implements ControlHub {
         });
     }
 
+    // ToDo(landry): Always call close() on the parent hub when the sample exits
     close() {
         this.embedded.close();
         this.sendCommand("stop", {}).then(() => this.webSocketConnection.close());
@@ -278,14 +286,6 @@ export class ControlHubInternal implements ControlHub {
 
     async getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode> {
         return this.embedded.getI2CChannelConfiguration(i2cChannel);
-    }
-
-    getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus> {
-        return this.embedded.getI2CReadStatus(i2cChannel);
-    }
-
-    getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus> {
-        return this.embedded.getI2CWriteStatus(i2cChannel);
     }
 
     async getInterfacePacketID(
@@ -367,23 +367,45 @@ export class ControlHubInternal implements ControlHub {
         return true;
     }
 
-    isControlHub(): this is ControlHub {
-        return true;
-    }
+    on(eventName: "error", listener: (error: Error) => void): this;
+    on(eventName: "statusChanged", listener: (status: ModuleStatus) => void): this;
+    on(
+        eventName: "addressChanged",
+        listener: (oldAddress: number, newAddress: number) => void,
+    ): this;
+    on(eventName: "sessionEnded", listener: () => void): this;
 
-    on(eventName: "error", listener: (error: Error) => void): RevHub {
-        return this.embedded.on(eventName, listener);
+    on(
+        eventName: "error" | "statusChanged" | "addressChanged" | "sessionEnded",
+        listener: (...args: any) => void,
+    ): this {
+        this.embedded.on(eventName, listener);
+        return this;
     }
 
     async queryInterface(interfaceName: string): Promise<ModuleInterface> {
         return this.embedded.queryInterface(interfaceName);
     }
 
+    readI2CRegister(
+        i2cChannel: number,
+        targetAddress: number,
+        numBytesToRead: number,
+        register: number,
+    ): Promise<number[]> {
+        return this.embedded.readI2CRegister(
+            i2cChannel,
+            targetAddress,
+            numBytesToRead,
+            register,
+        );
+    }
+
     readI2CMultipleBytes(
         i2cChannel: number,
         slaveAddress: number,
         numBytesToRead: number,
-    ): Promise<void> {
+    ): Promise<number[]> {
         return this.embedded.readI2CMultipleBytes(
             i2cChannel,
             slaveAddress,
@@ -391,7 +413,7 @@ export class ControlHubInternal implements ControlHub {
         );
     }
 
-    readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void> {
+    readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<number> {
         return this.embedded.readI2CSingleByte(i2cChannel, slaveAddress);
     }
 
@@ -560,26 +582,20 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.writeI2CMultipleBytes(i2cChannel, slaveAddress, bytes);
     }
 
-    writeI2CReadMultipleBytes(
-        i2cChannel: number,
-        slaveAddress: number,
-        numBytesToRead: number,
-        startAddress: number,
-    ): Promise<void> {
-        return this.embedded.writeI2CReadMultipleBytes(
-            i2cChannel,
-            slaveAddress,
-            numBytesToRead,
-            startAddress,
-        );
-    }
-
     writeI2CSingleByte(
         i2cChannel: number,
         slaveAddress: number,
         byte: number,
     ): Promise<void> {
         return this.embedded.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
+    }
+
+    async initializeImu() {
+        return await this.embedded.initializeImu();
+    }
+
+    async getImuData(): Promise<ImuData> {
+        return await this.embedded.getImuData();
     }
 
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {
@@ -656,7 +672,7 @@ export class ControlHubInternal implements ControlHub {
         let timer!: NodeJS.Timer;
         let timeoutPromise: Promise<R> = new Promise((_, reject) => {
             timer = setTimeout(() => {
-                console.log(`Got timeout for ${type}`);
+                console.error(`Got timeout for ${type}`);
                 reject(new TimeoutError());
             }, timeout);
         });

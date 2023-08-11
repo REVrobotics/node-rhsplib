@@ -1,5 +1,6 @@
-import { NackError, setPrototypeOf } from "./NackError.js";
+import { NackError } from "./NackError.js";
 import { NackCode } from "./nack-codes.js";
+import { setPrototypeOf } from "./set-prototype.js";
 
 export class CommandImplementationPendingError extends NackError {
     constructor() {

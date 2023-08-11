@@ -1,14 +1,13 @@
 import {
+    AngularVelocity,
     BulkInputData,
     ClosedLoopControlAlgorithm,
     ControlHub,
     DebugGroup,
     DigitalChannelDirection,
     DigitalState,
-    ExpansionHub,
-    I2CReadStatus,
-    I2CSpeedCode,
-    I2CWriteStatus,
+    ExpansionHub, I2CSpeedCode,
+    ImuData,
     LedPattern,
     ModuleInterface,
     ModuleStatus,
@@ -17,6 +16,7 @@ import {
     ParentRevHub,
     PidCoefficients,
     PidfCoefficients,
+    Quaternion,
     RevHub,
     RevHubType,
     Rgb,
@@ -171,12 +171,12 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     }
 
     async getDigitalInput(dioPin: number): Promise<DigitalState> {
-        let state: boolean = await this.sendCommand("getDigitalInput", {
+        let result: boolean = await this.sendCommand("getDigitalInput", {
             hId: this.id,
             c: dioPin,
         });
 
-        return state ? DigitalState.HIGH : DigitalState.LOW;
+        return result ? DigitalState.HIGH : DigitalState.LOW;
     }
 
     async setAllDigitalOutputs(bitPackedField: number): Promise<void> {
@@ -208,74 +208,6 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
 
     async setFTDIResetControl(_: boolean): Promise<void> {
     }
-
-    async setI2CChannelConfiguration(
-        i2cChannel: number,
-        speedCode: I2CSpeedCode,
-    ): Promise<void> {
-        await this.sendCommand("setI2CChannelConfiguration", {
-            hId: this.id,
-            c: i2cChannel,
-            sc: speedCode,
-        });
-    }
-
-    async getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode> {
-        let speedCode = await this.sendCommand("getI2CChannelConfiguration", {
-            hId: this.id,
-            c: i2cChannel,
-        });
-
-        return speedCode == 1
-            ? I2CSpeedCode.SpeedCode400_Kbps
-            : I2CSpeedCode.SpeedCode100_Kbps;
-    }
-
-    getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus> {
-        throw new Error("not implemented");
-    }
-
-    getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus> {
-        throw new Error("not implemented");
-    }
-
-    readI2CMultipleBytes(
-        i2cChannel: number,
-        slaveAddress: number,
-        numBytesToRead: number,
-    ): Promise<void> {
-        throw new Error("not implemented");
-    }
-
-    readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void> {
-        throw new Error("not implemented");
-    }
-
-    writeI2CMultipleBytes(
-        i2cChannel: number,
-        slaveAddress: number,
-        bytes: number[],
-    ): Promise<void> {
-        throw new Error("not implemented");
-    }
-
-    writeI2CReadMultipleBytes(
-        i2cChannel: number,
-        slaveAddress: number,
-        numBytesToRead: number,
-        startAddress: number,
-    ): Promise<void> {
-        throw new Error("not implemented");
-    }
-
-    writeI2CSingleByte(
-        i2cChannel: number,
-        slaveAddress: number,
-        byte: number,
-    ): Promise<void> {
-        throw new Error("not implemented");
-    }
-
 
     async getInterfacePacketID(
         interfaceName: string,
@@ -349,49 +281,6 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         });
     }
 
-    async getMotorPIDCoefficients(
-        motorChannel: number,
-        motorMode: number,
-    ): Promise<PidCoefficients> {
-        let result: { p: number; i: number; d: number } = await this.sendCommand(
-            "getMotorPidCoefficients",
-            {
-                hId: this.id,
-                c: motorChannel,
-                m: motorMode,
-            },
-        );
-
-        return {
-            p: result.p,
-            i: result.i,
-            d: result.d,
-            algorithm: ClosedLoopControlAlgorithm.Pid,
-        };
-    }
-
-    async getMotorPIDFCoefficients(
-        motorChannel: number,
-        motorMode: number,
-    ): Promise<PidfCoefficients> {
-        let result: { p: number; i: number; d: number, f: number, algorithm: number } = await this.sendCommand(
-            "getMotorPidfCoefficients",
-            {
-                hId: this.id,
-                c: motorChannel,
-                m: motorMode,
-            },
-        );
-
-        return {
-            p: result.p,
-            i: result.i,
-            d: result.d,
-            f: result.f,
-            algorithm: result.algorithm,
-        };
-    }
-
     async getMotorTargetPosition(
         motorChannel: number,
     ): Promise<{ targetPosition: number; targetTolerance: number }> {
@@ -414,6 +303,81 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
             hId: this.id,
             c: motorChannel,
         });
+    }
+
+    async setI2CChannelConfiguration(
+        i2cChannel: number,
+        speedCode: I2CSpeedCode,
+    ): Promise<void> {
+        await this.sendCommand("setI2CChannelConfiguration", {
+            hId: this.id,
+            c: i2cChannel,
+            sc: speedCode,
+        });
+    }
+
+    async getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode> {
+        let speedCode = await this.sendCommand("getI2CChannelConfiguration", {
+            hId: this.id,
+            c: i2cChannel,
+        });
+
+        return speedCode == 1
+            ? I2CSpeedCode.SpeedCode400_Kbps
+            : I2CSpeedCode.SpeedCode100_Kbps;
+    }
+
+    async readI2CRegister(
+        i2cChannel: number,
+        targetAddress: number,
+        numBytesToRead: number,
+        register: number,
+    ): Promise<number[]> {
+        return await this.sendCommand("readI2cRegister", {
+            hId: this.id,
+            a: targetAddress,
+            c: i2cChannel,
+            cb: numBytesToRead,
+            r: register,
+        });
+    }
+
+    async readI2CMultipleBytes(
+        i2cChannel: number,
+        targetAddress: number,
+        numBytesToRead: number,
+    ): Promise<number[]> {
+        return await this.sendCommand("readI2cData", {
+            hId: this.id,
+            a: targetAddress,
+            c: i2cChannel,
+            cb: numBytesToRead,
+        });
+    }
+
+    async readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<number> {
+        return (await this.readI2CMultipleBytes(i2cChannel, targetAddress, 1))[0];
+    }
+
+    async writeI2CMultipleBytes(
+        i2cChannel: number,
+        targetAddress: number,
+        bytes: number[],
+    ): Promise<void> {
+        await this.sendCommand("writeI2cData", {
+            hId: this.id,
+            a: targetAddress,
+            c: i2cChannel,
+            d: bytes,
+        });
+    }
+
+    async writeI2CSingleByte(
+        i2cChannel: number,
+        targetAddress: number,
+        byte: number,
+    ): Promise<void> {
+        await this.writeI2CMultipleBytes(i2cChannel, targetAddress, [byte]);
     }
 
     async setMotorChannelCurrentAlertLevel(
@@ -446,6 +410,44 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
             m: motorMode,
             faz: floatAtZero,
         });
+    }
+
+    async getMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode): Promise<PidfCoefficients | PidCoefficients> {
+        let result: any = await this.sendCommand("getClosedLoopControlCoefficients", {
+            hId: this.id,
+            c: motorChannel,
+            m: motorMode,
+        });
+
+        if(result.algorithm == ClosedLoopControlAlgorithm.Pidf) {
+            return {
+                p: result.p,
+                i: result.i,
+                d: result.d,
+                f: result.f,
+                algorithm: ClosedLoopControlAlgorithm.Pidf
+            }
+        } else {
+            return {
+                p: result.p,
+                i: result.i,
+                d: result.d,
+                algorithm: ClosedLoopControlAlgorithm.Pid
+            }
+        }
+    }
+
+    async setMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm,
+        pid: PidCoefficients | PidfCoefficients,
+    ): Promise<void> {
+        if (algorithm === ClosedLoopControlAlgorithm.Pidf) {
+            await this.setMotorPIDFCoefficients(motorChannel, motorMode, pid as PidfCoefficients);
+        } else {
+            await this.setMotorPIDCoefficients(motorChannel, motorMode, pid as PidCoefficients);
+        }
     }
 
     async setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
@@ -510,23 +512,6 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
             c: motorChannel,
             tv: velocity_cps,
         });
-    }
-
-    getMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode): Promise<PidfCoefficients | PidCoefficients> {
-        return this.getMotorPIDFCoefficients(motorChannel, motorMode);
-    }
-
-    async setMotorClosedLoopControlCoefficients(
-        motorChannel: number,
-        motorMode: MotorMode,
-        algorithm: ClosedLoopControlAlgorithm,
-        pid: PidCoefficients | PidfCoefficients,
-    ): Promise<void> {
-        if (algorithm === ClosedLoopControlAlgorithm.Pidf) {
-            await this.setMotorPIDFCoefficients(motorChannel, motorMode, pid as PidfCoefficients);
-        } else {
-            await this.setMotorPIDCoefficients(motorChannel, motorMode, pid as PidCoefficients);
-        }
     }
 
     async getPhoneChargeControl(): Promise<boolean> {
@@ -728,6 +713,23 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
             hId: this.id,
             newAddress: newModuleAddress,
         });
+    }
+    async initializeImu() {
+        await this.sendCommand("initializeImu", {
+            logoFacing: "UP",
+            usbFacing: "BACKWARD",
+        });
+    }
+
+    async getImuData(): Promise<ImuData> {
+        let imuData: any = await this.sendCommand("getImuData", {
+            u: "degrees",
+        });
+
+        return {
+            quaternion: new Quaternion(imuData.w, imuData.x, imuData.y, imuData.z),
+            angularVelocity: new AngularVelocity(imuData.xr, imuData.yr, imuData.zr),
+        };
     }
 
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {
