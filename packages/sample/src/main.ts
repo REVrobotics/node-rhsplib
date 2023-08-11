@@ -1,15 +1,15 @@
 import { Command } from "commander";
 import {
-    resetEncoder,
+    getMotorAlertLevel_mA,
+    getMotorRegulatedVelocityPidf,
     readEncoder,
+    resetEncoder,
     runMotorConstantPower,
     runMotorConstantVelocity,
     runMotorToPosition,
-    setMotorRegulatedVelocityPid,
     setMotorAlertLevel,
-    getMotorAlertLevel_mA,
+    setMotorRegulatedVelocityPid,
     setMotorRegulatedVelocityPidf,
-    getMotorRegulatedVelocityPidf,
 } from "./command/motor.js";
 import {
     analog,
@@ -31,11 +31,16 @@ import {
 } from "@rev-robotics/expansion-hub";
 import { getLed, getLedPattern, led, ledPattern } from "./command/led.js";
 import { runServo } from "./command/servo.js";
-import { ControlHub, ExpansionHub, ParentExpansionHub, RevHub } from "@rev-robotics/rev-hub-core";
+import {
+    ControlHub,
+    DigitalState,
+    ExpansionHub,
+    ParentExpansionHub,
+    RevHub,
+} from "@rev-robotics/rev-hub-core";
 import { injectLog, setDebugLogLevel } from "./command/log.js";
 import { firmwareVersion } from "./command/firmware-version.js";
 import { getBulkInputData } from "./command/bulkinput.js";
-import { DigitalState } from "@rev-robotics/rev-hub-core";
 import {
     digitalRead,
     digitalReadAll,
@@ -44,7 +49,7 @@ import {
 } from "./command/digital.js";
 import { sendFailSafe } from "./command/failsafe.js";
 import { queryInterface } from "./command/query.js";
-import {openUsbControlHubsAndChildren} from "./open-control-hub.js";
+import { openUsbControlHubsAndChildren } from "./open-control-hub.js";
 import { status } from "../dist/command/status.js";
 import { setHubAddress } from "../dist/command/set-hub-address.js";
 
@@ -71,9 +76,10 @@ program
     .option(
         "-c --child <address>",
         "communicate with the specified child Expansion Hub instead of its parent; requires parent address to be specified when the parent is an Expansion Hub",
-    ).option(
+    )
+    .option(
         "--control",
-    "Specify that this hub is a control hub. Default is expansion hub"
+        "Specify that this hub is a control hub. Default is expansion hub",
     );
 
 program
@@ -379,7 +385,6 @@ pidfCommand
         let dValue = Number(d);
         let fValue = Number(f);
         let [hub, close] = await getRevHubOrThrow();
-
 
         runOnSigint(() => {
             close();
@@ -701,23 +706,23 @@ program
     });
 
 program
-  .command("set-address <address>")
-  .description("Set Module Address")
-  .action(async (address) => {
-    let addressNumber = Number(address);
-    let [hub, close] = await getRevHubOrThrow();
-    await setHubAddress(hub as ControlHub, addressNumber);
-    close();
-  });
+    .command("set-address <address>")
+    .description("Set Module Address")
+    .action(async (address) => {
+        let addressNumber = Number(address);
+        let [hub, close] = await getRevHubOrThrow();
+        await setHubAddress(hub as ControlHub, addressNumber);
+        close();
+    });
 
 program.command("status").action(async () => {
-  let [hub, close] = await getRevHubOrThrow();
-  await status(hub as ControlHub);
+    let [hub, close] = await getRevHubOrThrow();
+    await status(hub as ControlHub);
 
-  process.on("SIGINT", () => {
-    close();
-    process.exit();
-  });
+    process.on("SIGINT", () => {
+        close();
+        process.exit();
+    });
 });
 
 program.parse(process.argv);
@@ -753,19 +758,21 @@ async function getRevHubOrThrow(): Promise<[hub: ExpansionHub, close: () => void
                 "parent address must be specified if serial number is specified.",
             );
         }
-        if(isControlHub) {
+        if (isControlHub) {
             let hubs = await openUsbControlHubsAndChildren();
-            let onClose = () => { hubs.forEach((hub) => hub.close()) };
-            if(childAddress === undefined) {
+            let onClose = () => {
+                hubs.forEach((hub) => hub.close());
+            };
+            if (childAddress === undefined) {
                 return [hubs[0], onClose];
             }
 
-            for(let controlHub of hubs) {
-                if(controlHub.moduleAddress == childAddress) {
+            for (let controlHub of hubs) {
+                if (controlHub.moduleAddress == childAddress) {
                     return [controlHub as ExpansionHub, onClose];
                 }
-                for(let hub of controlHub.children) {
-                    if(hub.moduleAddress == childAddress) {
+                for (let hub of controlHub.children) {
+                    if (hub.moduleAddress == childAddress) {
                         return [hub as ExpansionHub, onClose];
                     }
                 }
@@ -778,16 +785,18 @@ async function getRevHubOrThrow(): Promise<[hub: ExpansionHub, close: () => void
             );
         }
     } else if (parentAddress !== undefined) {
-        if(isControlHub) {
+        if (isControlHub) {
             let hubs = await openUsbControlHubsAndChildren();
-            let onClose = () => { hubs.forEach((hub) => hub.close()) };
+            let onClose = () => {
+                hubs.forEach((hub) => hub.close());
+            };
 
-            for(let controlHub of hubs) {
-                if(controlHub.moduleAddress == childAddress) {
+            for (let controlHub of hubs) {
+                if (controlHub.moduleAddress == childAddress) {
                     return [controlHub as ExpansionHub, onClose];
                 }
-                for(let hub of controlHub.children) {
-                    if(hub.moduleAddress == childAddress) {
+                for (let hub of controlHub.children) {
+                    if (hub.moduleAddress == childAddress) {
                         return [hub as ExpansionHub, onClose];
                     }
                 }
@@ -797,7 +806,7 @@ async function getRevHubOrThrow(): Promise<[hub: ExpansionHub, close: () => void
         }
     }
 
-    if(isControlHub) {
+    if (isControlHub) {
         let hubs = await openUsbControlHubsAndChildren();
         if (hubs.length == 0) {
             throw new Error("No hubs are connected");
@@ -805,7 +814,12 @@ async function getRevHubOrThrow(): Promise<[hub: ExpansionHub, close: () => void
         if (hubs.length > 1) {
             throw new Error("Multiple hubs connected. You must specify a serialNumber.");
         }
-        return [hubs[0], () => { hubs.forEach((hub) => hub.close()) }];
+        return [
+            hubs[0],
+            () => {
+                hubs.forEach((hub) => hub.close());
+            },
+        ];
     } else {
         let connectedHubs: ParentExpansionHub[] = await openConnectedExpansionHubs();
         if (connectedHubs.length == 0) {

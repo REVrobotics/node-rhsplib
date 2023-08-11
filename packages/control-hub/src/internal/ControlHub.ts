@@ -116,9 +116,9 @@ export class ControlHubInternal implements ControlHub {
                         if (handles.includes(hub.id)) {
                             hub.moduleAddress = addressChangedPayload.na;
                             hub.emit(
-                              "addressChanged",
-                              addressChangedPayload.oa,
-                              addressChangedPayload.na,
+                                "addressChanged",
+                                addressChangedPayload.oa,
+                                addressChangedPayload.na,
                             );
                         }
                     }
@@ -194,7 +194,7 @@ export class ControlHubInternal implements ControlHub {
             });
             if (response.data) {
                 let rcVersion: string | undefined = response.data.sdkVersion;
-                if(rcVersion === undefined) {
+                if (rcVersion === undefined) {
                     return false;
                 }
                 return semver.satisfies(rcVersion, ">=8.2");
@@ -442,7 +442,10 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.getDigitalDirection(dioPin);
     }
 
-    async setDigitalDirection(dioPin: number, direction: DigitalChannelDirection): Promise<void> {
+    async setDigitalDirection(
+        dioPin: number,
+        direction: DigitalChannelDirection,
+    ): Promise<void> {
         return await this.embedded.setDigitalDirection(dioPin, direction);
     }
 
@@ -518,15 +521,49 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.setMotorTargetVelocity(motorChannel, velocity_cps);
     }
 
-    async getMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode): Promise<PidfCoefficients | PidCoefficients> {
-        return await this.embedded.getMotorClosedLoopControlCoefficients(motorChannel, motorMode);
+    async getMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+    ): Promise<PidfCoefficients | PidCoefficients> {
+        return await this.embedded.getMotorClosedLoopControlCoefficients(
+            motorChannel,
+            motorMode,
+        );
     }
 
-    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pid, pid: PidCoefficients): Promise<void>;
-    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pidf, pidf: PidfCoefficients): Promise<void>;
-    setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm, pid: PidCoefficients | PidfCoefficients): Promise<void>;
-    async setMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode, algorithm: ClosedLoopControlAlgorithm.Pid | ClosedLoopControlAlgorithm.Pidf | ClosedLoopControlAlgorithm, pid: PidCoefficients | PidfCoefficients): Promise<void> {
-        return await this.embedded.setMotorClosedLoopControlCoefficients(motorChannel, motorMode, algorithm, pid);
+    setMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm.Pid,
+        pid: PidCoefficients,
+    ): Promise<void>;
+    setMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm.Pidf,
+        pidf: PidfCoefficients,
+    ): Promise<void>;
+    setMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm,
+        pid: PidCoefficients | PidfCoefficients,
+    ): Promise<void>;
+    async setMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        algorithm:
+            | ClosedLoopControlAlgorithm.Pid
+            | ClosedLoopControlAlgorithm.Pidf
+            | ClosedLoopControlAlgorithm,
+        pid: PidCoefficients | PidfCoefficients,
+    ): Promise<void> {
+        return await this.embedded.setMotorClosedLoopControlCoefficients(
+            motorChannel,
+            motorMode,
+            algorithm,
+            pid,
+        );
     }
 
     async setNewModuleAddress(newModuleAddress: number): Promise<void> {

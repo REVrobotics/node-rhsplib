@@ -186,7 +186,10 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         });
     }
 
-    async setDigitalDirection(dioPin: number, direction: DigitalChannelDirection): Promise<void> {
+    async setDigitalDirection(
+        dioPin: number,
+        direction: DigitalChannelDirection,
+    ): Promise<void> {
         await this.sendCommand("setDigitalDirection", {
             hId: this.id,
             c: dioPin,
@@ -206,8 +209,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         return false;
     }
 
-    async setFTDIResetControl(_: boolean): Promise<void> {
-    }
+    async setFTDIResetControl(_: boolean): Promise<void> {}
 
     async setI2CChannelConfiguration(
         i2cChannel: number,
@@ -276,7 +278,6 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         throw new Error("not implemented");
     }
 
-
     async getInterfacePacketID(
         interfaceName: string,
         functionNumber: number,
@@ -324,8 +325,8 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         });
         return {
             motorMode: result.m,
-            floatAtZero: result.faz
-        }
+            floatAtZero: result.faz,
+        };
     }
 
     async getMotorConstantPower(motorChannel: number): Promise<number> {
@@ -374,14 +375,12 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         motorChannel: number,
         motorMode: number,
     ): Promise<PidfCoefficients> {
-        let result: { p: number; i: number; d: number, f: number, algorithm: number } = await this.sendCommand(
-            "getMotorPidfCoefficients",
-            {
+        let result: { p: number; i: number; d: number; f: number; algorithm: number } =
+            await this.sendCommand("getMotorPidfCoefficients", {
                 hId: this.id,
                 c: motorChannel,
                 m: motorMode,
-            },
-        );
+            });
 
         return {
             p: result.p,
@@ -471,7 +470,6 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         });
     }
 
-
     async setMotorPIDFCoefficients(
         motorChannel: number,
         motorMode: number,
@@ -484,7 +482,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
             p: pid.p,
             i: pid.i,
             d: pid.d,
-            f: pid.f
+            f: pid.f,
         });
     }
 
@@ -512,7 +510,10 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         });
     }
 
-    getMotorClosedLoopControlCoefficients(motorChannel: number, motorMode: MotorMode): Promise<PidfCoefficients | PidCoefficients> {
+    getMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+    ): Promise<PidfCoefficients | PidCoefficients> {
         return this.getMotorPIDFCoefficients(motorChannel, motorMode);
     }
 
@@ -523,9 +524,17 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         pid: PidCoefficients | PidfCoefficients,
     ): Promise<void> {
         if (algorithm === ClosedLoopControlAlgorithm.Pidf) {
-            await this.setMotorPIDFCoefficients(motorChannel, motorMode, pid as PidfCoefficients);
+            await this.setMotorPIDFCoefficients(
+                motorChannel,
+                motorMode,
+                pid as PidfCoefficients,
+            );
         } else {
-            await this.setMotorPIDCoefficients(motorChannel, motorMode, pid as PidCoefficients);
+            await this.setMotorPIDCoefficients(
+                motorChannel,
+                motorMode,
+                pid as PidCoefficients,
+            );
         }
     }
 

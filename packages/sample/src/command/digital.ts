@@ -1,6 +1,6 @@
 import {
-    DigitalState,
     DigitalChannelDirection,
+    DigitalState,
     ExpansionHub,
 } from "@rev-robotics/rev-hub-core";
 
