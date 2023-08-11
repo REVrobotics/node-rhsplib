@@ -750,6 +750,14 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         return newHub;
     }
 
+    emit(eventName: "error", e: Error): void;
+    emit(eventName: "statusChanged", status: ModuleStatus): void;
+    emit(eventName: "addressChanged", oldAddress: number, newAddress: number): void;
+    emit(eventName: "sessionEnded"): void;
+    emit(eventName: string, ...args: any): void {
+        this.emitter.emit(eventName, ...args);
+    }
+
     on(
         eventName: "error" | "statusChanged" | "addressChanged" | "sessionEnded",
         listener: (...param: any) => void,
@@ -764,5 +772,17 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
 
     sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
         return Promise.resolve([]);
+    }
+
+    flattenChildren(): ControlHubConnectedExpansionHub[] {
+        let result: ControlHubConnectedExpansionHub[] = [];
+        for (let child of this.children) {
+            if (child instanceof ControlHubConnectedExpansionHub) {
+                result.push(child);
+                result.push(...child.flattenChildren());
+            }
+        }
+
+        return result;
     }
 }

@@ -31,7 +31,7 @@ import {
 } from "@rev-robotics/expansion-hub";
 import { getLed, getLedPattern, led, ledPattern } from "./command/led.js";
 import { runServo } from "./command/servo.js";
-import { ExpansionHub, ParentExpansionHub, RevHub } from "@rev-robotics/rev-hub-core";
+import { ControlHub, ExpansionHub, ParentExpansionHub, RevHub } from "@rev-robotics/rev-hub-core";
 import { injectLog, setDebugLogLevel } from "./command/log.js";
 import { firmwareVersion } from "./command/firmware-version.js";
 import { getBulkInputData } from "./command/bulkinput.js";
@@ -45,6 +45,7 @@ import {
 import { sendFailSafe } from "./command/failsafe.js";
 import { queryInterface } from "./command/query.js";
 import {openUsbControlHubs} from "./adb-setup.js";
+import { status } from "../dist/command/status.js";
 
 function runOnSigint(block: () => void) {
     process.on("SIGINT", () => {
@@ -697,6 +698,16 @@ program
 
         await runServo(hub, channelValue, pulseWidthValue, frameWidthValue);
     });
+
+program.command("status").action(async () => {
+  let [hub, close] = await getRevHubOrThrow();
+  await status(hub as ControlHub);
+
+  process.on("SIGINT", () => {
+    close();
+    process.exit();
+  });
+});
 
 program.parse(process.argv);
 

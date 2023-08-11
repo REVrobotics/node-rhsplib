@@ -111,6 +111,48 @@ export class ControlHubInternal implements ControlHub {
                 if (callback) {
                     callback(response, error);
                 }
+            } else {
+                //we have a message
+                if (rawMessage.type === "sessionEnded") {
+                    let allHubs = this.flattenChildren();
+                    for (let hub of allHubs) {
+                        hub.emit("sessionEnded");
+                    }
+                } else if (rawMessage.type === "hubAddressChanged") {
+                    //notify that hub address changed
+                    let payload = rawMessage.payload;
+                    let addressChangedPayload = JSON.parse(payload);
+                    let handles: number[] = addressChangedPayload.hIds;
+
+                    let allHubs = this.flattenChildren();
+
+                    for (let hub of allHubs) {
+                        if (handles.includes(hub.id)) {
+                            hub.moduleAddress = addressChangedPayload.na;
+                            hub.emit(
+                              "addressChanged",
+                              addressChangedPayload.oa,
+                              addressChangedPayload.na,
+                            );
+                        }
+                    }
+                } else if (rawMessage.type === "hubStatusChanged") {
+                    let payloadString = rawMessage.payload;
+                    let payload = JSON.parse(payloadString);
+                    let handles = payload.hIds;
+                    let status: ModuleStatus = {
+                        statusWord: payload.sBf,
+                        motorAlerts: payload.maBf,
+                    };
+
+                    let allHubs = this.flattenChildren();
+
+                    for (let hub of allHubs) {
+                        if (handles.includes(hub.id)) {
+                            hub.emit("statusChanged", status);
+                        }
+                    }
+                }
             }
         });
 
@@ -632,5 +674,24 @@ export class ControlHubInternal implements ControlHub {
         return await Promise.race([callbackPromise, timeoutPromise]).finally(() => {
             clearTimeout(timer);
         });
+    }
+
+    /**
+     * Returns all connected hubs in the hierarchy as a flat list. Intended for
+     * operations that could affect all hubs.
+     * @private
+     */
+    private flattenChildren(): ControlHubConnectedExpansionHub[] {
+        let result: ControlHubConnectedExpansionHub[] = [];
+        result.push(this.embedded);
+
+        for (let child of this.children) {
+            if (child instanceof ControlHubConnectedExpansionHub) {
+                result.push(child);
+                result.push(...child.flattenChildren());
+            }
+        }
+
+        return result;
     }
 }
