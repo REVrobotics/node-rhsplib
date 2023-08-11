@@ -1,7 +1,7 @@
 import { Adb, DeviceClient } from "@u4/adbkit";
 import getPort from "get-port";
 import { ControlHub, ParentRevHub } from "@rev-robotics/rev-hub-core";
-import { openControlHub } from "@rev-robotics/control-hub";
+import { openWifiControlHub } from "@rev-robotics/control-hub";
 import { ControlHubInternal } from "@rev-robotics/control-hub/dist/internal/ControlHub.js";
 
 export async function openUsbControlHubsAndChildren(): Promise<ControlHub[]> {
@@ -16,7 +16,7 @@ export async function openUsbControlHubsAndChildren(): Promise<ControlHub[]> {
             let port = await configureHubTcp(deviceClient);
             let serialNumber = device.id;
 
-            let hub = await openControlHub(serialNumber, 173, port) as ControlHubInternal;
+            let hub = await openWifiControlHub(serialNumber, 173, port) as ControlHubInternal;
             controlHubs.push(hub);
 
             let addresses: Record<

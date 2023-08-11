@@ -32,7 +32,7 @@ import { ControlHubConnectedExpansionHub } from "./ControlHubConnectedExpansionH
 
 export class ControlHubInternal implements ControlHub {
     readonly isOpen: boolean = true;
-    readonly moduleAddress: number = 173;
+    readonly moduleAddress: number;
     responseTimeoutMs: number = 0;
     type: RevHubType = RevHubType.ControlHub;
     readonly serialNumber: string;
@@ -70,8 +70,9 @@ export class ControlHubInternal implements ControlHub {
         (response: any | undefined, error: any | undefined) => void
     >();
 
-    constructor(serialNumber: string) {
+    constructor(serialNumber: string, moduleAddress: number) {
         this.serialNumber = serialNumber;
+        this.moduleAddress = moduleAddress;
     }
 
     async setDigitalOutput(digitalChannel: number, value: DigitalState): Promise<void> {
