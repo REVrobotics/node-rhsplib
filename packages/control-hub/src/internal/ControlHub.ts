@@ -79,6 +79,14 @@ export class ControlHubInternal implements ControlHub {
         return true;
     }
 
+    isExpansionHub(): this is ExpansionHub {
+        return true;
+    }
+
+    isControlHub(): this is ControlHub {
+        return true;
+    }
+
     async open(ip: string, port: number): Promise<void> {
         this.webSocketConnection = new WebSocket(`ws://${ip}:${port}`);
 
@@ -276,16 +284,8 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.getFTDIResetControl();
     }
 
-    async getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode> {
-        return this.embedded.getI2CChannelConfiguration(i2cChannel);
-    }
-
-    getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus> {
-        return this.embedded.getI2CReadStatus(i2cChannel);
-    }
-
-    getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus> {
-        return this.embedded.getI2CWriteStatus(i2cChannel);
+    async setFTDIResetControl(ftdiResetControl: boolean): Promise<void> {
+        return this.embedded.setFTDIResetControl(ftdiResetControl);
     }
 
     async getInterfacePacketID(
@@ -295,24 +295,12 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.getInterfacePacketID(interfaceName, functionNumber);
     }
 
-    async getModuleLedColor(): Promise<Rgb> {
-        return this.embedded.getModuleLedColor();
-    }
-
-    getModuleLedPattern(): Promise<LedPattern> {
-        return this.embedded.getModuleLedPattern();
-    }
-
     async getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus> {
         return this.embedded.getModuleStatus(clearStatusAfterResponse);
     }
 
     async getMotorAtTarget(motorChannel: number): Promise<boolean> {
         return this.embedded.getMotorAtTarget(motorChannel);
-    }
-
-    async getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<number> {
-        return this.embedded.getMotorChannelCurrentAlertLevel(motorChannel);
     }
 
     async getMotorChannelEnable(motorChannel: number): Promise<boolean> {
@@ -325,12 +313,20 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.getMotorChannelMode(motorChannel);
     }
 
-    async getMotorConstantPower(motorChannel: number): Promise<number> {
-        return this.embedded.getMotorConstantPower(motorChannel);
+    async getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<number> {
+        return this.embedded.getMotorChannelCurrentAlertLevel(motorChannel);
     }
 
     async getMotorEncoderPosition(motorChannel: number): Promise<number> {
         return this.embedded.getMotorEncoderPosition(motorChannel);
+    }
+
+    async getMotorConstantPower(motorChannel: number): Promise<number> {
+        return this.embedded.getMotorConstantPower(motorChannel);
+    }
+
+    async getMotorTargetVelocity(motorChannel: number): Promise<number> {
+        return this.embedded.getMotorTargetVelocity(motorChannel);
     }
 
     async getMotorTargetPosition(
@@ -339,8 +335,98 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.getMotorTargetPosition(motorChannel);
     }
 
-    async getMotorTargetVelocity(motorChannel: number): Promise<number> {
-        return this.embedded.getMotorTargetVelocity(motorChannel);
+    async setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void> {
+        return this.embedded.setMotorChannelEnable(motorChannel, enable);
+    }
+
+    async setMotorChannelMode(
+        motorChannel: number,
+        motorMode: number,
+        floatAtZero: boolean,
+    ): Promise<void> {
+        return this.embedded.setMotorChannelMode(motorChannel, motorMode, floatAtZero);
+    }
+
+    async setMotorChannelCurrentAlertLevel(
+        motorChannel: number,
+        currentLimit_mA: number,
+    ): Promise<void> {
+        return this.embedded.setMotorChannelCurrentAlertLevel(
+            motorChannel,
+            currentLimit_mA,
+        );
+    }
+
+    async setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
+        return this.embedded.setMotorConstantPower(motorChannel, powerLevel);
+    }
+
+    async setMotorTargetVelocity(
+        motorChannel: number,
+        velocity_cps: number,
+    ): Promise<void> {
+        return this.embedded.setMotorTargetVelocity(motorChannel, velocity_cps);
+    }
+
+    async setMotorTargetPosition(
+        motorChannel: number,
+        targetPosition_counts: number,
+        targetTolerance_counts: number,
+    ): Promise<void> {
+        return this.embedded.setMotorTargetPosition(
+            motorChannel,
+            targetPosition_counts,
+            targetTolerance_counts,
+        );
+    }
+
+    async getMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+    ): Promise<PidfCoefficients | PidCoefficients> {
+        return await this.embedded.getMotorClosedLoopControlCoefficients(
+            motorChannel,
+            motorMode,
+        );
+    }
+
+    setMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm.Pid,
+        pid: PidCoefficients,
+    ): Promise<void>;
+
+    setMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm.Pidf,
+        pidf: PidfCoefficients,
+    ): Promise<void>;
+
+    setMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm,
+        pid: PidCoefficients | PidfCoefficients,
+    ): Promise<void>;
+
+    async setMotorClosedLoopControlCoefficients(
+        motorChannel: number,
+        motorMode: MotorMode,
+        algorithm: ClosedLoopControlAlgorithm.Pid | ClosedLoopControlAlgorithm.Pidf,
+        pid: PidCoefficients | PidfCoefficients,
+    ): Promise<void> {
+        return await this.embedded.setMotorClosedLoopControlCoefficients(
+            motorChannel,
+            motorMode,
+            algorithm,
+            pid,
+        );
+    }
+
+    async resetMotorEncoder(motorChannel: number): Promise<void> {
+        return this.embedded.resetMotorEncoder(motorChannel);
     }
 
     async getPhoneChargeControl(): Promise<boolean> {
@@ -363,20 +449,27 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.injectDataLogHint(hintText);
     }
 
-    isExpansionHub(): this is ExpansionHub {
-        return true;
-    }
-
-    isControlHub(): this is ControlHub {
-        return true;
-    }
-
-    on(eventName: "error", listener: (error: Error) => void): RevHub {
-        return this.embedded.on(eventName, listener);
-    }
-
     async queryInterface(interfaceName: string): Promise<ModuleInterface> {
         return this.embedded.queryInterface(interfaceName);
+    }
+
+    async getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode> {
+        return this.embedded.getI2CChannelConfiguration(i2cChannel);
+    }
+
+    getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus> {
+        return this.embedded.getI2CReadStatus(i2cChannel);
+    }
+
+    getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus> {
+        return this.embedded.getI2CWriteStatus(i2cChannel);
+    }
+
+    async setI2CChannelConfiguration(
+        i2cChannel: number,
+        speedCode: I2CSpeedCode,
+    ): Promise<void> {
+        return this.embedded.setI2CChannelConfiguration(i2cChannel, speedCode);
     }
 
     readI2CMultipleBytes(
@@ -391,8 +484,38 @@ export class ControlHubInternal implements ControlHub {
         );
     }
 
-    readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void> {
-        return this.embedded.readI2CSingleByte(i2cChannel, slaveAddress);
+    async readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void> {
+        return await this.embedded.readI2CSingleByte(i2cChannel, slaveAddress);
+    }
+
+    async writeI2CMultipleBytes(
+        i2cChannel: number,
+        slaveAddress: number,
+        bytes: number[],
+    ): Promise<void> {
+        return await this.embedded.writeI2CMultipleBytes(i2cChannel, slaveAddress, bytes);
+    }
+
+    async writeI2CReadMultipleBytes(
+        i2cChannel: number,
+        slaveAddress: number,
+        numBytesToRead: number,
+        startAddress: number,
+    ): Promise<void> {
+        return await this.embedded.writeI2CReadMultipleBytes(
+            i2cChannel,
+            slaveAddress,
+            numBytesToRead,
+            startAddress,
+        );
+    }
+
+    async writeI2CSingleByte(
+        i2cChannel: number,
+        slaveAddress: number,
+        byte: number,
+    ): Promise<void> {
+        return await this.embedded.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
     }
 
     async readVersion(): Promise<Version> {
@@ -403,24 +526,12 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.readVersionString();
     }
 
-    async resetMotorEncoder(motorChannel: number): Promise<void> {
-        return this.embedded.resetMotorEncoder(motorChannel);
-    }
-
     async sendFailSafe(): Promise<void> {
         return this.embedded.sendFailSafe();
     }
 
     async sendKeepAlive(): Promise<void> {
         return this.embedded.sendKeepAlive();
-    }
-
-    async sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
-        return this.embedded.sendReadCommand(packetTypeID, payload);
-    }
-
-    sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
-        return this.embedded.sendWriteCommand(packetTypeID, payload);
     }
 
     async setDebugLogLevel(
@@ -442,6 +553,14 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.getDigitalDirection(dioPin);
     }
 
+    async setAllDigitalOutputs(bitPackedField: number): Promise<void> {
+        await this.embedded.setAllDigitalOutputs(bitPackedField);
+    }
+
+    async setDigitalOutput(digitalChannel: number, value: DigitalState): Promise<void> {
+        await this.embedded.setDigitalOutput(digitalChannel, value);
+    }
+
     async setDigitalDirection(
         dioPin: number,
         direction: DigitalChannelDirection,
@@ -449,23 +568,12 @@ export class ControlHubInternal implements ControlHub {
         return await this.embedded.setDigitalDirection(dioPin, direction);
     }
 
-    async setDigitalOutput(digitalChannel: number, value: DigitalState): Promise<void> {
-        await this.embedded.setDigitalOutput(digitalChannel, value);
+    async getModuleLedColor(): Promise<Rgb> {
+        return this.embedded.getModuleLedColor();
     }
 
-    async setAllDigitalOutputs(bitPackedField: number): Promise<void> {
-        await this.embedded.setAllDigitalOutputs(bitPackedField);
-    }
-
-    async setFTDIResetControl(ftdiResetControl: boolean): Promise<void> {
-        return this.embedded.setFTDIResetControl(ftdiResetControl);
-    }
-
-    async setI2CChannelConfiguration(
-        i2cChannel: number,
-        speedCode: I2CSpeedCode,
-    ): Promise<void> {
-        return this.embedded.setI2CChannelConfiguration(i2cChannel, speedCode);
+    getModuleLedPattern(): Promise<LedPattern> {
+        return this.embedded.getModuleLedPattern();
     }
 
     async setModuleLedColor(red: number, green: number, blue: number): Promise<void> {
@@ -476,95 +584,6 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.setModuleLedPattern(ledPattern);
     }
 
-    async setMotorChannelCurrentAlertLevel(
-        motorChannel: number,
-        currentLimit_mA: number,
-    ): Promise<void> {
-        return this.embedded.setMotorChannelCurrentAlertLevel(
-            motorChannel,
-            currentLimit_mA,
-        );
-    }
-
-    async setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void> {
-        return this.embedded.setMotorChannelEnable(motorChannel, enable);
-    }
-
-    async setMotorChannelMode(
-        motorChannel: number,
-        motorMode: number,
-        floatAtZero: boolean,
-    ): Promise<void> {
-        return this.embedded.setMotorChannelMode(motorChannel, motorMode, floatAtZero);
-    }
-
-    async setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
-        return this.embedded.setMotorConstantPower(motorChannel, powerLevel);
-    }
-
-    async setMotorTargetPosition(
-        motorChannel: number,
-        targetPosition_counts: number,
-        targetTolerance_counts: number,
-    ): Promise<void> {
-        return this.embedded.setMotorTargetPosition(
-            motorChannel,
-            targetPosition_counts,
-            targetTolerance_counts,
-        );
-    }
-
-    async setMotorTargetVelocity(
-        motorChannel: number,
-        velocity_cps: number,
-    ): Promise<void> {
-        return this.embedded.setMotorTargetVelocity(motorChannel, velocity_cps);
-    }
-
-    async getMotorClosedLoopControlCoefficients(
-        motorChannel: number,
-        motorMode: MotorMode,
-    ): Promise<PidfCoefficients | PidCoefficients> {
-        return await this.embedded.getMotorClosedLoopControlCoefficients(
-            motorChannel,
-            motorMode,
-        );
-    }
-
-    setMotorClosedLoopControlCoefficients(
-        motorChannel: number,
-        motorMode: MotorMode,
-        algorithm: ClosedLoopControlAlgorithm.Pid,
-        pid: PidCoefficients,
-    ): Promise<void>;
-    setMotorClosedLoopControlCoefficients(
-        motorChannel: number,
-        motorMode: MotorMode,
-        algorithm: ClosedLoopControlAlgorithm.Pidf,
-        pidf: PidfCoefficients,
-    ): Promise<void>;
-    setMotorClosedLoopControlCoefficients(
-        motorChannel: number,
-        motorMode: MotorMode,
-        algorithm: ClosedLoopControlAlgorithm,
-        pid: PidCoefficients | PidfCoefficients,
-    ): Promise<void>;
-    async setMotorClosedLoopControlCoefficients(
-        motorChannel: number,
-        motorMode: MotorMode,
-        algorithm:
-            | ClosedLoopControlAlgorithm.Pid
-            | ClosedLoopControlAlgorithm.Pidf
-            | ClosedLoopControlAlgorithm,
-        pid: PidCoefficients | PidfCoefficients,
-    ): Promise<void> {
-        return await this.embedded.setMotorClosedLoopControlCoefficients(
-            motorChannel,
-            motorMode,
-            algorithm,
-            pid,
-        );
-    }
 
     async setNewModuleAddress(newModuleAddress: number): Promise<void> {
         return this.embedded.setNewModuleAddress(newModuleAddress);
@@ -589,34 +608,19 @@ export class ControlHubInternal implements ControlHub {
         return this.embedded.setServoPulseWidth(servoChannel, pulseWidth);
     }
 
-    writeI2CMultipleBytes(
-        i2cChannel: number,
-        slaveAddress: number,
-        bytes: number[],
-    ): Promise<void> {
-        return this.embedded.writeI2CMultipleBytes(i2cChannel, slaveAddress, bytes);
-    }
-
-    writeI2CReadMultipleBytes(
-        i2cChannel: number,
-        slaveAddress: number,
-        numBytesToRead: number,
-        startAddress: number,
-    ): Promise<void> {
-        return this.embedded.writeI2CReadMultipleBytes(
-            i2cChannel,
-            slaveAddress,
-            numBytesToRead,
-            startAddress,
-        );
-    }
-
-    writeI2CSingleByte(
-        i2cChannel: number,
-        slaveAddress: number,
-        byte: number,
-    ): Promise<void> {
-        return this.embedded.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
+    on(eventName: "error", listener: (error: Error) => void): this;
+    on(eventName: "statusChanged", listener: (status: ModuleStatus) => void): this;
+    on(
+        eventName: "addressChanged",
+        listener: (oldAddress: number, newAddress: number) => void,
+    ): this;
+    on(eventName: "sessionEnded", listener: () => void): this;
+    on(
+        eventName: "error" | "statusChanged" | "addressChanged" | "sessionEnded",
+        listener: (...args: any) => void,
+    ): this {
+        this.embedded.on(eventName, listener);
+        return this;
     }
 
     async addChildByAddress(moduleAddress: number): Promise<RevHub> {
@@ -701,6 +705,14 @@ export class ControlHubInternal implements ControlHub {
         return await Promise.race([callbackPromise, timeoutPromise]).finally(() => {
             clearTimeout(timer);
         });
+    }
+
+    async sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
+        return this.embedded.sendReadCommand(packetTypeID, payload);
+    }
+
+    sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]> {
+        return this.embedded.sendWriteCommand(packetTypeID, payload);
     }
 
     /**
