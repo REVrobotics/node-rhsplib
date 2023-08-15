@@ -47,21 +47,21 @@ if(CMAKE_CROSSCOMPILING)
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
             list(APPEND LIB_SOURCES
-                arch/linux/time.c
-                arch/linux/serial.c
+                src/arch/linux/time.c
+                src/arch/linux/serial.c
             )
         elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
             list(APPEND LIB_SOURCES
-                arch/linux/time.c
-                arch/linux/serial.c
+                src/arch/linux/time.c
+                src/arch/linux/serial.c
             )
         else()
             message(FATAL_ERROR "Unsupported architecture for Linux cross-compilation:'${CMAKE_SYSTEM_PROCESSOR}'")
         endif()
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         list(APPEND LIB_SOURCES
-            arch/win/time.c
-            arch/win/serial.c
+            src/arch/win/time.c
+            src/arch/win/serial.c
         )
         set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
     else()
