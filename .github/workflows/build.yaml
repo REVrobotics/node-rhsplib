@@ -1,0 +1,58 @@
+name: Build
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    env:
+      V: 1
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            mingw: true
+            linux: true
+          - os: macos-latest
+            darwin: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Set up MinGW
+        if: ${{ matrix.mingw }}
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npx lerna run build
+
+      - name: Make prebuilds
+        if: ${{ matrix.linux }}
+        run: npx lerna run makePrebuildsOnLinux
+
+      - name: Make prebuilds
+        if: ${{ matrix.darwin }}
+        run: npx lerna run makePrebuildsOnDarwin
+
+      - name: Create Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: MyArtifacts
+          path: |
+            ./packages/rhsplib/prebuilds

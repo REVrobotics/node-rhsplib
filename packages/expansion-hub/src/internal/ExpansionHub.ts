@@ -348,24 +348,6 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    getPWMConfiguration(pwmChannel: number): Promise<number> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.getPWMConfiguration(pwmChannel);
-        });
-    }
-
-    getPWMEnable(pwmChannel: number): Promise<boolean> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.getPWMEnable(pwmChannel);
-        });
-    }
-
-    getPWMPulseWidth(pwmChannel: number): Promise<number> {
-        return this.convertErrorPromise(() => {
-            return this.nativeRevHub.getPWMPulseWidth(pwmChannel);
-        });
-    }
-
     getPhoneChargeControl(): Promise<boolean> {
         return this.convertErrorPromise(() => {
             return this.nativeRevHub.getPhoneChargeControl();
@@ -741,7 +723,7 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     private createError(e: any): any {
         if (e.errorCode == RhspLibErrorCode.GENERAL_ERROR) {
-            return new RhspLibError("General RHSPlib error");
+            return new RhspLibError("General librhsp error");
         } else if (e.errorCode == RhspLibErrorCode.MSG_NUMBER_MISMATCH) {
             return new RhspLibError("Message Number Mismatch");
         } else if (e.errorCode == RhspLibErrorCode.NOT_OPENED) {
