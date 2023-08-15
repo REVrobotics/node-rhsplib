@@ -1,4 +1,4 @@
-# node-rhsplib
+# node-librhsp
 
 This project enables Node.js applications to control devices that speak the REV Hub Serial Protocol (such as the REV Robotics Expansion Hub).
 
@@ -23,7 +23,7 @@ multi-package builds.
 
 We have several packages currently:
 
-1. `rhsplib`: Raw interaction with RHSPLib.
+1. `librhsp`: Raw interaction with librhsp.
 2. `expansion-hub`: High-level interaction with a REV expansion hub.
 3. `sample`: Command line app useful for testing and showing features.
 
