@@ -171,35 +171,78 @@ export interface ExpansionHub extends RevHub {
     getAllDigitalInputs(): Promise<number>;
 
     // I2C
+    /**
+     * Configure the speed of an I2C channel
+     * @param i2cChannel
+     * @param speedCode
+     */
     setI2CChannelConfiguration(
         i2cChannel: number,
         speedCode: I2CSpeedCode,
     ): Promise<void>;
+
+    /**
+     * Get the speed of an I2C channel
+     * @param i2cChannel
+     */
     getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode>;
+
+    /**
+     * Write a single byte over I2C
+     * @param i2cChannel
+     * @param targetAddress the address of the target device
+     * @param byte the byte to send
+     */
     writeI2CSingleByte(
         i2cChannel: number,
         targetAddress: number,
         byte: number,
     ): Promise<void>;
+
+    /**
+     * Write several bytes over I2C
+     * @param i2cChannel
+     * @param targetAddress the address of the target device
+     * @param bytes the data to send
+     */
     writeI2CMultipleBytes(
         i2cChannel: number,
         targetAddress: number,
         bytes: number[],
     ): Promise<void>;
-    getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus>;
-    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<void>;
+
+    /**
+     * Read a single byte from a target device.
+     * @param i2cChannel
+     * @param targetAddress the address of the target device
+     */
+    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<number>;
+
+    /**
+     * Read multiple bytes from a target device.
+     * @param i2cChannel
+     * @param targetAddress the address of the target device
+     * @param numBytesToRead the size of the payload to read
+     */
     readI2CMultipleBytes(
         i2cChannel: number,
         targetAddress: number,
         numBytesToRead: number,
-    ): Promise<void>;
-    writeI2CReadMultipleBytes(
+    ): Promise<number[]>;
+
+    /**
+     * Read data at a given register.
+     * @param i2cChannel
+     * @param targetAddress the address of the target device
+     * @param numBytesToRead size of data to read
+     * @param register a register address.
+     */
+    readI2CRegister(
         i2cChannel: number,
         targetAddress: number,
         numBytesToRead: number,
-        startAddress: number,
-    ): Promise<void>;
-    getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus>;
+        register: number,
+    ): Promise<number[]>;
 
     // Motor
     /**
