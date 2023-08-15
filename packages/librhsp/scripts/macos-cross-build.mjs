@@ -8,10 +8,10 @@ if(process.platform !== "darwin") {
   process.exit(0);
 }
 
-// This file should be kept in sync with the latest build instructions from the RHSPlib README file.
+// This file should be kept in sync with the latest build instructions from the librhsp README file.
 
 const scriptDirPath = path.dirname(fileURLToPath(import.meta.url));
-const rhsplibPath = path.join(scriptDirPath, "..", "RHSPlib");
+const rhsplibPath = path.join(scriptDirPath, "..", "librhsp");
 
 const darwinX64BuildPath = path.join(rhsplibPath, "build-darwinX64");
 const darwinArm64BuildPath = path.join(rhsplibPath, "build-darwinArm64");

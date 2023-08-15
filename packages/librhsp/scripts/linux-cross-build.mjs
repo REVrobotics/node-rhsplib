@@ -8,10 +8,10 @@ if(process.platform !== "linux") {
   process.exit(0);
 }
 
-// This file should be kept in sync with the latest build instructions from the RHSPlib README file.
+// This file should be kept in sync with the latest build instructions from the librhsp README file.
 
 const scriptDirPath = path.dirname(fileURLToPath(import.meta.url));
-const rhsplibPath = path.join(scriptDirPath, "..", "RHSPlib");
+const rhsplibPath = path.join(scriptDirPath, "..", "librhsp");
 
 const linuxX64BuildPath = path.join(rhsplibPath, "build-linuxX64");
 const linuxArm64BuildPath = path.join(rhsplibPath, "build-linuxArm64");
@@ -38,7 +38,7 @@ await runCmakeWithArgs(["--build", "."], `${baseBuildPath}linuxArm64`);
 console.log("Building Windows");
 await runCmakeWithArgs([...windowsArgs, ".."], `${baseBuildPath}windows`);
 await runCmakeWithArgs(["--build", "."], `${baseBuildPath}windows`);
-console.log("Build RHSPlib");
+console.log("Build librhsp");
 console.log();
 
 console.log("LinuxX64");

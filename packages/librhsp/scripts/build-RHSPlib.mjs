@@ -4,10 +4,10 @@ import { spawn } from "child_process";
 import { platform } from "os";
 import { fileURLToPath } from "url";
 
-// This file should be kept in sync with the latest build instructions from the RHSPlib README file.
+// This file should be kept in sync with the latest build instructions from the librhsp README file.
 
 const scriptDirPath = path.dirname(fileURLToPath(import.meta.url));
-const rhsplibPath = path.join(scriptDirPath, "..", "RHSPlib");
+const rhsplibPath = path.join(scriptDirPath, "..", "librhsp");
 
 let configureOptions = [];
 let buildOptions = [];
@@ -31,10 +31,10 @@ fs.mkdirSync(buildPath, { recursive: true });
 
 console.log("Configuring CMake\n");
 await runCmakeWithArgs([...configureOptions, ".."]);
-console.log("\nBuilding RHSPlib\n");
+console.log("\nBuilding librhsp\n");
 await runCmakeWithArgs(["--build", ".", ...buildOptions]);
 
-console.log("\nSuccessfully built RHSPlib");
+console.log("\nSuccessfully built librhsp");
 
 async function runCmakeWithArgs(args) {
     const cmake = spawn("cmake", args, {

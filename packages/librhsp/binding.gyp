@@ -10,7 +10,7 @@
       ],
       'include_dirs': [
         'src/',
-        'RHSPlib/include',
+        'librhsp/include',
         "<!@(node -p \"require('node-addon-api').include\")"
       ],
       'defines': [
@@ -25,19 +25,19 @@
         [
           'OS=="win"', {
             'libraries': [
-              '<(module_root_dir)/RHSPlib/build-windows/Release/rhsp.lib',
+              '<(module_root_dir)/librhsp/build-windows/Release/rhsp.lib',
             ],
             'copies':[
               {
                 'destination': '<(PRODUCT_DIR)',
                 'files':[
-                  '<(module_root_dir)/RHSPlib/build/Release/rhsp.dll',
+                  '<(module_root_dir)/librhsp/build/Release/rhsp.dll',
                 ],
               },
               {
                 'destination': '<(module_root_dir)/prebuilds/win32-<(target_arch)',
                 'files':[
-                  '<(module_root_dir)/RHSPlib/build/Release/rhsp.dll',
+                  '<(module_root_dir)/librhsp/build/Release/rhsp.dll',
                 ],
               },
             ]
@@ -47,18 +47,18 @@
           'OS=="linux" and target_arch=="x64"', {
             'link_settings': {
               'libraries': [
-                  '-L<(module_root_dir)/RHSPlib/build-linuxX64/',
+                  '-L<(module_root_dir)/librhsp/build-linuxX64/',
                   '-lrhsp'
               ],
               'ldflags': [
-                '-Wl,-rpath,<(module_root_dir)/RHSPlib/build-linuxX64/',
+                '-Wl,-rpath,<(module_root_dir)/librhsp/build-linuxX64/',
               ]
             },
             'copies':[
               {
                 'destination': '<(PRODUCT_DIR)',
                 'files':[
-                  '<(module_root_dir)/RHSPlib/build-linuxX64/librhsp.so',
+                  '<(module_root_dir)/librhsp/build-linuxX64/librhsp.so',
                 ],
               }
             ],
@@ -68,18 +68,18 @@
           'OS=="linux" and target_arch=="arm64"', {
             'link_settings': {
               'libraries': [
-                  '-L<(module_root_dir)/RHSPlib/build-linuxArm64/',
+                  '-L<(module_root_dir)/librhsp/build-linuxArm64/',
                   '-lrhsp'
               ],
               'ldflags': [
-                '-Wl,-rpath,<(module_root_dir)/RHSPlib/build-linuxArm64/',
+                '-Wl,-rpath,<(module_root_dir)/librhsp/build-linuxArm64/',
               ]
             },
             'copies':[
               {
                 'destination': '<(PRODUCT_DIR)',
                 'files':[
-                  '<(module_root_dir)/RHSPlib/build-linuxArm64/librhsp.so',
+                  '<(module_root_dir)/librhsp/build-linuxArm64/librhsp.so',
                 ],
               }
             ],
@@ -96,18 +96,18 @@
             },
             'link_settings': {
               'libraries': [
-                  '-L<(module_root_dir)/RHSPlib/build-darwinX64/',
-                  '-lRHSPlib'
+                  '-L<(module_root_dir)/librhsp/build-darwinX64/',
+                  '-lrhsp'
               ],
               'ldflags': [
-                '-Wl,-rpath,<(module_root_dir)/RHSPlib/build-darwinX64/',
+                '-Wl,-rpath,<(module_root_dir)/librhsp/build-darwinX64/',
               ]
             },
             'copies':[
               {
                 'destination': '<(PRODUCT_DIR)',
                 'files':[
-                  '<(module_root_dir)/RHSPlib/build-darwinX64/librhsp.dylib',
+                  '<(module_root_dir)/librhsp/build-darwinX64/librhsp.dylib',
                 ],
               }
             ],
