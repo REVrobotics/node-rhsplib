@@ -152,6 +152,10 @@ RevHub::RevHub(const Napi::CallbackInfo &info)
     // TODO(jan): Non-default constructor that calls RevHub::open()
 }
 
+RevHub::~RevHub() {
+    freeRevHub(this->obj);
+}
+
 Napi::Value RevHub::open(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
 
