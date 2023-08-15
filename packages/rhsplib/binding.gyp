@@ -25,19 +25,19 @@
         [
           'OS=="win"', {
             'libraries': [
-              '<(module_root_dir)/RHSPlib/build-windows/Release/RHSPlib.lib',
+              '<(module_root_dir)/RHSPlib/build-windows/Release/rhsp.lib',
             ],
             'copies':[
               {
                 'destination': '<(PRODUCT_DIR)',
                 'files':[
-                  '<(module_root_dir)/RHSPlib/build/Release/RHSPlib.dll',
+                  '<(module_root_dir)/RHSPlib/build/Release/rhsp.dll',
                 ],
               },
               {
                 'destination': '<(module_root_dir)/prebuilds/win32-<(target_arch)',
                 'files':[
-                  '<(module_root_dir)/RHSPlib/build/Release/RHSPlib.dll',
+                  '<(module_root_dir)/RHSPlib/build/Release/rhsp.dll',
                 ],
               },
             ]
@@ -69,7 +69,7 @@
             'link_settings': {
               'libraries': [
                   '-L<(module_root_dir)/RHSPlib/build-linuxArm64/',
-                  '-lRHSPlib'
+                  '-lrhsp'
               ],
               'ldflags': [
                 '-Wl,-rpath,<(module_root_dir)/RHSPlib/build-linuxArm64/',
@@ -79,7 +79,7 @@
               {
                 'destination': '<(PRODUCT_DIR)',
                 'files':[
-                  '<(module_root_dir)/RHSPlib/build-linuxArm64/libRHSPlib.so',
+                  '<(module_root_dir)/RHSPlib/build-linuxArm64/librhsp.so',
                 ],
               }
             ],
@@ -107,7 +107,7 @@
               {
                 'destination': '<(PRODUCT_DIR)',
                 'files':[
-                  '<(module_root_dir)/RHSPlib/build-darwinX64/libRHSPlib.dylib',
+                  '<(module_root_dir)/RHSPlib/build-darwinX64/librhsp.dylib',
                 ],
               }
             ],
