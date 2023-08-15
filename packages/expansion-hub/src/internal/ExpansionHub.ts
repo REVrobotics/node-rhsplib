@@ -75,6 +75,9 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     close(): void {
+        clearInterval(this.keepAliveTimer);
+        this.keepAliveTimer = undefined;
+
         //Closing a parent closes the serial port and all children
         if (this.isParent()) {
             if (this.serialPort) closeSerialPort(this.serialPort);
@@ -84,9 +87,6 @@ export class ExpansionHubInternal implements ExpansionHub {
                 }
             });
         }
-
-        clearInterval(this.keepAliveTimer);
-        this.keepAliveTimer = undefined;
     }
 
     open(destAddress: number): Promise<void> {
