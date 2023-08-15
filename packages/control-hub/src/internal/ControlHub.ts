@@ -296,47 +296,47 @@ export class ControlHubInternal implements ControlHub {
     }
 
     async getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus> {
-        return this.embedded.getModuleStatus(clearStatusAfterResponse);
+        return await this.embedded.getModuleStatus(clearStatusAfterResponse);
     }
 
     async getMotorAtTarget(motorChannel: number): Promise<boolean> {
-        return this.embedded.getMotorAtTarget(motorChannel);
+        return await this.embedded.getMotorAtTarget(motorChannel);
     }
 
     async getMotorChannelEnable(motorChannel: number): Promise<boolean> {
-        return this.embedded.getMotorChannelEnable(motorChannel);
+        return await this.embedded.getMotorChannelEnable(motorChannel);
     }
 
     async getMotorChannelMode(
         motorChannel: number,
     ): Promise<{ motorMode: number; floatAtZero: boolean }> {
-        return this.embedded.getMotorChannelMode(motorChannel);
+        return await this.embedded.getMotorChannelMode(motorChannel);
     }
 
     async getMotorChannelCurrentAlertLevel(motorChannel: number): Promise<number> {
-        return this.embedded.getMotorChannelCurrentAlertLevel(motorChannel);
+        return await this.embedded.getMotorChannelCurrentAlertLevel(motorChannel);
     }
 
     async getMotorEncoderPosition(motorChannel: number): Promise<number> {
-        return this.embedded.getMotorEncoderPosition(motorChannel);
+        return await this.embedded.getMotorEncoderPosition(motorChannel);
     }
 
     async getMotorConstantPower(motorChannel: number): Promise<number> {
-        return this.embedded.getMotorConstantPower(motorChannel);
+        return await this.embedded.getMotorConstantPower(motorChannel);
     }
 
     async getMotorTargetVelocity(motorChannel: number): Promise<number> {
-        return this.embedded.getMotorTargetVelocity(motorChannel);
+        return await this.embedded.getMotorTargetVelocity(motorChannel);
     }
 
     async getMotorTargetPosition(
         motorChannel: number,
     ): Promise<{ targetPosition: number; targetTolerance: number }> {
-        return this.embedded.getMotorTargetPosition(motorChannel);
+        return await this.embedded.getMotorTargetPosition(motorChannel);
     }
 
     async setMotorChannelEnable(motorChannel: number, enable: boolean): Promise<void> {
-        return this.embedded.setMotorChannelEnable(motorChannel, enable);
+        return await this.embedded.setMotorChannelEnable(motorChannel, enable);
     }
 
     async setMotorChannelMode(
@@ -344,28 +344,28 @@ export class ControlHubInternal implements ControlHub {
         motorMode: number,
         floatAtZero: boolean,
     ): Promise<void> {
-        return this.embedded.setMotorChannelMode(motorChannel, motorMode, floatAtZero);
+        return await this.embedded.setMotorChannelMode(motorChannel, motorMode, floatAtZero);
     }
 
     async setMotorChannelCurrentAlertLevel(
         motorChannel: number,
         currentLimit_mA: number,
     ): Promise<void> {
-        return this.embedded.setMotorChannelCurrentAlertLevel(
+        return await this.embedded.setMotorChannelCurrentAlertLevel(
             motorChannel,
             currentLimit_mA,
         );
     }
 
     async setMotorConstantPower(motorChannel: number, powerLevel: number): Promise<void> {
-        return this.embedded.setMotorConstantPower(motorChannel, powerLevel);
+        return await this.embedded.setMotorConstantPower(motorChannel, powerLevel);
     }
 
     async setMotorTargetVelocity(
         motorChannel: number,
         velocity_cps: number,
     ): Promise<void> {
-        return this.embedded.setMotorTargetVelocity(motorChannel, velocity_cps);
+        return await this.embedded.setMotorTargetVelocity(motorChannel, velocity_cps);
     }
 
     async setMotorTargetPosition(
@@ -373,7 +373,7 @@ export class ControlHubInternal implements ControlHub {
         targetPosition_counts: number,
         targetTolerance_counts: number,
     ): Promise<void> {
-        return this.embedded.setMotorTargetPosition(
+        return await this.embedded.setMotorTargetPosition(
             motorChannel,
             targetPosition_counts,
             targetTolerance_counts,
@@ -426,58 +426,58 @@ export class ControlHubInternal implements ControlHub {
     }
 
     async resetMotorEncoder(motorChannel: number): Promise<void> {
-        return this.embedded.resetMotorEncoder(motorChannel);
+        return await this.embedded.resetMotorEncoder(motorChannel);
     }
 
     async getPhoneChargeControl(): Promise<boolean> {
-        return this.embedded.getPhoneChargeControl();
+        return await this.embedded.getPhoneChargeControl();
     }
 
     async getServoConfiguration(servoChannel: number): Promise<number> {
-        return this.embedded.getServoConfiguration(servoChannel);
+        return await this.embedded.getServoConfiguration(servoChannel);
     }
 
     async getServoEnable(servoChannel: number): Promise<boolean> {
-        return this.embedded.getServoEnable(servoChannel);
+        return await this.embedded.getServoEnable(servoChannel);
     }
 
     async getServoPulseWidth(servoChannel: number): Promise<number> {
-        return this.embedded.getServoPulseWidth(servoChannel);
+        return await this.embedded.getServoPulseWidth(servoChannel);
     }
 
     async injectDataLogHint(hintText: string): Promise<void> {
-        return this.embedded.injectDataLogHint(hintText);
+        return await this.embedded.injectDataLogHint(hintText);
     }
 
     async queryInterface(interfaceName: string): Promise<ModuleInterface> {
-        return this.embedded.queryInterface(interfaceName);
+        return await this.embedded.queryInterface(interfaceName);
     }
 
     async getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode> {
-        return this.embedded.getI2CChannelConfiguration(i2cChannel);
+        return await this.embedded.getI2CChannelConfiguration(i2cChannel);
     }
 
-    getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus> {
-        return this.embedded.getI2CReadStatus(i2cChannel);
+    async getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus> {
+        return await this.embedded.getI2CReadStatus(i2cChannel);
     }
 
-    getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus> {
-        return this.embedded.getI2CWriteStatus(i2cChannel);
+    async getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus> {
+        return await this.embedded.getI2CWriteStatus(i2cChannel);
     }
 
     async setI2CChannelConfiguration(
         i2cChannel: number,
         speedCode: I2CSpeedCode,
     ): Promise<void> {
-        return this.embedded.setI2CChannelConfiguration(i2cChannel, speedCode);
+        return await this.embedded.setI2CChannelConfiguration(i2cChannel, speedCode);
     }
 
-    readI2CMultipleBytes(
+    async readI2CMultipleBytes(
         i2cChannel: number,
         slaveAddress: number,
         numBytesToRead: number,
     ): Promise<void> {
-        return this.embedded.readI2CMultipleBytes(
+        return await this.embedded.readI2CMultipleBytes(
             i2cChannel,
             slaveAddress,
             numBytesToRead,
