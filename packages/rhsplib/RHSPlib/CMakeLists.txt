@@ -43,7 +43,31 @@ set(LIB_SOURCES
         src/packet.c
 )
 
-if(NOT CMAKE_CROSSCOMPILING)
+if(CMAKE_CROSSCOMPILING)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+            list(APPEND LIB_SOURCES
+                arch/linux/RHSPlib_time.c
+                arch/linux/RHSPlib_serial.c
+            )
+        elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+            list(APPEND LIB_SOURCES
+                arch/linux/RHSPlib_time.c
+                arch/linux/RHSPlib_serial.c
+            )
+        else()
+            message(FATAL_ERROR "Unsupported architecture for Linux cross-compilation:'${CMAKE_SYSTEM_PROCESSOR}'")
+        endif()
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        list(APPEND LIB_SOURCES
+            arch/win/RHSPlib_time.c
+            arch/win/RHSPlib_serial.c
+        )
+        set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+    else()
+        message(FATAL_ERROR "Unsupported system for cross-compilation:'${CMAKE_SYSTEM_NAME}'")
+    endif()
+else()
     if(APPLE)
         list(APPEND LIB_SOURCES
                 src/arch/mac/time.c

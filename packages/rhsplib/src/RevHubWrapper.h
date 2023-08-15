@@ -9,6 +9,7 @@ class RevHub : public Napi::ObjectWrap<RevHub> {
     static Napi::Object Init(Napi::Env env, Napi::Object exports);
 
     RevHub(const Napi::CallbackInfo &info);
+    ~RevHub();
 
     Napi::Value open(const Napi::CallbackInfo &info);
     Napi::Value isOpened(const Napi::CallbackInfo &info);
