@@ -480,37 +480,37 @@ export class ControlHubInternal implements ControlHub {
 
     async readI2CMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         numBytesToRead: number,
     ): Promise<number[]> {
         return await this.embedded.readI2CMultipleBytes(
             i2cChannel,
-            slaveAddress,
+            targetAddress,
             numBytesToRead,
         );
     }
 
-    async readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<number> {
-        return await this.embedded.readI2CSingleByte(i2cChannel, slaveAddress);
+    async readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<number> {
+        return await this.embedded.readI2CSingleByte(i2cChannel, targetAddress);
     }
 
     async writeI2CMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         bytes: number[],
     ): Promise<void> {
-        return await this.embedded.writeI2CMultipleBytes(i2cChannel, slaveAddress, bytes);
+        return await this.embedded.writeI2CMultipleBytes(i2cChannel, targetAddress, bytes);
     }
 
     async writeI2CReadMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         numBytesToRead: number,
         startAddress: number,
     ): Promise<void> {
         return await this.embedded.writeI2CReadMultipleBytes(
             i2cChannel,
-            slaveAddress,
+            targetAddress,
             numBytesToRead,
             startAddress,
         );
@@ -518,10 +518,10 @@ export class ControlHubInternal implements ControlHub {
 
     async writeI2CSingleByte(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         byte: number,
     ): Promise<void> {
-        return await this.embedded.writeI2CSingleByte(i2cChannel, slaveAddress, byte);
+        return await this.embedded.writeI2CSingleByte(i2cChannel, targetAddress, byte);
     }
 
     async readVersion(): Promise<Version> {

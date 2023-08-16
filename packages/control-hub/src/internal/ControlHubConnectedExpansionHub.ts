@@ -603,9 +603,9 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
     }
 
     async getDigitalDirection(dioPin: number): Promise<DigitalChannelDirection> {
-        let isOutput = await this.sendCommand("getDigitalDirection", {
+        let isOutput = await this.sendCommand("isDigitalOutput", {
             hId: this.id,
-            channel: dioPin,
+            c: dioPin,
         });
 
         return isOutput ? DigitalChannelDirection.Output : DigitalChannelDirection.Input;

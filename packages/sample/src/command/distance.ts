@@ -1,5 +1,5 @@
-import { ExpansionHub } from "@rev-robotics/rev-hub-core";
 import { DistanceSensor } from "@rev-robotics/distance-sensor";
+import { ExpansionHub } from "@rev-robotics/rev-hub-core";
 
 export async function distance(
     hub: ExpansionHub,

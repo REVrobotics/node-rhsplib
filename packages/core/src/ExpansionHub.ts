@@ -9,8 +9,6 @@ import { VerbosityLevel } from "./VerbosityLevel.js";
 import { Version } from "./Version.js";
 import { DigitalChannelDirection } from "./DigitalChannelDirection.js";
 import { I2CSpeedCode } from "./I2CSpeedCode.js";
-import { I2CWriteStatus } from "./I2CWriteStatus.js";
-import { I2CReadStatus } from "./I2CReadStatus.js";
 import { MotorMode } from "./MotorMode.js";
 import { PidCoefficients } from "./PidCoefficients.js";
 import { PidfCoefficients } from "./PidfCoefficients.js";
@@ -30,8 +28,6 @@ export interface ExpansionHub extends RevHub {
      * it has been closed.
      */
     close(): void;
-    sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
-    sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
     getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus>;
     sendKeepAlive(): Promise<void>;
     sendFailSafe(): Promise<void>;
@@ -239,7 +235,7 @@ export interface ExpansionHub extends RevHub {
      */
     readI2CRegister(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         numBytesToRead: number,
         register: number,
     ): Promise<number[]>;
