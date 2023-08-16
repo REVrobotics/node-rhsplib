@@ -75,18 +75,18 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     close(): void {
+        clearInterval(this.keepAliveTimer);
+        this.keepAliveTimer = undefined;
+
         //Closing a parent closes the serial port and all children
         if (this.isParent()) {
-            if (this.serialPort) closeSerialPort(this.serialPort);
             this.children.forEach((child) => {
                 if (child.isExpansionHub()) {
                     child.close();
                 }
             });
+            if (this.serialPort) closeSerialPort(this.serialPort);
         }
-
-        clearInterval(this.keepAliveTimer);
-        this.keepAliveTimer = undefined;
     }
 
     open(destAddress: number): Promise<void> {
