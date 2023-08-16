@@ -51,8 +51,8 @@ import { distance } from "./command/distance.js";
 import { sendFailSafe } from "./command/failsafe.js";
 import { queryInterface } from "./command/query.js";
 import { openUsbControlHubsAndChildren } from "./open-control-hub.js";
-import { status } from "../dist/command/status.js";
-import { setHubAddress } from "../dist/command/set-hub-address.js";
+import { status } from "./command/status.js";
+import { setHubAddress } from "./command/set-hub-address.js";
 
 function runOnSigint(block: () => void) {
     process.on("SIGINT", () => {
