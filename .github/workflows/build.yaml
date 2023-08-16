@@ -55,4 +55,4 @@ jobs:
         with:
           name: MyArtifacts
           path: |
-            ./packages/rhsplib/prebuilds
+            ./packages/librhsp/prebuilds
