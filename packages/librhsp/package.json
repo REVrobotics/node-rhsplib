@@ -30,5 +30,9 @@
         "prepublishOnly": "prebuildify --napi && tsc",
         "cross-build": "node-gyp-build \"node scripts/cross-build-RHSPlib.mjs\""
     },
-    "gypfile": true
+    "gypfile": true,
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    }
 }
