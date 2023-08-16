@@ -502,20 +502,6 @@ export class ControlHubInternal implements ControlHub {
         return await this.embedded.writeI2CMultipleBytes(i2cChannel, targetAddress, bytes);
     }
 
-    async writeI2CReadMultipleBytes(
-        i2cChannel: number,
-        targetAddress: number,
-        numBytesToRead: number,
-        startAddress: number,
-    ): Promise<void> {
-        return await this.embedded.writeI2CReadMultipleBytes(
-            i2cChannel,
-            targetAddress,
-            numBytesToRead,
-            startAddress,
-        );
-    }
-
     async writeI2CSingleByte(
         i2cChannel: number,
         targetAddress: number,

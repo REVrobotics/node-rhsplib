@@ -506,44 +506,51 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
         numBytesToRead: number,
         register: number,
     ): Promise<number[]> {
-        throw new Error("not implemented");
+        return await this.sendCommand("readI2cRegister", {
+            hId: this.id,
+            a: targetAddress,
+            c: i2cChannel,
+            cb: numBytesToRead,
+            r: register,
+        });
     }
 
-    readI2CMultipleBytes(
+    async readI2CMultipleBytes(
         i2cChannel: number,
         targetAddress: number,
         numBytesToRead: number,
     ): Promise<number[]> {
-        throw new Error("not implemented");
+        return await this.sendCommand("readI2cData", {
+            hId: this.id,
+            a: targetAddress,
+            c: i2cChannel,
+            cb: numBytesToRead,
+        });
     }
 
-    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<number> {
-        throw new Error("not implemented");
+    async readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<number> {
+        return (await this.readI2CMultipleBytes(i2cChannel, targetAddress, 1))[0];
     }
 
-    writeI2CMultipleBytes(
+    async writeI2CMultipleBytes(
         i2cChannel: number,
         targetAddress: number,
         bytes: number[],
     ): Promise<void> {
-        throw new Error("not implemented");
+        await this.sendCommand("writeI2cData", {
+            hId: this.id,
+            a: targetAddress,
+            c: i2cChannel,
+            d: bytes,
+        });
     }
 
-    writeI2CReadMultipleBytes(
-        i2cChannel: number,
-        targetAddress: number,
-        numBytesToRead: number,
-        startAddress: number,
-    ): Promise<void> {
-        throw new Error("not implemented");
-    }
-
-    writeI2CSingleByte(
+    async writeI2CSingleByte(
         i2cChannel: number,
         targetAddress: number,
         byte: number,
     ): Promise<void> {
-        throw new Error("not implemented");
+        await this.writeI2CMultipleBytes(i2cChannel, targetAddress, [byte]);
     }
 
     async readVersion(): Promise<Version> {
