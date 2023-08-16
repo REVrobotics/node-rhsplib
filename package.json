@@ -8,5 +8,8 @@
     "lerna": "^7.0.0",
     "prettier": "2.8.8",
     "nx": "^16.2.1"
+  },
+  "dependencies": {
+    "node-addon-api": "^7.0.0"
   }
 }
