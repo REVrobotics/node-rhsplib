@@ -167,16 +167,40 @@ export interface ExpansionHub extends RevHub {
     getAllDigitalInputs(): Promise<number>;
 
     // I2C
+    /**
+     * Configure the speed of an I2C channel
+     * @param i2cChannel
+     * @param speedCode
+     */
     setI2CChannelConfiguration(
         i2cChannel: number,
         speedCode: I2CSpeedCode,
     ): Promise<void>;
+
+    /**
+     * Get the speed of an I2C channel
+     * @param i2cChannel
+     */
     getI2CChannelConfiguration(i2cChannel: number): Promise<I2CSpeedCode>;
+
+    /**
+     * Write a single byte over I2C
+     * @param i2cChannel
+     * @param targetAddress the address of the target device
+     * @param byte the byte to send
+     */
     writeI2CSingleByte(
         i2cChannel: number,
         targetAddress: number,
         byte: number,
     ): Promise<void>;
+
+    /**
+     * Write several bytes over I2C
+     * @param i2cChannel
+     * @param targetAddress the address of the target device
+     * @param bytes the data to send
+     */
     writeI2CMultipleBytes(
         i2cChannel: number,
         targetAddress: number,
@@ -184,16 +208,14 @@ export interface ExpansionHub extends RevHub {
     ): Promise<void>;
 
     /**
-     * Read a single byte from a target device. Use {@link getI2CReadStatus} to
-     * get the actual byte.
+     * Read a single byte from a target device.
      * @param i2cChannel
      * @param targetAddress the address of the target device
      */
     readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<number>;
 
     /**
-     * Read multiple bytes from a target device. Use {@link getI2CReadStatus} to
-     * get the actual data.
+     * Read multiple bytes from a target device.
      * @param i2cChannel
      * @param targetAddress the address of the target device
      * @param numBytesToRead the size of the payload to read
@@ -205,11 +227,11 @@ export interface ExpansionHub extends RevHub {
     ): Promise<number[]>;
 
     /**
-     * Send a write command to a given target requesting data at a given register.
+     * Read data at a given register.
      * @param i2cChannel
      * @param targetAddress the address of the target device
      * @param numBytesToRead size of data to read
-     * @param register a byte to send at the start of the payload, typically a register address.
+     * @param register a register address.
      */
     readI2CRegister(
         i2cChannel: number,

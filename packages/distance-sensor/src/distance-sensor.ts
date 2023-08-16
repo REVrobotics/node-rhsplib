@@ -1,6 +1,6 @@
+import { ExpansionHub } from "@rev-robotics/rev-hub-core";
 import { VL53L0X } from "./drivers/vl53l0x.js";
 import { DistanceSensorDriver } from "./drivers/DistanceSensorDriver.js";
-import { ExpansionHub } from "@rev-robotics/rev-hub-core";
 
 export class DistanceSensor {
     /**

@@ -1,4 +1,6 @@
+import { ExpansionHub } from "@rev-robotics/rev-hub-core";
 import * as register from "../registers.js";
+import { SYSTEM_SEQUENCE_CONFIG } from "../registers.js";
 import {
     readRegister,
     readRegisterMultipleBytes,
@@ -59,7 +61,7 @@ export class VL53L0X implements DistanceSensorDriver {
             if ((await this.readRegister(0xc2)) != 0x10) return false;
             if ((await this.readRegister(0x61)) != 0x00) return false;
             else return true;
-        } catch (e: any) {
+        } catch {
             //if there's an I2C error, we don't have a working sensor.
             return false;
         }
@@ -448,7 +450,7 @@ export class VL53L0X implements DistanceSensorDriver {
     private async getSequenceStepEnables(): Promise<SequenceStepEnables> {
         let result = new SequenceStepEnables();
 
-        let sequenceConfig = await this.readRegister(register.SYSTEM_SEQUENCE_CONFIG);
+        let sequenceConfig = await this.readRegister(SYSTEM_SEQUENCE_CONFIG);
 
         result.tcc = ((sequenceConfig >> 4) & 0x1) != 0;
         result.dss = ((sequenceConfig >> 3) & 0x1) != 0;

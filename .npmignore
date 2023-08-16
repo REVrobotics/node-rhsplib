@@ -7,4 +7,4 @@ tsconfig.json
 .clang-format
 
 # Ensure we don't accidentally include tarballs produced by npm pack
-rev-robotics-rhsplib-*.tgz
+rev-robotics-librhsp-*.tgz

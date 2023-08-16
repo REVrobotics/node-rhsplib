@@ -41,6 +41,7 @@ import {
     digitalWrite,
     digitalWriteAll,
 } from "./command/digital.js";
+import { distance } from "./command/distance.js";
 import { sendFailSafe } from "./command/failsafe.js";
 import { queryInterface } from "./command/query.js";
 import {openUsbControlHubsAndChildren} from "./open-usb-control-hub.js";
@@ -564,6 +565,24 @@ motorCommand
             positionNumber,
             toleranceNumber,
         );
+    });
+
+program
+    .command("distance <channel>")
+    .option("--continuous", "run continuously")
+    .description("Read distance from a REV 2m distance sensor")
+    .action(async (channel, options): Promise<void> => {
+        let isContinuous = options.continuous !== undefined;
+        let channelNumber = Number(channel);
+        let hubs = await openConnectedExpansionHubs();
+        let hub = hubs[0];
+
+        runOnSigint(() => {
+            hub.close();
+        });
+
+        await distance(hub, channelNumber, isContinuous);
+        hub.close();
     });
 
 program

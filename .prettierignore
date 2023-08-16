@@ -4,4 +4,4 @@
 **/dist
 .yarn/
 .pnp.*
-packages/rhsplib/RHSPlib
+packages/librhsp/librhsp

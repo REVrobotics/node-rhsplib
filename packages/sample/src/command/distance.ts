@@ -6,19 +6,18 @@ export async function distance(
     channel: number,
     isContinuous: boolean,
 ) {
-    console.log(`Channel number is ${channel}`);
-
     let sensor = new DistanceSensor(hub, channel);
     await sensor.setup();
 
     if (isContinuous) {
-        sensor.startMeasuringDistance((distance: number) => {
+        sensor.startMeasuringDistance((distance) => {
             console.log(`Distance is ${distance}mm`);
-        }, 10);
+        }, 1000);
     } else {
         let distance = await sensor.getDistanceMillimeters();
         console.log(`Distance is ${distance}mm`);
 
         sensor.stop();
+        hub.close();
     }
 }
