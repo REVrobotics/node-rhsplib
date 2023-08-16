@@ -457,14 +457,6 @@ export class ControlHubInternal implements ControlHub {
         return await this.embedded.getI2CChannelConfiguration(i2cChannel);
     }
 
-    async getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus> {
-        return await this.embedded.getI2CReadStatus(i2cChannel);
-    }
-
-    async getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus> {
-        return await this.embedded.getI2CWriteStatus(i2cChannel);
-    }
-
     async setI2CChannelConfiguration(
         i2cChannel: number,
         speedCode: I2CSpeedCode,
@@ -472,11 +464,25 @@ export class ControlHubInternal implements ControlHub {
         return await this.embedded.setI2CChannelConfiguration(i2cChannel, speedCode);
     }
 
+    async readI2CRegister(
+        i2cChannel: number,
+        targetAddress: number,
+        numBytesToRead: number,
+        register: number,
+    ): Promise<number[]> {
+        return await this.embedded.readI2CRegister(
+            i2cChannel,
+            targetAddress,
+            numBytesToRead,
+            register
+        );
+    }
+
     async readI2CMultipleBytes(
         i2cChannel: number,
         slaveAddress: number,
         numBytesToRead: number,
-    ): Promise<void> {
+    ): Promise<number[]> {
         return await this.embedded.readI2CMultipleBytes(
             i2cChannel,
             slaveAddress,
@@ -484,7 +490,7 @@ export class ControlHubInternal implements ControlHub {
         );
     }
 
-    async readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void> {
+    async readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<number> {
         return await this.embedded.readI2CSingleByte(i2cChannel, slaveAddress);
     }
 

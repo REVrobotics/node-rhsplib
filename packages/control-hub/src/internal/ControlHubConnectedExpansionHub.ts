@@ -1,14 +1,11 @@
 import {
     BulkInputData,
-    ClosedLoopControlAlgorithm,
-    ControlHub,
+    ClosedLoopControlAlgorithm, ControlHub,
     DebugGroup,
     DigitalChannelDirection,
     DigitalState,
     ExpansionHub,
-    I2CReadStatus,
     I2CSpeedCode,
-    I2CWriteStatus,
     LedPattern,
     ModuleInterface,
     ModuleStatus,
@@ -21,7 +18,7 @@ import {
     RevHubType,
     Rgb,
     VerbosityLevel,
-    Version,
+    Version
 } from "@rev-robotics/rev-hub-core";
 import { EventEmitter } from "events";
 
@@ -503,29 +500,30 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
             : I2CSpeedCode.SpeedCode100_Kbps;
     }
 
-    getI2CReadStatus(i2cChannel: number): Promise<I2CReadStatus> {
-        throw new Error("not implemented");
-    }
-
-    getI2CWriteStatus(i2cChannel: number): Promise<I2CWriteStatus> {
+    async readI2CRegister(
+        i2cChannel: number,
+        targetAddress: number,
+        numBytesToRead: number,
+        register: number,
+    ): Promise<number[]> {
         throw new Error("not implemented");
     }
 
     readI2CMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         numBytesToRead: number,
-    ): Promise<void> {
+    ): Promise<number[]> {
         throw new Error("not implemented");
     }
 
-    readI2CSingleByte(i2cChannel: number, slaveAddress: number): Promise<void> {
+    readI2CSingleByte(i2cChannel: number, targetAddress: number): Promise<number> {
         throw new Error("not implemented");
     }
 
     writeI2CMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         bytes: number[],
     ): Promise<void> {
         throw new Error("not implemented");
@@ -533,7 +531,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
 
     writeI2CReadMultipleBytes(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         numBytesToRead: number,
         startAddress: number,
     ): Promise<void> {
@@ -542,7 +540,7 @@ export class ControlHubConnectedExpansionHub implements ParentExpansionHub {
 
     writeI2CSingleByte(
         i2cChannel: number,
-        slaveAddress: number,
+        targetAddress: number,
         byte: number,
     ): Promise<void> {
         throw new Error("not implemented");
