@@ -1,8 +1,11 @@
 build
 build-windows
 build-linux*
+build-js-*
 dist
 **/prebuilds
+cmake-build-debug
+build-def
 
 # Logs
 logs
