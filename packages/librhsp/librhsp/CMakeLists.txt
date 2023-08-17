@@ -50,11 +50,14 @@ if(CMAKE_CROSSCOMPILING)
                 src/arch/linux/time.c
                 src/arch/linux/serial.c
             )
+            add_compile_options("-target" "aarch64-pc-linux-gnu")
+            add_link_options("-target" "aarch64-pc-linux-gnu" "-fuse-ld=/usr/bin/aarch64-linux-gnu-ld")
         elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
             list(APPEND LIB_SOURCES
                 src/arch/linux/time.c
                 src/arch/linux/serial.c
             )
+            add_compile_options("-target" "x86_64-pc-linux-gnu")
         else()
             message(FATAL_ERROR "Unsupported architecture for Linux cross-compilation:'${CMAKE_SYSTEM_PROCESSOR}'")
         endif()

@@ -41,30 +41,27 @@ await runCmakeWithArgs(["--build", "."], `${baseBuildPath}windows`);
 console.log("Build librhsp");
 console.log();
 
-console.log("LinuxX64");
-fs.readdirSync(`${baseBuildPath}linuxX64`).forEach(file => {
-  console.log(file);
-});
-console.log();
+let cmakeJsArgs = [ "compile", "--config", "Release" ]
+let cmakeJsWindowsArgs = [ "--CDCMAKE_SYSTEM_NAME=Windows", "--CDCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc-posix", "--CDCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++-posix" ]
+let cmakeJsLinuxArgs = [ "--prefer-make=true", "--prefer-clang=true", "--CDCMAKE_SYSTEM_NAME=Linux" ]
 
-console.log("LinuxArm64");
-fs.readdirSync(`${baseBuildPath}linuxArm64`).forEach(file => {
-  console.log(file);
-});
-console.log();
+let prebuiltsFolder = path.join(rhsplibPath, "prebuilts")
 
-console.log("Windows");
-fs.readdirSync(`${baseBuildPath}windows`).forEach(file => {
-  console.log(file);
-});
-console.log();
+fs.mkdirSync(baseBuildPath + "js-linuxX64", { recursive: true })
+fs.mkdirSync(baseBuildPath + "js-linuxArm64", { recursive: true })
+fs.mkdirSync(baseBuildPath + "js-windowsX64", { recursive: true })
+fs.mkdirSync(path.join(prebuiltsFolder, "linux-x64"), { recursive: true })
+fs.mkdirSync(path.join(prebuiltsFolder, "linux-arm64"), { recursive: true })
+fs.mkdirSync(path.join(prebuiltsFolder, "windows-x64"), { recursive: true })
 
-console.log("Prebuilding Linux X64");
-await prebuildify(["--napi", "--platform=linux", "--arch=x86_64"], `${baseBuildPath}linuxX64`);
-console.log("Prebuilding Linux Arm64");
-await prebuildify(["--napi", "--platform=linux", "--arch=arm64"], `${baseBuildPath}linuxArm64`);
-console.log("Prebuilding Windows");
-await prebuildify(["--napi", "--platform=win32", "--arch=x64"], `${baseBuildPath}windows`);
+await runCmakeJs([...cmakeJsArgs, ...cmakeJsLinuxArgs, "--CDSYSTEM=LinuxX64"], baseBuildPath + "js-linuxX64")
+await runCmakeJs([...cmakeJsArgs, ...cmakeJsLinuxArgs, "--CDSYSTEM=LinuxArm64"], baseBuildPath + "js-linuxArm64")
+//await runCmakeJs([...cmakeJsArgs, ...cmakeJsWindowsArgs, "--CDSYSTEM=Windows"], baseBuildPath + "js-windowsX64")
+
+fs.copyFileSync("build-js-linuxArm64/rhsp.node", path.join(prebuiltsFolder, "linux-arm64/rhsp.node"))
+fs.copyFileSync("build-js-linuxX64/rhsp.node", path.join(prebuiltsFolder, "linux-x64/rhsp.node"))
+fs.copyFileSync("build-linuxArm64/librhsp.so", path.join(prebuiltsFolder, "linux-arm64/librhsp.so"))
+fs.copyFileSync("build-linuxX64/librhsp.so", path.join(prebuiltsFolder, "linux-x64/librhsp.so"))
 
 async function runCmakeWithArgs(args, cwd) {
   const cmake = spawn("cmake", args, {
@@ -86,14 +83,15 @@ async function runCmakeWithArgs(args, cwd) {
   });
 }
 
-async function prebuildify(args, cwd) {
-  const prebuildify = spawn(`prebuildify`, args);
-  prebuildify.stderr.pipe(process.stderr);
-  prebuildify.stdout.pipe(process.stdout);
-
+async function runCmakeJs(args, outDir) {
+  fs.rmSync("build/", { recursive: true, force: true })
+  console.log("Running CMake js")
+  const cmakejs = spawn("cmake-js", args, {});
+  cmakejs.stderr.pipe(process.stderr);
+  cmakejs.stdout.pipe(process.stdout);
   await new Promise((resolve, reject) => {
-    prebuildify.on("error", (e) => reject(e));
-    prebuildify.on("exit", (code, signal) => {
+    cmakejs.on("error", (e) => reject(e));
+    cmakejs.on("exit", (code, signal) => {
       if (signal != null) {
         reject(new Error(`CMake execution was terminated by signal ${signal}`));
       } else if (code === 0) {
@@ -103,4 +101,6 @@ async function prebuildify(args, cwd) {
       }
     });
   });
+
+  fs.copyFileSync("build/Release/rhsp.node", path.join(outDir, "rhsp.node"))
 }
