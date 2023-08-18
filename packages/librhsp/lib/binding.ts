@@ -27,13 +27,12 @@ import * as path from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const require = createRequire(import.meta.url);
-console.log(__dirname);
+
+let bindingOptions = require("../binding-options.cjs");
+
 const addon = require("pkg-prebuilds")(
     path.join(__dirname, ".."),
-    {
-        name: 'noderhsp',
-        napi_versions: [8],
-    }
+    bindingOptions
 );
 
 export * from "./error-codes.js";
