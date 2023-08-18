@@ -43,6 +43,7 @@ set(LIB_SOURCES
         src/packet.c
 )
 
+message("Is cross compiling? ${CMAKE_CROSSCOMPILING}")
 if(CMAKE_CROSSCOMPILING)
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
