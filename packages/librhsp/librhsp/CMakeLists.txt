@@ -67,6 +67,18 @@ if(CMAKE_CROSSCOMPILING)
             src/arch/win/serial.c
         )
         set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        list(APPEND LIB_SOURCES
+            src/arch/mac/time.c
+            src/arch/mac/serial.c
+        )
+        if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+            add_compile_options("-target" "x86_64-pc-linux-gnu")
+        elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+            add_compile_options("-target" "aarch64-pc-linux-gnu")
+        else()
+            message(FATAL_ERROR "Unsupported architecture for Darwin cross-compilation:'${CMAKE_SYSTEM_PROCESSOR}'")
+        endif()
     else()
         message(FATAL_ERROR "Unsupported system for cross-compilation:'${CMAKE_SYSTEM_NAME}'")
     endif()
