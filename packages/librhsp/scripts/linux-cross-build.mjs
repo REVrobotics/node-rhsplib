@@ -58,10 +58,10 @@ await runCmakeJs([...cmakeJsArgs, ...cmakeJsLinuxArgs, "--CDSYSTEM=LinuxX64"], b
 await runCmakeJs([...cmakeJsArgs, ...cmakeJsLinuxArgs, "--CDSYSTEM=LinuxArm64"], baseBuildPath + "js-linuxArm64")
 //await runCmakeJs([...cmakeJsArgs, ...cmakeJsWindowsArgs, "--CDSYSTEM=Windows"], baseBuildPath + "js-windowsX64")
 
-fs.copyFileSync("build-js-linuxArm64/rhsp.node", path.join(prebuiltsFolder, "linux-arm64/rhsp.node"))
-fs.copyFileSync("build-js-linuxX64/rhsp.node", path.join(prebuiltsFolder, "linux-x64/rhsp.node"))
-fs.copyFileSync("build-linuxArm64/librhsp.so", path.join(prebuiltsFolder, "linux-arm64/librhsp.so"))
-fs.copyFileSync("build-linuxX64/librhsp.so", path.join(prebuiltsFolder, "linux-x64/librhsp.so"))
+fs.copyFileSync(baseBuildPath + "js-linuxArm64/rhsp.node", path.join(prebuiltsFolder, "linux-arm64/rhsp.node"))
+fs.copyFileSync(baseBuildPath + "js-linuxX64/rhsp.node", path.join(prebuiltsFolder, "linux-x64/rhsp.node"))
+fs.copyFileSync(baseBuildPath + "linuxArm64/librhsp.so", path.join(prebuiltsFolder, "linux-arm64/librhsp.so"))
+fs.copyFileSync(baseBuildPath + "linuxX64/librhsp.so", path.join(prebuiltsFolder, "linux-x64/librhsp.so"))
 
 async function runCmakeWithArgs(args, cwd) {
   const cmake = spawn("cmake", args, {

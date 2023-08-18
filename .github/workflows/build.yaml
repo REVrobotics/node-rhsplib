@@ -42,6 +42,16 @@ jobs:
       - name: Build project
         run: npx lerna run build
 
+      - name: Install cross-compilation tools
+        if: ${{ matrix.linux }}
+        uses: taiki-e/setup-cross-toolchain-action@v1
+        with:
+          target: aarch64-unknown-linux-gnu
+
+      - name: install multilib
+        if: ${{ matrix.linux }}
+        run: sudo apt install gcc-multilib
+
       - name: Make prebuilds
         if: ${{ matrix.linux }}
         run: npx lerna run makePrebuildsOnLinux

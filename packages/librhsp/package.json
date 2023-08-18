@@ -13,25 +13,19 @@
     },
     "dependencies": {
         "@rev-robotics/rev-hub-core": "^1.0.0",
-        "cmake-js": "^7.2.1",
-        "node-addon-api": "^6.0.0",
-        "node-gyp-build": "^4.6.0"
+        "node-addon-api": "^6.0.0"
     },
     "devDependencies": {
         "@types/node": "^16.18.18",
-        "node-gyp": "^9.3.1",
         "prebuildify": "^5.0.1",
-        "typescript": "^5.0.2"
+        "typescript": "^5.0.2",
+        "cmake-js": "^7.2.1"
     },
     "scripts": {
         "build": "tsc",
-        "install": "node-gyp-build \"node scripts/build-RHSPlib.mjs\"",
         "makePrebuildsOnLinux": "node scripts/linux-cross-build.mjs",
-        "makePrebuildsOnDarwin": "node scripts/macos-cross-build.mjs",
-        "prepublishOnly": "prebuildify --napi && tsc",
-        "cross-build": "node-gyp-build \"node scripts/cross-build-RHSPlib.mjs\""
+        "makePrebuildsOnDarwin": "node scripts/macos-cross-build.mjs"
     },
-    "gypfile": true,
     "publishConfig": {
         "access": "public",
         "registry": "https://registry.npmjs.org/"

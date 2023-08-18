@@ -42,11 +42,11 @@ fs.mkdirSync(path.join(prebuiltsFolder, "darwin-arm64"), { recursive: true })
 let cmakeJsArgs = [ "compile", "--config", "Release", "--CDCMAKE_SYSTEM_NAME=Darwin", "--prefer-clang=true" ]
 
 console.log("Prebuildifying")
-await runCmakeJs([...cmakeJsArgs, "--CDCMAKE_SYSTEM_PROCESSOR=x86_64"], baseBuildPath + "darwinX64");
-await runCmakeJs([...cmakeJsArgs, "--CDCMAKE_SYSTEM_PROCESSOR=arm64"], baseBuildPath + "darwinArm64");
+await runCmakeJs([...cmakeJsArgs, "--CDCMAKE_SYSTEM_PROCESSOR=x86_64"], baseBuildPath + "js-darwinX64");
+await runCmakeJs([...cmakeJsArgs, "--CDCMAKE_SYSTEM_PROCESSOR=arm64"], baseBuildPath + "js-darwinArm64");
 
-fs.copyFileSync("build-js-darwinX64/rhsp.node", path.join(prebuiltsFolder, "darwin-x64/rhsp.node"))
-fs.copyFileSync("build-js-darwinArm64/rhsp.node", path.join(prebuiltsFolder, "darwin-arm64/rhsp.node"))
+fs.copyFileSync(baseBuildPath + "js-darwinX64/rhsp.node", path.join(prebuiltsFolder, "darwin-x64/rhsp.node"))
+fs.copyFileSync(baseBuildPath + "js-darwinArm64/rhsp.node", path.join(prebuiltsFolder, "darwin-arm64/rhsp.node"))
 
 async function runCmakeWithArgs(args, cwd) {
   const cmake = spawn("cmake", args, {
