@@ -1,4 +1,3 @@
-import * as path from "path";
 import { createRequire } from "module";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -23,11 +22,19 @@ import {
     Version,
 } from "@rev-robotics/rev-hub-core";
 import { SerialParity } from "@rev-robotics/rev-hub-core";
+import * as path from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const require = createRequire(import.meta.url);
-const addon = require("node-gyp-build")(path.join(__dirname, ".."));
+console.log(__dirname);
+const addon = require("pkg-prebuilds")(
+    path.join(__dirname, ".."),
+    {
+        name: 'noderhsp',
+        napi_versions: [8],
+    }
+);
 
 export * from "./error-codes.js";
 export * from "./serial-errors.js";

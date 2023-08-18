@@ -3,7 +3,9 @@ cmake_policy(SET CMP0091 NEW)
 cmake_policy(SET CMP0042 NEW)
 set (CMAKE_CXX_STANDARD 17)
 
-project(rhsp)
+add_subdirectory(librhsp)
+
+project(noderhsp)
 
 if(SYSTEM STREQUAL "Windows")
     link_libraries(${CMAKE_SOURCE_DIR}/build-def/node.lib)
@@ -49,6 +51,7 @@ include_directories(${NODE_ADDON_API_DIR} ${CMAKE_JS_INC} ${CMAKE_CURRENT_SOURCE
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${SOURCES} ${CMAKE_JS_SRC})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
+target_link_libraries(${PROJECT_NAME} rhsp)
 
 if(MSVC AND CMAKE_JS_NODELIB_DEF AND CMAKE_JS_NODELIB_TARGET)
   # Generate node.lib
