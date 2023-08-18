@@ -1,3 +1,10 @@
+// https://github.com/cmake-js/cmake-js/issues/200
+// To build cross-build for Windows, we need a
+// node.lib file with the proper symbols.
+// By creating a node.def file listing the
+// symbols we need, we can run dlltool to
+// create node.lib
+
 import * as headers from "node-api-headers"
 import * as fs from "fs";
 import { spawn } from "child_process";
