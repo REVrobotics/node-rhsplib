@@ -15,7 +15,7 @@ elseif(SYSTEM STREQUAL "LinuxArm64")
     add_link_options("-target" "aarch64-pc-linux-gnu" "-fuse-ld=/usr/bin/aarch64-linux-gnu-ld")
 endif()
 
-add_definitions(-DNAPI_VERSION=8)
+add_definitions(-DNAPI_VERSION=8) # Keep in sync with binding-options.cjs
 add_definitions(-DNAPI_DISABLE_CPP_EXCEPTIONS)
 
 set(SOURCES
