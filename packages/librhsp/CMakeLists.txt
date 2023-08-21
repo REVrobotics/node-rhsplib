@@ -7,15 +7,12 @@ add_subdirectory(librhsp)
 
 project(noderhsp)
 
-if(SYSTEM STREQUAL "Windows")
-    link_libraries(${CMAKE_SOURCE_DIR}/build-def/node.lib)
-elseif(SYSTEM STREQUAL "LinuxX64")
+# Set some things up for cross-compiling on Linux using clang
+if(SYSTEM STREQUAL "LinuxX64")
     add_compile_options("-target" "x86_64-pc-linux-gnu")
 elseif(SYSTEM STREQUAL "LinuxArm64")
     add_compile_options("-target" "aarch64-pc-linux-gnu")
     add_link_options("-target" "aarch64-pc-linux-gnu" "-fuse-ld=/usr/bin/aarch64-linux-gnu-ld")
-else()
-    message("Target platform is not defined")
 endif()
 
 execute_process(COMMAND node -p "process.versions.napi" WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_VARIABLE NAPI_VERSION)
@@ -51,7 +48,7 @@ include_directories(${NODE_ADDON_API_DIR} ${CMAKE_JS_INC} ${CMAKE_CURRENT_SOURCE
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${SOURCES} ${CMAKE_JS_SRC})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
-target_link_libraries(${PROJECT_NAME} rhsp)
+target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB} rhsp)
 
 if(MSVC AND CMAKE_JS_NODELIB_DEF AND CMAKE_JS_NODELIB_TARGET)
   # Generate node.lib
