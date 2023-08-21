@@ -18,13 +18,6 @@ endif()
 add_definitions(-DNAPI_VERSION=8)
 add_definitions(-DNAPI_DISABLE_CPP_EXCEPTIONS)
 
-# https://github.com/cmake-js/cmake-js/issues/222#issuecomment-1102126212
-add_definitions(
-        -DV8_COMPRESS_POINTERS
-        -DV8_REVERSE_JSARGS
-        -DV8_COMPRESS_POINTERS_IN_ISOLATE_CAGE
-)
-
 set(SOURCES
     src/addon.cc
     src/RevHubWrapper.cc
