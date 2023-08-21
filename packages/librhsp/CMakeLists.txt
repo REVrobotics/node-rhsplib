@@ -15,10 +15,7 @@ elseif(SYSTEM STREQUAL "LinuxArm64")
     add_link_options("-target" "aarch64-pc-linux-gnu" "-fuse-ld=/usr/bin/aarch64-linux-gnu-ld")
 endif()
 
-execute_process(COMMAND node -p "process.versions.napi" WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_VARIABLE NAPI_VERSION)
-string(STRIP "${NAPI_VERSION}" NAPI_VERSION)
-
-add_definitions(-DNAPI_VERSION=${NAPI_VERSION})
+add_definitions(-DNAPI_VERSION=8)
 add_definitions(-DNAPI_DISABLE_CPP_EXCEPTIONS)
 
 # https://github.com/cmake-js/cmake-js/issues/222#issuecomment-1102126212
