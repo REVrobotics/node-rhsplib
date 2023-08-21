@@ -25,7 +25,10 @@ set(SOURCES
     src/RHSPlibWorker.cc
 )
 
-# Include N-API wrappers
+# Include the node-addon-api wrapper for Node-API
+# TODO: Figure out why the build breaks without this, given that the CMake.js README
+#       says that it will "add [node-addon-api] to the include search path automatically"
+#       https://github.com/cmake-js/cmake-js/tree/6a2a50ba3d2e82a0ea80a8bb77cd2d3a03fb838c#node-api-and-node-addon-api
 execute_process(COMMAND node -p "require('node-addon-api').include"
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         OUTPUT_VARIABLE NODE_ADDON_API_DIR
