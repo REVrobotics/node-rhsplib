@@ -1,6 +1,6 @@
 {
     "name": "rev-hub-cli",
-    "descripton": "sample for testing Rev Hub code",
+    "descripton": "Basic command line application to control an Expansion Hub",
     "version": "1.0.0",
     "main": "dist/main.js",
     "bin": "revhub",
