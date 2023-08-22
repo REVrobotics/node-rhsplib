@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { Command } from "commander";
 import {
     resetEncoder,
@@ -56,6 +58,9 @@ function runOnSigint(block: () => void) {
 const program = new Command();
 
 program.version("1.0.0");
+
+// TODO: Use commander preAction hook
+// TODO: Use @commander-js/extra-typings
 
 program
     .option(

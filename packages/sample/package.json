@@ -3,7 +3,7 @@
     "descripton": "Basic command line application to control an Expansion Hub",
     "version": "1.0.0",
     "main": "dist/main.js",
-    "bin": "revhub",
+    "bin": "dist/main.js",
     "private": true,
     "type": "module",
     "dependencies": {
@@ -11,15 +11,10 @@
         "@rev-robotics/expansion-hub": "^1.0.0",
         "commander": "^10.0.1"
     },
+    "devDependencies": {
+        "typescript": "^5.0.2"
+    },
     "scripts": {
-        "build": "tsc",
-        "motor": "node dist/main.js motor power 1 0.60",
-        "analog": "node dist/main.js analog 0",
-        "battery": "node dist/main.js battery --continuous",
-        "voltage": "node dist/main.js voltage --continuous",
-        "temperature": "node dist/main.js temperature --continuous",
-        "error": "node dist/main.js testErrorHandling",
-        "list": "node dist/main.js list",
-        "led": "node dist/main.js led"
+        "build": "tsc"
     }
 }
