@@ -20,7 +20,6 @@ export {
     ModuleStatus,
     PidCoefficients,
     Rgb,
-    SerialFlowControl,
     VerbosityLevel,
     Version,
     BatteryTooLowError,

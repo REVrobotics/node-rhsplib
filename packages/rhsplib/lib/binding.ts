@@ -1,6 +1,7 @@
 import { createRequire } from "module";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import * as path from "path";
 import {
     BulkInputData,
     ClosedLoopControlAlgorithm,
@@ -17,12 +18,11 @@ import {
     PidCoefficients,
     PidfCoefficients,
     Rgb,
-    SerialFlowControl,
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rev-hub-core";
-import { SerialParity } from "@rev-robotics/rev-hub-core";
-import * as path from "path";
+import {SerialParity} from "./SerialParity.js";
+import {SerialFlowControl} from "./SerialFlowControl.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -37,8 +37,12 @@ const addon = require("pkg-prebuilds")(
 
 export * from "./RhspLibErrorCode.js";
 export * from "./SerialErrorCode.js";
+export * from "./SerialFlowControl.js";
+export * from "./SerialParity.js";
+// Everything that this file needs to import from @rev-robotics/rev-hub-core must also be exported here.
 export {
     BulkInputData,
+    ClosedLoopControlAlgorithm,
     DebugGroup,
     DigitalChannelDirection,
     DiscoveredAddresses,
@@ -48,11 +52,15 @@ export {
     LedPattern,
     ModuleInterface,
     ModuleStatus,
+    MotorMode,
     PidCoefficients,
+    PidfCoefficients,
     Rgb,
-    SerialFlowControl,
     VerbosityLevel,
     Version,
+
+    // Additional items from @rev-robotics/rev-hub-core that are not directly used in this library's API, but that are
+    // useful to the users of this library.
     NackCode,
 } from "@rev-robotics/rev-hub-core";
 
