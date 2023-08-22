@@ -1,3 +1,4 @@
+// These numeric values MUST match the values specified in the REV Hub Serial Protocol spec
 export enum NackCode {
     PARAMETER_OUT_OF_RANGE_START = 0,
     PARAMETER_OUT_OF_RANGE_END = 9,
