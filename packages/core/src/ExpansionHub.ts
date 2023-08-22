@@ -428,9 +428,9 @@ export interface ExpansionHub extends RevHub {
     /**
      * Set the interval between pulses (framePeriod_us) for a given servo
      * @param servoChannel
-     * @param framePeriod_us time between the rising edge of each pulse in microseconds
+     * @param framePeriod_uS time between the rising edge of each pulse in microseconds
      */
-    setServoConfiguration(servoChannel: number, framePeriod_us: number): Promise<void>;
+    setServoConfiguration(servoChannel: number, framePeriod_uS: number): Promise<void>;
 
     /**
      * Get the interval between pulses (frame period) for a given servo
@@ -442,9 +442,9 @@ export interface ExpansionHub extends RevHub {
      * Set the width of the pulses that are being sent. For most servos, this is a range centered on
      * 1500us, but the minimum and maximum can vary by servo model.
      * @param servoChannel
-     * @param pulseWidth_us the pulse width in microseconds
+     * @param pulseWidth_uS the pulse width in microseconds
      */
-    setServoPulseWidth(servoChannel: number, pulseWidth_us: number): Promise<void>;
+    setServoPulseWidth(servoChannel: number, pulseWidth_uS: number): Promise<void>;
 
     /**
      * Get the current pulse width for the given servo

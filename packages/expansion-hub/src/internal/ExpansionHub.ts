@@ -635,9 +635,9 @@ export class ExpansionHubInternal implements ExpansionHub {
         });
     }
 
-    setServoConfiguration(servoChannel: number, framePeriod_us: number): Promise<void> {
+    setServoConfiguration(servoChannel: number, framePeriod_uS: number): Promise<void> {
         return this.convertErrorPromise(() => {
-            return this.nativeRevHub.setServoConfiguration(servoChannel, framePeriod_us);
+            return this.nativeRevHub.setServoConfiguration(servoChannel, framePeriod_uS);
         });
     }
 
