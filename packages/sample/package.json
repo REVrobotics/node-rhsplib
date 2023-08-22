@@ -11,6 +11,9 @@
         "@rev-robotics/expansion-hub": "^1.0.0",
         "commander": "^10.0.1"
     },
+    "devDependencies": {
+        "typescript": "^5.0.2"
+    },
     "scripts": {
         "build": "tsc",
         "motor": "node dist/main.js motor power 1 0.60",
