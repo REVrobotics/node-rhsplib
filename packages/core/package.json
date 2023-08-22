@@ -9,7 +9,8 @@
         "typescript": "^5.0.2"
     },
     "scripts": {
-        "build": "tsc"
+        "build": "tsc",
+        "prepublishOnly": "tsc"
     },
     "publishConfig": {
         "access": "public",
