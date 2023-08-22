@@ -3,7 +3,8 @@ cmake_policy(SET CMP0091 NEW)
 cmake_policy(SET CMP0042 NEW)
 set (CMAKE_CXX_STANDARD 17)
 
-add_subdirectory(librhsp)
+# By specifying EXCLUDE_FROM_ALL, we prevent the tests from being built
+add_subdirectory(librhsp EXCLUDE_FROM_ALL)
 
 project(noderhsp)
 

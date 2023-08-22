@@ -18,6 +18,22 @@ extern "C" {
 #define LEGACY_PID_TAG 0
 #define PIDF_TAG 1
 
+typedef enum {
+    /**
+     * Open loop control. Sets power in [-1.0, 1.0] range.
+     */
+    MOTOR_MODE_OPEN_LOOP,
+    /**
+     * Regulated velocity mode. Sets target velocity in counts/second.
+     */
+    MOTOR_MODE_REGULATED_VELOCITY,
+    /**
+     * Regulated position mode. Motor will attempt to hold a given
+     * encoder count to a given tolerance.
+     */
+    MOTOR_MODE_REGULATED_POSITION
+} MotorMode;
+
 /**
  * Coefficients for PID mode
  */
@@ -70,7 +86,7 @@ typedef struct {
  * */
 int rhsp_setMotorChannelMode(RhspRevHub* hub,
                              uint8_t motorChannel,
-                             uint8_t motorMode,
+                             MotorMode motorMode,
                              uint8_t floatAtZero,
                              uint8_t* nackReasonCode);
 
@@ -316,7 +332,7 @@ int rhsp_getEncoderPosition(RhspRevHub* hub,
  * */
 int rhsp_setClosedLoopControlCoefficients(RhspRevHub* hub,
                                           uint8_t motorChannel,
-                                          uint8_t mode,
+                                          MotorMode mode,
                                           ClosedLoopControlParameters* parameters,
                                           uint8_t* nackReasonCode);
 
@@ -334,7 +350,7 @@ int rhsp_setClosedLoopControlCoefficients(RhspRevHub* hub,
  * */
 int rhsp_getClosedLoopControlCoefficients(RhspRevHub* hub,
                                           uint8_t motorChannel,
-                                          uint8_t mode,
+                                          MotorMode mode,
                                           ClosedLoopControlParameters* parameters,
                                           uint8_t* nackReasonCode);
 

@@ -992,7 +992,7 @@ Napi::Value RevHub::setMotorChannelMode(const Napi::CallbackInfo &info) {
     uint8_t floatAtZero = info[2].As<Napi::Boolean>().Value();
 
     CREATE_VOID_WORKER(worker, env, {
-        _code = rhsp_setMotorChannelMode(this->obj, motorChannel, motorMode,
+        _code = rhsp_setMotorChannelMode(this->obj, motorChannel, static_cast<MotorMode>(motorMode),
                                              floatAtZero, &_nackCode);
     });
 
@@ -1274,7 +1274,7 @@ Napi::Value RevHub::setMotorClosedLoopControlCoefficients(const Napi::CallbackIn
         }
 
         _code = rhsp_setClosedLoopControlCoefficients(
-            this->obj, motorChannel, motorMode, &p, &_nackCode);
+            this->obj, motorChannel, static_cast<MotorMode>(motorMode), &p, &_nackCode);
     });
 
     QUEUE_WORKER(worker);
@@ -1291,7 +1291,7 @@ Napi::Value RevHub::getMotorClosedLoopControlCoefficients(const Napi::CallbackIn
     };
     CREATE_WORKER(worker, env, retType, {
         _code = rhsp_getClosedLoopControlCoefficients(
-            this->obj, motorChannel, motorMode, &_data.params, &_nackCode);
+            this->obj, motorChannel, static_cast<MotorMode>(motorMode), &_data.params, &_nackCode);
     });
 
     SET_WORKER_CALLBACK(worker, retType, {

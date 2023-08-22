@@ -19,7 +19,7 @@
 
 int rhsp_setMotorChannelMode(RhspRevHub* hub,
                              uint8_t motorChannel,
-                             uint8_t motorMode,
+                             MotorMode motorMode,
                              uint8_t floatAtZero,
                              uint8_t* nackReasonCode)
 {
@@ -536,7 +536,7 @@ int rhsp_getEncoderPosition(RhspRevHub* hub,
 
 int rhsp_setClosedLoopControlCoefficients(RhspRevHub* hub,
                                           uint8_t motorChannel,
-                                          uint8_t mode,
+                                          MotorMode mode,
                                           ClosedLoopControlParameters* parameters,
                                           uint8_t* nackReasonCode)
 {
@@ -549,7 +549,7 @@ int rhsp_setClosedLoopControlCoefficients(RhspRevHub* hub,
     if (motorChannel >= RHSP_NUMBER_OF_MOTOR_CHANNELS)
     {
         return RHSP_ERROR_ARG_1_OUT_OF_RANGE;
-    } else if (mode != 1 && mode != 2)
+    } else if (mode != MOTOR_MODE_REGULATED_VELOCITY && mode != MOTOR_MODE_REGULATED_POSITION)
     {
         return RHSP_ERROR_ARG_2_OUT_OF_RANGE;
     }
@@ -594,7 +594,7 @@ int rhsp_setClosedLoopControlCoefficients(RhspRevHub* hub,
 
 int rhsp_getClosedLoopControlCoefficients(RhspRevHub* hub,
                                           uint8_t motorChannel,
-                                          uint8_t mode,
+                                          MotorMode mode,
                                           ClosedLoopControlParameters* parameters,
                                           uint8_t* nackReasonCode)
 {
@@ -607,7 +607,7 @@ int rhsp_getClosedLoopControlCoefficients(RhspRevHub* hub,
     if (motorChannel >= RHSP_NUMBER_OF_MOTOR_CHANNELS)
     {
         return RHSP_ERROR_ARG_1_OUT_OF_RANGE;
-    } else if (mode != 1 && mode != 2)
+    } else if (mode != MOTOR_MODE_REGULATED_VELOCITY && mode != MOTOR_MODE_REGULATED_POSITION)
     {
         return RHSP_ERROR_ARG_2_OUT_OF_RANGE;
     }

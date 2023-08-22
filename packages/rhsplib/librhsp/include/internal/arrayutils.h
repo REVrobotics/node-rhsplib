@@ -1,6 +1,10 @@
 #ifndef RHSP_ARRAYUTILS_H
 #define RHSP_ARRAYUTILS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // helper functions to set/get byte, word, dword values from payload
 #define RHSP_ARRAY_BYTE(type, buffer, index)       ((type)(buffer)[index])
 #define RHSP_ARRAY_BYTE_PTR(type, buffer, index)   (&((type)(buffer))[index])
@@ -19,5 +23,9 @@
                                                              (buffer)[index + 2] = (uint32_t)(value) >> 16; \
                                                              (buffer)[index + 3] = (uint32_t)(value) >> 24; \
                                                           } while(0)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //RHSP_ARRAYUTILS_H

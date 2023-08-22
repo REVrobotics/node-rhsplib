@@ -1,6 +1,10 @@
 #ifndef RHSP_PACKET_H
 #define RHSP_PACKET_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "rhsp/serial.h"
 #include "rhsp/revhub.h"
 #include "revhub.h"
@@ -45,5 +49,9 @@ int sendPacket(RhspRevHubInternal* hub,
                uint16_t payloadSize);
 
 void fillPayloadData(const RhspRevHubInternal* hub, RhspPayloadData* payload);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //RHSP_PACKET_H
