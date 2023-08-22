@@ -1,6 +1,7 @@
 import { createRequire } from "module";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import * as path from "path";
 import {
     BulkInputData,
     ClosedLoopControlAlgorithm,
@@ -20,7 +21,6 @@ import {
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rev-hub-core";
-import * as path from "path";
 import {SerialParity} from "./SerialParity.js";
 import {SerialFlowControl} from "./SerialFlowControl.js";
 
