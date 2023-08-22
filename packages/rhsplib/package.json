@@ -19,7 +19,6 @@
     },
     "devDependencies": {
         "@types/node": "^16.18.18",
-        "prebuildify": "^5.0.1",
         "typescript": "^5.0.2"
     },
     "scripts": {
@@ -27,7 +26,7 @@
         "install": "pkg-prebuilds-verify binding-options.cjs || cmake-js compile",
         "makePrebuildsOnLinux": "node scripts/linux-cross-build.mjs",
         "makePrebuildsOnDarwin": "node scripts/macos-cross-build.mjs",
-        "prepublishOnly": "prebuildify --napi && tsc",
+        "prepublishOnly": "tsc",
         "cross-build": "node-gyp-build \"node scripts/cross-build-RHSPlib.mjs\""
     },
     "publishConfig": {
