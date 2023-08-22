@@ -33,5 +33,15 @@
     "publishConfig": {
         "access": "public",
         "registry": "https://registry.npmjs.org/"
-    }
+    },
+    "files": [
+        "dist",
+        "librhsp/include",
+        "librhsp/src",
+        "librhsp/test",
+        "librhsp/CMakeLists.txt",
+        "src",
+        "binding-options.cjs",
+        "CMakeLists.txt"
+    ]
 }
