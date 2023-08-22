@@ -6,7 +6,7 @@
     "bin": "dist/main.js",
     "type": "module",
     "dependencies": {
-        "@rev-robotics/distance-sensor": "^1.0.0",
+        "@rev-robotics/distance-sensor": "^1.0.1",
         "@rev-robotics/expansion-hub": "^1.0.0",
         "commander": "^10.0.1"
     },

@@ -1,6 +1,6 @@
 {
     "name": "@rev-robotics/rev-hub-core",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Common interfaces for REV Robotics hub devices",
     "main": "dist/index.js",
     "type": "module",
