@@ -15,14 +15,6 @@
         "typescript": "^5.0.2"
     },
     "scripts": {
-        "build": "tsc",
-        "motor": "node dist/main.js motor power 1 0.60",
-        "analog": "node dist/main.js analog 0",
-        "voltage": "node dist/main.js battery voltage --continuous",
-        "current": "node dist/main.js battery current --continuous",
-        "temperature": "node dist/main.js temperature --continuous",
-        "error": "node dist/main.js testErrorHandling",
-        "list": "node dist/main.js list",
-        "led": "node dist/main.js led"
+        "build": "tsc"
     }
 }
