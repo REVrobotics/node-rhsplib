@@ -35,8 +35,8 @@ const addon = require("pkg-prebuilds")(
     bindingOptions
 );
 
-export * from "./error-codes.js";
-export * from "./serial-errors.js";
+export * from "./RhspLibErrorCode.js";
+export * from "./SerialErrorCode.js";
 export {
     BulkInputData,
     DebugGroup,

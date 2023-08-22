@@ -2,7 +2,7 @@ import {
     DiscoveredAddresses,
     NativeRevHub,
     NativeSerial,
-    SerialError,
+    SerialErrorCode,
     SerialFlowControl,
 } from "@rev-robotics/rhsplib";
 import { SerialPort as SerialLister } from "serialport";
@@ -162,15 +162,15 @@ async function openSerialPort(serialPortPath: string): Promise<typeof NativeSeri
         );
     } catch (e: any) {
         let code = e.errorCode;
-        if (code == SerialError.INVALID_ARGS) {
+        if (code == SerialErrorCode.INVALID_ARGS) {
             throw new InvalidSerialArguments(serialPortPath);
-        } else if (code == SerialError.UNABLE_TO_OPEN) {
+        } else if (code == SerialErrorCode.UNABLE_TO_OPEN) {
             throw new UnableToOpenSerialError(serialPortPath);
-        } else if (code == SerialError.CONFIGURATION_ERROR) {
+        } else if (code == SerialErrorCode.CONFIGURATION_ERROR) {
             throw new SerialConfigurationError(serialPortPath);
-        } else if (code == SerialError.IO_ERROR) {
+        } else if (code == SerialErrorCode.IO_ERROR) {
             throw new SerialIoError(serialPortPath);
-        } else if (code == SerialError.GENERAL_ERROR) {
+        } else if (code == SerialErrorCode.GENERAL_ERROR) {
             throw new GeneralSerialError(serialPortPath);
         }
     }

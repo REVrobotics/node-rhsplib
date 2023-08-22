@@ -1,3 +1,4 @@
+// These MUST match the values specified in librhsp's include/rhsp/errors.h file
 export enum RhspLibErrorCode {
     GENERAL_ERROR = -1,
     TIMEOUT = -2,

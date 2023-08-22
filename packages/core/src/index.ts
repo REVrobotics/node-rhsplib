@@ -1,4 +1,4 @@
-export * from "./nack-errors/nack-codes.js";
+export * from "./nack-errors/NackCode.js";
 export * from "./ExpansionHub.js";
 export * from "./serial-errors.js";
 export * from "./RevHub.js";

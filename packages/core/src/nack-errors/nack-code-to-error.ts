@@ -26,7 +26,7 @@ import {
 } from "./diagnostic-errors.js";
 import { UnrecognizedNackError } from "./UnrecognizedNackError.js";
 import { NackError } from "./NackError.js";
-import { NackCode } from "./nack-codes.js";
+import { NackCode } from "./NackCode.js";
 import {
     BatteryTooLowToRunServoError,
     ServoNotFullyConfiguredError,
