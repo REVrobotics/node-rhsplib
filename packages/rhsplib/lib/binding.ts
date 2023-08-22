@@ -39,8 +39,10 @@ export * from "./RhspLibErrorCode.js";
 export * from "./SerialErrorCode.js";
 export * from "./SerialFlowControl.js";
 export * from "./SerialParity.js";
+// Everything that this file needs to import from @rev-robotics/rev-hub-core must also be exported here.
 export {
     BulkInputData,
+    ClosedLoopControlAlgorithm,
     DebugGroup,
     DigitalChannelDirection,
     DiscoveredAddresses,
@@ -50,10 +52,15 @@ export {
     LedPattern,
     ModuleInterface,
     ModuleStatus,
+    MotorMode,
     PidCoefficients,
+    PidfCoefficients,
     Rgb,
     VerbosityLevel,
     Version,
+
+    // Additional items from @rev-robotics/rev-hub-core that are not directly used in this library's API, but that are
+    // useful to the users of this library.
     NackCode,
 } from "@rev-robotics/rev-hub-core";
 
