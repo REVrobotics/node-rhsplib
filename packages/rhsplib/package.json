@@ -2,7 +2,7 @@
     "name": "@rev-robotics/rhsplib",
     "version": "2.0.0",
     "author": "REV Robotics",
-    "description": "Node addon that facilitates low-level REV Hub Serial Protocol communication",
+    "description": "Native node.js addon that facilitates low-level REV Hub Serial Protocol communication",
     "license": "BSD-3-Clause",
     "main": "dist/binding.js",
     "types": "dist/binding.d.ts",
