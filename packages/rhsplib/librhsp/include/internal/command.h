@@ -1,6 +1,10 @@
 #ifndef RHSP_COMMAND_H
 #define RHSP_COMMAND_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "rhsp/revhub.h"
 #include "packet.h"
 
@@ -87,5 +91,9 @@ int rhsp_sendReadCommand(RhspRevHub* hub,
                          uint16_t payloadSize,
                          RhspPayloadData* responsePayloadData,
                          uint8_t* nackReasonCode);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //RHSP_COMMAND_H

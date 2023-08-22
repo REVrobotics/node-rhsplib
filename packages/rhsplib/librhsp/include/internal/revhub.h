@@ -1,6 +1,10 @@
 #ifndef RHSP_INTERNAL_REVHUB_H
 #define RHSP_INTERNAL_REVHUB_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "RhspRxStates.h"
 
 typedef struct {
@@ -15,5 +19,9 @@ typedef struct {
     uint32_t responseTimeoutMs;
     RhspModuleInterfaceList* interfaceList;
 } RhspRevHubInternal;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //RHSP_INTERNAL_REVHUB_H
