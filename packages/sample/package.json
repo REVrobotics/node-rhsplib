@@ -3,7 +3,7 @@
     "descripton": "sample for testing Rev Hub code",
     "version": "1.0.0",
     "main": "dist/main.js",
-    "bin": "revhub",
+    "bin": "dist/main.js",
     "private": true,
     "type": "module",
     "dependencies": {
