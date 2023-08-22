@@ -2,6 +2,7 @@ export * from "./nack-errors/NackCode.js";
 export * from "./ExpansionHub.js";
 export * from "./serial-errors.js";
 export * from "./RevHub.js";
+export * from "./ControlHub.js"
 export * from "./RevHubType.js";
 export * from "./led-pattern.js";
 export * from "./BulkInputData.js";

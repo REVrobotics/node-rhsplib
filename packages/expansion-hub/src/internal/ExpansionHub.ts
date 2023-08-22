@@ -1,18 +1,12 @@
 import {
-    NackCode,
-    NativeRevHub,
-    RhspLibErrorCode,
-    Serial as SerialPort,
-} from "@rev-robotics/rhsplib";
-import {
     BulkInputData,
     ClosedLoopControlAlgorithm,
-    CommandNotSupportedError,
+    CommandNotSupportedError, ControlHub,
     DebugGroup,
     DigitalChannelDirection,
     DigitalState,
-    ExpansionHub,
-    GeneralSerialError,
+    ExpansionHub, GeneralSerialError,
+    I2cOperationInProgressError,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
@@ -20,25 +14,24 @@ import {
     ModuleInterface,
     ModuleStatus,
     MotorMode,
-    nackCodeToError,
-    NoExpansionHubWithAddressError,
+    NackCode, nackCodeToError, NoExpansionHubWithAddressError,
     ParameterOutOfRangeError,
-    I2cOperationInProgressError,
     ParentRevHub,
     PidCoefficients,
     PidfCoefficients,
     RevHub,
     RevHubType,
-    Rgb,
-    TimeoutError,
+    Rgb, TimeoutError,
     VerbosityLevel,
-    Version,
+    Version
 } from "@rev-robotics/rev-hub-core";
-import { closeSerialPort } from "../open-rev-hub.js";
-import { EventEmitter } from "events";
-import { RhspLibError } from "../errors/RhspLibError.js";
-import { startKeepAlive } from "../start-keep-alive.js";
-import { performance } from "perf_hooks";
+import {SerialPort} from "serialport";
+import {NativeRevHub, RhspLibErrorCode} from "@rev-robotics/rhsplib";
+import {EventEmitter} from "events";
+import {closeSerialPort} from "../open-rev-hub.js";
+import {RhspLibError} from "../errors/RhspLibError.js";
+import {performance} from "perf_hooks";
+import {startKeepAlive} from "../start-keep-alive.js";
 
 export class ExpansionHubInternal implements ExpansionHub {
     constructor(isParent: true, serial: SerialPort, serialNumber: string);
@@ -63,7 +56,7 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     keepAliveTimer?: NodeJS.Timer;
 
-    type = RevHubType.ExpansionHub;
+    type: RevHubType = RevHubType.ExpansionHub;
     private emitter = new EventEmitter();
 
     isParent(): this is ParentRevHub {
@@ -72,6 +65,10 @@ export class ExpansionHubInternal implements ExpansionHub {
 
     isExpansionHub(): this is ExpansionHub {
         return true;
+    }
+
+    isControlHub(): this is ControlHub {
+        return false;
     }
 
     close(): void {

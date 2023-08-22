@@ -1,21 +1,19 @@
 import { ParentRevHub, RevHub } from "./RevHub.js";
-import { ModuleStatus } from "./ModuleStatus.js";
+import { DigitalState } from "./DigitalState.js";
 import { ModuleInterface } from "./ModuleInterface.js";
 import { Rgb } from "./Rgb.js";
 import { LedPattern } from "./LedPattern.js";
+import { ModuleStatus } from "./ModuleStatus.js";
 import { DebugGroup } from "./DebugGroup.js";
 import { VerbosityLevel } from "./VerbosityLevel.js";
-import { BulkInputData } from "./BulkInputData.js";
 import { Version } from "./Version.js";
-import { DigitalState } from "./DigitalState.js";
-import { I2CSpeedCode } from "./I2CSpeedCode.js";
-import { I2CWriteStatus } from "./I2CWriteStatus.js";
-import { I2CReadStatus } from "./I2CReadStatus.js";
-import { PidCoefficients } from "./PidCoefficients.js";
 import { DigitalChannelDirection } from "./DigitalChannelDirection.js";
+import { I2CSpeedCode } from "./I2CSpeedCode.js";
 import { MotorMode } from "./MotorMode.js";
+import { PidCoefficients } from "./PidCoefficients.js";
 import { PidfCoefficients } from "./PidfCoefficients.js";
 import { ClosedLoopControlAlgorithm } from "./ClosedLoopControlAlgorithm.js";
+import { BulkInputData } from "./BulkInputData.js";
 
 export type ParentExpansionHub = ParentRevHub & ExpansionHub;
 
@@ -30,8 +28,6 @@ export interface ExpansionHub extends RevHub {
      * it has been closed.
      */
     close(): void;
-    sendWriteCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
-    sendReadCommand(packetTypeID: number, payload: number[]): Promise<number[]>;
     getModuleStatus(clearStatusAfterResponse: boolean): Promise<ModuleStatus>;
     sendKeepAlive(): Promise<void>;
     sendFailSafe(): Promise<void>;
