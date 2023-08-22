@@ -4,6 +4,7 @@ import {
     NativeSerial,
     SerialErrorCode,
     SerialFlowControl,
+    SerialParity,
 } from "@rev-robotics/rhsplib";
 import { SerialPort as SerialLister } from "serialport";
 import { ExpansionHubInternal } from "./internal/ExpansionHub.js";
@@ -16,7 +17,6 @@ import {
     RevHub,
     SerialConfigurationError,
     SerialIoError,
-    SerialParity,
     TimeoutError,
     UnableToOpenSerialError,
 } from "@rev-robotics/rev-hub-core";

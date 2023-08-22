@@ -17,12 +17,12 @@ import {
     PidCoefficients,
     PidfCoefficients,
     Rgb,
-    SerialFlowControl,
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rev-hub-core";
-import { SerialParity } from "@rev-robotics/rev-hub-core";
 import * as path from "path";
+import {SerialParity} from "./SerialParity.js";
+import {SerialFlowControl} from "./SerialFlowControl.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -37,6 +37,8 @@ const addon = require("pkg-prebuilds")(
 
 export * from "./RhspLibErrorCode.js";
 export * from "./SerialErrorCode.js";
+export * from "./SerialFlowControl.js";
+export * from "./SerialParity.js";
 export {
     BulkInputData,
     DebugGroup,
@@ -50,7 +52,6 @@ export {
     ModuleStatus,
     PidCoefficients,
     Rgb,
-    SerialFlowControl,
     VerbosityLevel,
     Version,
     NackCode,

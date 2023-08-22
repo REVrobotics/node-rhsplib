@@ -20,8 +20,6 @@ export * from "./PidfCoefficients.js";
 export * from "./ClosedLoopControlAlgorithm.js";
 export * from "./Rgb.js";
 export * from "./MotorMode.js";
-export * from "./SerialFlowControl.js";
-export * from "./SerialParity.js";
 export * from "./VerbosityLevel.js";
 export * from "./Version.js";
 export * from "./serial-errors.js";
