@@ -1,4 +1,4 @@
-import { setPrototypeOf } from "./NackError.js";
+import { setPrototypeOf } from "./set-prototype-of.js";
 
 export class TimeoutError extends Error {
     constructor() {

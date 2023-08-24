@@ -1,4 +1,4 @@
-import { setPrototypeOf } from "./nack-errors/NackError.js";
+import { setPrototypeOf } from "./set-prototype-of.js";
 
 export class RevHubError extends Error {
     constructor(message: string) {

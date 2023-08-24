@@ -1,4 +1,4 @@
-import { setPrototypeOf } from "./nack-errors/NackError.js";
+import { setPrototypeOf } from "./set-prototype-of.js";
 
 export class UnableToOpenSerialError extends Error {
     constructor(serialPort: string) {
@@ -29,5 +29,15 @@ export class SerialIoError extends Error {
         super(`IO Error on serial port ${serialPort}`);
 
         setPrototypeOf(this, SerialIoError.prototype);
+    }
+}
+
+export class GeneralSerialError extends Error {
+    serialNumber: string;
+    constructor(serialNumber: string) {
+        super(`Serial Port Error for ${serialNumber}`);
+
+        this.serialNumber = serialNumber;
+        setPrototypeOf(this, GeneralSerialError.prototype);
     }
 }
