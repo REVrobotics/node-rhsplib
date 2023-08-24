@@ -178,6 +178,8 @@ async function openSerialPort(serialPortPath: string, serialNumber: string | und
                 throw new SerialIoError(serialPortPath);
             } else if (code == SerialErrorCode.GENERAL_ERROR) {
                 throw new GeneralSerialError(serialPortPath);
+            } else {
+                throw e;
             }
         }
         return serial;
