@@ -21,6 +21,7 @@ export * from "./Rgb.js";
 export * from "./MotorMode.js";
 export * from "./VerbosityLevel.js";
 export * from "./Version.js";
+export * from "./general-errors/HubNotRespondingError.js";
 export * from "./general-errors/NoExpansionHubWithAddressError.js";
 export * from "./general-errors/RevHubError.js";
 export * from "./general-errors/serial-errors.js";

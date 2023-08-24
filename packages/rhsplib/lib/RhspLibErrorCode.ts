@@ -8,6 +8,7 @@ export enum RhspLibErrorCode {
     NOT_OPENED = -6,
     COMMAND_NOT_SUPPORTED = -7,
     UNEXPECTED_RESPONSE = -8,
+    NO_HUBS_DISCOVERED = -9,
 
     ARG_OUT_OF_RANGE_START = -50,
     ARG_OUT_OF_RANGE_END = -55,

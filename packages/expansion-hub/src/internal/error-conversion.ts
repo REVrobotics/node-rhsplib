@@ -2,7 +2,9 @@ import {RhspLibErrorCode} from "@rev-robotics/rhsplib";
 import {RhspLibError} from "../errors/RhspLibError.js";
 import {
     CommandNotSupportedError,
-    GeneralSerialError, nackCodeToError,
+    GeneralSerialError,
+    HubNotRespondingError,
+    nackCodeToError,
     ParameterOutOfRangeError,
     TimeoutError
 } from "@rev-robotics/rev-hub-core";
@@ -36,6 +38,9 @@ function createError(e: any, serialNumber: string | undefined): any {
         return new RhspLibError("Unexpected packet received");
     } else if (e.errorCode == RhspLibErrorCode.TIMEOUT) {
         return new TimeoutError();
+    } else if (e.errorCode == RhspLibErrorCode.NO_HUBS_DISCOVERED) {
+        return new HubNotRespondingError(`The REV Hub with serial number ${serialNumber} did not respond when spoken to. ` +
+                                         `It may be soft-bricked and need its firmware re-installed.`);
     } else if (e.errorCode == RhspLibErrorCode.SERIAL_ERROR) {
         return new GeneralSerialError(
             serialNumber ?? "no serial number provided",
