@@ -37,7 +37,7 @@ Tasks in the top-level package.json can be run with
       get bumped for each one
    2. Commit the version bumps and any `package-json.lock` changes
    3. Create a git tag for each package that is being published, and push it to GitHub
-5. If `lerna publish failed`, see https://lerna.js.org/docs/faq#how-do-i-retry-publishing-if-publish-fails. Make sure
+5. If `lerna publish` failed, see https://lerna.js.org/docs/faq#how-do-i-retry-publishing-if-publish-fails. Make sure
    to remove any `gitHead` fields in `package.json` files.
 6. Go to https://github.com/REVrobotics/node-rhsplib/tags, select each new tag, and create a new release for each one.
    1. Name the release `<package name> version <version>`
