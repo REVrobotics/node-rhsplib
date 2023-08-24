@@ -1,8 +1,9 @@
 import { setPrototypeOf } from "./set-prototype-of.js";
+import {RevHubError} from "./RevHubError.js";
 
-export class TimeoutError extends Error {
+export class TimeoutError extends RevHubError {
     constructor() {
-        super();
+        super("");
 
         setPrototypeOf(this, TimeoutError.prototype);
     }

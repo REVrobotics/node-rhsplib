@@ -1,6 +1,7 @@
 import { setPrototypeOf } from "./set-prototype-of.js";
+import {RevHubError} from "./RevHubError.js";
 
-export class NoExpansionHubWithAddressError extends Error {
+export class NoExpansionHubWithAddressError extends RevHubError {
     moduleAddress: number;
     serialNumber: string;
     constructor(serialNumber: string, moduleAddress: number) {
