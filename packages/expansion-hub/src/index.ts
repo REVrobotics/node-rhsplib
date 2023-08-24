@@ -45,6 +45,7 @@ export {
     NoDigitalChannelsConfiguredForOutputError,
     NoExpansionHubWithAddressError,
     ParameterOutOfRangeError,
+    ParentExpansionHub,
     PidCoefficients,
     PidfCoefficients,
     RevHub,
