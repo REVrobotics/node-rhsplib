@@ -1,4 +1,5 @@
 import { ExpansionHubInternal } from "./internal/ExpansionHub.js";
+import {convertErrorPromise} from "./internal/error-conversion.js";
 
 /**
  * Starts a keep alive task for a given hub.
@@ -11,7 +12,9 @@ export function startKeepAlive(hub: ExpansionHubInternal, intervalMs: number) {
         clearInterval(hub.keepAliveTimer);
     }
     hub.keepAliveTimer = setInterval(() => {
-        hub.sendKeepAlive().catch((e: any) => {
+        convertErrorPromise(hub.serialNumber, async (): Promise<void> => {
+            await hub.sendKeepAlive();
+        }).catch((e: any) => {
             hub.emitError(e);
         });
     }, intervalMs);
