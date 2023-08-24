@@ -230,7 +230,12 @@ static int getDiscoveryResult(size_t numberOfParents)
         return RHSP_RESULT_OK;
     } else if (numberOfParents == 0)
     {
-        return RHSP_RESULT_DISCOVERY_NO_PARENT_DETECTED;
+        /*
+         * If the parent wasn't found, there shouldn't be any children found, and even if there were, we couldn't
+         * communicate with them unless the parent is communicated with first, which isn't possible since we don't know
+         * it's address
+         */
+        return RHSP_ERROR_NO_HUBS_DISCOVERED;
     }
     return RHSP_RESULT_DISCOVERY_MULTIPLE_PARENTS_DETECTED;
 }
@@ -274,16 +279,18 @@ int rhsp_discoverRevHubs(RhspSerial* serialPort, RhspDiscoveredAddresses* discov
         if (result < 0)
         {
             rhsp_close((RhspRevHub*) module);
-            // timeout response is considered as normal exiting if we have received at least one discovery response
-            if (responseCount > 0 && result == RHSP_ERROR_RESPONSE_TIMEOUT)
+            freeRevHub((RhspRevHub*) module);
+            // timeout response is considered as normal exiting
+            if (result == RHSP_ERROR_RESPONSE_TIMEOUT)
             {
                 /*
-                 * We are under normal exiting by timeout when we received at least one discovery response
+                 * Discovery will always time out unless the max number of children is present, so this is the typical
+                 * exit path.
                  *
-                 * at this point, we shall return RHSP_RESULT_DISCOVERY_NO_PARENT_DETECTED, if no parent is found
-                 * if we have multiple parents, return RHSP_RESULT_DISCOVERY_MULTIPLE_PARENTS_DETECTED
-                 *
-                 * */
+                 * At this point, we shall return RHSP_ERROR_NO_HUBS_DISCOVERED if no parent is found,
+                 * RHSP_RESULT_OK if exactly one parent is found, and RHSP_RESULT_DISCOVERY_MULTIPLE_PARENTS_DETECTED
+                 * if multiple parents are found.
+                 */
                 return getDiscoveryResult(numberOfParents);
             } else
             {
@@ -310,5 +317,6 @@ int rhsp_discoverRevHubs(RhspSerial* serialPort, RhspDiscoveredAddresses* discov
     }
 
     rhsp_close((RhspRevHub*) module);
+    freeRevHub((RhspRevHub*) module);
     return getDiscoveryResult(numberOfParents);
 }
