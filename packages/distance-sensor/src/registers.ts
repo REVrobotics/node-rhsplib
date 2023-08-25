@@ -1,4 +1,3 @@
-
 export const SYS_RANGE_START = 0x00;
 export const SYSTEM_SEQUENCE_CONFIG = 0x01;
 export const SYSTEM_INTERRUPT_CONFIG_GPIO = 0x0a;

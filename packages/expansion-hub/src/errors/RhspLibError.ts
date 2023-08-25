@@ -1,4 +1,4 @@
-import {RevHubError, setPrototypeOf} from "@rev-robotics/rev-hub-core";
+import { RevHubError, setPrototypeOf } from "@rev-robotics/rev-hub-core";
 
 export class RhspLibError extends RevHubError {
     constructor(message: string) {

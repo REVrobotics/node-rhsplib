@@ -1,5 +1,5 @@
 import { ExpansionHubInternal } from "./internal/ExpansionHub.js";
-import {convertErrorPromise} from "./internal/error-conversion.js";
+import { convertErrorPromise } from "./internal/error-conversion.js";
 
 /**
  * Starts a keep alive task for a given hub.

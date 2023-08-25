@@ -1,8 +1,4 @@
-import {
-    NackCode,
-    NativeRevHub,
-    Serial as SerialPort,
-} from "@rev-robotics/rhsplib";
+import { NackCode, NativeRevHub, Serial as SerialPort } from "@rev-robotics/rhsplib";
 import {
     BulkInputData,
     ClosedLoopControlAlgorithm,
@@ -33,7 +29,7 @@ import {
 import { closeSerialPort } from "../open-rev-hub.js";
 import { EventEmitter } from "events";
 import { startKeepAlive } from "../start-keep-alive.js";
-import {convertErrorPromise, convertErrorSync} from "./error-conversion.js";
+import { convertErrorPromise, convertErrorSync } from "./error-conversion.js";
 import { performance } from "perf_hooks";
 
 export class ExpansionHubInternal implements ExpansionHub {
@@ -702,11 +698,11 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     private async convertErrorPromise<T>(block: () => Promise<T>): Promise<T> {
-       return convertErrorPromise(this.serialNumber, block);
+        return convertErrorPromise(this.serialNumber, block);
     }
 
     private convertErrorSync<T>(block: () => T): T {
-      return convertErrorSync(this.serialNumber, block);
+        return convertErrorSync(this.serialNumber, block);
     }
 
     addChild(hub: RevHub): void {
