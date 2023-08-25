@@ -1,6 +1,6 @@
 {
     "name": "@rev-robotics/rhsplib",
-    "version": "2.0.1",
+    "version": "2.1.0",
     "author": "REV Robotics",
     "description": "Native node.js addon that facilitates low-level REV Hub Serial Protocol communication",
     "license": "BSD-3-Clause",
@@ -12,7 +12,7 @@
         "url": "git+https://github.com/REVrobotics/node-rhsplib.git"
     },
     "dependencies": {
-        "@rev-robotics/rev-hub-core": "^1.1.1",
+        "@rev-robotics/rev-hub-core": "^1.2.0",
         "cmake-js": "^7.2.1",
         "node-addon-api": "^6.0.0",
         "pkg-prebuilds": "^0.2.0"

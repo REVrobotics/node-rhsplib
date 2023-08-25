@@ -1,11 +1,11 @@
 {
     "name": "@rev-robotics/distance-sensor",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Library for using a REV Robotics 2m distance sensor with a REV Robotics Control Hub or Expansion Hub",
     "main": "dist/index.js",
     "type": "module",
     "dependencies": {
-        "@rev-robotics/rev-hub-core": "^1.1.1"
+        "@rev-robotics/rev-hub-core": "^1.2.0"
     },
     "devDependencies": {
         "@types/node": "^16.18.18",
