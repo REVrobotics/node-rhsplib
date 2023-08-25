@@ -5,3 +5,4 @@
 .yarn/
 .pnp.*
 packages/librhsp/librhsp
+package-lock.json
