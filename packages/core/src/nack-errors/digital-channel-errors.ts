@@ -1,4 +1,5 @@
-import { NackError, setPrototypeOf } from "./NackError.js";
+import { setPrototypeOf } from "../general-errors/set-prototype-of.js";
+import { NackError } from "./NackError.js";
 import { NackCode } from "./NackCode.js";
 
 export class DigitalChannelNotConfiguredForOutputError extends NackError {

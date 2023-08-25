@@ -20,6 +20,7 @@ import {
     UnableToOpenSerialError,
 } from "@rev-robotics/rev-hub-core";
 import { performance } from "perf_hooks";
+import {convertErrorPromise, convertErrorSync} from "./internal/error-conversion.js";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
@@ -41,51 +42,53 @@ export async function openParentExpansionHub(
     serialNumber: string,
     moduleAddress?: number,
 ): Promise<ParentExpansionHub> {
-    let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
+    return convertErrorPromise(serialNumber, async (): Promise<ParentExpansionHub> => {
+        let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
 
-    if (openSerialMap.get(serialPortPath) == undefined) {
-        openSerialMap.set(serialPortPath, await openSerialPort(serialPortPath));
-    }
-
-    let serialPort = openSerialMap.get(serialPortPath)!;
-
-    let parentHub = new ExpansionHubInternal(true, serialPort, serialNumber);
-
-    if (moduleAddress === undefined) {
-        let addresses: DiscoveredAddresses = await NativeRevHub.discoverRevHubs(
-            serialPort,
-        );
-        moduleAddress = addresses.parentAddress;
-    }
-
-    try {
-        await parentHub.open(moduleAddress);
-        // If discovery has not occurred on the hub, then we will
-        // need to send keep-alive signals until the hub responds.
-        // If we don't do this, the hub will be stuck waiting to
-        // find out if it's a parent or child and won't respond.
-        let startTime = performance.now();
-        while (true) {
-            try {
-                if (performance.now() - startTime >= 500) break;
-                await parentHub.sendKeepAlive();
-                break;
-            } catch (e) {}
+        if (openSerialMap.get(serialPortPath) == undefined) {
+            openSerialMap.set(serialPortPath, await openSerialPort(serialPortPath, serialNumber));
         }
-        await parentHub.queryInterface("DEKA");
-    } catch (e: any) {
-        if (e instanceof TimeoutError)
-            throw new NoExpansionHubWithAddressError(serialNumber, moduleAddress);
-    }
-    startKeepAlive(parentHub, 1000);
 
-    if (parentHub.isParent()) {
-        return parentHub;
-    } else {
-        throw new Error(
-            `Hub at ${serialNumber} with moduleAddress ${moduleAddress} is not a parent`,
-        );
-    }
+        let serialPort = openSerialMap.get(serialPortPath)!;
+
+        let parentHub = new ExpansionHubInternal(true, serialPort, serialNumber);
+
+        if (moduleAddress === undefined) {
+            let addresses: DiscoveredAddresses = await NativeRevHub.discoverRevHubs(
+                serialPort,
+            );
+            moduleAddress = addresses.parentAddress;
+        }
+
+        try {
+            await parentHub.open(moduleAddress);
+            // If discovery has not occurred on the hub, then we will
+            // need to send keep-alive signals until the hub responds.
+            // If we don't do this, the hub will be stuck waiting to
+            // find out if it's a parent or child and won't respond.
+            let startTime = performance.now();
+            while (true) {
+                try {
+                    if (performance.now() - startTime >= 500) break;
+                    await parentHub.sendKeepAlive();
+                    break;
+                } catch (e) {}
+            }
+            await parentHub.queryInterface("DEKA");
+        } catch (e: any) {
+            if (e instanceof TimeoutError)
+                throw new NoExpansionHubWithAddressError(serialNumber, moduleAddress);
+        }
+        startKeepAlive(parentHub, 1000);
+
+        if (parentHub.isParent()) {
+            return parentHub;
+        } else {
+            throw new Error(
+                `Hub at ${serialNumber} with moduleAddress ${moduleAddress} is not a parent`,
+            );
+        }
+    });
 }
 
 /**
@@ -97,23 +100,25 @@ export async function openParentExpansionHub(
 export async function openExpansionHubAndAllChildren(
     serialNumber: string,
 ): Promise<ParentExpansionHub> {
-    let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
+    return convertErrorPromise(serialNumber, async (): Promise<ParentExpansionHub> => {
+        let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
 
-    if (openSerialMap.get(serialPortPath) == undefined) {
-        openSerialMap.set(serialPortPath, await openSerialPort(serialPortPath));
-    }
+        if (openSerialMap.get(serialPortPath) == undefined) {
+            openSerialMap.set(serialPortPath, await openSerialPort(serialPortPath, serialNumber));
+        }
 
-    let serialPort = openSerialMap.get(serialPortPath)!;
+        let serialPort = openSerialMap.get(serialPortPath)!;
 
-    let discoveredModules = await NativeRevHub.discoverRevHubs(serialPort);
-    let parentAddress = discoveredModules.parentAddress;
-    let parentHub = await openParentExpansionHub(serialNumber, parentAddress);
+        let discoveredModules = await NativeRevHub.discoverRevHubs(serialPort);
+        let parentAddress = discoveredModules.parentAddress;
+        let parentHub = await openParentExpansionHub(serialNumber, parentAddress);
 
-    for (let address of discoveredModules.childAddresses) {
-        await parentHub.addChildByAddress(address);
-    }
+        for (let address of discoveredModules.childAddresses) {
+            await parentHub.addChildByAddress(address);
+        }
 
-    return parentHub;
+        return parentHub;
+    });
 }
 
 /**
@@ -145,33 +150,38 @@ export function closeSerialPort(serialPort: typeof NativeSerial) {
             openSerialMap.delete(path);
         }
     }
-    serialPort.close();
+
+    convertErrorSync(serialPort.serialNumber, () => serialPort.close());
 }
 
-async function openSerialPort(serialPortPath: string): Promise<typeof NativeSerial> {
-    let serial = new NativeSerial();
-    try {
-        await serial.open(
-            serialPortPath,
-            460800,
-            8,
-            SerialParity.None,
-            1,
-            SerialFlowControl.None,
-        );
-    } catch (e: any) {
-        let code = e.errorCode;
-        if (code == SerialErrorCode.INVALID_ARGS) {
-            throw new InvalidSerialArguments(serialPortPath);
-        } else if (code == SerialErrorCode.UNABLE_TO_OPEN) {
-            throw new UnableToOpenSerialError(serialPortPath);
-        } else if (code == SerialErrorCode.CONFIGURATION_ERROR) {
-            throw new SerialConfigurationError(serialPortPath);
-        } else if (code == SerialErrorCode.IO_ERROR) {
-            throw new SerialIoError(serialPortPath);
-        } else if (code == SerialErrorCode.GENERAL_ERROR) {
-            throw new GeneralSerialError(serialPortPath);
+async function openSerialPort(serialPortPath: string, serialNumber: string | undefined): Promise<typeof NativeSerial> {
+    return convertErrorPromise(serialNumber, async (): Promise<typeof NativeSerial> => {
+        let serial = new NativeSerial();
+        try {
+            await serial.open(
+                serialPortPath,
+                460800,
+                8,
+                SerialParity.None,
+                1,
+                SerialFlowControl.None,
+            );
+        } catch (e: any) {
+            let code = e.errorCode;
+            if (code == SerialErrorCode.INVALID_ARGS) {
+                throw new InvalidSerialArguments(serialPortPath);
+            } else if (code == SerialErrorCode.UNABLE_TO_OPEN) {
+                throw new UnableToOpenSerialError(serialPortPath);
+            } else if (code == SerialErrorCode.CONFIGURATION_ERROR) {
+                throw new SerialConfigurationError(serialPortPath);
+            } else if (code == SerialErrorCode.IO_ERROR) {
+                throw new SerialIoError(serialPortPath);
+            } else if (code == SerialErrorCode.GENERAL_ERROR) {
+                throw new GeneralSerialError(serialPortPath);
+            } else {
+                throw e;
+            }
         }
-    }
-    return serial;
+        return serial;
+    });
 }

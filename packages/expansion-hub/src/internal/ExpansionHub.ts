@@ -1,18 +1,15 @@
 import {
     NackCode,
     NativeRevHub,
-    RhspLibErrorCode,
     Serial as SerialPort,
 } from "@rev-robotics/rhsplib";
 import {
     BulkInputData,
     ClosedLoopControlAlgorithm,
-    CommandNotSupportedError,
     DebugGroup,
     DigitalChannelDirection,
     DigitalState,
     ExpansionHub,
-    GeneralSerialError,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
@@ -20,7 +17,6 @@ import {
     ModuleInterface,
     ModuleStatus,
     MotorMode,
-    nackCodeToError,
     NoExpansionHubWithAddressError,
     ParameterOutOfRangeError,
     I2cOperationInProgressError,
@@ -36,8 +32,8 @@ import {
 } from "@rev-robotics/rev-hub-core";
 import { closeSerialPort } from "../open-rev-hub.js";
 import { EventEmitter } from "events";
-import { RhspLibError } from "../errors/RhspLibError.js";
 import { startKeepAlive } from "../start-keep-alive.js";
+import {convertErrorPromise, convertErrorSync} from "./error-conversion.js";
 import { performance } from "perf_hooks";
 
 export class ExpansionHubInternal implements ExpansionHub {
@@ -706,49 +702,11 @@ export class ExpansionHubInternal implements ExpansionHub {
     }
 
     private async convertErrorPromise<T>(block: () => Promise<T>): Promise<T> {
-        try {
-            return await block();
-        } catch (e: any) {
-            throw this.createError(e);
-        }
+       return convertErrorPromise(this.serialNumber, block);
     }
 
     private convertErrorSync<T>(block: () => T): T {
-        try {
-            return block();
-        } catch (e: any) {
-            throw this.createError(e);
-        }
-    }
-
-    private createError(e: any): any {
-        if (e.errorCode == RhspLibErrorCode.GENERAL_ERROR) {
-            return new RhspLibError("General librhsp error");
-        } else if (e.errorCode == RhspLibErrorCode.MSG_NUMBER_MISMATCH) {
-            return new RhspLibError("Message Number Mismatch");
-        } else if (e.errorCode == RhspLibErrorCode.NOT_OPENED) {
-            return new RhspLibError("Hub is not opened");
-        } else if (e.errorCode == RhspLibErrorCode.COMMAND_NOT_SUPPORTED) {
-            return new CommandNotSupportedError();
-        } else if (e.errorCode == RhspLibErrorCode.UNEXPECTED_RESPONSE) {
-            return new RhspLibError("Unexpected packet received");
-        } else if (e.errorCode == RhspLibErrorCode.TIMEOUT) {
-            return new TimeoutError();
-        } else if (e.errorCode == RhspLibErrorCode.SERIAL_ERROR) {
-            return new GeneralSerialError(
-                this.serialNumber ?? "no serial number provided",
-            );
-        } else if (
-            e.errorCode >= RhspLibErrorCode.ARG_OUT_OF_RANGE_END &&
-            e.errorCode <= RhspLibErrorCode.ARG_OUT_OF_RANGE_START
-        ) {
-            let index = -e.errorCode + RhspLibErrorCode.ARG_OUT_OF_RANGE_START;
-            return new ParameterOutOfRangeError(index);
-        } else if (e.nackCode !== undefined) {
-            return nackCodeToError(e.nackCode);
-        } else {
-            return e;
-        }
+      return convertErrorSync(this.serialNumber, block);
     }
 
     addChild(hub: RevHub): void {

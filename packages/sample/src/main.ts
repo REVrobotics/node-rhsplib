@@ -720,7 +720,12 @@ program
         await runServo(hub, channelValue, pulseWidthValue, frameWidthValue);
     });
 
-program.parse(process.argv);
+try {
+    await program.parseAsync(process.argv);
+} catch (e) {
+    console.error("Encountered unexpected error:")
+    console.error(e);
+}
 
 /**
  * Returns the expansion hub referred to by the options provided to the program.
