@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.7)
 
+# Opt-in to new behaviors surrounding VERSION variables
+cmake_policy(SET CMP0048 NEW)
+
 message(STATUS "requested c-compiler:'${CMAKE_C_COMPILER}'")
-project(rhsp VERSION 2.0.0 LANGUAGES C CXX)
+project(rhsp VERSION 3.0.0 LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
