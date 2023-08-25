@@ -23,6 +23,7 @@ export {
     DiscoveredAddresses,
     ExpansionHub,
     GeneralSerialError,
+    HubNotRespondingError,
     I2CReadStatus,
     I2CSpeedCode,
     I2CWriteStatus,
