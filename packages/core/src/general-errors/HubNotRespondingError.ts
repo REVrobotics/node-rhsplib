@@ -1,4 +1,4 @@
-import {RevHubError} from "./RevHubError.js";
+import { RevHubError } from "./RevHubError.js";
 
 export class HubNotRespondingError extends RevHubError {
     constructor(message: string) {

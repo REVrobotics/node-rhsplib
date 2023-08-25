@@ -21,8 +21,8 @@ import {
     VerbosityLevel,
     Version,
 } from "@rev-robotics/rev-hub-core";
-import {SerialParity} from "./SerialParity.js";
-import {SerialFlowControl} from "./SerialFlowControl.js";
+import { SerialParity } from "./SerialParity.js";
+import { SerialFlowControl } from "./SerialFlowControl.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -30,10 +30,7 @@ const require = createRequire(import.meta.url);
 
 let bindingOptions = require("../binding-options.cjs");
 
-const addon = require("pkg-prebuilds")(
-    path.join(__dirname, ".."),
-    bindingOptions
-);
+const addon = require("pkg-prebuilds")(path.join(__dirname, ".."), bindingOptions);
 
 export * from "./RhspLibErrorCode.js";
 export * from "./SerialErrorCode.js";

@@ -20,7 +20,7 @@ import {
     UnableToOpenSerialError,
 } from "@rev-robotics/rev-hub-core";
 import { performance } from "perf_hooks";
-import {convertErrorPromise, convertErrorSync} from "./internal/error-conversion.js";
+import { convertErrorPromise, convertErrorSync } from "./internal/error-conversion.js";
 
 /**
  * Maps the serial port path (/dev/tty1 or COM3 for example) to an open
@@ -46,7 +46,10 @@ export async function openParentExpansionHub(
         let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
 
         if (openSerialMap.get(serialPortPath) == undefined) {
-            openSerialMap.set(serialPortPath, await openSerialPort(serialPortPath, serialNumber));
+            openSerialMap.set(
+                serialPortPath,
+                await openSerialPort(serialPortPath, serialNumber),
+            );
         }
 
         let serialPort = openSerialMap.get(serialPortPath)!;
@@ -104,7 +107,10 @@ export async function openExpansionHubAndAllChildren(
         let serialPortPath = await getSerialPortPathForExHubSerial(serialNumber);
 
         if (openSerialMap.get(serialPortPath) == undefined) {
-            openSerialMap.set(serialPortPath, await openSerialPort(serialPortPath, serialNumber));
+            openSerialMap.set(
+                serialPortPath,
+                await openSerialPort(serialPortPath, serialNumber),
+            );
         }
 
         let serialPort = openSerialMap.get(serialPortPath)!;
@@ -154,7 +160,10 @@ export function closeSerialPort(serialPort: typeof NativeSerial) {
     convertErrorSync(serialPort.serialNumber, () => serialPort.close());
 }
 
-async function openSerialPort(serialPortPath: string, serialNumber: string | undefined): Promise<typeof NativeSerial> {
+async function openSerialPort(
+    serialPortPath: string,
+    serialNumber: string | undefined,
+): Promise<typeof NativeSerial> {
     return convertErrorPromise(serialNumber, async (): Promise<typeof NativeSerial> => {
         let serial = new NativeSerial();
         try {

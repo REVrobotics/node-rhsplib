@@ -1,15 +1,18 @@
-import {RhspLibErrorCode} from "@rev-robotics/rhsplib";
-import {RhspLibError} from "../errors/RhspLibError.js";
+import { RhspLibErrorCode } from "@rev-robotics/rhsplib";
+import { RhspLibError } from "../errors/RhspLibError.js";
 import {
     CommandNotSupportedError,
     GeneralSerialError,
     HubNotRespondingError,
     nackCodeToError,
     ParameterOutOfRangeError,
-    TimeoutError
+    TimeoutError,
 } from "@rev-robotics/rev-hub-core";
 
-export async function convertErrorPromise<T>(serialNumber: string | undefined, block: () => Promise<T>): Promise<T> {
+export async function convertErrorPromise<T>(
+    serialNumber: string | undefined,
+    block: () => Promise<T>,
+): Promise<T> {
     try {
         return await block();
     } catch (e: any) {
@@ -45,12 +48,12 @@ function createError(e: any, serialNumber: string | undefined): any {
         } else if (errorCode == RhspLibErrorCode.TIMEOUT) {
             return new TimeoutError();
         } else if (errorCode == RhspLibErrorCode.NO_HUBS_DISCOVERED) {
-            return new HubNotRespondingError(`The REV Hub with serial number ${serialNumber} did not respond when spoken to. ` +
-                `It may be soft-bricked and need its firmware re-installed.`);
-        } else if (errorCode == RhspLibErrorCode.SERIAL_ERROR) {
-            return new GeneralSerialError(
-                serialNumber ?? "no serial number provided",
+            return new HubNotRespondingError(
+                `The REV Hub with serial number ${serialNumber} did not respond when spoken to. ` +
+                    `It may be soft-bricked and need its firmware re-installed.`,
             );
+        } else if (errorCode == RhspLibErrorCode.SERIAL_ERROR) {
+            return new GeneralSerialError(serialNumber ?? "no serial number provided");
         } else if (
             errorCode >= RhspLibErrorCode.ARG_OUT_OF_RANGE_END &&
             errorCode <= RhspLibErrorCode.ARG_OUT_OF_RANGE_START

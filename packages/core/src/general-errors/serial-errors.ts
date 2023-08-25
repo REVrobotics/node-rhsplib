@@ -1,5 +1,5 @@
 import { setPrototypeOf } from "./set-prototype-of.js";
-import {RevHubError} from "./RevHubError.js";
+import { RevHubError } from "./RevHubError.js";
 
 export class UnableToOpenSerialError extends RevHubError {
     constructor(serialPort: string) {

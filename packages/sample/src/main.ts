@@ -723,7 +723,7 @@ program
 try {
     await program.parseAsync(process.argv);
 } catch (e) {
-    console.error("Encountered unexpected error:")
+    console.error("Encountered unexpected error:");
     console.error(e);
 }
 
