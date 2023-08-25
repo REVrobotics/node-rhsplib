@@ -5,7 +5,6 @@
 #define RHSP_RESULT_OK                                      0
 #define RHSP_RESULT_ATTENTION_REQUIRED                      1 // returned if the device needs getStatus command
 #define RHSP_RESULT_DISCOVERY_MULTIPLE_PARENTS_DETECTED     2
-#define RHSP_RESULT_DISCOVERY_NO_PARENT_DETECTED            3
 
 // Errors
 #define RHSP_ERROR                          -1 // unrecognized or unspecified error
@@ -16,6 +15,7 @@
 #define RHSP_ERROR_NOT_OPENED               -6 // error when module is not opened
 #define RHSP_ERROR_COMMAND_NOT_SUPPORTED    -7 // command is not supported by module
 #define RHSP_ERROR_UNEXPECTED_RESPONSE      -8 // error when we've received unexpected packet
+#define RHSP_ERROR_NO_HUBS_DISCOVERED       -9 // discovery failed to find any modules
 
 // out of range errors
 #define RHSP_ERROR_ARG_0_OUT_OF_RANGE       -50 // zero arg is out of range

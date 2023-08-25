@@ -229,8 +229,8 @@ int rhsp_setDebugLogLevel(RhspRevHub* hub,
  *
  * @return RHSP_RESULT_OK in case success
  *
- * @note This function may return RHSP_RESULT_DISCOVERY_MULTIPLE_PARENTS_DETECTED when there are several parents that is not normal
- *       or RHSP_RESULT_DISCOVERY_NO_PARENT_DETECTED when we have no parent (we need only one parent always)
+ * @note This function may return RHSP_RESULT_DISCOVERY_MULTIPLE_PARENTS_DETECTED when there are several parents (should never happen)
+ *       or RHSP_ERROR_NO_HUBS_DISCOVERED when we have no parent (we need only one parent always)
  *
  * */
 int rhsp_discoverRevHubs(RhspSerial* serialPort, RhspDiscoveredAddresses* discoveredAddresses);
