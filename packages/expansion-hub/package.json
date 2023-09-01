@@ -7,7 +7,7 @@
     "dependencies": {
         "@rev-robotics/rev-hub-core": "^1.2.0",
         "@rev-robotics/rhsplib": "^2.1.0",
-        "serialport": "^10.5.0"
+        "serialport": "^12.0.0"
     },
     "devDependencies": {
         "@types/node": "^16.18.18",
