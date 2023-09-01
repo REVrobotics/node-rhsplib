@@ -36,6 +36,11 @@ const allLightFixtures = [RED_OXYGEN_GOAL, RED_BUTTON, BLUE_OXYGEN_GOAL, BLUE_BU
 
 let expansionHub: ExpansionHub = (await openConnectedExpansionHubs())[0];
 
+expansionHub.on("error", (e: any) => {
+    console.log("Expansion Hub reported error");
+    console.log(e);
+});
+
 process.on("SIGINT", () => {
     console.log("Exiting");
     expansionHub.close();
