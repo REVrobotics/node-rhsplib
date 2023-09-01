@@ -1,8 +1,11 @@
 import { openConnectedExpansionHubs } from "@rev-robotics/expansion-hub";
-import {ExpansionHub} from "@rev-robotics/rev-hub-core";
-import { input } from '@inquirer/prompts';
+import { ExpansionHub } from "@rev-robotics/rev-hub-core";
+import { input } from "@inquirer/prompts";
 
-enum RevHub { CONTROL_HUB, EXPANSION_HUB}
+enum RevHub {
+    CONTROL_HUB,
+    EXPANSION_HUB,
+}
 
 interface LightFixture {
     revHub: RevHub;
@@ -12,14 +15,24 @@ interface LightFixture {
 const RED_OXYGEN_GOAL: LightFixture = {
     revHub: RevHub.EXPANSION_HUB,
     blinkinPort: 0,
-}
+};
+
+const RED_BUTTON: LightFixture = {
+    revHub: RevHub.EXPANSION_HUB,
+    blinkinPort: 1,
+};
 
 const BLUE_OXYGEN_GOAL: LightFixture = {
     revHub: RevHub.EXPANSION_HUB,
-    blinkinPort: 1,
-}
+    blinkinPort: 3,
+};
 
-const allLightFixtures = [RED_OXYGEN_GOAL, BLUE_OXYGEN_GOAL];
+const BLUE_BUTTON: LightFixture = {
+    revHub: RevHub.EXPANSION_HUB,
+    blinkinPort: 0,
+};
+
+const allLightFixtures = [RED_OXYGEN_GOAL, RED_BUTTON, BLUE_OXYGEN_GOAL, BLUE_BUTTON];
 
 let expansionHub: ExpansionHub = (await openConnectedExpansionHubs())[0];
 
