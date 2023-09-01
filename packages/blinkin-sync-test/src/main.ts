@@ -49,8 +49,8 @@ for (const lightFixture of allLightFixtures) {
 // noinspection InfiniteLoopJS
 while (true) {
     try {
-        const commandString = await input({ message: "<pulse width> [goal]:"});
-        const commandElements = commandString.split(' ');
+        const commandString = await input({ message: "<pulse width> [goal]:" });
+        const commandElements = commandString.split(" ");
 
         if (commandElements.length == 0) {
             continue;
@@ -62,7 +62,7 @@ while (true) {
             continue;
         }
 
-        const goal = commandElements.slice(1).join(' ').toLowerCase();
+        const goal = commandElements.slice(1).join(" ").toLowerCase();
 
         let lightFixtures: LightFixture[];
         if (goal.length === 0 || goal == "all") {
