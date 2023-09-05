@@ -29,7 +29,7 @@ const BLUE_OXYGEN_GOAL: LightFixture = {
 
 const BLUE_BUTTON: LightFixture = {
     revHub: RevHub.EXPANSION_HUB,
-    blinkinPort: 0,
+    blinkinPort: 4,
 };
 
 const allLightFixtures = [RED_OXYGEN_GOAL, RED_BUTTON, BLUE_OXYGEN_GOAL, BLUE_BUTTON];
