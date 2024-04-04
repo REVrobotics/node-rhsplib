@@ -240,3 +240,7 @@ void RHSPlib_serial_close(RHSPlib_Serial_T* serial)
         }
     }
 }
+
+int RHSPlib_getLastOsError(void) {
+    return (int) GetLastError();
+}

@@ -10,6 +10,7 @@
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
+#include <errno.h>
 
 //#include "RHSPlib_compiler.h"
 #include "RHSPlib_serial.h"
@@ -232,3 +233,6 @@ void RHSPlib_serial_close(RHSPlib_Serial_T *serial)
     serial->fd = -1;
 }
 
+int RHSPlib_getLastOsError(void) {
+    return errno;
+}

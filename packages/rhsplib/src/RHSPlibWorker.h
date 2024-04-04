@@ -21,7 +21,7 @@
  */
 #define CREATE_WORKER(NAME, ENV, RETURN, FUNCTION_BODY) \
     auto NAME = new RHSPlibWorker<RETURN>(ENV, [=         \
-    ](int &_code, RETURN &_data, uint8_t &_nackCode) mutable FUNCTION_BODY)
+    ](int &_code, RETURN &_data, uint8_t &_nackCode, int &_osErrorCode) mutable FUNCTION_BODY)
 
 /**
  * @brief Create a worker whose work function does not return a value (void).
@@ -33,7 +33,7 @@
  */
 #define CREATE_VOID_WORKER(NAME, ENV, FUNCTION_BODY) \
     auto NAME = new RHSPlibWorker<void>(               \
-        ENV, [=](int &_code, uint8_t &_nackCode) mutable FUNCTION_BODY)
+        ENV, [=](int &_code, uint8_t &_nackCode, int &_osErrorCode) mutable FUNCTION_BODY)
 
 /**
  * @brief Set the callback function for a worker.
@@ -118,7 +118,7 @@ class RHSPlibWorker : public Napi::AsyncWorker, public RHSPlibWorkerBase {
      */
     void Execute() override {
         std::scoped_lock<std::mutex> lock{m_mutex};
-        workFunction(resultCode, returnData, nackCode);
+        workFunction(resultCode, returnData, nackCode, osErrorCode);
     }
 
     /**
@@ -147,12 +147,13 @@ class RHSPlibWorker : public Napi::AsyncWorker, public RHSPlibWorkerBase {
     void OnError(const Napi::Error &e) override { deferred.Reject(e.Value()); }
 
   private:
-    std::function<void(int &, TReturn &, uint8_t &)> workFunction;
+    std::function<void(int &, TReturn &, uint8_t &, int &)> workFunction;
     std::function<Napi::Value(Napi::Env, int &, TReturn &)> callbackFunction;
     Napi::Promise::Deferred deferred;
     TReturn returnData;
     int resultCode;
     uint8_t nackCode;
+    int osErrorCode;
 };
 
 /**
@@ -194,7 +195,7 @@ class RHSPlibWorker<void> : public Napi::AsyncWorker, public RHSPlibWorkerBase {
      */
     void Execute() override {
         std::scoped_lock<std::mutex> lock{m_mutex};
-        workFunction(resultCode, nackCode);
+        workFunction(resultCode, nackCode, osErrorCode);
     }
 
     /**
@@ -210,6 +211,9 @@ class RHSPlibWorker<void> : public Napi::AsyncWorker, public RHSPlibWorkerBase {
             if (resultCode == RHSPLIB_ERROR_NACK_RECEIVED) {
                 errorObj.Set("nackCode", nackCode);
             }
+            if(resultCode != 0) {
+                errorObj.Set("osErrorCode", osErrorCode);
+            }
             deferred.Reject(errorObj);
         }
     }
@@ -222,10 +226,11 @@ class RHSPlibWorker<void> : public Napi::AsyncWorker, public RHSPlibWorkerBase {
     void OnError(const Napi::Error &e) override { deferred.Reject(e.Value()); }
 
   private:
-    std::function<void(int &, uint8_t &)> workFunction;
+    std::function<void(int &, uint8_t &, int&)> workFunction;
     Napi::Promise::Deferred deferred;
     int resultCode;
     uint8_t nackCode;
+    int osErrorCode;
 };
 
 #endif

@@ -10,6 +10,7 @@
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
+#include <errno.h>
 
 //#include "RHSPlib_compiler.h"
 #include "RHSPlib_serial.h"
@@ -330,4 +331,6 @@ static int baudrateToBits(uint32_t baudrate) {
     }
 }
 
-
+int RHSPlib_getLastOsError(void) {
+    return (int) GetLastError();
+}

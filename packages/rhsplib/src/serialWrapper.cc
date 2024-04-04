@@ -49,6 +49,10 @@ Napi::Value Serial::open(const Napi::CallbackInfo &info) {
         const char *serialPortName = serialPortNameStr.c_str();
         _code = RHSPlib_serial_open(&this->serialPort, serialPortName, baudrate,
                                     databits, parity, stopbits, flowControl);
+
+        if(_code != 0) {
+            _osErrorCode = RHSPlib_getLastOsError();
+        }
     });
 
     QUEUE_WORKER(worker);

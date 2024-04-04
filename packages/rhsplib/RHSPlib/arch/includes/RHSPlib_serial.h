@@ -113,6 +113,12 @@ int RHSPlib_serial_write(RHSPlib_Serial_T *serial, const uint8_t *buffer, size_t
  * */
 void RHSPlib_serial_close(RHSPlib_Serial_T *serial);
 
+/**
+ * @brief Get the last error code from the OS.
+ * This is errno on unix, and GetLastError on windows.
+ * */
+int RHSPlib_getLastOsError(void);
+
 #ifdef __cplusplus
 }
 #endif
