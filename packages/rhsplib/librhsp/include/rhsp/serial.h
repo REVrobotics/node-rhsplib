@@ -113,6 +113,12 @@ int rhsp_serialWrite(RhspSerial* serial, const uint8_t* buffer, size_t bytesToWr
  * */
 void rhsp_serialClose(RhspSerial* serial);
 
+/**
+ * @brief Get the last error code from the OS.
+ * This is errno on unix, and GetLastError on windows.
+ * */
+int rhsp_getLastOsError();
+
 #ifdef __cplusplus
 }
 #endif

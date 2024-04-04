@@ -109,9 +109,18 @@ int rhsp_serialOpen(RhspSerial* serial,
     {
         return RHSP_SERIAL_ERROR;
     }
+
+    char modifiedSerialPortName[20];
+
+    // if the user has already prefixed the workaround, don't add it again
+    if(serialPort[0] == '\\') {
+        strncpy(modifiedSerialPortName, serialPort, 20);
+    } else {
+        snprintf(modifiedSerialPortName, 20, "\\\\.\\%s", serialPort);
+    }
     
     /* Try to open specified COM-port */
-    serial->handle = CreateFile(serialPort,
+    serial->handle = CreateFile(modifiedSerialPortName,
                                 GENERIC_READ | GENERIC_WRITE,
                                 0,      //  must be opened with exclusive-access
                                 NULL,   //  default security attributes
@@ -241,4 +250,8 @@ void rhsp_serialClose(RhspSerial* serial)
             serial->handle = INVALID_HANDLE_VALUE;
         }
     }
+}
+
+int rhsp_getLastOsError(void) {
+    return (int) GetLastError();
 }

@@ -9,6 +9,7 @@
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "rhsp/serial.h"
 
@@ -359,4 +360,6 @@ static int baudrateToBits(uint32_t baudrate)
     }
 }
 
-
+int rhsp_getLastOsError() {
+    return errno;
+}
