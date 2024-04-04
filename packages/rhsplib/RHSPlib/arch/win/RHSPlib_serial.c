@@ -107,9 +107,12 @@ int RHSPlib_serial_open(RHSPlib_Serial_T* serial, const char* serialPortName,
     {
         return RHSPLIB_SERIAL_ERROR;
     }
+
+    char modifiedSerialPortName[20];
+    snprintf(modifiedSerialPortName, 20, "\\\\.\\%s", serialPortName);
     
     /* Try to open specified COM-port */
-    serial->handle = CreateFile(serialPortName,
+    serial->handle = CreateFile(modifiedSerialPortName,
                                 GENERIC_READ | GENERIC_WRITE,
                                 0,      //  must be opened with exclusive-access
                                 NULL,   //  default security attributes
