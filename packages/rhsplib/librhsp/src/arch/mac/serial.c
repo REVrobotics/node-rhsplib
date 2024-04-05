@@ -9,6 +9,7 @@
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "rhsp/serial.h"
 
@@ -226,5 +227,9 @@ void rhsp_serialClose(RhspSerial* serial)
         return;
     }
     serial->fd = -1;
+}
+
+int rhsp_getLastOsError() {
+    return errno;
 }
 
